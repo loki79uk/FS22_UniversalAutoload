@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="61">
+
+    <author>Loki_79</author>
+    <version>1.0.0.0</version>
+	
+    <title>
+        <en>Universal Autoload</en>
+    </title>
+	
+    <description>
+        <en>Configurable autoloading specialsiation for all flatbed trailers</en>
+    </description>
+	
+	<multiplayer supported="true" />
+	<iconFilename>modIcon.dds</iconFilename>
+	
+	<extraSourceFiles>
+        <sourceFile filename="UniversalAutoloadInstaller.lua" />
+    </extraSourceFiles>
+	
+ 	<actions>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_SELECT_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+	</actions>
+	
+	<inputBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_r" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_i" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_u" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_TYPES_FW" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_TYPES_BW" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
+		</actionBinding>
+	</inputBinding>
+	
+	<l10n>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
+			<en>Toggle loading</en>
+			<de>Laden umschalten</de>
+			<fr>Basculer le chargement</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
+			<en>Unload</en>
+			<de>Auskippen</de>
+			<fr>Décharger</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
+			<en>Toggle loading filter</en>
+			<de>Filter laden umschalten</de>
+			<fr>Basculer le sélection de chargement</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL">
+			<en>Select all loading types</en>
+			<de>Alle Ladearten auswählen</de>
+			<fr>Sélectionner tous types de chargement</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_TYPES_FW">
+			<en>Cycle loading type</en>
+			<de>Zyklusladeart</de>
+			<fr>Type de chargement de cycle</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_TYPES_BW">
+			<en>Cycle loading type back</en>
+			<de>Zyklusladeart zurück</de>
+			<fr>Type de chargement de cycle retour</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
+			<en>Toggle unloading side</en>
+			<de>Aktive entladeseite umschalten</de>
+			<fr>Basculer le côté actif</fr>
+		</text>
+		
+		<text name="universalAutoload_tipside">
+			<en>Unloading side</en>
+			<de>Aktive entladeseite</de>
+			<fr>Côté actif</fr>
+		</text>
+		<text name="universalAutoload_left">
+			<en>LEFT</en>
+			<de>LINKS</de>
+			<fr>GAUCHE</fr>
+		</text>
+		<text name="universalAutoload_right">
+			<en>RIGHT</en>
+			<de>RECHTS</de>
+			<fr>DROIT</fr>
+		</text>
+		<text name="universalAutoload_none">
+			<en>NONE</en>
+			<de>KEINE</de>
+			<fr>AUCUN</fr>
+		</text>
+		<text name="universalAutoload_loadingFilter">
+			<en>Loading filter</en>
+			<de>Filter laden</de>
+			<fr>Sélection de chargement</fr>
+		</text>
+		<text name="universalAutoload_enabled">
+			<en>FULL ONLY</en>
+			<de>NUR FULL</de>
+			<fr>COMPLET UNIQUEMENT</fr>
+		</text>
+		<text name="universalAutoload_disabled">
+			<en>ANY</en>
+			<de>JEDE</de>
+			<fr>TOUT</fr>
+		</text>
+		<text name="universalAutoload_startLoading">
+			<en>Start loading</en>
+			<de>Laden starten</de>
+			<fr>Démarrer chargement</fr>
+		</text>
+		<text name="universalAutoload_stopLoading">
+			<en>Stop loading</en>
+			<de>Laden stoppen</de>
+			<fr>Arrêter le chargement</fr>
+		</text>
+		<text name="universalAutoload_unloadAll">
+			<en>Unload</en>
+			<de>Auskippen</de>
+			<fr>Décharger</fr>
+		</text>
+		<text name="universalAutoload_loadingType">
+			<en>Loading type</en>
+			<de>Ladungsart</de>
+			<fr>Type de chargement</fr>
+		</text>
+		<text name="universalAutoload_ALL">
+			<en>ALL</en>
+			<de>ALLE</de>
+			<fr>TOUS</fr>
+		</text>
+		<text name="universalAutoload_LIQUID_TANK">
+			<en>LIQUID TANK</en>
+			<de>FLÜSSIGKEITSTANK</de>
+			<fr>RÉSERVOIR DE LIQUIDE</fr>
+		</text>
+		<text name="universalAutoload_EURO_PALLET">
+			<en>EURO PALLET</en>
+			<de>EURO-PALETTE</de>
+			<fr>PALETTE EURO</fr>
+		</text>
+		<text name="universalAutoload_PIONEER_PALLET">
+			<en>PIONEER PALLET</en>
+			<de>PIONEER-PALETTE</de>
+			<fr>PALETTE PIONEER</fr>
+		</text>
+		<text name="universalAutoload_BIGBAG_PALLET">
+			<en>BIGBAG PALLET</en>
+			<de>BIGBAG-PALETTE</de>
+			<fr>PALETTE DE BIG BAG</fr>
+		</text>
+		<text name="universalAutoload_BIGBAG">
+			<en>BIGBAG</en>
+			<de>BIGBAG</de>
+			<fr>BIG BAG</fr>
+		</text>
+		<text name="universalAutoload_POTATOBOX">
+			<en>POTATO BOX</en>
+			<de>KARTOFFELKISTE</de>
+			<fr>PALOX POMMES DE TERRE</fr>
+		</text>
+		<text name="universalAutoload_BALE">
+			<en>BALE</en>
+			<de>BALE</de>
+			<fr>BALLE</fr>
+		</text>
+		<text name="universalAutoload_ROUND_BALE">
+			<en>ROUND BALE</en>
+			<de>RUNDBALLEN</de>
+			<fr>BALLE RONDE</fr>
+		</text>
+		<text name="universalAutoload_SQUARE_BALE">
+			<en>SQUARE BALE</en>
+			<de>QUADRATBALE</de>
+			<fr>BALLE CARRÉE</fr>
+		</text>
+	</l10n>
+	
+	<i3dMappings>
+        <i3dMapping id="AutoloadTriggers" node="0>"/>
+        <i3dMapping id="pickupTriggerLeft" node="0>0" />
+        <i3dMapping id="triggerNode" node="0>1" />
+        <i3dMapping id="pickupTriggerRight" node="0>2" />
+    </i3dMappings>
+	
+</modDesc>

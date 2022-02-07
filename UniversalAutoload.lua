@@ -120,7 +120,10 @@ function UniversalAutoload.getPalletTypeName(object)
 		objectType = "EURO_PALLET"
 	elseif
 		g_modIsLoaded['FS22_Seedpotato_Farm_Pack'] and
-		string.find(object.i3dFilename, "PotatoBox.i3d") then
+		string.find(object.i3dFilename, "PotatoBox.i3d") or
+		string.find(object.i3dFilename, "Potatoboxwaste.i3d") or
+		string.find(object.i3dFilename, "Potatoboxmedium.i3d") or
+		string.find(object.i3dFilename, "Potatoboxpremium.i3d") then
 		objectType = "POTATOBOX"
 	else
 		print("UNKNOWN PALLET TYPE...")
@@ -1075,6 +1078,19 @@ function UniversalAutoload:onLoad(savegame)
 				addTrigger(rearTrigger.node, "rearLoadingTriggerCallback", self)
 			end
 		end
+		
+
+		--server only
+		spec.currentLoadLength = 0
+
+		spec.isLoading = false
+		spec.isUnloading = false
+		spec.doPostLoadDelay = false
+		spec.doSetTensionBelts = false
+		spec.totalLoadCount = 0
+		spec.totalUnloadCount = 0
+		spec.validLoadCount = 0
+		spec.validUnloadCount = 0
 
 	end
 
@@ -1082,6 +1098,12 @@ function UniversalAutoload:onLoad(savegame)
 	spec.actionEvents = {}
 	spec.playerInTrigger = {}
 	
+	--client+server
+	spec.currentTipside = "left"
+	spec.currentLoadside = "both"
+	spec.currentTypeIndex = 1
+	spec.currentLoadingFilter = true
+
 	-- if not self.isClient then
 		-- SpecializationUtil.removeEventListener(self, "onDelete", UniversalAutoload)
 		-- SpecializationUtil.removeEventListener(self, "onUpdate", UniversalAutoload)

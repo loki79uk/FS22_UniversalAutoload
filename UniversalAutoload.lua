@@ -341,7 +341,7 @@ function UniversalAutoload:updateActionEventKeys()
 		local spec = self.spec_universalAutoload
 		
 		if spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
-			print("updateActionEventKeys: "..self:getFullName())
+			-- print("updateActionEventKeys: "..self:getFullName())
 			local actions = UniversalAutoload.ACTIONS
 		
 			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, true, true)
@@ -707,8 +707,63 @@ function UniversalAutoload:startUnloading(noEventSend)
 			--spec.isUnloading = true
 
 			if self.isServer then
+			
+				--UniversalAutoload.countActivePallets(self)
+				if spec.loadedObjects ~= nil then
+	
+					spec.objectsToUnload = {}
+					for _, object in pairs(spec.loadedObjects) do
+						if self:isValidForUnloading(object) then
+						
+							local p = {}
+							p.x, p.y, p.z, p.rx, p.ry, p.rz = UniversalAutoload.getUnloadingTransform(self, object)
+							
+							local unloadPlace = {}
+							unloadPlace.node = createTransformGroup("unloadPlace")
+							setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
+							setTranslation(unloadPlace.node, p.x, p.y, p.z)
+							
+							local autoLoadType = UniversalAutoload.getPalletType(object)
+							unloadPlace.sizeX = autoLoadType.sizeX
+							unloadPlace.sizeY = autoLoadType.sizeY
+							unloadPlace.sizeZ = autoLoadType.sizeZ
+							
+							local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
+							local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
+							--local heightAboveGround = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, p.x, p.y, p.z) + 0.1
+							unloadPlace.heightAbovePlace = heightAbovePlace
+							unloadPlace.heightAboveGround = heightAboveGround - p.y
 
+							spec.objectsToUnload[object] = unloadPlace
+							
+						end
+					end
+				
+					spec.unloadingAreaClear = true
+					for object, unloadPlace in pairs(spec.objectsToUnload) do
+					
+						local thisAreaClear = false
+						local x, y, z = getTranslation(unloadPlace.node)
+						for height = unloadPlace.heightAboveGround, 0, 0.1 do
+						
+							setTranslation(unloadPlace.node, x, y+height, z)
+							if self:testUnloadLocationIsEmpty(unloadPlace) then
+								local offset = unloadPlace.heightAbovePlace
+								setTranslation(unloadPlace.node, x, y+offset+height, z)
+								thisAreaClear = true
+								break
+							end
+						end
+							
+						if not thisAreaClear then
+							spec.unloadingAreaClear = false
+						end
+
+					end
+				end
+	
 				if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
+					self:setAllTensionBeltsActive(false)
 					for object, unloadPlace in pairs(spec.objectsToUnload) do
 						if self:isValidForUnloading(object) then
 							self:unloadObject(object, unloadPlace)
@@ -716,7 +771,6 @@ function UniversalAutoload:startUnloading(noEventSend)
 					end
 					spec.objectsToUnload = {}
 					self:buildNewLoadingPattern(true)
-					self:setAllTensionBeltsActive(false)
 					if spec.totalUnloadCount > 0  then
 						spec.doSetTensionBelts = true
 					end
@@ -1200,6 +1254,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				if spec.currentTypeIndex ~= palletIndex then
 					self:setLoadingTypeIndex( palletIndex )
 					self:buildNewLoadingPattern()
+					self:setAllTensionBeltsActive(false)
+					spec.doSetTensionBelts = true
+					spec.doPostLoadDelay = true
 				end
 				if self:loadObject(object) then
 					print("LOADED PALLET FROM REAR TRIGGER")
@@ -1375,59 +1432,6 @@ function UniversalAutoload:countActivePallets()
 			end
 		end
 	end
-	
-	if spec.loadedObjects ~= nil then
-	
-		spec.objectsToUnload = {}
-		for _, object in pairs(spec.loadedObjects) do
-			if self:isValidForUnloading(object) then
-			
-				local p = {}
-				p.x, p.y, p.z, p.rx, p.ry, p.rz = UniversalAutoload.getUnloadingTransform(self, object)
-				
-				local unloadPlace = {}
-				unloadPlace.node = createTransformGroup("unloadPlace")
-				setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
-				setTranslation(unloadPlace.node, p.x, p.y, p.z)
-				
-				local autoLoadType = UniversalAutoload.getPalletType(object)
-				unloadPlace.sizeX = autoLoadType.sizeX
-				unloadPlace.sizeY = autoLoadType.sizeY
-				unloadPlace.sizeZ = autoLoadType.sizeZ
-				
-				local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
-				local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
-				--local heightAboveGround = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, p.x, p.y, p.z) + 0.1
-				unloadPlace.heightAbovePlace = heightAbovePlace
-				unloadPlace.heightAboveGround = heightAboveGround - p.y
-
-				spec.objectsToUnload[object] = unloadPlace
-				
-			end
-		end
-	
-		spec.unloadingAreaClear = true
-		for object, unloadPlace in pairs(spec.objectsToUnload) do
-		
-			local thisAreaClear = false
-			local x, y, z = getTranslation(unloadPlace.node)
-			for height = unloadPlace.heightAboveGround, 0, 0.1 do
-			
-				setTranslation(unloadPlace.node, x, y+height, z)
-				if self:testUnloadLocationIsEmpty(unloadPlace) then
-					local offset = unloadPlace.heightAbovePlace
-					setTranslation(unloadPlace.node, x, y+offset+height, z)
-					thisAreaClear = true
-					break
-				end
-			end
-				
-			if not thisAreaClear then
-				spec.unloadingAreaClear = false
-			end
-
-		end
-	end
 
 	if not isActiveForLoading then
 		if (spec.validLoadCount ~= validLoadCount) or (spec.validUnloadCount ~= validUnloadCount) then
@@ -1550,11 +1554,8 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 
 			if SPEC.totalUnloadCount == 0 then
 				vehicle:buildNewLoadingPattern(true)
-			end
-			
-			if vehicle.spec_tensionBelts.areBeltsFasten then
+			else
 				vehicle:setAllTensionBeltsActive(false)
-				vehicle:setAllTensionBeltsActive(true)
 			end
 
 		end

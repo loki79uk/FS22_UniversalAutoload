@@ -27,6 +27,7 @@
 		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_SELECT_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 	</actions>
 	
 	<inputBinding>
@@ -51,6 +52,9 @@
 		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
 		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_l" />
+		</actionBinding>
 	</inputBinding>
 	
 	<l10n>
@@ -64,15 +68,15 @@
 			<de>Auskippen</de>
 			<fr>Décharger</fr>
 		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
+			<en>Toggle unloading side</en>
+			<de>Aktive entladeseite umschalten</de>
+			<fr>Basculer le côté actif</fr>
+		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
 			<de>Filter laden umschalten</de>
 			<fr>Basculer le sélection de chargement</fr>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL">
-			<en>Select all loading types</en>
-			<de>Alle Ladearten auswählen</de>
-			<fr>Sélectionner tous types de chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_TYPES_FW">
 			<en>Cycle loading type</en>
@@ -84,10 +88,21 @@
 			<de>Zyklusladeart zurück</de>
 			<fr>Type de chargement de cycle retour</fr>
 		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
-			<en>Toggle unloading side</en>
-			<de>Aktive entladeseite umschalten</de>
-			<fr>Basculer le côté actif</fr>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL">
+			<en>Select all loading types</en>
+			<de>Alle Ladearten auswählen</de>
+			<fr>Sélectionner tous types de chargement</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
+			<en>Fasten/Unfasten tension belts</en>
+			<de>Spanngurte anbringen/lösen</de>
+			<fr>Attacher/détacher les sangles de serrage</fr>
+		</text>
+		
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
+			<en>Unloading area is blocked. Please clear the unloading area.</en>
+			<de></de>
+			<fr></fr>
 		</text>
 		
 		<text name="universalAutoload_tipside">

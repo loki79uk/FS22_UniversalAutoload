@@ -15,17 +15,6 @@ for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
 	end
 end
 
---TODO:
--- bales
--- test unload area for collisions
--- custom pallets
--- custom trailers
-
--- tension straps key conflict
--- bridges and kerbs
-
-
-
 -- Welger DK 115
 -- Brantner DD 24073/2 XXL
 -- Fliegl DTS 5.9
@@ -36,6 +25,9 @@ end
 -- Kröger PWO 24
 -- Bremer Transportwagen TP 500 S
 -- BÖCKMANN MH-AL 4320/35
+
+--TODO:
+-- bales
 
 --data/objects/buyableBales/buyableBale.i3d (0.18 ms)
 --baseDirectory :: 

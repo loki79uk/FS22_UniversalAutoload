@@ -3,10 +3,12 @@ UniversalAutoload = {}
 
 UniversalAutoload.name = g_currentModName
 UniversalAutoload.path = g_currentModDirectory
-UniversalAutoload.debugEnabled = false
+UniversalAutoload.debugEnabled = true
 UniversalAutoload.delayTime = 200
 
---events/
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 002") 
+
+--events
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
 source(g_currentModDirectory.."events/RaiseActiveEvent.lua")
 source(g_currentModDirectory.."events/ResetLoadingEvent.lua")
@@ -18,6 +20,7 @@ source(g_currentModDirectory.."events/StartLoadingEvent.lua")
 source(g_currentModDirectory.."events/StartUnloadingEvent.lua")
 source(g_currentModDirectory.."events/StopLoadingEvent.lua")
 source(g_currentModDirectory.."events/StopUnloadingEvent.lua")
+source(g_currentModDirectory.."events/UnloadingBlockedEvent.lua")
 source(g_currentModDirectory.."events/UpdateActionEvents.lua")
 
 UniversalAutoload.ACTIONS = {
@@ -31,112 +34,169 @@ UniversalAutoload.ACTIONS = {
 	["TOGGLE_BELTS"]	= "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
 }
 
--- UniversalAutoload.ACTIONS = {
-	-- ["TOGGLE_LOADING"]  = InputAction.ACTIVATE_OBJECT,
-	-- ["UNLOAD_ALL"]      = InputAction.UNLOAD,
-	-- ["TOGGLE_TIPSIDE"]  = InputAction.TOGGLE_TIPSIDE,
-	-- ["TOGGLE_FILTER"]   = InputAction.TOGGLE_PIPE,
-	-- ["CYCLE_TYPES_FW"] = InputAction.TOGGLE_SEEDS,
-	-- ["CYCLE_TYPES_BW"] = InputAction.TOGGLE_SEEDS_BACK
--- }
-
-
-UniversalAutoload.VEHICLES = {}
+UniversalAutoload.TYPES = {
+	[1] = "ALL",
+	[2] = "EURO_PALLET",
+	[3] = "BIGBAG_PALLET",
+	[4] = "LIQUID_TANK",
+	[5] = "BIGBAG"
+}
+if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
+	print("** Seedpotato Farm Pack is loaded **")
+	table.insert(UniversalAutoload.TYPES, "POTATOBOX")
+end	 
 
 -- DEFINE LOADING TYPES
-UniversalAutoload.OBJECTS = {
-	["EURO_PALLET"] = {
+UniversalAutoload.EURO_PALLET = {
+	["default"] = {
 		sizeX = 1.240,
 		sizeY = 0.785,
 		sizeZ = 0.833,
 		alwaysRotate = false
-	},
-	["PIONEER_PALLET"] = {
-		sizeX = 1.350,
-		sizeY = 0.833,
-		sizeZ = 1.050,
-		alwaysRotate = false
-	},
-	["BIGBAG_PALLET"] = {
+	}
+}
+UniversalAutoload.BIGBAG_PALLET = {
+	["default"] = {
 		sizeX = 1.525,
 		sizeY = 1.075,
 		sizeZ = 1.200,
 		alwaysRotate = false
-	},
-	["LIQUID_TANK"] = {
+	}
+}
+UniversalAutoload.LIQUID_TANK = {
+	["default"] = {
 		sizeX = 1.433,
 		sizeY = 1.500,
 		sizeZ = 1.415,
 		alwaysRotate = false
-	},
-	["BIGBAG"] = {
+	}
+}
+UniversalAutoload.BIGBAG = {
+	["default"] = {
 		sizeX = 1.050,
 		sizeY = 2.000,
 		sizeZ = 0.900,
 		alwaysRotate = true
 	}
 }
-		  
-UniversalAutoload.TYPES = {
-	[1] = "ALL",
-	[2] = "EURO_PALLET",
-	[3] = "PIONEER_PALLET",
-	[4] = "BIGBAG_PALLET",
-	[5] = "LIQUID_TANK",
-	[6] = "BIGBAG"
-}
-
-if g_modIsLoaded['FS22_Seedpotato_Farm_Pack'] then
-	print("** Seedpotato Farm Pack is loaded **")
-	UniversalAutoload.OBJECTS["POTATOBOX"] = {
+UniversalAutoload.POTATOBOX = {
+	["default"] = {
 		sizeX = 1.850,
 		sizeY = 1.100,
 		sizeZ = 1.200,
 		alwaysRotate = false
 	}
-	table.insert(UniversalAutoload.TYPES, "POTATOBOX")
-end
+}
+ 
+UniversalAutoload.VEHICLES = {}
+UniversalAutoload.UNKNOWN_TYPES = {}
 
 -- IDENTIFY PALLET TYPE
 function UniversalAutoload.getPalletTypeName(object)
 
-	local objectType = ""
-	if  string.find(object.i3dFilename, "pioneerPallet.i3d") then
-		objectType = "PIONEER_PALLET"
-	elseif
-		string.find(object.i3dFilename, "liquidTank.i3d") then
-		objectType = "LIQUID_TANK"
-	elseif
-		string.find(object.i3dFilename, "/bigBagPallet/") then
-		objectType = "BIGBAG_PALLET"
-	elseif
-		string.find(object.i3dFilename, "/bigBag/") then
-		objectType = "BIGBAG"
-	elseif
-		(string.find(object.i3dFilename, "/pallets/") or
-		string.find(object.i3dFilename, "epsoTop.i3d")) and
-		not string.find(object.i3dFilename, "liquidTank.i3d") and
-		not string.find(object.i3dFilename, "pioneerPallet.i3d") then
-		objectType = "EURO_PALLET"
-	elseif
-		g_modIsLoaded['FS22_Seedpotato_Farm_Pack'] and
-		string.find(object.i3dFilename, "PotatoBox.i3d") or
-		string.find(object.i3dFilename, "Potatoboxwaste.i3d") or
-		string.find(object.i3dFilename, "Potatoboxmedium.i3d") or
-		string.find(object.i3dFilename, "Potatoboxpremium.i3d") then
-		objectType = "POTATOBOX"
+	local i3d_path = object.i3dFilename
+	local i3d_name = i3d_path:match("[^/]*.i3d$")
+	local name = i3d_name:sub(0, #i3d_name - 4)
+	
+	local loadingType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+	
+	if loadingType == nil then
+		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
+			UniversalAutoload.UNKNOWN_TYPES[name] = true
+			print("UNKNOWN LOADING TYPE: ".. name )
+		end
+		return ""
 	else
-		print("UNKNOWN PALLET TYPE...")
-		if object.i3dFilename ~= nil then
-			print("  "..object.i3dFilename)
-		end
-		if object.xmlFilename ~= nil then
-			print("  "..object.xmlFilename)
-		end
+		return loadingType, name
 	end
-	return objectType
+	
 end
---
+
+-- IMPORT LOADING TYPE DEFINITIONS
+UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
+function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
+	print("  IMPORT supported vehicle configurations")
+	
+	-- define the loading area parameters from settings file
+	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
+	if xmlFile ~= 0 then
+
+		local key = "universalAutoload.vehicleConfigurations"
+		local i = 0
+		while true do
+			local configKey = string.format("%s.vehicleConfiguration(%d)", key, i)
+
+			if not xmlFile:hasProperty(configKey) then
+				break
+			end
+
+			local xmlName = xmlFile:getValue(configKey.."#name")
+			
+			UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName] = {}
+			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName]
+			
+			config.xmlName = xmlName
+			config.width  = xmlFile:getValue(configKey..".loadingArea#width")
+			config.length = xmlFile:getValue(configKey..".loadingArea#length")
+			config.height = xmlFile:getValue(configKey..".loadingArea#height")
+			config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
+			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
+			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
+			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+			
+			print("  Loaded Vehicle Config: "..xmlName)
+
+			i = i + 1
+		end
+
+		xmlFile:delete()
+	end
+end
+
+-- IMPORT LOADING TYPE DEFINITIONS
+UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
+function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
+	print("  IMPORT default loading types")
+	-- define the loading area parameters from settings file
+	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
+	if xmlFile ~= 0 then
+
+		local key = "universalAutoload.loadingTypeConfigurations"
+		local i = 0
+		while true do
+			local configKey = string.format("%s.loadingTypeConfiguration(%d)", key, i)
+
+			if not xmlFile:hasProperty(configKey) then
+				break
+			end
+
+			local configName = xmlFile:getValue(configKey.."#name")
+			local loadType = xmlFile:getValue(configKey.."#loadingType")
+			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[configName] = loadType
+			
+			local loadingType = UniversalAutoload[loadType]
+			local default = loadingType['default']
+			
+			loadingType[configName] = {}
+			local newType = loadingType[configName]
+			newType.sizeX = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeX", default.sizeX)))
+			newType.sizeY = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeY", default.sizeY)))
+			newType.sizeZ = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeZ", default.sizeZ)))
+			newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", false)
+
+			print("  configName: "..configName)
+			print("    loadType: "..loadType)
+			print("    sizeX: "..newType.sizeX)
+			print("    sizeY: "..newType.sizeY)
+			print("    sizeZ: "..newType.sizeZ)
+			print("    alwaysRotate: "..tostring(newType.alwaysRotate))
+
+			i = i + 1
+		end
+
+		xmlFile:delete()
+	end
+end
 
 -- REQUIRED SPECIALISATION FUNCTIONS
 function UniversalAutoload.prerequisitesPresent(specializations)
@@ -149,16 +209,25 @@ function UniversalAutoload.initSpecialization()
 	g_configurationManager:addConfigurationType("universalAutoload", g_i18n:getText("configuration_universalAutoload"), "universalAutoload", nil, nil, nil, ConfigurationUtil.SELECTOR_MULTIOPTION)
 	
 	UniversalAutoload.xmlSchema = XMLSchema.new("universalAutoload")
-    local xmlKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, xmlKey.."#name", "Full Vehicle Name", "UNKNOWN")
-	UniversalAutoload.xmlSchema:register(XMLValueType.VECTOR_TRANS, xmlKey..".loadingArea#offset", "Offset to the centre of the loading area", "0 0 0")
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, xmlKey..".loadingArea#height", "Height of the loading area", 0)
-	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, xmlKey..".loadingArea#length", "Length of the loading area", 0)
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, xmlKey..".loadingArea#width", "Width of the loading area", 0)
+    local vehicleKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, vehicleKey.."#name", "Full Vehicle Name", "UNKNOWN")
+	UniversalAutoload.xmlSchema:register(XMLValueType.VECTOR_TRANS, vehicleKey..".loadingArea#offset", "Offset to the centre of the loading area", "0 0 0")
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, vehicleKey..".loadingArea#height", "Height of the loading area", 0)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, vehicleKey..".loadingArea#length", "Length of the loading area", 0)
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, vehicleKey..".loadingArea#width", "Width of the loading area", 0)
 	
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, xmlKey..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, xmlKey..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, xmlKey..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
+	
+	local palletKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, palletKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, palletKey.."#loadingType", "The loading type category to group under in the menu)", "EURO_PALLET")
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeX", "Width of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeY", "Height of the pallet", 2.0)
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeZ", "Length of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, palletKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+	
 	
     local schemaSavegame = Vehicle.xmlSchemaSavegame
     schemaSavegame:register(XMLValueType.STRING, "vehicles.vehicle(?).universalAutoload#tipside", "Last used tip side", "none")
@@ -166,6 +235,11 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadLength", "Last used load length", 0)
     schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#typeIndex", "Last used pallet type", 1)
     schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?).universalAutoload#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
+	
+	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)
+	UniversalAutoload.ImportVehicleConfigurations(vehicleSettingsFile)
+	local LoadingTypeSettingsFile = Utils.getFilename("config/LoadingTypes.xml", UniversalAutoload.path)
+	UniversalAutoload.ImportLoadingTypeConfigurations(LoadingTypeSettingsFile)
 end
 --
 function UniversalAutoload.registerFunctions(vehicleType)
@@ -217,20 +291,8 @@ function UniversalAutoload.registerFunctions(vehicleType)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
-    -- SpecializationUtil.registerOverwrittenFunction(vehicleType, "setAllTensionBeltsActive", UniversalAutoload.overwrittenSetAllTensionBeltsActive)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
 end
---
--- function UniversalAutoload.overwrittenSetAllTensionBeltsActive(self, superfunc, isActive, noEventSend)
-	-- local spec = self.spec_universalAutoload
-	-- spec.tensionBeltsActive = isActive
-	-- superfunc(self, isActive, noEventSend)
--- end
--- function UniversalAutoload.appendToggleTensionBelts(self, actionName, inputValue, callbackState, isAnalog)
-	-- local spec = self.spec_universalAutoload
-	-- spec.tensionBeltsActive = not self.spec_tensionBelts.areBeltsFasten
--- end
--- TensionBelts.actionEventToggleTensionBelts = Utils.appendedFunction(TensionBelts.actionEventToggleTensionBelts, UniversalAutoload.appendToggleTensionBelts)
 --
 function UniversalAutoload.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onLoad", UniversalAutoload)
@@ -313,11 +375,10 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 			end
 
 		end
-		if closestVehicle then
-			return
+		if not closestVehicle then
+			return superFunc(self)
 		end	
 	end
-	return superFunc(self)
 end
 ActivatableObjectsSystem.updateObjects = Utils.overwrittenFunction(ActivatableObjectsSystem.updateObjects, UniversalAutoload.OverwrittenUpdateObjects)
 
@@ -589,11 +650,7 @@ function UniversalAutoload:setLoadingTypeIndex(typeIndex, noEventSend)
 	local spec = self.spec_universalAutoload
 
 	spec.currentTypeIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.TYPES))
-	
-	if self.isServer then
-		self:buildNewLoadingPattern()
-	end
-	
+
 	UniversalAutoloadSetLoadingTypeEvent.sendEvent(self, typeIndex, noEventSend)
 	UniversalAutoload.updateCycleTypeActionEvent(self)
 	if self.isServer then
@@ -662,7 +719,6 @@ function UniversalAutoload:startLoading(noEventSend)
 			if spec.currentTypeIndex == 1 then
 				spec.loadAllTypes = true
 				spec.currentTypeIndex = spec.currentTypeIndex + 1
-				self:buildNewLoadingPattern()
 			else
 				spec.loadAllTypes = false
 			end
@@ -688,7 +744,6 @@ function UniversalAutoload:stopLoading(noEventSend)
 			if spec.loadAllTypes then
 				spec.loadAllTypes = false
 				spec.currentTypeIndex = 1
-				self:buildNewLoadingPattern()
 			end
 			spec.loadDelayTime = 0
 			spec.doSetTensionBelts = true
@@ -773,7 +828,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 						end
 					end
 					spec.objectsToUnload = {}
-					self:buildNewLoadingPattern(true)
+					self:buildNewLoadingPattern()
 					if spec.totalUnloadCount > 0  then
 						spec.doSetTensionBelts = true
 					end
@@ -805,7 +860,7 @@ function UniversalAutoload:stopUnloading(noEventSend)
 		print("Stop Unloading: "..self:getFullName() )
 		spec.isUnloading = false
 		spec.doPostLoadDelay = true
-		self:buildNewLoadingPattern(true)
+		spec.currentLoadLength = 0
 		UniversalAutoloadStopUnloadingEvent.sendEvent(self, noEventSend)
 		UniversalAutoload.updateToggleLoadingActionEvent(self)
 	else
@@ -884,7 +939,7 @@ function UniversalAutoload:updatePlayerTriggerState(playerId, inTrigger, noEvent
 	UniversalAutoloadPlayerTriggerEvent.sendEvent(self, playerId, inTrigger, noEventSend)
 end
 
--- MAIN 'ON LOAD' INITIALISATION FUNCTION
+-- MAIN "ON LOAD" INITIALISATION FUNCTION
 function UniversalAutoload:onLoad(savegame)
 
 	self.spec_universalAutoload = {}
@@ -894,9 +949,9 @@ function UniversalAutoload:onLoad(savegame)
 
 	-- apply to selected trailers only (with tension belts)
 	--print("UniversalAutoload - vehicle: "..self:getFullName().." = "..self.typeDesc )
-	if  self.typeDesc == 'tipper' or
-		self.typeDesc == 'trailer' or
-		self.typeDesc == 'low loader' then
+	if  self.typeDesc == "tipper" or
+		self.typeDesc == "trailer" or
+		self.typeDesc == "low loader" then
 		
 		if self.spec_tensionBelts.hasTensionBelts and not self.spec_fillUnit.hasExactFillRootNodes then
 			print("UniversalAutoload - vaild vehicle: "..self:getFullName() )
@@ -922,64 +977,30 @@ function UniversalAutoload:onLoad(savegame)
 		spec.rearLoadingObjects = {}
 		
 		-- define the loading area parameters from settings file
-		local settingsFound = false
-		local xmlFilename = Utils.getFilename("config/UniversalAutoload.xml", UniversalAutoload.path)
-		local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
+		local xmlName = self:getFullName()
+		local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName]
 		
-		if xmlFile ~= 0 then
-
-			local key = "universalAutoload.vehicleConfigurations"
-			local j = 0
-			while true do
-				local configKey = string.format("%s.vehicleConfiguration(%d)", key, j)
-
-				if not xmlFile:hasProperty(configKey) then
-					break
-				end
-
-				local xmlName = xmlFile:getValue(configKey.."#name")
-				if xmlName == self:getFullName() then
-					spec.xmlName = xmlName
-					spec.loadArea.width  = xmlFile:getValue(configKey..".loadingArea#width")
-					spec.loadArea.length = xmlFile:getValue(configKey..".loadingArea#length")
-					spec.loadArea.height = xmlFile:getValue(configKey..".loadingArea#height")
-					spec.loadArea.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
+		if config ~= nil then
+			spec.xmlName = xmlName
+			spec.loadArea.width  = config.width
+			spec.loadArea.length = config.length
+			spec.loadArea.height = config.height
+			spec.loadArea.offset = config.offset	
+			spec.isCurtainTrailer = config.isCurtainTrailer
+			spec.enableRearLoading = config.enableRearLoading
+			spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
 					
-					spec.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
-					spec.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
-					spec.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
-					
-					if  spec.loadArea.offset~=nil and
-						spec.loadArea.length~=nil and
-						spec.loadArea.height~=nil and
-						spec.loadArea.width~=nil then
-							print("settings found for '"..xmlName.."'")
-							settingsFound = true
-					end
-				end
-				j = j + 1
+			if  spec.loadArea.offset~=nil and
+				spec.loadArea.length~=nil and
+				spec.loadArea.height~=nil and
+				spec.loadArea.width~=nil then
+					print("settings found for '"..xmlName.."'")
+			else
+					print("SETTINGS NOT FOUND")
+					spec.available = false
+					UniversalAutoload.removeEventListeners(self)
+					return
 			end
-			
-			--xmlFilename = Utils.getFilename("UniversalAutoload.xml", getUserProfileAppPath().."modSettings/")
-			-- if not settingsFound then
-				-- print("settings NOT found for '"..self:getFullName().."'")
-				-- if spec.xmlName == nil then
-					-- configKey = string.format("%s.vehicleConfiguration(%d)", key, j)
-					-- xmlFile:setString(configKey.."#name", self:getFullName())
-					-- xmlFile:setString(configKey..".loadingArea#offset", "0 0 0")
-					-- xmlFile:save()
-					-- print("written missing entry to universalAutoload.xml")
-				-- end
-			-- end
-			
-			xmlFile:delete()
-		end
-			
-		if not settingsFound then
-			print("SETTINGS NOT FOUND")
-			spec.available = false
-			UniversalAutoload.removeEventListeners(self)
-			return
 		end
 
 		-- create loading area
@@ -1081,8 +1102,6 @@ function UniversalAutoload:onLoad(savegame)
 		
 
 		--server only
-		spec.currentLoadLength = 0
-
 		spec.isLoading = false
 		spec.isUnloading = false
 		spec.doPostLoadDelay = false
@@ -1091,6 +1110,7 @@ function UniversalAutoload:onLoad(savegame)
 		spec.totalUnloadCount = 0
 		spec.validLoadCount = 0
 		spec.validUnloadCount = 0
+		spec.currentLoadLength = 0
 
 	end
 
@@ -1115,7 +1135,7 @@ function UniversalAutoload:onLoad(savegame)
     spec.initialized = true
 end
 
--- 'ON POST LOAD' CALLED AFTER VEHICLE IS LOADED
+-- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED
 function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil and self.spec_universalAutoload ~= nil then
 		local spec = self.spec_universalAutoload
@@ -1141,7 +1161,6 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLoadingFilter = true
 			--server only
 			spec.currentLoadLength = 0
-			self:buildNewLoadingPattern(true)
 		else
 			--client+server
             spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
@@ -1150,25 +1169,29 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
 			--server only
             spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
-			self:buildNewLoadingPattern()
         end
 	
 	end
 end
 
--- 'SAVE TO XML FILE' CALLED DURING GAME SAVE
+-- "SAVE TO XML FILE" CALLED DURING GAME SAVE
 function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
-    local spec = self.spec_universalAutoload
-	--client+server
-	xmlFile:setValue(key.."#tipside", spec.currentTipside)
-	xmlFile:setValue(key.."#loadside", spec.currentLoadside)
-	xmlFile:setValue(key.."#typeIndex", spec.currentTypeIndex)
-	xmlFile:setValue(key.."#loadingFilter", spec.currentLoadingFilter)
-	--server only
-	xmlFile:setValue(key.."#loadLength", spec.currentLoadLength)
+	if self.spec_universalAutoload ~= nil then
+		local spec = self.spec_universalAutoload
+		if spec.available then
+			print("UniversalAutoload - saveToXMLFile: "..self:getFullName())
+			--client+server
+			xmlFile:setValue(key.."#tipside", spec.currentTipside)
+			xmlFile:setValue(key.."#loadside", spec.currentLoadside)
+			xmlFile:setValue(key.."#typeIndex", spec.currentTypeIndex)
+			xmlFile:setValue(key.."#loadingFilter", spec.currentLoadingFilter)
+			--server only
+			xmlFile:setValue(key.."#loadLength", spec.currentLoadLength)
+		end
+	end
 end
 
--- 'ON DELETE' CLEANUP TRIGGER NODES
+-- "ON DELETE" CLEANUP TRIGGER NODES
 function UniversalAutoload:onDelete()
 	--print("UniversalAutoload - onDelete")
     local spec = self.spec_universalAutoload
@@ -1275,7 +1298,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				local palletIndex = UniversalAutoload.getPalletIndex(object)
 				if spec.currentTypeIndex ~= palletIndex then
 					self:setLoadingTypeIndex( palletIndex )
-					self:buildNewLoadingPattern()
 					self:setAllTensionBeltsActive(false)
 					spec.doSetTensionBelts = true
 					spec.doPostLoadDelay = true
@@ -1314,6 +1336,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						end
 					end
 					if not foundObject then
+						-- if spec.currentTypeIndex == 2 then
+						-- end
+						
 						if spec.loadAllTypes and spec.currentTypeIndex ~= 1 then
 							--print("TRY OTHER TYPES")
 							if spec.currentTypeIndex < #UniversalAutoload.TYPES then
@@ -1322,7 +1347,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								spec.loadAllTypes = false
 								spec.currentTypeIndex = 1
 							end
-							self:buildNewLoadingPattern()
 						else
 							if #spec.sortedObjectsToLoad > 0 then
 								spec.reachedLoadingCapacity = true
@@ -1362,10 +1386,10 @@ function UniversalAutoload:onActivate()
 		UniversalAutoload.countActivePallets(self)
 		self:forceRaiseActive(true)
 	end
-	if self:getIsActiveForInput(true) then
-		print("REGISTER ACTION EVENTS AGAIN...")
-		self:registerActionEvents()
-	end
+	-- if self:getIsActiveForInput(true) then
+		-- print("REGISTER ACTION EVENTS AGAIN...")
+		-- self:registerActionEvents()
+	-- end
 end
 --
 function UniversalAutoload:onDeactivate()
@@ -1390,13 +1414,11 @@ function UniversalAutoload:determineTipside()
 				--print("SET SIDE = LEFT")
 				self:setCurrentTipside("left")
 				self:setCurrentLoadside("left")	
-				self:buildNewLoadingPattern()
 			end
 			if spec.currentTipside ~= "right" and string.find(tipSide.name, "Right") then
 				--print("SET SIDE = RIGHT")
 				self:setCurrentTipside("right")
 				self:setCurrentLoadside("right")	
-				self:buildNewLoadingPattern()
 			end
 		else
 			if spec.currentTipside ~= "none" then
@@ -1485,6 +1507,24 @@ function UniversalAutoload:loadObject(object)
 		if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
 			local spec = self.spec_universalAutoload
 			if spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil then
+			
+				local autoLoadType = UniversalAutoload.getPalletType(object)
+				if spec.lastLoadType ~= autoLoadType then
+					spec.lastLoadType = autoLoadType
+					self:buildNewLoadingPattern(autoLoadType)
+				end
+				
+				-- local objectType, typeName = UniversalAutoload.getPalletTypeName(object)
+				-- if spec.lastLoadedObjectType ~= objectType then
+					-- spec.lastLoadedObjectType = objectType
+					-- self:buildNewLoadingPattern(autoLoadType)
+				-- end
+				-- if spec.objectType == "EURO_PALLET" then
+					-- if autoLoadType.sizeX < spec.lastX or autoLoadType.sizeY < spec.lastY then
+						-- spec.lastX, spec.lastY = autoLoadType.sizeX, autoLoadType.sizeY
+						-- self:buildNewLoadingPattern(autoLoadType)
+					-- end
+				-- end
 
 				local firstValidLoadPlace, thisLoadHeight = self:getNextLoadPlace(object)
 				if firstValidLoadPlace ~= -1 then
@@ -1575,7 +1615,7 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			vehicle:removeLoadedObject(object)
 
 			if SPEC.totalUnloadCount == 0 then
-				vehicle:buildNewLoadingPattern(true)
+				SPEC.currentLoadLength = 0
 			else
 				vehicle:setAllTensionBeltsActive(false)
 			end
@@ -1606,7 +1646,7 @@ function UniversalAutoload:onDeleteLoadedObject(object)
 		spec.totalUnloadCount = spec.totalUnloadCount - 1
 		
 		if spec.totalUnloadCount == 0 then
-			self:buildNewLoadingPattern(true)
+			spec.currentLoadLength = 0
 		end
 	else
 		print("...PALLET WAS ALREADY DELETED")
@@ -1614,19 +1654,20 @@ function UniversalAutoload:onDeleteLoadedObject(object)
 end
 
 -- CREATE NEW LOADING PATTERN IN AVAILABLE SPACE
-function UniversalAutoload:buildNewLoadingPattern(reset)
-	print("buildNewLoadingPattern: "..self:getFullName() )
+function UniversalAutoload:buildNewLoadingPattern(autoLoadType)
 	local spec = self.spec_universalAutoload
 	
-	if reset or spec.currentLoadLength == nil then
-		spec.currentLoadLength = 0
-	end
-
-	local autoLoadType = UniversalAutoload.getSelectedType(self)
+	print("buildNewLoadingPattern: "..self:getFullName() )
 	spec.currentPlaceIndex = 1
 	spec.currentLoadHeight = 0
 	
-	if autoLoadType == nil or autoLoadType == "ALL" then
+	if autoLoadType == nil then
+		spec.lastLoadType = nil
+		spec.currentLoadLength = 0
+		spec.currentLoadingPattern = {}
+		return
+	end
+	if autoLoadType == "ALL" then
 		spec.currentLoadingPattern = {}
 		return
 	end
@@ -2092,14 +2133,18 @@ end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
 function UniversalAutoload.getPalletType(object)
-	local objectType = UniversalAutoload.getPalletTypeName(object)
-	return UniversalAutoload.OBJECTS[objectType]	
+	local loadType, name = UniversalAutoload.getPalletTypeName(object)
+	--print(loadType.." - "..name)
+
+	local loadingType = UniversalAutoload[loadType]
+	return loadingType[name] --or loadingType["default"]
+
 end
 --
 function UniversalAutoload.getPalletIndex(object)
-	local objectType = UniversalAutoload.getPalletTypeName(object)
+	local loadType, _ = UniversalAutoload.getPalletTypeName(object)
 	for index, indexType in ipairs(UniversalAutoload.TYPES) do
-		if objectType == indexType then
+		if loadType == indexType then
 			return index
 		end
 	end
@@ -2110,18 +2155,9 @@ function UniversalAutoload:getSelectedTypeName()
 	return UniversalAutoload.TYPES[spec.currentTypeIndex]
 end
 --
-function UniversalAutoload:getSelectedType()
-	local objectType = UniversalAutoload.getSelectedTypeName(self)
-	if objectType == "ALL" then
-		return objectType
-	else
-		return UniversalAutoload.OBJECTS[objectType]
-	end
-end
---
 function UniversalAutoload:getPalletIsSelectedType(object)
 
-	local objectPalletType = UniversalAutoload.getPalletTypeName(object)
+	local objectPalletType, _ = UniversalAutoload.getPalletTypeName(object)
 	local selectedPalletType = UniversalAutoload.getSelectedTypeName(self)
 	
 	if objectPalletType~=nil and selectedPalletType~=nil then
@@ -2138,7 +2174,7 @@ end
 function UniversalAutoload:getPalletIsSelectedLoadside(object)
 	local spec = self.spec_universalAutoload
 	
-	if spec.currentLoadside == 'both' then
+	if spec.currentLoadside == "both" then
 		return true
 	end
 	
@@ -2148,8 +2184,8 @@ function UniversalAutoload:getPalletIsSelectedLoadside(object)
 	end
 	
 	local x, y, z = localToLocal(node, spec.loadArea.rootNode, 0, 0, 0)
-	if (x > 0 and spec.currentLoadside == 'left') or 
-	   (x < 0 and spec.currentLoadside == 'right') then
+	if (x > 0 and spec.currentLoadside == "left") or 
+	   (x < 0 and spec.currentLoadside == "right") then
 		return true
 	else
 		return false

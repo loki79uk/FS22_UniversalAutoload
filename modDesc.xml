@@ -9,7 +9,42 @@
     </title>
 	
     <description>
-        <en>Configurable autoloading specialsiation for all flatbed trailers</en>
+<en><![CDATA[Autoloading specialsiation for flatbed trailers.  This modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.
+
+Features:
+- Loads any compatible pallet types (see list below)
+- Installed automatically on any compatible trailers (see list below)
+- Load/Unload by selected type only or select 'ALL' to load mixed types in sequence 
+- Optional filter to prevent partially full pallets from being loaded
+
+Special Features for 'KRONE Trailer Profi Liner'
+- Load/Unload only available on the side that curtain is open
+- Rear loading directly from forklift
+
+Configured for the following items:
+- BigBags
+- BigBag Pallets
+- IBC Liquid Tanks
+- Euro Pallets
+- Pioneer pallets
+- Potato Boxes (requires mod: Seed Potato Pack)
+
+Configured for the following trailers:
+- Welger DK 115
+- Brantner DD 24073/2 XXL
+- Fliegl DTS 5.9
+- Demco Steel Drop Deck
+- LODE KING Renown Drop Deck
+- KRONE Trailer Profi Liner
+- Farmtech DPW 1800
+- Kröger PWO 24
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+]]>
+</en>
+
+
+
     </description>
 	
 	<multiplayer supported="true" />

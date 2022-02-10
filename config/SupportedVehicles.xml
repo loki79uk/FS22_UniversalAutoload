@@ -20,7 +20,7 @@
             <loadingArea offset="0 1.010 -1.0" length="11.1" width="2.33" height="2.20"/>
         </vehicleConfiguration>
         <vehicleConfiguration name="KRONE Trailer Profi Liner">
-            <loadingArea offset="0 1.185 -0.1" length="13.2" width="2.40" height="2.40"/>
+            <loadingArea offset="0 1.185 -0.1" length="13.2" width="2.40" height="2.50"/>
 			<options isCurtainTrailer="true" enableRearLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration name="Farmtech DPW 1800">

@@ -17,11 +17,10 @@ source(g_currentModDirectory.."events/SetLoadingTypeEvent.lua")
 source(g_currentModDirectory.."events/SetLoadsideEvent.lua")
 source(g_currentModDirectory.."events/SetTipsideEvent.lua")
 source(g_currentModDirectory.."events/StartLoadingEvent.lua")
-source(g_currentModDirectory.."events/StartUnloadingEvent.lua")
 source(g_currentModDirectory.."events/StopLoadingEvent.lua")
-source(g_currentModDirectory.."events/StopUnloadingEvent.lua")
-source(g_currentModDirectory.."events/UnloadingBlockedEvent.lua")
+source(g_currentModDirectory.."events/UnloadingEvent.lua")
 source(g_currentModDirectory.."events/UpdateActionEvents.lua")
+source(g_currentModDirectory.."events/WarningMessageEvent.lua")
 
 UniversalAutoload.ACTIONS = {
 	["TOGGLE_LOADING"]  = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
@@ -46,71 +45,15 @@ if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
 	table.insert(UniversalAutoload.TYPES, "POTATOBOX")
 end	 
 
--- DEFINE LOADING TYPES
-UniversalAutoload.EURO_PALLET = {
-	["default"] = {
-		sizeX = 1.240,
-		sizeY = 0.785,
-		sizeZ = 0.833,
-		alwaysRotate = false
-	}
-}
-UniversalAutoload.BIGBAG_PALLET = {
-	["default"] = {
-		sizeX = 1.525,
-		sizeY = 1.075,
-		sizeZ = 1.200,
-		alwaysRotate = false
-	}
-}
-UniversalAutoload.LIQUID_TANK = {
-	["default"] = {
-		sizeX = 1.433,
-		sizeY = 1.500,
-		sizeZ = 1.415,
-		alwaysRotate = false
-	}
-}
-UniversalAutoload.BIGBAG = {
-	["default"] = {
-		sizeX = 1.050,
-		sizeY = 2.000,
-		sizeZ = 0.900,
-		alwaysRotate = true
-	}
-}
-UniversalAutoload.POTATOBOX = {
-	["default"] = {
-		sizeX = 1.850,
-		sizeY = 1.100,
-		sizeZ = 1.200,
-		alwaysRotate = false
-	}
-}
+-- DEFINE DEFAULTS FOR LOADING TYPES
+UniversalAutoload.EURO_PALLET   = { sizeX = 1.240, sizeY = 0.785, sizeZ = 0.833, alwaysRotate = false }
+UniversalAutoload.BIGBAG_PALLET = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
+UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
+UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
+UniversalAutoload.POTATOBOX     = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
  
 UniversalAutoload.VEHICLES = {}
 UniversalAutoload.UNKNOWN_TYPES = {}
-
--- IDENTIFY PALLET TYPE
-function UniversalAutoload.getPalletTypeName(object)
-
-	local i3d_path = object.i3dFilename
-	local i3d_name = i3d_path:match("[^/]*.i3d$")
-	local name = i3d_name:sub(0, #i3d_name - 4)
-	
-	local loadingType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-	
-	if loadingType == nil then
-		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
-			UniversalAutoload.UNKNOWN_TYPES[name] = true
-			print("UNKNOWN LOADING TYPE: ".. name )
-		end
-		return ""
-	else
-		return loadingType, name
-	end
-	
-end
 
 -- IMPORT LOADING TYPE DEFINITIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
@@ -144,13 +87,22 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
 			
-			print("  Loaded Vehicle Config: "..xmlName)
+			print("  >> "..xmlName)
 
 			i = i + 1
 		end
 
 		xmlFile:delete()
 	end
+end
+
+function tableContainsValue(container, value)
+	for k, v in pairs(container) do
+		if v == value then
+			return true
+		end
+	end
+	return false
 end
 
 -- IMPORT LOADING TYPE DEFINITIONS
@@ -164,32 +116,43 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 		local key = "universalAutoload.loadingTypeConfigurations"
 		local i = 0
 		while true do
-			local configKey = string.format("%s.loadingTypeConfiguration(%d)", key, i)
+			local loadingTypeKey = string.format("%s.loadingTypeConfiguration(%d)", key, i)
 
-			if not xmlFile:hasProperty(configKey) then
+			if not xmlFile:hasProperty(loadingTypeKey) then
 				break
 			end
 
-			local configName = xmlFile:getValue(configKey.."#name")
-			local loadType = xmlFile:getValue(configKey.."#loadingType")
-			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[configName] = loadType
+			local loadingType = xmlFile:getValue(loadingTypeKey.."#loadingType")
+			if not tableContainsValue(UniversalAutoload.TYPES, loadingType) then
+				print("UNKNOWN LOADING TYPE: "..loadingType)
+				break
+			end
 			
-			local loadingType = UniversalAutoload[loadType]
-			local default = loadingType['default']
+			local default = UniversalAutoload[loadingType]
+			print("  >> "..loadingType)
 			
-			loadingType[configName] = {}
-			local newType = loadingType[configName]
-			newType.sizeX = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeX", default.sizeX)))
-			newType.sizeY = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeY", default.sizeY)))
-			newType.sizeZ = tonumber(string.format("%.3f", xmlFile:getValue(configKey..".dimensions#sizeZ", default.sizeZ)))
-			newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", false)
-
-			print("  configName: "..configName)
-			print("    loadType: "..loadType)
-			print("    sizeX: "..newType.sizeX)
-			print("    sizeY: "..newType.sizeY)
-			print("    sizeZ: "..newType.sizeZ)
-			print("    alwaysRotate: "..tostring(newType.alwaysRotate))
+			local j = 0
+			while true do
+				local objectTypeKey = string.format("%s.objectType(%d)", loadingTypeKey, j)
+				
+				if not xmlFile:hasProperty(objectTypeKey) then
+					break
+				end
+			
+				local name = xmlFile:getValue(objectTypeKey.."#name")
+				UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
+				newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+				newType.loadingType = loadingType
+				newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
+				newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
+				newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
+				newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", false)
+				
+				print(string.format("      %s [%.3f, %.3f, %.3f] %s", name,
+					newType.sizeX, newType.sizeY, newType.sizeZ, tostring(newType.alwaysRotate) ))
+				
+				j = j + 1
+			end
 
 			i = i + 1
 		end
@@ -220,13 +183,14 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
 	
-	local palletKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?)"
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, palletKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, palletKey.."#loadingType", "The loading type category to group under in the menu)", "EURO_PALLET")
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeX", "Width of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeY", "Height of the pallet", 2.0)
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, palletKey..".dimensions#sizeZ", "Length of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, palletKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+	local loadingTypeKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?)"
+	local objectTypeKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?).objectType(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, loadingTypeKey.."#loadingType", "The loading type category to group under in the menu)", "EURO_PALLET")
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, objectTypeKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeX", "Width of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeY", "Height of the pallet", 2.0)
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeZ", "Length of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
 	
 	
     local schemaSavegame = Vehicle.xmlSchemaSavegame
@@ -257,7 +221,6 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "startLoading", UniversalAutoload.startLoading)
     SpecializationUtil.registerFunction(vehicleType, "stopLoading", UniversalAutoload.stopLoading)
     SpecializationUtil.registerFunction(vehicleType, "startUnloading", UniversalAutoload.startUnloading)
-    SpecializationUtil.registerFunction(vehicleType, "stopUnloading", UniversalAutoload.stopUnloading)
     SpecializationUtil.registerFunction(vehicleType, "resetLoadingState", UniversalAutoload.resetLoadingState)
 	
     SpecializationUtil.registerFunction(vehicleType, "loadObject", UniversalAutoload.loadObject)
@@ -850,23 +813,6 @@ function UniversalAutoload:startUnloading(noEventSend)
 	else
 		print("Start Unloading CALLED TWICE...")
 	end
-end
---
-function UniversalAutoload:stopUnloading(noEventSend)
-	local spec = self.spec_universalAutoload
-
-	-- CURRENTLY NOT USED
-	if spec.isUnloading then
-		print("Stop Unloading: "..self:getFullName() )
-		spec.isUnloading = false
-		spec.doPostLoadDelay = true
-		spec.currentLoadLength = 0
-		UniversalAutoloadStopUnloadingEvent.sendEvent(self, noEventSend)
-		UniversalAutoload.updateToggleLoadingActionEvent(self)
-	else
-		print("Stop Unloading CALLED TWICE...")
-	end		
-	
 end
 --
 function UniversalAutoload:resetLoadingState(noEventSend)
@@ -1850,7 +1796,7 @@ function UniversalAutoload:getIsValidObject(object)
 	end
 	if object.i3dFilename ~= nil and object.typeName == "pallet" or object.typeName == "bigBag" then
 		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
-			return UniversalAutoload.getPalletTypeName(object) ~= ""
+			return UniversalAutoload.getPalletType(object) ~= nil
 		end
 	end
 	
@@ -2132,19 +2078,38 @@ function UniversalAutoload:removeLoadedObject(object)
 end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
+function UniversalAutoload.getPalletTypeName(object)
+	local i3d_path = object.i3dFilename
+	local i3d_name = i3d_path:match("[^/]*.i3d$")
+	local name = i3d_name:sub(0, #i3d_name - 4)
+	
+	return name
+end
+
+function UniversalAutoload.getLoadingTypeName(object)
+	local palletType = UniversalAutoload.getPalletType(object)
+	return palletType.loadingType
+end
+
 function UniversalAutoload.getPalletType(object)
-	local loadType, name = UniversalAutoload.getPalletTypeName(object)
-	--print(loadType.." - "..name)
-
-	local loadingType = UniversalAutoload[loadType]
-	return loadingType[name] --or loadingType["default"]
-
+	local name = UniversalAutoload.getPalletTypeName(object)
+	local palletType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+	
+	if palletType == nil then
+		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
+			UniversalAutoload.UNKNOWN_TYPES[name] = true
+			print("UNKNOWN OBJECT TYPE: ".. name )
+		end
+	end
+	
+	return palletType
 end
 --
 function UniversalAutoload.getPalletIndex(object)
-	local loadType, _ = UniversalAutoload.getPalletTypeName(object)
+	local loadingType = UniversalAutoload.getLoadingTypeName(object)
+
 	for index, indexType in ipairs(UniversalAutoload.TYPES) do
-		if loadType == indexType then
+		if loadingType == indexType then
 			return index
 		end
 	end
@@ -2157,14 +2122,14 @@ end
 --
 function UniversalAutoload:getPalletIsSelectedType(object)
 
-	local objectPalletType, _ = UniversalAutoload.getPalletTypeName(object)
-	local selectedPalletType = UniversalAutoload.getSelectedTypeName(self)
+	local objectLoadingType = UniversalAutoload.getLoadingTypeName(object)
+	local selectedLoadingType = UniversalAutoload.getSelectedTypeName(self)
 	
-	if objectPalletType~=nil and selectedPalletType~=nil then
-		if selectedPalletType == "ALL" then
+	if objectLoadingType~=nil and selectedLoadingType~=nil then
+		if selectedLoadingType == "ALL" then
 			return true
 		else
-			return objectPalletType == selectedPalletType
+			return objectLoadingType == selectedLoadingType
 		end
 	else
 		return false

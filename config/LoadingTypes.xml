@@ -2,113 +2,67 @@
 <universalAutoLoad>
     <loadingTypeConfigurations>
 	
-		<loadingTypeConfiguration name="bigBag" loadingType="BIGBAG"/>
+		<loadingTypeConfiguration loadingType="EURO_PALLET">
+			<objectType name="epsoTop"/>
+			
+			<objectType name="bakeryBoxPallet"/>
+			<objectType name="boardsStackPallet"/>
+			<objectType name="bonsilagePallet"/>
+			<objectType name="butterBoxPallet"/>
+			<objectType name="cakePallet"/>
+			<objectType name="canolaOilPallet"/>
+			<objectType name="cerealsPallet"/>
+			<objectType name="cheesePallet"/>
+			<objectType name="chocolateBoxPallet"/>
+			<objectType name="clothesBoxPallet"/>
+			<objectType name="eggBoxPallet"/>
+			<objectType name="euroPallet"/>
+			<objectType name="fabricsPallet"/>
+			<objectType name="fillablePallet"/>
+			<objectType name="flourBoxPallet"/>
+			<objectType name="furnitureStackPallet"/>
+			<objectType name="grapeJuicePallet"/>
+			<objectType name="grapePallet"/>
+			<objectType name="honeyBoxPallet"/>
+			<objectType name="lettuceBoxPallet"/>
+			<objectType name="oliveOilPallet"/>
+			<objectType name="raisinBoxPallet"/>
+			<objectType name="schaumannPallet"/>
+			<objectType name="strawberriesBoxPallet"/>
+			<objectType name="sugarBoxPallet"/>
+			<objectType name="sunflowerOilPallet"/>
+			<objectType name="tomatoesBoxPallet"/>
+			<objectType name="treeSaplingPallet"/>
+			<objectType name="woolPallet"/>
+			
+			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+			
+		</loadingTypeConfiguration>
 		
-		<loadingTypeConfiguration name="liquidTank" loadingType="LIQUID_TANK"/>
+		<loadingTypeConfiguration loadingType="BIGBAG">
+			<objectType name="bigBag" alwaysRotate="true"/>
+		</loadingTypeConfiguration>
 		
-		<loadingTypeConfiguration name="bigBagPallet" loadingType="BIGBAG_PALLET"/>
+		<loadingTypeConfiguration loadingType="LIQUID_TANK">
+			<objectType name="liquidTank"/>
+		</loadingTypeConfiguration>
 		
-		<loadingTypeConfiguration name="PotatoBox" loadingType="POTATOBOX"/>
-		<loadingTypeConfiguration name="Potatoboxwaste" loadingType="POTATOBOX"/>
-		<loadingTypeConfiguration name="Potatoboxmedium" loadingType="POTATOBOX"/>
-		<loadingTypeConfiguration name="Potatoboxpremium" loadingType="POTATOBOX"/>
+		<loadingTypeConfiguration loadingType="BIGBAG_PALLET">
+			<objectType name="bigBagPallet"/>
+		</loadingTypeConfiguration>
 		
-		<loadingTypeConfiguration name="pioneerPallet" loadingType="EURO_PALLET">
-			<dimensions sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+		<loadingTypeConfiguration loadingType="POTATOBOX">
+			<objectType name="PotatoBox"/>
+			<objectType name="Potatoboxwaste"/>
+			<objectType name="Potatoboxmedium"/>
+			<objectType name="Potatoboxpremium"/>
 		</loadingTypeConfiguration>
 		
     </loadingTypeConfigurations>
 </universalAutoLoad>
 
-<!-- local i3d_path = object.i3dFilename
-	 local i3d_name = i3d_path:match("[^/]*.i3d$")
-	 local name = i3d_name:sub(0, #i3d_name - 4) -->
-
- <!-- Butter Lettuce Cake Bread Silage_Additive Fertilizer Wool Liquidfertilizer Mineral_Feed Wheat Oat Olive Sugar Soybean Herbicide Lime Oilseedradish Barley Furniture Boards Chocolate Strawberry Cereal Canola_Oil Grapejuice Sunflower_Oil Raisins Olive_Oil Honey Maize Seeds Grape Canola Flour Clothes Cotton Fabric Sunflower Sorghum Potato Sugarcane Egg Cheese Tomato -->
- 
-<!--  	-- local objectType = ""
-	-- if  (string.find(object.i3dFilename, "data/objects/pallets/") or
-		-- string.find(object.i3dFilename, "epsoTop.i3d") or
-		-- string.find(object.i3dFilename, "chocolateBoxPallet.i3d")) and
-		-- not string.find(object.i3dFilename, "liquidTank.i3d") then
-		-- objectType = "EURO_PALLET"
-	-- elseif
-		-- string.find(object.i3dFilename, "data/objects/bigBagPallet/") then
-		-- objectType = "BIGBAG_PALLET"
-	-- elseif
-		-- string.find(object.i3dFilename, "liquidTank.i3d") then
-		-- objectType = "LIQUID_TANK"
-	-- elseif
-		-- string.find(object.i3dFilename, "data/objects/bigBag/") then
-		-- objectType = "BIGBAG"
-	-- elseif
-		-- g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] and
-		-- string.find(object.i3dFilename, "PotatoBox.i3d") or
-		-- string.find(object.i3dFilename, "Potatoboxwaste.i3d") or
-		-- string.find(object.i3dFilename, "Potatoboxmedium.i3d") or
-		-- string.find(object.i3dFilename, "Potatoboxpremium.i3d") then
-		-- objectType = "POTATOBOX"
-	-- else
-		-- if UniversalAutoload.UNKNOWN_TYPES[tostring(object.i3dFilename)] == nil then
-			-- UniversalAutoload.UNKNOWN_TYPES[tostring(object.i3dFilename)] = true
-			-- print("UNKNOWN PALLET TYPE...")
-			-- if object.i3dFilename ~= nil then
-				-- print("  i3d: "..object.i3dFilename)
-			-- end
-			-- if object.xmlFilename ~= nil then
-				-- print("  xml: "..object.xmlFilename)
-			-- end
-		-- end
-	-- end -->
- 
-<!-- UniversalAutoload.TYPES = { -->
-	<!-- [1] = "ALL", -->
-	<!-- [2] = "EURO_PALLET", -->
-	<!-- [3] = "BIGBAG_PALLET", -->
-	<!-- [4] = "LIQUID_TANK", -->
-	<!-- [5] = "BIGBAG", -->
-	<!-- [6] = "POTATOBOX" -->
-<!-- } -->
-
-
-<!-- 	-- ["lettuceBoxPallet"] = {
-		-- sizeX = 1.240,
-		-- sizeY = 0.785,
-		-- sizeZ = 0.833,
-		-- alwaysRotate = false
-	-- },
-	-- ["tomatoesBoxPallet"] = {
-		-- sizeX = 1.240,
-		-- sizeY = 0.785,
-		-- sizeZ = 0.833,
-		-- alwaysRotate = false
-	-- },
-	-- ["strawberriesBoxPallet"] = {
-		-- sizeX = 1.240,
-		-- sizeY = 0.785,
-		-- sizeZ = 0.833,
-		-- alwaysRotate = false
-	-- },
-
-
--- eggBoxPallet
--- woolPallet
--- flourBoxPallet
--- bakeryBoxPallet
--- cakePallet
--- butterBoxPallet
--- cheesePallet
--- fabricsPallet
--- clothesBoxPallet
--- sugarBoxPallet
--- honeyBoxPallet
--- cerealsPallet
--- sunflowerOilPallet
--- canolaOilPallet
--- oliveOilPallet
--- raisinBoxPallet
--- grapeJuicePallet
--- chocolateBoxPallet
--- boardsStackPallet
--- furnitureStackPallet
--- bonsilagePallet -->
+<!--
+	local i3d_path = object.i3dFilename
+	local i3d_name = i3d_path:match("[^/]*.i3d$")
+	local name = i3d_name:sub(0, #i3d_name - 4)
+-->

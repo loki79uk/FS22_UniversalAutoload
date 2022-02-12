@@ -1,14 +1,16 @@
----Specialization for automatically load objects onto a vehicle
+-- ============================================================= --
+-- Universal Autoload MOD - SPECIALISATION
+-- ============================================================= --
 UniversalAutoload = {}
 
 UniversalAutoload.name = g_currentModName
 UniversalAutoload.path = g_currentModDirectory
-UniversalAutoload.debugEnabled = true
+UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
-print("  UNIVERSAL AUTOLOAD TEST VERSION: 002") 
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 003")
 
---events
+-- EVENTS
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
 source(g_currentModDirectory.."events/RaiseActiveEvent.lua")
 source(g_currentModDirectory.."events/ResetLoadingEvent.lua")
@@ -21,153 +23,6 @@ source(g_currentModDirectory.."events/StopLoadingEvent.lua")
 source(g_currentModDirectory.."events/UnloadingEvent.lua")
 source(g_currentModDirectory.."events/UpdateActionEvents.lua")
 source(g_currentModDirectory.."events/WarningMessageEvent.lua")
-
-UniversalAutoload.ACTIONS = {
-	["TOGGLE_LOADING"]  = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
-	["UNLOAD_ALL"]      = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
-	["TOGGLE_TIPSIDE"]  = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
-	["TOGGLE_FILTER"]   = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
-	["CYCLE_TYPES_FW"]  = "UNIVERSALAUTOLOAD_CYCLE_TYPES_FW",
-	["CYCLE_TYPES_BW"]  = "UNIVERSALAUTOLOAD_CYCLE_TYPES_BW",
-	["SELECT_ALL"]      = "UNIVERSALAUTOLOAD_SELECT_ALL",
-	["TOGGLE_BELTS"]	= "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
-}
-
-UniversalAutoload.TYPES = {
-	[1] = "ALL",
-	[2] = "EURO_PALLET",
-	[3] = "BIGBAG_PALLET",
-	[4] = "LIQUID_TANK",
-	[5] = "BIGBAG"
-}
-if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
-	print("** Seedpotato Farm Pack is loaded **")
-	table.insert(UniversalAutoload.TYPES, "POTATOBOX")
-end	 
-
--- DEFINE DEFAULTS FOR LOADING TYPES
-UniversalAutoload.EURO_PALLET   = { sizeX = 1.240, sizeY = 0.785, sizeZ = 0.833, alwaysRotate = false }
-UniversalAutoload.BIGBAG_PALLET = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
-UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
-UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
-UniversalAutoload.POTATOBOX     = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
- 
-UniversalAutoload.VEHICLES = {}
-UniversalAutoload.UNKNOWN_TYPES = {}
-
--- IMPORT LOADING TYPE DEFINITIONS
-UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
-	print("  IMPORT supported vehicle configurations")
-	
-	-- define the loading area parameters from settings file
-	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
-	if xmlFile ~= 0 then
-
-		local key = "universalAutoload.vehicleConfigurations"
-		local i = 0
-		while true do
-			local configKey = string.format("%s.vehicleConfiguration(%d)", key, i)
-
-			if not xmlFile:hasProperty(configKey) then
-				break
-			end
-
-			local xmlName = xmlFile:getValue(configKey.."#name")
-			
-			UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName] = {}
-			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName]
-			
-			config.xmlName = xmlName
-			config.width  = xmlFile:getValue(configKey..".loadingArea#width")
-			config.length = xmlFile:getValue(configKey..".loadingArea#length")
-			config.height = xmlFile:getValue(configKey..".loadingArea#height")
-			config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
-			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
-			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
-			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
-			
-			print("  >> "..xmlName)
-
-			i = i + 1
-		end
-
-		xmlFile:delete()
-	end
-end
-
-function tableContainsValue(container, value)
-	for k, v in pairs(container) do
-		if v == value then
-			return true
-		end
-	end
-	return false
-end
-
--- IMPORT LOADING TYPE DEFINITIONS
-UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
-	print("  IMPORT default loading types")
-	-- define the loading area parameters from settings file
-	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
-	if xmlFile ~= 0 then
-
-		local key = "universalAutoload.loadingTypeConfigurations"
-		local i = 0
-		while true do
-			local loadingTypeKey = string.format("%s.loadingTypeConfiguration(%d)", key, i)
-
-			if not xmlFile:hasProperty(loadingTypeKey) then
-				break
-			end
-
-			local loadingType = xmlFile:getValue(loadingTypeKey.."#loadingType")
-			if not tableContainsValue(UniversalAutoload.TYPES, loadingType) then
-				print("UNKNOWN LOADING TYPE: "..loadingType)
-				break
-			end
-			
-			local default = UniversalAutoload[loadingType]
-			print("  >> "..loadingType)
-			
-			local j = 0
-			while true do
-				local objectTypeKey = string.format("%s.objectType(%d)", loadingTypeKey, j)
-				
-				if not xmlFile:hasProperty(objectTypeKey) then
-					break
-				end
-			
-				local name = xmlFile:getValue(objectTypeKey.."#name")
-				UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
-				newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-				newType.loadingType = loadingType
-				newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
-				newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
-				newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
-				newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate)
-				
-				if alwaysRotate then
-					newType.width = newType.sizeX
-					newType.length = newType.sizeZ
-				else
-					newType.width = math.min(newType.sizeX, newType.sizeZ)
-					newType.length = math.max(newType.sizeX, newType.sizeZ)
-				end
-				
-				print(string.format("      %s [%.3f, %.3f, %.3f] %s", name,
-					newType.sizeX, newType.sizeY, newType.sizeZ, tostring(newType.alwaysRotate) ))
-				
-				j = j + 1
-			end
-
-			i = i + 1
-		end
-
-		xmlFile:delete()
-	end
-end
 
 -- REQUIRED SPECIALISATION FUNCTIONS
 function UniversalAutoload.prerequisitesPresent(specializations)
@@ -204,14 +59,13 @@ function UniversalAutoload.initSpecialization()
     local schemaSavegame = Vehicle.xmlSchemaSavegame
     schemaSavegame:register(XMLValueType.STRING, "vehicles.vehicle(?).universalAutoload#tipside", "Last used tip side", "none")
     schemaSavegame:register(XMLValueType.STRING, "vehicles.vehicle(?).universalAutoload#loadside", "Last used load side", "both")
+    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadWidth", "Last used load width", 0)
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadLength", "Last used load length", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadHeight", "Last used load height", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#actualWidth", "Last used total load width", 0)
     schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#typeIndex", "Last used pallet type", 1)
     schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?).universalAutoload#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
-	
-	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)
-	UniversalAutoload.ImportVehicleConfigurations(vehicleSettingsFile)
-	local LoadingTypeSettingsFile = Utils.getFilename("config/LoadingTypes.xml", UniversalAutoload.path)
-	UniversalAutoload.ImportLoadingTypeConfigurations(LoadingTypeSettingsFile)
+
 end
 --
 function UniversalAutoload.registerFunctions(vehicleType)
@@ -680,6 +534,12 @@ function UniversalAutoload:startLoading(noEventSend)
 					local node = object.nodeId or object.components[1].node
 					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
 					object.distance = math.abs(x) + math.abs(z) - y
+					
+					local loadingType = UniversalAutoload.getLoadingType(object)
+					object.width = loadingType.width
+					object.length = loadingType.length
+					object.height = loadingType.height
+					object.loadingIndex = loadingType.loadingIndex
 					table.insert(spec.sortedObjectsToLoad, object)
 				end
 			end
@@ -687,12 +547,6 @@ function UniversalAutoload:startLoading(noEventSend)
 				table.sort(spec.sortedObjectsToLoad, sortPalletsForLoading)
 			end
 			
-			if spec.currentTypeIndex == 1 then
-				spec.loadAllTypes = true
-				spec.currentTypeIndex = spec.currentTypeIndex + 1
-			else
-				spec.loadAllTypes = false
-			end
 			self:setAllTensionBeltsActive(false)
 		end
 		
@@ -704,7 +558,16 @@ function UniversalAutoload:startLoading(noEventSend)
 end
 --
 function sortPalletsForLoading(w1,w2)
-	if w1.distance < w2.distance then
+
+	if w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
+		return true
+	elseif w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
+		return true
+	elseif w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and  w1.length > w2.length then
+		return true
+	elseif w1.loadingIndex == w2.loadingIndex and w1.width > w2.width then
+		return true
+	elseif w1.loadingIndex < w2.loadingIndex then
 		return true
 	end
 end
@@ -718,10 +581,10 @@ function UniversalAutoload:stopLoading(noEventSend)
 		spec.doPostLoadDelay = true
 		
 		if self.isServer then
-			if spec.loadAllTypes then
-				spec.loadAllTypes = false
-				spec.currentTypeIndex = 1
-			end
+			-- if spec.loadAllTypes then
+				-- spec.loadAllTypes = false
+				-- spec.currentTypeIndex = 1
+			-- end
 			spec.loadDelayTime = 0
 			spec.doSetTensionBelts = true
 		end
@@ -758,7 +621,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 							setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
 							setTranslation(unloadPlace.node, p.x, p.y, p.z)
 							
-							local autoLoadType = UniversalAutoload.getPalletType(object)
+							local autoLoadType = UniversalAutoload.getLoadingType(object)
 							unloadPlace.sizeX = autoLoadType.sizeX
 							unloadPlace.sizeY = autoLoadType.sizeY
 							unloadPlace.sizeZ = autoLoadType.sizeZ
@@ -805,12 +668,8 @@ function UniversalAutoload:startUnloading(noEventSend)
 						end
 					end
 					spec.objectsToUnload = {}
-					
-					spec.currentLoadWidth = 0
-					spec.currentLoadHeight = 0
-					spec.currentLoadLength = 0
-					spec.currentLoadingPattern = {}
-					spec.makeNewLoadingPlace = true
+					--spec.currentLoadingPattern = {}
+					spec.resetLoadingPattern = true
 
 					if spec.totalUnloadCount > 0  then
 						spec.doSetTensionBelts = true
@@ -1008,7 +867,7 @@ function UniversalAutoload:onLoad(savegame)
 			link(spec.loadArea.rootNode, playerTrigger.node)
 			setRotation(playerTrigger.node, 0, 0, 0)
 			setTranslation(playerTrigger.node, 0, spec.loadArea.height/2, 0)
-			setScale(playerTrigger.node, 4*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+2*spec.loadArea.width)
+			setScale(playerTrigger.node, 5*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+2*spec.loadArea.width)
 			
 			table.insert(spec.triggers, playerTrigger)
             addTrigger(playerTrigger.node, "playerTriggerCallback", self)
@@ -1020,7 +879,7 @@ function UniversalAutoload:onLoad(savegame)
 			leftTrigger.name = "leftTrigger"
 			link(spec.loadArea.rootNode, leftTrigger.node)
 			
-			local width, height, length = 1.5*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+spec.loadArea.width/2
+			local width, height, length = 1.66*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+spec.loadArea.width/2
 
 			setRotation(leftTrigger.node, 0, 0, 0)
 			setTranslation(leftTrigger.node, 1.1*(width+spec.loadArea.width)/2, 0, 0)
@@ -1036,7 +895,7 @@ function UniversalAutoload:onLoad(savegame)
 			rightTrigger.name = "rightTrigger"
 			link(spec.loadArea.rootNode, rightTrigger.node)
 			
-			local width, height, length = 1.5*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+spec.loadArea.width/2
+			local width, height, length = 1.66*spec.loadArea.width, 2*spec.loadArea.height, spec.loadArea.length+spec.loadArea.width/2
 
 			setRotation(rightTrigger.node, 0, 0, 0)
 			setTranslation(rightTrigger.node, -1.1*(width+spec.loadArea.width)/2, 0, 0)
@@ -1076,7 +935,12 @@ function UniversalAutoload:onLoad(savegame)
 		spec.totalUnloadCount = 0
 		spec.validLoadCount = 0
 		spec.validUnloadCount = 0
-		spec.currentLoadLength = 0
+		
+		-- --current load dimensions
+		-- spec.currentLoadWidth = 0
+		-- spec.currentLoadHeight = 0
+		-- spec.currentLoadLength = 0
+		-- spec.currentActualWidth = 0
 
 	end
 
@@ -1126,7 +990,10 @@ function UniversalAutoload:onPostLoad(savegame)
             spec.currentTypeIndex = 1
 			spec.currentLoadingFilter = true
 			--server only
-			spec.currentLoadLength = 0
+			-- spec.currentLoadWidth = 0
+			-- spec.currentLoadHeight = 0
+			-- spec.currentLoadLength = 0
+			-- spec.currentActualWidth = 0
 		else
 			--client+server
             spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
@@ -1134,7 +1001,10 @@ function UniversalAutoload:onPostLoad(savegame)
             spec.currentTypeIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#typeIndex", 1)
 			spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
 			--server only
-            spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
+			spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
+			spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
+			spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
+			spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
         end
 	
 	end
@@ -1152,7 +1022,10 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			xmlFile:setValue(key.."#typeIndex", spec.currentTypeIndex)
 			xmlFile:setValue(key.."#loadingFilter", spec.currentLoadingFilter)
 			--server only
+			xmlFile:setValue(key.."#loadWidth", spec.currentLoadWidth)
+			xmlFile:setValue(key.."#loadHeight", spec.currentLoadHeight)
 			xmlFile:setValue(key.."#loadLength", spec.currentLoadLength)
+			xmlFile:setValue(key.."#actualWidth", spec.currentActualWidth)
 		end
 	end
 end
@@ -1261,7 +1134,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		if spec.rearLoadingObjects ~= nil then
 			for _, object in pairs(spec.rearLoadingObjects) do
 				--print("LOADING PALLET FROM REAR TRIGGER")
-				local palletIndex = UniversalAutoload.getPalletIndex(object)
+				local loadingType = UniversalAutoload.getLoadingTypeName(object)
+				local palletIndex = UniversalAutoload.getLoadingIndex(loadingType)
 				if spec.currentTypeIndex ~= palletIndex then
 					self:setLoadingTypeIndex( palletIndex )
 					self:setAllTensionBeltsActive(false)
@@ -1305,20 +1179,20 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						-- if spec.currentTypeIndex == 2 then
 						-- end
 						
-						if spec.loadAllTypes and spec.currentTypeIndex ~= 1 then
-							--print("TRY OTHER TYPES")
-							if spec.currentTypeIndex < #UniversalAutoload.TYPES then
-								spec.currentTypeIndex = spec.currentTypeIndex + 1
-							else
-								spec.loadAllTypes = false
-								spec.currentTypeIndex = 1
-							end
-						else
+						-- if spec.loadAllTypes and spec.currentTypeIndex ~= 1 then
+							-- --print("TRY OTHER TYPES")
+							-- if spec.currentTypeIndex < #UniversalAutoload.TYPES then
+								-- spec.currentTypeIndex = spec.currentTypeIndex + 1
+							-- else
+								-- spec.loadAllTypes = false
+								-- spec.currentTypeIndex = 1
+							-- end
+						-- else
 							if #spec.sortedObjectsToLoad > 0 then
 								spec.reachedLoadingCapacity = true
 							end
 							self:stopLoading()
-						end
+						-- end
 					end
 				else
 					spec.loadDelayTime = spec.loadDelayTime + dt
@@ -1473,8 +1347,9 @@ function UniversalAutoload:loadObject(object)
 		if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
 			local spec = self.spec_universalAutoload
 			if spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil then
-			
-				local placeIndex, thisLoadHeight = self:getLoadPlace(object)
+				local thisLoadType = UniversalAutoload.getLoadingType(object)
+				print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", thisLoadType.name, thisLoadType.sizeX, thisLoadType.sizeY, thisLoadType.sizeZ))
+				local placeIndex, thisLoadHeight = self:getLoadPlace(thisLoadType)
 				if placeIndex ~= -1 then
 
 					local p = {}
@@ -1593,209 +1468,28 @@ function UniversalAutoload:onDeleteLoadedObject(object)
 	end
 end
 
--- CREATE NEW LOADING PATTERN IN AVAILABLE SPACE
--- function UniversalAutoload:buildNewLoadingPattern(autoLoadType)
-	-- local spec = self.spec_universalAutoload
-	
-	-- print("buildNewLoadingPattern: "..self:getFullName() )
-	-- spec.currentPlaceIndex = 1
-	-- spec.currentLoadHeight = 0
-	
-	-- if autoLoadType == nil then
-		-- spec.lastLoadType = nil
-		-- spec.currentLoadWidth = 0
-		-- spec.currentLoadHeight = 0
-		-- spec.currentLoadLength = 0
-		-- spec.currentLoadingPattern = {}
-		-- spec.makeNewLoadingPlace = true
-		-- return
-	-- end
-	-- if autoLoadType == "ALL" then
-		-- spec.currentLoadingPattern = {}
-		-- return
-	-- end
-
-	-- local spacing = spec.spacing or 0
-	-- local currentLoadLength = spec.currentLoadLength or 0
-
-	-- --CALCUATE POSSIBLE ARRAY SIZES
-	-- local width, length = spec.loadArea.width, spec.loadArea.length - currentLoadLength
-	-- local N1 = math.floor(width / (autoLoadType.sizeX + spacing))
-	-- local M1 = math.floor(length / (autoLoadType.sizeZ + spacing))
-	
-	-- local N2 = math.floor(width / (autoLoadType.sizeZ + spacing))
-	-- local M2 = math.floor(length / (autoLoadType.sizeX + spacing))
-	
-	-- local N, M, sizeX, sizeY, sizeZ, rotation
-	-- if N2*M2 > N1*M1  or autoLoadType.alwaysRotate then
-		-- N, M = N2, M2
-		-- rotation = math.pi/2
-		-- sizeZ = autoLoadType.sizeX
-		-- sizeY = autoLoadType.sizeY
-		-- sizeX = autoLoadType.sizeZ
-	-- else
-		-- N, M = N1, M1
-		-- rotation = 0
-		-- sizeX = autoLoadType.sizeX
-		-- sizeY = autoLoadType.sizeY
-		-- sizeZ = autoLoadType.sizeZ
-	-- end
-
-	-- --CENTRAL AXIS COORDINATES
-	-- local actualWidth = N * (sizeX + spacing) - spacing
-	-- local X0, Z0 = actualWidth/2, -currentLoadLength
-	
-	-- --BUILD NEW LOADING PATTERN
-	-- local tempLoadingPattern = {}
-	-- if N*M >= 1 then
-		-- for n = 0, N-1 do
-			-- for m = 0, M-1 do
-				-- local loadingPatternItem = {}
-				-- loadingPatternItem.rotation = rotation
-				-- loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
-				-- loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
-				-- table.insert(tempLoadingPattern, loadingPatternItem)
-			-- end
-		-- end
-	-- end
-	
-	-- --CHECK IF ROOM FOR ANY MORE IN OTHER ROTATION
-	-- local newLoadLength = M*(sizeZ + spacing)
-	-- if rotation == math.pi/2 then
-		-- rotation = 0
-		-- sizeX = autoLoadType.sizeX
-		-- sizeY = autoLoadType.sizeY
-		-- sizeZ = autoLoadType.sizeZ
-	-- else
-		-- rotation = math.pi/2
-		-- sizeZ = autoLoadType.sizeX
-		-- sizeY = autoLoadType.sizeY
-		-- sizeX = autoLoadType.sizeZ
-	-- end
-	-- N = math.floor(width / (sizeX + spacing))
-	-- M = math.floor((length - newLoadLength) / (sizeZ + spacing))
-	-- if N*M >= 1 then
-		-- actualWidth = N * (sizeX + spacing) - spacing
-		-- X0, Z0 = actualWidth/2, -(currentLoadLength + newLoadLength)
-		-- for n = 0, N-1 do
-			-- for m = 0, M-1 do
-				-- local loadingPatternItem = {}
-				-- loadingPatternItem.rotation = rotation
-				-- loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
-				-- loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
-				-- table.insert(tempLoadingPattern, loadingPatternItem)
-			-- end
-		-- end
-	-- end
-	
-	-- --SORT TABLE TO LOAD FROM THE CORRECT SIDE
-	-- if spec.currentLoadside == "right" then
-		-- table.sort(tempLoadingPattern, startLoadingFromLeft)
-	-- else
-		-- table.sort(tempLoadingPattern, startLoadingFromRight)
-	-- end
-	
-	-- --COPY NEW LOADING PATTERN
-	-- local newLoadingPattern = {}
-	-- for index, loadingPatternItem in ipairs(tempLoadingPattern) do
-		-- local loadPlace = {}
-		-- loadPlace.index = index
-		-- loadPlace.node = createTransformGroup("loadPlace")
-		-- loadPlace.sizeX = autoLoadType.sizeX
-		-- loadPlace.sizeY = autoLoadType.sizeY
-		-- loadPlace.sizeZ = autoLoadType.sizeZ
-		-- loadPlace.isRotated = loadingPatternItem.rotation == math.pi/2
-		-- link(spec.loadArea.startNode, loadPlace.node)
-		-- setRotation(loadPlace.node, 0, loadingPatternItem.rotation, 0)
-		-- setTranslation(loadPlace.node, loadingPatternItem.posX, 0, loadingPatternItem.posZ)
-		-- table.insert(newLoadingPattern, loadPlace)
-	-- end
-	-- table.sort(newLoadingPattern, sortIndexAscending)
-	-- spec.currentLoadingPattern = newLoadingPattern
--- end
-
--- SORTING CALLBACK FUNCTIONS
--- function sortIndexAscending(w1,w2)
-    -- if w1.index < w2.index then
-        -- return true
-    -- end
--- end
---
--- function startLoadingFromLeft(w1,w2)
-    -- if w1.posZ == w2.posZ and w1.posX > w2.posX then
-        -- return true
-    -- end
-    -- if w1.posZ > w2.posZ then
-        -- return true
-    -- end
--- end
---
--- function startLoadingFromRight(w1,w2)
-    -- if w1.posZ == w2.posZ and w1.posX < w2.posX then
-        -- return true
-    -- end
-    -- if w1.posZ > w2.posZ then
-        -- return true
-    -- end
--- end
---
-
--- -- MAIN PICKUP LOGIC FUNCTION
--- function UniversalAutoload:getNextLoadPlace(object)
-    -- local spec = self.spec_universalAutoload
-
-	-- local loadPlaces = spec.currentLoadingPattern
-	-- local palletType = UniversalAutoload.getPalletType(object)
-	
-	-- for i=spec.currentPlaceIndex, #loadPlaces do
-		-- --print("trying place: " .. tostring(i))
-		-- local loadPlace = loadPlaces[i]
-		-- local thisLoadHeight = spec.currentLoadHeight
-
-		-- while thisLoadHeight >= 0 do
-			-- if self:testPalletLocationIsEmpty(loadPlace, palletType, thisLoadHeight) and
-			-- (thisLoadHeight==0 or self:testPalletLocationIsFull(loadPlace, palletType, thisLoadHeight-palletType.sizeY)) then
-				-- --print("using this place")
-				-- if spec.currentLoadHeight + 2*palletType.sizeY < spec.loadArea.height then
-					-- --print("STACK NEXT HERE")
-					-- spec.currentLoadHeight = spec.currentLoadHeight + palletType.sizeY
-				-- else
-					-- --print("START NEW PLACE")
-					-- spec.currentLoadHeight = 0
-					-- spec.currentPlaceIndex = spec.currentPlaceIndex + 1
-				-- end
-				-- return i, thisLoadHeight
-			-- end
-			-- thisLoadHeight = thisLoadHeight - palletType.sizeY
-			-- spec.currentLoadHeight = thisLoadHeight
-		-- end
-		
-		-- --print("trying next place")
-		-- spec.currentLoadHeight = 0
-		-- spec.currentPlaceIndex = spec.currentPlaceIndex + 1
-	-- end
-
-	-- --print("no places found")
-    -- return -1, 0
--- end
-
 function UniversalAutoload:addLoadPlace(autoLoadType)
     local spec = self.spec_universalAutoload
 
-	spec.makeNewLoadingPlace = false
 	spec.currentLoadWidth = spec.currentLoadWidth or 0
 	spec.currentLoadLength = spec.currentLoadLength or 0
-	spec.currentLoadHeight = spec.currentLoadHeight or 0
+	spec.currentActualWidth = spec.currentActualWidth or 0
 	
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea.width
 	local length = spec.loadArea.length - spec.currentLoadLength
 	local N1 = math.floor(width / autoLoadType.sizeX)
 	local M1 = math.floor(length / autoLoadType.sizeZ)
-	
 	local N2 = math.floor(width / autoLoadType.sizeZ)
 	local M2 = math.floor(length / autoLoadType.sizeX)
 	
+	if N2*M2 == N1*M1 then
+	-- if equal use same packing as an empty trailer
+		M1 = math.floor(spec.loadArea.length / autoLoadType.sizeX)
+		M2 = math.floor(spec.loadArea.length / autoLoadType.sizeZ)
+	end
+	
+	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
 	if N2*M2 > N1*M1  or autoLoadType.alwaysRotate then
 		N, M = N2, M2
@@ -1810,83 +1504,97 @@ function UniversalAutoload:addLoadPlace(autoLoadType)
 		sizeY = autoLoadType.sizeY
 		sizeZ = autoLoadType.sizeZ
 	end
-
-	--CREATE NEW LOADING PLACE
-	loadPlace = {}
-	loadPlace.index = index
-	loadPlace.node = createTransformGroup("loadPlace")
-	loadPlace.sizeX = autoLoadType.sizeX
-	loadPlace.sizeY = autoLoadType.sizeY
-	loadPlace.sizeZ = autoLoadType.sizeZ
-	loadPlace.isRotated = rotation == math.pi/2
 	
-	local actualWidth = N * sizeX
-	if spec.currentLoadWidth + sizeX > actualWidth then
-		spec.currentLoadWidth = sizeX
-		spec.currentLoadLength = spec.currentLoadLength + sizeZ
-	else
-		if spec.currentLoadLength == 0 then
-			spec.currentLoadLength = sizeZ
-		end
-		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
-	end
+	-- UPDATE NEW PACKING DIMENSIONS
+
 	spec.currentLoadHeight = 0
-
-	--DEFINE NEW LOADING PLACE
-	local posX, posZ
-	if spec.currentLoadside == "right" then
-		print("right")
-		posX = -( spec.currentLoadWidth - (actualWidth/2) - (sizeX/2) )
+	print("reset currentLoadHeight: "..spec.currentLoadHeight)
+	
+	if spec.currentLoadWidth==0 or spec.currentLoadWidth + sizeX > spec.loadArea.width then
+		spec.currentLoadWidth = sizeX
+		spec.currentActualWidth = N * sizeX
+		print("reset currentLoadWidth: "..spec.currentLoadWidth)
+		
+		spec.currentLoadLength = spec.currentLoadLength + sizeZ
+		print("increased currentLoadLength: "..spec.currentLoadLength)
 	else
-		print("left")
-		posX = spec.currentLoadWidth - (actualWidth/2) - (sizeX/2)
+		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
+		print("increased currentLoadWidth: "..spec.currentLoadWidth)
 	end
-	posZ = -( spec.currentLoadLength - (sizeZ/2) )
 	
-	
-	link(spec.loadArea.startNode, loadPlace.node)
-	setRotation(loadPlace.node, 0, rotation, 0)
-	setTranslation(loadPlace.node, posX, 0, posZ)
+	if spec.currentLoadLength == 0 then
+		spec.currentLoadLength = sizeZ
+		print("reset currentLoadLength: "..spec.currentLoadLength)
+	end
 
-	print("inserting new place: " .. tostring(loadPlace) )
-	table.insert(spec.currentLoadingPattern, loadPlace)
-	spec.currentPlaceIndex = #spec.currentLoadingPattern
+	if spec.currentLoadLength < spec.loadArea.length and spec.currentLoadWidth <= spec.currentActualWidth then
+		--CREATE NEW LOADING PLACE
+		loadPlace = {}
+		loadPlace.index = #spec.currentLoadingPattern + 1
+		loadPlace.node = createTransformGroup("loadPlace")
+		loadPlace.sizeX = autoLoadType.sizeX
+		loadPlace.sizeY = autoLoadType.sizeY
+		loadPlace.sizeZ = autoLoadType.sizeZ
+		loadPlace.isRotated = rotation == math.pi/2
+		
+		--LOAD FROM THE CORRECT SIDE
+		local posX, posZ
+		if spec.currentLoadside == "right" then
+			print("right")
+			posX = -( spec.currentLoadWidth - (spec.currentActualWidth/2) - (sizeX/2) )
+		else
+			print("left")
+			posX = spec.currentLoadWidth - (spec.currentActualWidth/2) - (sizeX/2)
+		end
+		posZ = -( spec.currentLoadLength - (sizeZ/2) )
+		
+		--SET POSITION AND ORIENTATION
+		link(spec.loadArea.startNode, loadPlace.node)
+		setRotation(loadPlace.node, 0, rotation, 0)
+		setTranslation(loadPlace.node, posX, 0, posZ)
+		
+		--INSERT PLACE INTO CURRENT TABLE
+		table.insert(spec.currentLoadingPattern, loadPlace)
+		spec.currentPlaceIndex = #spec.currentLoadingPattern
+	end
 
 end
 
-function UniversalAutoload:getLoadPlace(object)
+function UniversalAutoload:getLoadPlace(thisLoadType)
     local spec = self.spec_universalAutoload
-	local thisLoadType = UniversalAutoload.getPalletType(object)
 	
-	while spec.currentLoadLength+thisLoadType.length < spec.loadArea.length do
+	if spec.resetLoadingPattern then
+		spec.currentLoadingPattern = {}
+		spec.currentLoadWidth = 0
+		spec.currentLoadHeight = 0
+		spec.currentLoadLength = 0
+		spec.makeNewLoadingPlace = true
+		spec.resetLoadingPattern = false
+	end
+
+	while spec.currentLoadLength < spec.loadArea.length do
 	
 		spec.currentLoadHeight = spec.currentLoadHeight or 0
+		if spec.currentLoadHeight + thisLoadType.sizeY > spec.loadArea.height then
+			spec.makeNewLoadingPlace = true
+		end
+	
 		if spec.makeNewLoadingPlace ~= false then
-			print("ADDING NEW PLACE FOR: " .. thisLoadType.loadingType)
+			print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", thisLoadType.name, thisLoadType.sizeX, thisLoadType.sizeY, thisLoadType.sizeZ))
 			self:addLoadPlace(thisLoadType)
+			spec.makeNewLoadingPlace = false
 		end
 
 		local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
 		local thisLoadHeight = spec.currentLoadHeight
-		print("using load place: " .. tostring(loadPlace) )
-
-		while thisLoadHeight >= 0 do
-			if self:testPalletLocationIsEmpty(thisLoadPlace, thisLoadType, thisLoadHeight) and
-			(thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, thisLoadType, thisLoadHeight-thisLoadType.sizeY)) then
-				print("using place: " .. spec.currentPlaceIndex)
-				if spec.currentLoadHeight + 2*thisLoadType.sizeY < spec.loadArea.height then
-					print("STACK NEXT HERE")
-					spec.currentLoadHeight = spec.currentLoadHeight + thisLoadType.sizeY
-				else
-					print("START NEW PLACE")
-					spec.makeNewLoadingPlace = true
-				end
-				return spec.currentPlaceIndex, thisLoadHeight
-			end
-			thisLoadHeight = thisLoadHeight - thisLoadType.sizeY
-			spec.currentLoadHeight = thisLoadHeight
+		
+		if self:testPalletLocationIsEmpty(thisLoadPlace, thisLoadType, thisLoadHeight) then
+			print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
+			spec.currentLoadHeight = spec.currentLoadHeight + thisLoadType.sizeY
+			return spec.currentPlaceIndex, thisLoadHeight
 		end
 		
+		print("DID NOT FIT HERE...")
 		spec.makeNewLoadingPlace = true
 	end
 
@@ -1902,7 +1610,7 @@ function UniversalAutoload:getIsValidObject(object)
 	end
 	if object.i3dFilename ~= nil and object.typeName == "pallet" or object.typeName == "bigBag" then
 		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
-			return UniversalAutoload.getPalletType(object) ~= nil
+			return UniversalAutoload.getLoadingType(object) ~= nil
 		end
 	end
 	
@@ -1938,7 +1646,7 @@ function UniversalAutoload:testPalletLocationIsFull(loadPlace, autoLoadType, tes
 
 	if spec.foundObject then
 		local x0, y0, z0 = localToLocal(loadPlace.node, spec.foundObjectId, 0, 0, 0)
-		return x0 < 0.1 and z0 < 0.1
+		return x0 < 0.2 and z0 < 0.2
 	else
 		return false
 	end
@@ -2172,19 +1880,18 @@ function UniversalAutoload:removeLoadedObject(object)
 end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
-function UniversalAutoload.getPalletTypeName(object)
-	local i3d_path = object.i3dFilename
+function UniversalAutoload.getObjectNameFromPath(i3d_path)
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
 	return i3d_name:sub(0, #i3d_name - 4)
 end
 --
 function UniversalAutoload.getLoadingTypeName(object)
-	local palletType = UniversalAutoload.getPalletType(object)
+	local palletType = UniversalAutoload.getLoadingType(object)
 	return palletType.loadingType
 end
 --
-function UniversalAutoload.getPalletType(object)
-	local name = UniversalAutoload.getPalletTypeName(object)
+function UniversalAutoload.getLoadingType(object)
+	local name = UniversalAutoload.getObjectNameFromPath(object.i3dFilename)
 	local palletType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 	
 	if palletType == nil then
@@ -2197,9 +1904,7 @@ function UniversalAutoload.getPalletType(object)
 	return palletType
 end
 --
-function UniversalAutoload.getPalletIndex(object)
-	local loadingType = UniversalAutoload.getLoadingTypeName(object)
-
+function UniversalAutoload.getLoadingIndex(loadingType)
 	for index, indexType in ipairs(UniversalAutoload.TYPES) do
 		if loadingType == indexType then
 			return index
@@ -2268,10 +1973,10 @@ function UniversalAutoload:drawDebugDisplay()
 		for _,object in pairs(spec.objectsToLoad) do
 			if object ~= nil then
 				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getPalletType(object)
+				local autoLoadType = UniversalAutoload.getLoadingType(object)
 				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
 				if self:isValidForLoading(object) then
-					DrawDebugPallet( node, w, h, l, false, 0, 1, 0 )
+					DrawDebugPallet( node, w, h, l, true, 0, 1, 0 )
 				else
 					DrawDebugPallet( node, w, h, l, false, 1, 0, 0 )
 				end
@@ -2281,10 +1986,10 @@ function UniversalAutoload:drawDebugDisplay()
 		for _,object in pairs(spec.loadedObjects) do
 			if object ~= nil then
 				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getPalletType(object)
+				local autoLoadType = UniversalAutoload.getLoadingType(object)
 				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
 				if self:isValidForUnloading(object) then
-					DrawDebugPallet( node, w, h, l, false, 0, 1, 0 )
+					DrawDebugPallet( node, w, h, l, true, 0, 1, 0 )
 				else
 					DrawDebugPallet( node, w, h, l, false, 1, 1, 0 )
 				end
@@ -2337,20 +2042,27 @@ function DrawDebugPallet( node, w, h, l, showAxis, r, g, b )
 		local zx,zy,zz = localDirectionToWorld(node, 0,0,l)
 
 		if showAxis then
-			local x0,y0,z0 = localToWorld(node, 0, h/2, 0)
-			Utils.renderTextAtWorldPosition(x0-xx/2,y0-xy/2,z0-xz/2, "-x", getCorrectTextSize(0.012), 0)
-			Utils.renderTextAtWorldPosition(x0+xx/2,y0+xy/2,z0+xz/2, "+x", getCorrectTextSize(0.012), 0)
-			Utils.renderTextAtWorldPosition(x0-yx/2,y0-yy/2,z0-yz/2, "-y", getCorrectTextSize(0.012), 0)
-			Utils.renderTextAtWorldPosition(x0+yx/2,y0+yy/2,z0+yz/2, "+y", getCorrectTextSize(0.012), 0)
-			Utils.renderTextAtWorldPosition(x0-zx/2,y0-zy/2,z0-zz/2, "-z", getCorrectTextSize(0.012), 0)
-			Utils.renderTextAtWorldPosition(x0+zx/2,y0+zy/2,z0+zz/2, "+z", getCorrectTextSize(0.012), 0)
-			drawDebugLine(x0-xx/2,y0-xy/2,z0-xz/2,1,1,1,x0+xx/2,y0+xy/2,z0+xz/2,1,1,1)
-			drawDebugLine(x0-yx/2,y0-yy/2,z0-yz/2,1,1,1,x0+yx/2,y0+yy/2,z0+yz/2,1,1,1)
-			drawDebugLine(x0-zx/2,y0-zy/2,z0-zz/2,1,1,1,x0+zx/2,y0+zy/2,z0+zz/2,1,1,1)
+			-- local x0,y0,z0 = localToWorld(node, 0, h/2, 0)
+			-- Utils.renderTextAtWorldPosition(x0-xx/2,y0-xy/2,z0-xz/2, "-x", getCorrectTextSize(0.012), 0)
+			-- Utils.renderTextAtWorldPosition(x0+xx/2,y0+xy/2,z0+xz/2, "+x", getCorrectTextSize(0.012), 0)
+			-- Utils.renderTextAtWorldPosition(x0-yx/2,y0-yy/2,z0-yz/2, "-y", getCorrectTextSize(0.012), 0)
+			-- Utils.renderTextAtWorldPosition(x0+yx/2,y0+yy/2,z0+yz/2, "+y", getCorrectTextSize(0.012), 0)
+			-- Utils.renderTextAtWorldPosition(x0-zx/2,y0-zy/2,z0-zz/2, "-z", getCorrectTextSize(0.012), 0)
+			-- Utils.renderTextAtWorldPosition(x0+zx/2,y0+zy/2,z0+zz/2, "+z", getCorrectTextSize(0.012), 0)
+			-- drawDebugLine(x0-xx/2,y0-xy/2,z0-xz/2,1,1,1,x0+xx/2,y0+xy/2,z0+xz/2,1,1,1)
+			-- drawDebugLine(x0-yx/2,y0-yy/2,z0-yz/2,1,1,1,x0+yx/2,y0+yy/2,z0+yz/2,1,1,1)
+			-- drawDebugLine(x0-zx/2,y0-zy/2,z0-zz/2,1,1,1,x0+zx/2,y0+zy/2,z0+zz/2,1,1,1)
+			
+			local x0,y0,z0 = localToWorld(node, -w/2, h, -l/2)
+			drawDebugLine(x0,y0,z0,r,g,b,x0+xx,y0+xy,z0+xz,r,g,b)
+			drawDebugLine(x0,y0,z0,r,g,b,x0+zx,y0+zy,z0+zz,r,g,b)
+			drawDebugLine(x0+xx,y0+xy,z0+xz,r,g,b,x0+xx+zx,y0+xy+zy,z0+xz+zz,r,g,b)
+			drawDebugLine(x0+zx,y0+zy,z0+zz,r,g,b,x0+xx+zx,y0+xy+zy,z0+xz+zz,r,g,b)
+		
 		end
 
 		local x0,y0,z0 = localToWorld(node, -w/2, 0, -l/2)
-		y0 = y0 + 0.01
+		--y0 = y0 + 0.01
 		drawDebugLine(x0,y0,z0,r,g,b,x0+xx,y0+xy,z0+xz,r,g,b)
 		drawDebugLine(x0,y0,z0,r,g,b,x0+zx,y0+zy,z0+zz,r,g,b)
 		drawDebugLine(x0+xx,y0+xy,z0+xz,r,g,b,x0+xx+zx,y0+xy+zy,z0+xz+zz,r,g,b)

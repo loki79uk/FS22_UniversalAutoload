@@ -3,39 +3,56 @@
     <loadingTypeConfigurations>
 	
 		<loadingTypeConfiguration loadingType="EURO_PALLET">
-			<objectType name="epsoTop"/>
 			
-			<objectType name="bakeryBoxPallet"/>
-			<objectType name="boardsStackPallet"/>
-			<objectType name="bonsilagePallet"/>
+			<objectType name="lettuceBoxPallet"/>
+			<objectType name="tomatoesBoxPallet"/>
+			<objectType name="strawberriesBoxPallet"/>
 			<objectType name="butterBoxPallet"/>
-			<objectType name="cakePallet"/>
-			<objectType name="canolaOilPallet"/>
-			<objectType name="cerealsPallet"/>
-			<objectType name="cheesePallet"/>
 			<objectType name="chocolateBoxPallet"/>
-			<objectType name="clothesBoxPallet"/>
-			<objectType name="eggBoxPallet"/>
-			<objectType name="euroPallet"/>
-			<objectType name="fabricsPallet"/>
-			<objectType name="fillablePallet"/>
-			<objectType name="flourBoxPallet"/>
 			<objectType name="furnitureStackPallet"/>
 			<objectType name="grapeJuicePallet"/>
-			<objectType name="grapePallet"/>
-			<objectType name="honeyBoxPallet"/>
-			<objectType name="lettuceBoxPallet"/>
-			<objectType name="oliveOilPallet"/>
 			<objectType name="raisinBoxPallet"/>
-			<objectType name="schaumannPallet"/>
-			<objectType name="strawberriesBoxPallet"/>
-			<objectType name="sugarBoxPallet"/>
-			<objectType name="sunflowerOilPallet"/>
-			<objectType name="tomatoesBoxPallet"/>
-			<objectType name="treeSaplingPallet"/>
-			<objectType name="woolPallet"/>
+			<objectType name="grapePallet"/>
+
 			
+			<objectType name="euroPallet" sizeY="0.200"/>
+			
+			<objectType name="oliveOilPallet" sizeY="0.450"/>
+			<objectType name="canolaOilPallet" sizeY="0.450"/>
+			<objectType name="sunflowerOilPallet" sizeY="0.450"/>
+			
+			<objectType name="bonsilagePallet" sizeY="0.450"/>
+			<objectType name="cakePallet" sizeY="0.475"/>
+			
+			<objectType name="eggBoxPallet" sizeY="0.550"/>
+			
+			
+			
+			<objectType name="fabricsPallet" sizeY="0.600"/>
+			<objectType name="honeyBoxPallet" sizeY="0.650"/>
+			<objectType name="boardsStackPallet" sizeY="0.650"/>
+			
+			
+ 			<objectType name="bakeryBoxPallet" sizeY="0.720"/>
+			
+			<objectType name="fillablePallet" sizeY="0.800"/>
+			
+			<objectType name="cheesePallet" sizeY="1.000"/>
+			<objectType name="clothesBoxPallet" sizeY="1.000"/>
+			
+			<objectType name="cerealsPallet" sizeY="1.100"/>
+			
+			<objectType name="flourBoxPallet" sizeY="1.125"/>
+			<objectType name="sugarBoxPallet" sizeY="1.125"/>
+			
+			<objectType name="woolPallet" sizeY="1.200"/>
+						
+			<objectType name="treeSaplingPallet" sizeY="2.000"/>
+			
+			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
+			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
 			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
 			
 		</loadingTypeConfiguration>
 		
@@ -71,4 +88,38 @@
 	UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
 	UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
 	UniversalAutoload.POTATOBOX     = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
+	
+	bigBagPallet [2.000, 2.000, 0.000]
+	bigBagPallet [2.000, 2.000, 0.000]
+	liquidTank [2.000, 2.000, 0.000]
+	bigBagPallet [2.000, 2.000, 0.000]
+	liquidTank [2.000, 2.000, 0.000]
+	boardsStackPallet [0.800, 1.200, 0.000]
+
+	grapePallet [1.600, 1.200, 1.100]
+	eggBoxPallet [1.400, 1.000, 0.800]
+	woolPallet [2.000, 1.500, 2.000]
+	flourBoxPallet [1.400, 1.000, 0.800]
+	bakeryBoxPallet [1.400, 1.000, 1.100]
+	cakePallet [1.400, 1.000, 1.100]
+	butterBoxPallet [1.400, 1.000, 1.100]
+	cheesePallet [1.400, 1.000, 1.500]
+	fabricsPallet [1.400, 1.000, 0.800]
+	clothesBoxPallet [1.400, 1.000, 1.100]
+	sugarBoxPallet [1.400, 1.000, 1.500]
+	honeyBoxPallet [1.400, 1.000, 0.800]
+	cerealsPallet [1.400, 1.000, 1.500]
+	sunflowerOilPallet [1.400, 1.000, 1.500]
+	canolaOilPallet [1.400, 1.000, 1.100]
+	oliveOilPallet [1.400, 1.000, 1.500]
+	raisinBoxPallet [1.400, 1.000, 1.100]
+	grapeJuicePallet [1.400, 1.000, 0.800]
+	lettuceBoxPallet [1.400, 1.000, 0.800]
+	tomatoesBoxPallet [1.400, 1.000, 1.500]
+	strawberriesBoxPallet [1.400, 1.000, 0.800]
+	chocolateBoxPallet [1.400, 1.000, 1.100]
+	furnitureStackPallet [1.400, 1.000, 0.800]
+	bonsilagePallet [1.600, 1.200, 0.800]
+	schaumannPallet [1.600, 1.200, 1.100]
+
 -->

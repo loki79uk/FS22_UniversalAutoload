@@ -146,7 +146,15 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 				newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
 				newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
 				newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
-				newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", false)
+				newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate)
+				
+				if alwaysRotate then
+					newType.width = newType.sizeX
+					newType.length = newType.sizeZ
+				else
+					newType.width = math.min(newType.sizeX, newType.sizeZ)
+					newType.length = math.max(newType.sizeX, newType.sizeZ)
+				end
 				
 				print(string.format("      %s [%.3f, %.3f, %.3f] %s", name,
 					newType.sizeX, newType.sizeY, newType.sizeZ, tostring(newType.alwaysRotate) ))
@@ -225,11 +233,11 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	
     SpecializationUtil.registerFunction(vehicleType, "loadObject", UniversalAutoload.loadObject)
     SpecializationUtil.registerFunction(vehicleType, "unloadObject", UniversalAutoload.unloadObject)
-    SpecializationUtil.registerFunction(vehicleType, "getNextLoadPlace", UniversalAutoload.getNextLoadPlace)
+    SpecializationUtil.registerFunction(vehicleType, "addLoadPlace", UniversalAutoload.addLoadPlace)
+	SpecializationUtil.registerFunction(vehicleType, "getLoadPlace", UniversalAutoload.getLoadPlace)
+	
     SpecializationUtil.registerFunction(vehicleType, "getIsValidObject", UniversalAutoload.getIsValidObject)
     SpecializationUtil.registerFunction(vehicleType, "getIsAutoloadingAllowed", UniversalAutoload.getIsAutoloadingAllowed)
-	SpecializationUtil.registerFunction(vehicleType, "buildNewLoadingPattern", UniversalAutoload.buildNewLoadingPattern)
-	
     SpecializationUtil.registerFunction(vehicleType, "addLoadedObject", UniversalAutoload.addLoadedObject)
     SpecializationUtil.registerFunction(vehicleType, "removeLoadedObject", UniversalAutoload.removeLoadedObject)
 	
@@ -695,6 +703,12 @@ function UniversalAutoload:startLoading(noEventSend)
 	end
 end
 --
+function sortPalletsForLoading(w1,w2)
+	if w1.distance < w2.distance then
+		return true
+	end
+end
+--
 function UniversalAutoload:stopLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 	
@@ -791,7 +805,13 @@ function UniversalAutoload:startUnloading(noEventSend)
 						end
 					end
 					spec.objectsToUnload = {}
-					self:buildNewLoadingPattern()
+					
+					spec.currentLoadWidth = 0
+					spec.currentLoadHeight = 0
+					spec.currentLoadLength = 0
+					spec.currentLoadingPattern = {}
+					spec.makeNewLoadingPlace = true
+
 					if spec.totalUnloadCount > 0  then
 						spec.doSetTensionBelts = true
 					end
@@ -1454,42 +1474,16 @@ function UniversalAutoload:loadObject(object)
 			local spec = self.spec_universalAutoload
 			if spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil then
 			
-				local autoLoadType = UniversalAutoload.getPalletType(object)
-				if spec.lastLoadType ~= autoLoadType then
-					spec.lastLoadType = autoLoadType
-					self:buildNewLoadingPattern(autoLoadType)
-				end
-				
-				-- local objectType, typeName = UniversalAutoload.getPalletTypeName(object)
-				-- if spec.lastLoadedObjectType ~= objectType then
-					-- spec.lastLoadedObjectType = objectType
-					-- self:buildNewLoadingPattern(autoLoadType)
-				-- end
-				-- if spec.objectType == "EURO_PALLET" then
-					-- if autoLoadType.sizeX < spec.lastX or autoLoadType.sizeY < spec.lastY then
-						-- spec.lastX, spec.lastY = autoLoadType.sizeX, autoLoadType.sizeY
-						-- self:buildNewLoadingPattern(autoLoadType)
-					-- end
-				-- end
-
-				local firstValidLoadPlace, thisLoadHeight = self:getNextLoadPlace(object)
-				if firstValidLoadPlace ~= -1 then
+				local placeIndex, thisLoadHeight = self:getLoadPlace(object)
+				if placeIndex ~= -1 then
 
 					local p = {}
-					local loadPlace = spec.currentLoadingPattern[firstValidLoadPlace]
+					local loadPlace = spec.currentLoadingPattern[placeIndex]
 					p.x, p.y, p.z = localToWorld(loadPlace.node, 0, thisLoadHeight, 0)
 					p.rx, p.ry, p.rz = getWorldRotation(loadPlace.node)
 					p.vx, p.vy, p.vz = getLinearVelocity(self.rootNode)
 					
 					moveObjectNodes(object, p)
-					
-					local spacing = spec.spacing or 0
-					local _, _, Z = localToLocal(loadPlace.node, spec.loadArea.startNode, 0, 0, 0)
-					if loadPlace.isRotated then
-						spec.currentLoadLength = -Z + (loadPlace.sizeX/2) + spacing
-					else
-						spec.currentLoadLength = -Z + (loadPlace.sizeZ/2) + spacing
-					end
 
 					UniversalAutoload.clearPalletFromAllVehicles(self, object)
 					
@@ -1600,34 +1594,207 @@ function UniversalAutoload:onDeleteLoadedObject(object)
 end
 
 -- CREATE NEW LOADING PATTERN IN AVAILABLE SPACE
-function UniversalAutoload:buildNewLoadingPattern(autoLoadType)
-	local spec = self.spec_universalAutoload
+-- function UniversalAutoload:buildNewLoadingPattern(autoLoadType)
+	-- local spec = self.spec_universalAutoload
 	
-	print("buildNewLoadingPattern: "..self:getFullName() )
-	spec.currentPlaceIndex = 1
-	spec.currentLoadHeight = 0
+	-- print("buildNewLoadingPattern: "..self:getFullName() )
+	-- spec.currentPlaceIndex = 1
+	-- spec.currentLoadHeight = 0
 	
-	if autoLoadType == nil then
-		spec.lastLoadType = nil
-		spec.currentLoadLength = 0
-		spec.currentLoadingPattern = {}
-		return
-	end
-	if autoLoadType == "ALL" then
-		spec.currentLoadingPattern = {}
-		return
-	end
+	-- if autoLoadType == nil then
+		-- spec.lastLoadType = nil
+		-- spec.currentLoadWidth = 0
+		-- spec.currentLoadHeight = 0
+		-- spec.currentLoadLength = 0
+		-- spec.currentLoadingPattern = {}
+		-- spec.makeNewLoadingPlace = true
+		-- return
+	-- end
+	-- if autoLoadType == "ALL" then
+		-- spec.currentLoadingPattern = {}
+		-- return
+	-- end
 
-	local spacing = spec.spacing or 0
-	local currentLoadLength = spec.currentLoadLength or 0
+	-- local spacing = spec.spacing or 0
+	-- local currentLoadLength = spec.currentLoadLength or 0
 
+	-- --CALCUATE POSSIBLE ARRAY SIZES
+	-- local width, length = spec.loadArea.width, spec.loadArea.length - currentLoadLength
+	-- local N1 = math.floor(width / (autoLoadType.sizeX + spacing))
+	-- local M1 = math.floor(length / (autoLoadType.sizeZ + spacing))
+	
+	-- local N2 = math.floor(width / (autoLoadType.sizeZ + spacing))
+	-- local M2 = math.floor(length / (autoLoadType.sizeX + spacing))
+	
+	-- local N, M, sizeX, sizeY, sizeZ, rotation
+	-- if N2*M2 > N1*M1  or autoLoadType.alwaysRotate then
+		-- N, M = N2, M2
+		-- rotation = math.pi/2
+		-- sizeZ = autoLoadType.sizeX
+		-- sizeY = autoLoadType.sizeY
+		-- sizeX = autoLoadType.sizeZ
+	-- else
+		-- N, M = N1, M1
+		-- rotation = 0
+		-- sizeX = autoLoadType.sizeX
+		-- sizeY = autoLoadType.sizeY
+		-- sizeZ = autoLoadType.sizeZ
+	-- end
+
+	-- --CENTRAL AXIS COORDINATES
+	-- local actualWidth = N * (sizeX + spacing) - spacing
+	-- local X0, Z0 = actualWidth/2, -currentLoadLength
+	
+	-- --BUILD NEW LOADING PATTERN
+	-- local tempLoadingPattern = {}
+	-- if N*M >= 1 then
+		-- for n = 0, N-1 do
+			-- for m = 0, M-1 do
+				-- local loadingPatternItem = {}
+				-- loadingPatternItem.rotation = rotation
+				-- loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
+				-- loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
+				-- table.insert(tempLoadingPattern, loadingPatternItem)
+			-- end
+		-- end
+	-- end
+	
+	-- --CHECK IF ROOM FOR ANY MORE IN OTHER ROTATION
+	-- local newLoadLength = M*(sizeZ + spacing)
+	-- if rotation == math.pi/2 then
+		-- rotation = 0
+		-- sizeX = autoLoadType.sizeX
+		-- sizeY = autoLoadType.sizeY
+		-- sizeZ = autoLoadType.sizeZ
+	-- else
+		-- rotation = math.pi/2
+		-- sizeZ = autoLoadType.sizeX
+		-- sizeY = autoLoadType.sizeY
+		-- sizeX = autoLoadType.sizeZ
+	-- end
+	-- N = math.floor(width / (sizeX + spacing))
+	-- M = math.floor((length - newLoadLength) / (sizeZ + spacing))
+	-- if N*M >= 1 then
+		-- actualWidth = N * (sizeX + spacing) - spacing
+		-- X0, Z0 = actualWidth/2, -(currentLoadLength + newLoadLength)
+		-- for n = 0, N-1 do
+			-- for m = 0, M-1 do
+				-- local loadingPatternItem = {}
+				-- loadingPatternItem.rotation = rotation
+				-- loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
+				-- loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
+				-- table.insert(tempLoadingPattern, loadingPatternItem)
+			-- end
+		-- end
+	-- end
+	
+	-- --SORT TABLE TO LOAD FROM THE CORRECT SIDE
+	-- if spec.currentLoadside == "right" then
+		-- table.sort(tempLoadingPattern, startLoadingFromLeft)
+	-- else
+		-- table.sort(tempLoadingPattern, startLoadingFromRight)
+	-- end
+	
+	-- --COPY NEW LOADING PATTERN
+	-- local newLoadingPattern = {}
+	-- for index, loadingPatternItem in ipairs(tempLoadingPattern) do
+		-- local loadPlace = {}
+		-- loadPlace.index = index
+		-- loadPlace.node = createTransformGroup("loadPlace")
+		-- loadPlace.sizeX = autoLoadType.sizeX
+		-- loadPlace.sizeY = autoLoadType.sizeY
+		-- loadPlace.sizeZ = autoLoadType.sizeZ
+		-- loadPlace.isRotated = loadingPatternItem.rotation == math.pi/2
+		-- link(spec.loadArea.startNode, loadPlace.node)
+		-- setRotation(loadPlace.node, 0, loadingPatternItem.rotation, 0)
+		-- setTranslation(loadPlace.node, loadingPatternItem.posX, 0, loadingPatternItem.posZ)
+		-- table.insert(newLoadingPattern, loadPlace)
+	-- end
+	-- table.sort(newLoadingPattern, sortIndexAscending)
+	-- spec.currentLoadingPattern = newLoadingPattern
+-- end
+
+-- SORTING CALLBACK FUNCTIONS
+-- function sortIndexAscending(w1,w2)
+    -- if w1.index < w2.index then
+        -- return true
+    -- end
+-- end
+--
+-- function startLoadingFromLeft(w1,w2)
+    -- if w1.posZ == w2.posZ and w1.posX > w2.posX then
+        -- return true
+    -- end
+    -- if w1.posZ > w2.posZ then
+        -- return true
+    -- end
+-- end
+--
+-- function startLoadingFromRight(w1,w2)
+    -- if w1.posZ == w2.posZ and w1.posX < w2.posX then
+        -- return true
+    -- end
+    -- if w1.posZ > w2.posZ then
+        -- return true
+    -- end
+-- end
+--
+
+-- -- MAIN PICKUP LOGIC FUNCTION
+-- function UniversalAutoload:getNextLoadPlace(object)
+    -- local spec = self.spec_universalAutoload
+
+	-- local loadPlaces = spec.currentLoadingPattern
+	-- local palletType = UniversalAutoload.getPalletType(object)
+	
+	-- for i=spec.currentPlaceIndex, #loadPlaces do
+		-- --print("trying place: " .. tostring(i))
+		-- local loadPlace = loadPlaces[i]
+		-- local thisLoadHeight = spec.currentLoadHeight
+
+		-- while thisLoadHeight >= 0 do
+			-- if self:testPalletLocationIsEmpty(loadPlace, palletType, thisLoadHeight) and
+			-- (thisLoadHeight==0 or self:testPalletLocationIsFull(loadPlace, palletType, thisLoadHeight-palletType.sizeY)) then
+				-- --print("using this place")
+				-- if spec.currentLoadHeight + 2*palletType.sizeY < spec.loadArea.height then
+					-- --print("STACK NEXT HERE")
+					-- spec.currentLoadHeight = spec.currentLoadHeight + palletType.sizeY
+				-- else
+					-- --print("START NEW PLACE")
+					-- spec.currentLoadHeight = 0
+					-- spec.currentPlaceIndex = spec.currentPlaceIndex + 1
+				-- end
+				-- return i, thisLoadHeight
+			-- end
+			-- thisLoadHeight = thisLoadHeight - palletType.sizeY
+			-- spec.currentLoadHeight = thisLoadHeight
+		-- end
+		
+		-- --print("trying next place")
+		-- spec.currentLoadHeight = 0
+		-- spec.currentPlaceIndex = spec.currentPlaceIndex + 1
+	-- end
+
+	-- --print("no places found")
+    -- return -1, 0
+-- end
+
+function UniversalAutoload:addLoadPlace(autoLoadType)
+    local spec = self.spec_universalAutoload
+
+	spec.makeNewLoadingPlace = false
+	spec.currentLoadWidth = spec.currentLoadWidth or 0
+	spec.currentLoadLength = spec.currentLoadLength or 0
+	spec.currentLoadHeight = spec.currentLoadHeight or 0
+	
 	--CALCUATE POSSIBLE ARRAY SIZES
-	local width, height, length = spec.loadArea.width, spec.loadArea.height, spec.loadArea.length - currentLoadLength
-	local N1 = math.floor(width / (autoLoadType.sizeX + spacing))
-	local M1 = math.floor(length / (autoLoadType.sizeZ + spacing))
+	local width = spec.loadArea.width
+	local length = spec.loadArea.length - spec.currentLoadLength
+	local N1 = math.floor(width / autoLoadType.sizeX)
+	local M1 = math.floor(length / autoLoadType.sizeZ)
 	
-	local N2 = math.floor(width / (autoLoadType.sizeZ + spacing))
-	local M2 = math.floor(length / (autoLoadType.sizeX + spacing))
+	local N2 = math.floor(width / autoLoadType.sizeZ)
+	local M2 = math.floor(length / autoLoadType.sizeX)
 	
 	local N, M, sizeX, sizeY, sizeZ, rotation
 	if N2*M2 > N1*M1  or autoLoadType.alwaysRotate then
@@ -1644,146 +1811,85 @@ function UniversalAutoload:buildNewLoadingPattern(autoLoadType)
 		sizeZ = autoLoadType.sizeZ
 	end
 
-	--CENTRAL AXIS COORDINATES
-	local actualWidth = N * (sizeX + spacing) - spacing
-	local X0, Y0, Z0 = actualWidth/2, 0, -currentLoadLength
+	--CREATE NEW LOADING PLACE
+	loadPlace = {}
+	loadPlace.index = index
+	loadPlace.node = createTransformGroup("loadPlace")
+	loadPlace.sizeX = autoLoadType.sizeX
+	loadPlace.sizeY = autoLoadType.sizeY
+	loadPlace.sizeZ = autoLoadType.sizeZ
+	loadPlace.isRotated = rotation == math.pi/2
 	
-	--BUILD NEW LOADING PATTERN
-	local tempLoadingPattern = {}
-	if N*M >= 1 then
-		for n = 0, N-1 do
-			for m = 0, M-1 do
-				local loadingPatternItem = {}
-				loadingPatternItem.rotation = rotation
-				loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
-				loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
-				table.insert(tempLoadingPattern, loadingPatternItem)
-			end
-		end
-	end
-	
-	--CHECK IF ROOM FOR ANY MORE IN OTHER ROTATION
-	local newLoadLength = M*(sizeZ + spacing)
-	if rotation == math.pi/2 then
-		rotation = 0
-		sizeX = autoLoadType.sizeX
-		sizeY = autoLoadType.sizeY
-		sizeZ = autoLoadType.sizeZ
+	local actualWidth = N * sizeX
+	if spec.currentLoadWidth + sizeX > actualWidth then
+		spec.currentLoadWidth = sizeX
+		spec.currentLoadLength = spec.currentLoadLength + sizeZ
 	else
-		rotation = math.pi/2
-		sizeZ = autoLoadType.sizeX
-		sizeY = autoLoadType.sizeY
-		sizeX = autoLoadType.sizeZ
-	end
-	N = math.floor(width / (sizeX + spacing))
-	M = math.floor((length - newLoadLength) / (sizeZ + spacing))
-	if N*M >= 1 then
-		actualWidth = N * (sizeX + spacing) - spacing
-		X0, Y0, Z0 = actualWidth/2, 0, -(currentLoadLength + newLoadLength)
-		for n = 0, N-1 do
-			for m = 0, M-1 do
-				local loadingPatternItem = {}
-				loadingPatternItem.rotation = rotation
-				loadingPatternItem.posX = X0 - (sizeX/2) - (n*(sizeX + spacing))
-				loadingPatternItem.posZ = Z0 - (sizeZ/2) - (m*(sizeZ + spacing)) - spacing/2
-				table.insert(tempLoadingPattern, loadingPatternItem)
-			end
+		if spec.currentLoadLength == 0 then
+			spec.currentLoadLength = sizeZ
 		end
+		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
 	end
-	
-	--SORT TABLE TO LOAD FROM THE CORRECT SIDE
+	spec.currentLoadHeight = 0
+
+	--DEFINE NEW LOADING PLACE
+	local posX, posZ
 	if spec.currentLoadside == "right" then
-		table.sort(tempLoadingPattern, startLoadingFromLeft)
+		print("right")
+		posX = -( spec.currentLoadWidth - (actualWidth/2) - (sizeX/2) )
 	else
-		table.sort(tempLoadingPattern, startLoadingFromRight)
+		print("left")
+		posX = spec.currentLoadWidth - (actualWidth/2) - (sizeX/2)
 	end
+	posZ = -( spec.currentLoadLength - (sizeZ/2) )
 	
-	--COPY NEW LOADING PATTERN
-	local newLoadingPattern = {}
-	for index, loadingPatternItem in ipairs(tempLoadingPattern) do
-		local loadPlace = {}
-		loadPlace.index = index
-		loadPlace.node = createTransformGroup("loadPlace")
-		loadPlace.sizeX = autoLoadType.sizeX
-		loadPlace.sizeY = autoLoadType.sizeY
-		loadPlace.sizeZ = autoLoadType.sizeZ
-		loadPlace.isRotated = loadingPatternItem.rotation == math.pi/2
-		link(spec.loadArea.startNode, loadPlace.node)
-		setRotation(loadPlace.node, 0, loadingPatternItem.rotation, 0)
-		setTranslation(loadPlace.node, loadingPatternItem.posX, Y0, loadingPatternItem.posZ)
-		table.insert(newLoadingPattern, loadPlace)
-	end
-	table.sort(newLoadingPattern, sortIndexAscending)
-	spec.currentLoadingPattern = newLoadingPattern
+	
+	link(spec.loadArea.startNode, loadPlace.node)
+	setRotation(loadPlace.node, 0, rotation, 0)
+	setTranslation(loadPlace.node, posX, 0, posZ)
+
+	print("inserting new place: " .. tostring(loadPlace) )
+	table.insert(spec.currentLoadingPattern, loadPlace)
+	spec.currentPlaceIndex = #spec.currentLoadingPattern
+
 end
 
--- SORTING CALLBACK FUNCTIONS
-function sortIndexAscending(w1,w2)
-    if w1.index < w2.index then
-        return true
-    end
-end
---
-function startLoadingFromLeft(w1,w2)
-    if w1.posZ == w2.posZ and w1.posX > w2.posX then
-        return true
-    end
-    if w1.posZ > w2.posZ then
-        return true
-    end
-end
---
-function startLoadingFromRight(w1,w2)
-    if w1.posZ == w2.posZ and w1.posX < w2.posX then
-        return true
-    end
-    if w1.posZ > w2.posZ then
-        return true
-    end
-end
---
-function sortPalletsForLoading(w1,w2)
-	if w1.distance < w2.distance then
-		return true
-	end
-end
-
--- MAIN PICKUP LOGIC FUNCTION
-function UniversalAutoload:getNextLoadPlace(object)
+function UniversalAutoload:getLoadPlace(object)
     local spec = self.spec_universalAutoload
-
-	local loadPlaces = spec.currentLoadingPattern
-	local palletType = UniversalAutoload.getPalletType(object)
+	local thisLoadType = UniversalAutoload.getPalletType(object)
 	
-	for i=spec.currentPlaceIndex, #loadPlaces do
-		--print("trying place: " .. tostring(i))
-		local loadPlace = loadPlaces[i]
+	while spec.currentLoadLength+thisLoadType.length < spec.loadArea.length do
+	
+		spec.currentLoadHeight = spec.currentLoadHeight or 0
+		if spec.makeNewLoadingPlace ~= false then
+			print("ADDING NEW PLACE FOR: " .. thisLoadType.loadingType)
+			self:addLoadPlace(thisLoadType)
+		end
+
+		local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
 		local thisLoadHeight = spec.currentLoadHeight
+		print("using load place: " .. tostring(loadPlace) )
 
 		while thisLoadHeight >= 0 do
-			if self:testPalletLocationIsEmpty(loadPlace, palletType, thisLoadHeight) and
-			(thisLoadHeight==0 or self:testPalletLocationIsFull(loadPlace, palletType, thisLoadHeight-palletType.sizeY)) then
-				--print("using this place")
-				if spec.currentLoadHeight + 2*palletType.sizeY < spec.loadArea.height then
-					--print("STACK NEXT HERE")
-					spec.currentLoadHeight = spec.currentLoadHeight + palletType.sizeY
+			if self:testPalletLocationIsEmpty(thisLoadPlace, thisLoadType, thisLoadHeight) and
+			(thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, thisLoadType, thisLoadHeight-thisLoadType.sizeY)) then
+				print("using place: " .. spec.currentPlaceIndex)
+				if spec.currentLoadHeight + 2*thisLoadType.sizeY < spec.loadArea.height then
+					print("STACK NEXT HERE")
+					spec.currentLoadHeight = spec.currentLoadHeight + thisLoadType.sizeY
 				else
-					--print("START NEW PLACE")
-					spec.currentLoadHeight = 0
-					spec.currentPlaceIndex = spec.currentPlaceIndex + 1
+					print("START NEW PLACE")
+					spec.makeNewLoadingPlace = true
 				end
-				return i, thisLoadHeight
+				return spec.currentPlaceIndex, thisLoadHeight
 			end
-			thisLoadHeight = thisLoadHeight - palletType.sizeY
+			thisLoadHeight = thisLoadHeight - thisLoadType.sizeY
 			spec.currentLoadHeight = thisLoadHeight
 		end
 		
-		--print("trying next place")
-		spec.currentLoadHeight = 0
-		spec.currentPlaceIndex = spec.currentPlaceIndex + 1
+		spec.makeNewLoadingPlace = true
 	end
 
-	--print("no places found")
     return -1, 0
 end
 
@@ -1955,7 +2061,6 @@ end
 
 -- TRIGGER CALLBACK FUNCTIONS
 function UniversalAutoload:playerTriggerCallback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	
 	if otherActorId ~= 0 then
 		for _, player in pairs(g_currentMission.players) do
 			if otherActorId == player.rootNode then
@@ -1981,7 +2086,6 @@ function UniversalAutoload:playerTriggerCallback(triggerId, otherActorId, onEnte
 end
 --
 function UniversalAutoload:loadingTriggerCallback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	
 	if otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
@@ -2004,7 +2108,6 @@ function UniversalAutoload:loadingTriggerCallback(triggerId, otherActorId, onEnt
 end
 --
 function UniversalAutoload:unloadingTriggerCallback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-
 	if otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
@@ -2021,7 +2124,6 @@ function UniversalAutoload:unloadingTriggerCallback(triggerId, otherActorId, onE
 end
 --
 function UniversalAutoload:rearLoadingTriggerCallback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-
 	if otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
@@ -2046,51 +2148,41 @@ function UniversalAutoload:rearLoadingTriggerCallback(triggerId, otherActorId, o
 end
 --
 function UniversalAutoload:addLoadedObject(object)
-
 	local spec = self.spec_universalAutoload
 	if spec.loadedObjects[object] == nil then
-
 		spec.loadedObjects[object] = object
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
 		if object.addDeleteListener ~= nil then
 			object:addDeleteListener(self, "onDeleteLoadedObject")
 		end
 		object:raiseDirtyFlags(object.vehicleDirtyFlag)
-		
 	end
-
 end
 --
 function UniversalAutoload:removeLoadedObject(object)
-
 	local spec = self.spec_universalAutoload
 	if spec.loadedObjects[object] ~= nil then
-	
 		spec.loadedObjects[object] = nil
 		spec.totalUnloadCount = spec.totalUnloadCount - 1
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self)
 		end
 		object:raiseDirtyFlags(object.vehicleDirtyFlag)
-
 	end
-	
 end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
 function UniversalAutoload.getPalletTypeName(object)
 	local i3d_path = object.i3dFilename
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
-	local name = i3d_name:sub(0, #i3d_name - 4)
-	
-	return name
+	return i3d_name:sub(0, #i3d_name - 4)
 end
-
+--
 function UniversalAutoload.getLoadingTypeName(object)
 	local palletType = UniversalAutoload.getPalletType(object)
 	return palletType.loadingType
 end
-
+--
 function UniversalAutoload.getPalletType(object)
 	local name = UniversalAutoload.getPalletTypeName(object)
 	local palletType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]

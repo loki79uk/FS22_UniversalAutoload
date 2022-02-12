@@ -64,5 +64,11 @@
 <!--
 	local i3d_path = object.i3dFilename
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
-	local name = i3d_name:sub(0, #i3d_name - 4)
+	return i3d_name:sub(0, #i3d_name - 4)
+	
+	UniversalAutoload.EURO_PALLET   = { sizeX = 1.240, sizeY = 0.785, sizeZ = 0.833, alwaysRotate = false }
+	UniversalAutoload.BIGBAG_PALLET = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
+	UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
+	UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
+	UniversalAutoload.POTATOBOX     = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
 -->

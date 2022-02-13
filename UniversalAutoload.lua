@@ -5,7 +5,7 @@ UniversalAutoload = {}
 
 UniversalAutoload.name = g_currentModName
 UniversalAutoload.path = g_currentModDirectory
-UniversalAutoload.debugEnabled = false
+UniversalAutoload.debugEnabled = true
 UniversalAutoload.delayTime = 200
 
 print("  UNIVERSAL AUTOLOAD TEST VERSION: 003")
@@ -14,9 +14,10 @@ print("  UNIVERSAL AUTOLOAD TEST VERSION: 003")
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
 source(g_currentModDirectory.."events/RaiseActiveEvent.lua")
 source(g_currentModDirectory.."events/ResetLoadingEvent.lua")
+source(g_currentModDirectory.."events/SetContainerTypeEvent.lua")
 source(g_currentModDirectory.."events/SetFilterEvent.lua")
-source(g_currentModDirectory.."events/SetLoadingTypeEvent.lua")
 source(g_currentModDirectory.."events/SetLoadsideEvent.lua")
+source(g_currentModDirectory.."events/SetMaterialTypeEvent.lua")
 source(g_currentModDirectory.."events/SetTipsideEvent.lua")
 source(g_currentModDirectory.."events/StartLoadingEvent.lua")
 source(g_currentModDirectory.."events/StopLoadingEvent.lua")
@@ -46,9 +47,9 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, vehicleKey..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
 	
-	local loadingTypeKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?)"
-	local objectTypeKey = "universalAutoload.loadingTypeConfigurations.loadingTypeConfiguration(?).objectType(?)"
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, loadingTypeKey.."#loadingType", "The loading type category to group under in the menu)", "EURO_PALLET")
+	local containerTypeKey = "universalAutoload.containerTypeConfigurations.containerTypeConfiguration(?)"
+	local objectTypeKey = "universalAutoload.containerTypeConfigurations.containerTypeConfiguration(?).objectType(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerTypeKey.."#containerType", "The loading type category to group under in the menu)", "ANY")
 	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, objectTypeKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
     UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeX", "Width of the pallet", 1.5)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeY", "Height of the pallet", 2.0)
@@ -63,7 +64,8 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadLength", "Last used load length", 0)
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadHeight", "Last used load height", 0)
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#actualWidth", "Last used total load width", 0)
-    schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#typeIndex", "Last used pallet type", 1)
+    schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#materialIndex", "Last used material type", 1)
+    schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#containerIndex", "Last used container type", 1)
     schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?).universalAutoload#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
 
 end
@@ -74,8 +76,10 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedType", UniversalAutoload.getPalletIsSelectedType)
     SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedLoadside", UniversalAutoload.getPalletIsSelectedLoadside)
 	
-	SpecializationUtil.registerFunction(vehicleType, "changeLoadingTypeIndex", UniversalAutoload.changeLoadingTypeIndex)
-	SpecializationUtil.registerFunction(vehicleType, "setLoadingTypeIndex", UniversalAutoload.setLoadingTypeIndex)
+	SpecializationUtil.registerFunction(vehicleType, "changeMaterialTypeIndex", UniversalAutoload.changeMaterialTypeIndex)
+	SpecializationUtil.registerFunction(vehicleType, "setMaterialTypeIndex", UniversalAutoload.setMaterialTypeIndex)
+	SpecializationUtil.registerFunction(vehicleType, "changeContainerTypeIndex", UniversalAutoload.changeContainerTypeIndex)
+	SpecializationUtil.registerFunction(vehicleType, "setContainerTypeIndex", UniversalAutoload.setContainerTypeIndex)
 	SpecializationUtil.registerFunction(vehicleType, "setCurrentTipside", UniversalAutoload.setCurrentTipside)
 	SpecializationUtil.registerFunction(vehicleType, "setCurrentLoadside", UniversalAutoload.setCurrentLoadside)
 	SpecializationUtil.registerFunction(vehicleType, "setLoadingFilter", UniversalAutoload.setLoadingFilter)
@@ -241,16 +245,24 @@ function UniversalAutoload:updateActionEventKeys()
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.unloadAllActionEventId = actionEventId
 
-			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_TYPES_FW, self, UniversalAutoload.actionEventCycleTypes_FW, false, true, false, true, nil, nil, true, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
-			spec.cycleTypesActionEventId = actionEventId
+			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, true, true)
+			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+			spec.cycleMaterialActionEventId = actionEventId
 
-			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_TYPES_BW, self, UniversalAutoload.actionEventCycleTypes_BW, false, true, false, true, nil, nil, true, true)
+			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, true, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
 			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 			
-			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL, self, UniversalAutoload.actionEventSelectAllTypes, false, true, false, true, nil, nil, true, true)
+			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, true, true)
+			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+			spec.cycleContainerActionEventId = actionEventId
+
+			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, true, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
+			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+
+			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL, self, UniversalAutoload.actionEventSelectAllTypes, false, true, false, true, nil, nil, true, true)
+			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 			
 			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, true, true)
@@ -266,7 +278,8 @@ function UniversalAutoload:updateActionEventKeys()
 			spec.toggleBeltsActionEventId = actionEventId
 			
 			UniversalAutoload.updateToggleBeltsActionEvent(self)
-			UniversalAutoload.updateCycleTypeActionEvent(self)
+			UniversalAutoload.updateCycleMaterialActionEvent(self)
+			UniversalAutoload.updateCycleContainerActionEvent(self)
 			UniversalAutoload.updateToggleFilterActionEvent(self)
 			UniversalAutoload.updateToggleTipsideActionEvent(self)
 			UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -293,15 +306,30 @@ function UniversalAutoload:updateToggleBeltsActionEvent()
 	end
 end
 --
-function UniversalAutoload:updateCycleTypeActionEvent()
+function UniversalAutoload:updateCycleMaterialActionEvent()
 	local spec = self.spec_universalAutoload
 	
-	if spec.cycleTypesActionEventId ~= nil then
+	if spec.cycleMaterialActionEventId ~= nil then
 	
-		-- Loading Type: ALL / <PALLET_TYPE>
+		-- Material Type: ALL / <MATERIAL>
 		if not spec.isLoading then
-			local loadingTypeText = g_i18n:getText("universalAutoload_loadingType")..": "..g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedTypeName(self))
-			g_inputBinding:setActionEventText(spec.cycleTypesActionEventId, loadingTypeText)
+			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.MATERIALS[spec.currentMaterialIndex]
+			--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedTypeName(self))
+			g_inputBinding:setActionEventText(spec.cycleMaterialActionEventId, materialTypeText)
+		end
+
+	end
+end
+--
+function UniversalAutoload:updateCycleContainerActionEvent()
+	local spec = self.spec_universalAutoload
+	
+	if spec.cycleContainerActionEventId ~= nil then
+	
+		-- Container Type: ALL / <PALLET_TYPE>
+		if not spec.isLoading then
+			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedTypeName(self))
+			g_inputBinding:setActionEventText(spec.cycleContainerActionEventId, containerTypeText)
 		end
 
 	end
@@ -398,19 +426,30 @@ function UniversalAutoload.actionEventToggleBelts(self, actionName, inputValue, 
 	UniversalAutoload.updateToggleBeltsActionEvent(self)
 end
 --
-function UniversalAutoload.actionEventCycleTypes_FW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleTypes_FW: "..self:getFullName())
-	self:changeLoadingTypeIndex(1)
+function UniversalAutoload.actionEventCycleMaterial_FW(self, actionName, inputValue, callbackState, isAnalog)
+	print("actionEventCycleMaterial_FW: "..self:getFullName())
+	self:changeMaterialTypeIndex(1)
 end
 --
-function UniversalAutoload.actionEventCycleTypes_BW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleTypes_BW: "..self:getFullName())
-	self:changeLoadingTypeIndex(-1)
+function UniversalAutoload.actionEventCycleMaterial_BW(self, actionName, inputValue, callbackState, isAnalog)
+	print("actionEventCycleMaterial_BW: "..self:getFullName())
+	self:changeMaterialTypeIndex(-1)
+end
+--
+function UniversalAutoload.actionEventCycleContainer_FW(self, actionName, inputValue, callbackState, isAnalog)
+	print("actionEventCycleContainer_FW: "..self:getFullName())
+	self:changeContainerTypeIndex(1)
+end
+-- --
+function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputValue, callbackState, isAnalog)
+	print("actionEventCycleContainer_BW: "..self:getFullName())
+	self:changeContainerTypeIndex(-1)
 end
 --
 function UniversalAutoload.actionEventSelectAllTypes(self, actionName, inputValue, callbackState, isAnalog)
 	print("actionEventSelectAllTypes: "..self:getFullName())
-	self:setLoadingTypeIndex(1)
+	self:setMaterialTypeIndex(1)
+	self:setContainerTypeIndex(1)
 end
 --
 function UniversalAutoload.actionEventToggleFilter(self, actionName, inputValue, callbackState, isAnalog)
@@ -457,9 +496,35 @@ function UniversalAutoload.actionEventUnloadAll(self, actionName, inputValue, ca
 end
 
 -- EVENT FUNCTIONS
-function UniversalAutoload:changeLoadingTypeIndex(increment)
+function UniversalAutoload:changeMaterialTypeIndex(increment)
 	local spec = self.spec_universalAutoload
-	local loadType = spec.currentTypeIndex + increment
+	local typeIndex = spec.currentMaterialIndex + increment
+
+	if typeIndex > #UniversalAutoload.MATERIALS then
+		typeIndex = 1
+	elseif typeIndex < 1 then
+		typeIndex = #UniversalAutoload.MATERIALS
+	end
+
+	self:setMaterialTypeIndex(typeIndex)
+end
+--
+function UniversalAutoload:setMaterialTypeIndex(typeIndex, noEventSend)
+	print("setMaterialTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
+	local spec = self.spec_universalAutoload
+
+	spec.currentMaterialIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.MATERIALS))
+
+	UniversalAutoloadSetMaterialTypeEvent.sendEvent(self, typeIndex, noEventSend)
+	UniversalAutoload.updateCycleMaterialActionEvent(self)
+	if self.isServer then
+		UniversalAutoload.countActivePallets(self)
+	end
+end
+--
+function UniversalAutoload:changeContainerTypeIndex(increment)
+	local spec = self.spec_universalAutoload
+	local loadType = spec.currentContainerIndex + increment
 
 	if loadType > #UniversalAutoload.TYPES then
 		loadType = 1
@@ -467,17 +532,17 @@ function UniversalAutoload:changeLoadingTypeIndex(increment)
 		loadType = #UniversalAutoload.TYPES
 	end
 
-	self:setLoadingTypeIndex(loadType)
+	self:setContainerTypeIndex(loadType)
 end
 --
-function UniversalAutoload:setLoadingTypeIndex(typeIndex, noEventSend)
-	print("setLoadingTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
+function UniversalAutoload:setContainerTypeIndex(typeIndex, noEventSend)
+	print("setContainerTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
 	local spec = self.spec_universalAutoload
 
-	spec.currentTypeIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.TYPES))
+	spec.currentContainerIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.TYPES))
 
-	UniversalAutoloadSetLoadingTypeEvent.sendEvent(self, typeIndex, noEventSend)
-	UniversalAutoload.updateCycleTypeActionEvent(self)
+	UniversalAutoloadSetContainerTypeEvent.sendEvent(self, typeIndex, noEventSend)
+	UniversalAutoload.updateCycleContainerActionEvent(self)
 	if self.isServer then
 		UniversalAutoload.countActivePallets(self)
 	end
@@ -535,11 +600,12 @@ function UniversalAutoload:startLoading(noEventSend)
 					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
 					object.distance = math.abs(x) + math.abs(z) - y
 					
-					local loadingType = UniversalAutoload.getLoadingType(object)
-					object.width = loadingType.width
-					object.length = loadingType.length
-					object.height = loadingType.height
-					object.loadingIndex = loadingType.loadingIndex
+					local containerType = UniversalAutoload.getContainerType(object)
+					object.width = containerType.width
+					object.length = containerType.length
+					object.height = containerType.height
+					--object.index = containerType.materialIndex
+					object.index = containerType.containerIndex
 					table.insert(spec.sortedObjectsToLoad, object)
 				end
 			end
@@ -559,15 +625,15 @@ end
 --
 function sortPalletsForLoading(w1,w2)
 
-	if w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
+	if w1.index == w2.index and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
 		return true
-	elseif w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
+	elseif w1.index == w2.index and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
 		return true
-	elseif w1.loadingIndex == w2.loadingIndex and w1.width == w2.width and  w1.length > w2.length then
+	elseif w1.index == w2.index and w1.width == w2.width and  w1.length > w2.length then
 		return true
-	elseif w1.loadingIndex == w2.loadingIndex and w1.width > w2.width then
+	elseif w1.index == w2.index and w1.width > w2.width then
 		return true
-	elseif w1.loadingIndex < w2.loadingIndex then
+	elseif w1.index < w2.index then
 		return true
 	end
 end
@@ -581,10 +647,6 @@ function UniversalAutoload:stopLoading(noEventSend)
 		spec.doPostLoadDelay = true
 		
 		if self.isServer then
-			-- if spec.loadAllTypes then
-				-- spec.loadAllTypes = false
-				-- spec.currentTypeIndex = 1
-			-- end
 			spec.loadDelayTime = 0
 			spec.doSetTensionBelts = true
 		end
@@ -621,7 +683,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 							setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
 							setTranslation(unloadPlace.node, p.x, p.y, p.z)
 							
-							local autoLoadType = UniversalAutoload.getLoadingType(object)
+							local autoLoadType = UniversalAutoload.getContainerType(object)
 							unloadPlace.sizeX = autoLoadType.sizeX
 							unloadPlace.sizeY = autoLoadType.sizeY
 							unloadPlace.sizeZ = autoLoadType.sizeZ
@@ -951,7 +1013,8 @@ function UniversalAutoload:onLoad(savegame)
 	--client+server
 	spec.currentTipside = "left"
 	spec.currentLoadside = "both"
-	spec.currentTypeIndex = 1
+	spec.currentMaterialIndex = 1
+	spec.currentContainerIndex = 1
 	spec.currentLoadingFilter = true
 
 	-- if not self.isClient then
@@ -987,7 +1050,8 @@ function UniversalAutoload:onPostLoad(savegame)
 			--client+server
             spec.currentTipside = "left"
             spec.currentLoadside = "both"
-            spec.currentTypeIndex = 1
+			spec.currentMaterialIndex = 1
+			spec.currentContainerIndex = 1
 			spec.currentLoadingFilter = true
 			--server only
 			-- spec.currentLoadWidth = 0
@@ -998,7 +1062,8 @@ function UniversalAutoload:onPostLoad(savegame)
 			--client+server
             spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
             spec.currentLoadside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadside", "both")
-            spec.currentTypeIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#typeIndex", 1)
+			spec.currentMaterialIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#materialIndex", 1)
+			spec.currentContainerIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#containerIndex", 1)
 			spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
 			--server only
 			spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
@@ -1019,7 +1084,8 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			--client+server
 			xmlFile:setValue(key.."#tipside", spec.currentTipside)
 			xmlFile:setValue(key.."#loadside", spec.currentLoadside)
-			xmlFile:setValue(key.."#typeIndex", spec.currentTypeIndex)
+			xmlFile:setValue(key.."#materialIndex", spec.currentMaterialIndex)
+			xmlFile:setValue(key.."#containerIndex", spec.currentContainerIndex)
 			xmlFile:setValue(key.."#loadingFilter", spec.currentLoadingFilter)
 			--server only
 			xmlFile:setValue(key.."#loadWidth", spec.currentLoadWidth)
@@ -1076,7 +1142,8 @@ function UniversalAutoload:onReadStream(streamId, connection)
 	
 	spec.currentTipside = streamReadString(streamId)
 	spec.currentLoadside = streamReadString(streamId)
-	spec.currentTypeIndex = streamReadInt32(streamId)
+	spec.currentMaterialIndex = streamReadInt32(streamId)
+	spec.currentContainerIndex = streamReadInt32(streamId)
 	spec.currentLoadingFilter = streamReadBool(streamId)
 	spec.isLoading = streamReadBool(streamId)
 	spec.isUnloading = streamReadBool(streamId)
@@ -1090,7 +1157,8 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 	
 	spec.currentTipside = spec.currentTipside or "left"
     spec.currentLoadside = spec.currentLoadside or "both"
-    spec.currentTypeIndex = spec.currentTypeIndex or 1
+    spec.currentMaterialIndex = spec.currentMaterialIndex or 1
+    spec.currentContainerIndex = spec.currentContainerIndex or 1
 	spec.currentLoadingFilter = spec.currentLoadingFilter or true
 	spec.isLoading = spec.isLoading or false
 	spec.isUnloading = spec.isUnloading or false
@@ -1099,7 +1167,8 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 	
 	streamWriteString(streamId, spec.currentTipside)
 	streamWriteString(streamId, spec.currentLoadside)
-	streamWriteInt32(streamId, spec.currentTypeIndex)
+	streamWriteInt32(streamId, spec.currentMaterialIndex)
+	streamWriteInt32(streamId, spec.currentContainerIndex)
 	streamWriteBool(streamId, spec.currentLoadingFilter)
 	streamWriteBool(streamId, spec.isLoading)
 	streamWriteBool(streamId, spec.isUnloading)
@@ -1134,14 +1203,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		if spec.rearLoadingObjects ~= nil then
 			for _, object in pairs(spec.rearLoadingObjects) do
 				--print("LOADING PALLET FROM REAR TRIGGER")
-				local loadingType = UniversalAutoload.getLoadingTypeName(object)
-				local palletIndex = UniversalAutoload.getLoadingIndex(loadingType)
-				if spec.currentTypeIndex ~= palletIndex then
-					self:setLoadingTypeIndex( palletIndex )
-					self:setAllTensionBeltsActive(false)
-					spec.doSetTensionBelts = true
-					spec.doPostLoadDelay = true
-				end
+				self:setAllTensionBeltsActive(false)
+				spec.doSetTensionBelts = true
+				spec.doPostLoadDelay = true
 				if self:loadObject(object) then
 					print("LOADED PALLET FROM REAR TRIGGER")
 					spec.rearLoadingObjects[object] = nil
@@ -1176,24 +1240,11 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						end
 					end
 					if not foundObject then
-						-- if spec.currentTypeIndex == 2 then
-						-- end
-						
-						-- if spec.loadAllTypes and spec.currentTypeIndex ~= 1 then
-							-- --print("TRY OTHER TYPES")
-							-- if spec.currentTypeIndex < #UniversalAutoload.TYPES then
-								-- spec.currentTypeIndex = spec.currentTypeIndex + 1
-							-- else
-								-- spec.loadAllTypes = false
-								-- spec.currentTypeIndex = 1
-							-- end
-						-- else
-							if #spec.sortedObjectsToLoad > 0 then
-								spec.reachedLoadingCapacity = true
-							end
-							self:stopLoading()
-						-- end
-					end
+						if #spec.sortedObjectsToLoad > 0 then
+							spec.reachedLoadingCapacity = true
+						end
+						self:stopLoading()
+					end	
 				else
 					spec.loadDelayTime = spec.loadDelayTime + dt
 				end
@@ -1347,7 +1398,7 @@ function UniversalAutoload:loadObject(object)
 		if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
 			local spec = self.spec_universalAutoload
 			if spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil then
-				local thisLoadType = UniversalAutoload.getLoadingType(object)
+				local thisLoadType = UniversalAutoload.getContainerType(object)
 				print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", thisLoadType.name, thisLoadType.sizeX, thisLoadType.sizeY, thisLoadType.sizeZ))
 				local placeIndex, thisLoadHeight = self:getLoadPlace(thisLoadType)
 				if placeIndex ~= -1 then
@@ -1610,7 +1661,7 @@ function UniversalAutoload:getIsValidObject(object)
 	end
 	if object.i3dFilename ~= nil and object.typeName == "pallet" or object.typeName == "bigBag" then
 		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
-			return UniversalAutoload.getLoadingType(object) ~= nil
+			return UniversalAutoload.getContainerType(object) ~= nil
 		end
 	end
 	
@@ -1885,12 +1936,12 @@ function UniversalAutoload.getObjectNameFromPath(i3d_path)
 	return i3d_name:sub(0, #i3d_name - 4)
 end
 --
-function UniversalAutoload.getLoadingTypeName(object)
-	local palletType = UniversalAutoload.getLoadingType(object)
-	return palletType.loadingType
+function UniversalAutoload.getContainerTypeName(object)
+	local palletType = UniversalAutoload.getContainerType(object)
+	return palletType.containerType
 end
 --
-function UniversalAutoload.getLoadingType(object)
+function UniversalAutoload.getContainerType(object)
 	local name = UniversalAutoload.getObjectNameFromPath(object.i3dFilename)
 	local palletType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 	
@@ -1904,9 +1955,9 @@ function UniversalAutoload.getLoadingType(object)
 	return palletType
 end
 --
-function UniversalAutoload.getLoadingIndex(loadingType)
+function UniversalAutoload.getLoadingIndex(containerType)
 	for index, indexType in ipairs(UniversalAutoload.TYPES) do
-		if loadingType == indexType then
+		if containerType == indexType then
 			return index
 		end
 	end
@@ -1914,19 +1965,19 @@ end
 --
 function UniversalAutoload:getSelectedTypeName()
 	local spec = self.spec_universalAutoload
-	return UniversalAutoload.TYPES[spec.currentTypeIndex]
+	return UniversalAutoload.TYPES[spec.currentContainerIndex]
 end
 --
 function UniversalAutoload:getPalletIsSelectedType(object)
 
-	local objectLoadingType = UniversalAutoload.getLoadingTypeName(object)
-	local selectedLoadingType = UniversalAutoload.getSelectedTypeName(self)
+	local objectContainerType = UniversalAutoload.getContainerTypeName(object)
+	local selectedContainerType = UniversalAutoload.getSelectedTypeName(self)
 	
-	if objectLoadingType~=nil and selectedLoadingType~=nil then
-		if selectedLoadingType == "ALL" then
+	if objectContainerType~=nil and selectedContainerType~=nil then
+		if selectedContainerType == "ALL" then
 			return true
 		else
-			return objectLoadingType == selectedLoadingType
+			return objectContainerType == selectedContainerType
 		end
 	else
 		return false
@@ -1973,7 +2024,7 @@ function UniversalAutoload:drawDebugDisplay()
 		for _,object in pairs(spec.objectsToLoad) do
 			if object ~= nil then
 				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getLoadingType(object)
+				local autoLoadType = UniversalAutoload.getContainerType(object)
 				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
 				if self:isValidForLoading(object) then
 					DrawDebugPallet( node, w, h, l, true, 0, 1, 0 )
@@ -1986,7 +2037,7 @@ function UniversalAutoload:drawDebugDisplay()
 		for _,object in pairs(spec.loadedObjects) do
 			if object ~= nil then
 				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getLoadingType(object)
+				local autoLoadType = UniversalAutoload.getContainerType(object)
 				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
 				if self:isValidForUnloading(object) then
 					DrawDebugPallet( node, w, h, l, true, 0, 1, 0 )

@@ -1,9 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <universalAutoLoad>
-    <loadingTypeConfigurations>
+    <containerTypeConfigurations>
 	
-		<loadingTypeConfiguration loadingType="EURO_PALLET">
-			
+		<containerTypeConfiguration containerType="ALL">
+			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
+			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
+			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
+		</containerTypeConfiguration>
+		
+		<containerTypeConfiguration containerType="EURO_PALLET">
 			<objectType name="lettuceBoxPallet"/>
 			<objectType name="tomatoesBoxPallet"/>
 			<objectType name="strawberriesBoxPallet"/>
@@ -13,69 +19,47 @@
 			<objectType name="grapeJuicePallet"/>
 			<objectType name="raisinBoxPallet"/>
 			<objectType name="grapePallet"/>
-
-			
 			<objectType name="euroPallet" sizeY="0.200"/>
-			
 			<objectType name="oliveOilPallet" sizeY="0.450"/>
 			<objectType name="canolaOilPallet" sizeY="0.450"/>
 			<objectType name="sunflowerOilPallet" sizeY="0.450"/>
-			
 			<objectType name="bonsilagePallet" sizeY="0.450"/>
 			<objectType name="cakePallet" sizeY="0.475"/>
-			
 			<objectType name="eggBoxPallet" sizeY="0.550"/>
-			
-			
-			
 			<objectType name="fabricsPallet" sizeY="0.600"/>
 			<objectType name="honeyBoxPallet" sizeY="0.650"/>
 			<objectType name="boardsStackPallet" sizeY="0.650"/>
-			
-			
  			<objectType name="bakeryBoxPallet" sizeY="0.720"/>
-			
 			<objectType name="fillablePallet" sizeY="0.800"/>
-			
 			<objectType name="cheesePallet" sizeY="1.000"/>
 			<objectType name="clothesBoxPallet" sizeY="1.000"/>
-			
 			<objectType name="cerealsPallet" sizeY="1.100"/>
-			
 			<objectType name="flourBoxPallet" sizeY="1.125"/>
 			<objectType name="sugarBoxPallet" sizeY="1.125"/>
-			
 			<objectType name="woolPallet" sizeY="1.200"/>
-						
 			<objectType name="treeSaplingPallet" sizeY="2.000"/>
-			
-			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
-			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
-			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
-			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
-			
-		</loadingTypeConfiguration>
+		</containerTypeConfiguration>
 		
-		<loadingTypeConfiguration loadingType="BIGBAG">
+		<containerTypeConfiguration containerType="BIGBAG">
 			<objectType name="bigBag" alwaysRotate="true"/>
-		</loadingTypeConfiguration>
+		</containerTypeConfiguration>
 		
-		<loadingTypeConfiguration loadingType="LIQUID_TANK">
+		<containerTypeConfiguration containerType="LIQUID_TANK">
 			<objectType name="liquidTank"/>
-		</loadingTypeConfiguration>
+		</containerTypeConfiguration>
 		
-		<loadingTypeConfiguration loadingType="BIGBAG_PALLET">
+		<containerTypeConfiguration containerType="BIGBAG_PALLET">
 			<objectType name="bigBagPallet"/>
-		</loadingTypeConfiguration>
+		</containerTypeConfiguration>
 		
-		<loadingTypeConfiguration loadingType="POTATOBOX">
+		<containerTypeConfiguration containerType="POTATOBOX">
 			<objectType name="PotatoBox"/>
 			<objectType name="Potatoboxwaste"/>
 			<objectType name="Potatoboxmedium"/>
 			<objectType name="Potatoboxpremium"/>
-		</loadingTypeConfiguration>
+		</containerTypeConfiguration>
 		
-    </loadingTypeConfigurations>
+    </containerTypeConfigurations>
 </universalAutoLoad>
 
 <!--
@@ -83,7 +67,7 @@
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
 	return i3d_name:sub(0, #i3d_name - 4)
 	
-	UniversalAutoload.EURO_PALLET   = { sizeX = 1.240, sizeY = 0.785, sizeZ = 0.833, alwaysRotate = false }
+	UniversalAutoload.GREENHOUSE   = { sizeX = 1.240, sizeY = 0.785, sizeZ = 0.833, alwaysRotate = false }
 	UniversalAutoload.BIGBAG_PALLET = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
 	UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
 	UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }

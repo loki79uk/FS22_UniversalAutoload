@@ -59,8 +59,10 @@ Configured for the following trailers:
 		<action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_TYPES_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_SELECT_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 	</actions>
@@ -78,11 +80,17 @@ Configured for the following trailers:
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
 		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_TYPES_FW" >
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
 		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_TYPES_BW" >
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_t" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_t" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
@@ -113,13 +121,23 @@ Configured for the following trailers:
 			<de>Filter laden umschalten</de>
 			<fr>Basculer le sélection de chargement</fr>
 		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_TYPES_FW">
-			<en>Cycle loading type</en>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
+			<en>Cycle material type</en>
+			<de>Zyklusladegut</de>
+			<fr>Chargement de cycle</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
+			<en>Cycle material type back</en>
+			<de>Zyklusladegut zurück</de>
+			<fr>Chargement de cycle retour</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
+			<en>Cycle container type</en>
 			<de>Zyklusladeart</de>
 			<fr>Type de chargement de cycle</fr>
 		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_TYPES_BW">
-			<en>Cycle loading type back</en>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
+			<en>Cycle container type back</en>
 			<de>Zyklusladeart zurück</de>
 			<fr>Type de chargement de cycle retour</fr>
 		</text>
@@ -190,8 +208,13 @@ Configured for the following trailers:
 			<de>Auskippen</de>
 			<fr>Décharger</fr>
 		</text>
-		<text name="universalAutoload_loadingType">
-			<en>Loading type</en>
+		<text name="universalAutoload_materialType">
+			<en>Material type</en>
+			<de>Ladegut</de>
+			<fr>Chargement</fr>
+		</text>
+		<text name="universalAutoload_containerType">
+			<en>Container type</en>
 			<de>Ladungsart</de>
 			<fr>Type de chargement</fr>
 		</text>

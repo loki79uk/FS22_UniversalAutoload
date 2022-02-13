@@ -20,14 +20,16 @@ end
 
 -- tables
 UniversalAutoload.ACTIONS = {
-	["TOGGLE_LOADING"]  = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
-	["UNLOAD_ALL"]      = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
-	["TOGGLE_TIPSIDE"]  = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
-	["TOGGLE_FILTER"]   = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
-	["CYCLE_TYPES_FW"]  = "UNIVERSALAUTOLOAD_CYCLE_TYPES_FW",
-	["CYCLE_TYPES_BW"]  = "UNIVERSALAUTOLOAD_CYCLE_TYPES_BW",
-	["SELECT_ALL"]      = "UNIVERSALAUTOLOAD_SELECT_ALL",
-	["TOGGLE_BELTS"]	= "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
+	["TOGGLE_LOADING"]     = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
+	["UNLOAD_ALL"]         = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
+	["TOGGLE_TIPSIDE"]     = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
+	["TOGGLE_FILTER"]      = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
+	["CYCLE_MATERIAL_FW"]  = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
+	["CYCLE_MATERIAL_BW"]  = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
+	["CYCLE_CONTAINER_FW"] = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
+	["CYCLE_CONTAINER_BW"] = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
+	["SELECT_ALL"]         = "UNIVERSALAUTOLOAD_SELECT_ALL",
+	["TOGGLE_BELTS"]	   = "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
 }
 
 UniversalAutoload.TYPES = {
@@ -39,12 +41,12 @@ UniversalAutoload.TYPES = {
 }
 
 -- DEFINE DEFAULTS FOR LOADING TYPES
-UniversalAutoload.EURO_PALLET   = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850, alwaysRotate = false }
-UniversalAutoload.BIGBAG_PALLET = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
-UniversalAutoload.LIQUID_TANK   = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
-UniversalAutoload.BIGBAG        = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
+UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850, alwaysRotate = false }
+UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850, alwaysRotate = false }
+UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
+UniversalAutoload.LIQUID_TANK    = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
+UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
 
- 
 UniversalAutoload.VEHICLES = {}
 UniversalAutoload.UNKNOWN_TYPES = {}
 
@@ -91,38 +93,31 @@ end
 
 -- IMPORT LOADING TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
+function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 
-	print("  IMPORT KNOWN MODS:")
-	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
-		print("** Seedpotato Farm Pack is loaded **")
-		table.insert(UniversalAutoload.TYPES, "POTATOBOX")
-		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
-	end
-	
-	print("  IMPORT custom loading types")
-	-- define the loading area parameters from settings file
+	print("  IMPORT custom container types")
+	-- define the container area parameters from settings file
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 
-		local key = "universalAutoload.loadingTypeConfigurations"
+		local key = "universalAutoload.containerTypeConfigurations"
 		local i = 0
 		while true do
-			local loadingTypeKey = string.format("%s.loadingTypeConfiguration(%d)", key, i)
+			local containerTypeKey = string.format("%s.containerTypeConfiguration(%d)", key, i)
 
-			if not xmlFile:hasProperty(loadingTypeKey) then
+			if not xmlFile:hasProperty(containerTypeKey) then
 				break
 			end
 
-			local loadingType = xmlFile:getValue(loadingTypeKey.."#loadingType")
-			if tableContainsValue(UniversalAutoload.TYPES, loadingType) then
+			local containerType = xmlFile:getValue(containerTypeKey.."#containerType")
+			if tableContainsValue(UniversalAutoload.TYPES, containerType) then
 			
-				local default = UniversalAutoload[loadingType]
-				print("  "..loadingType..":")
+				local default = UniversalAutoload[containerType]
+				print("  "..containerType..":")
 				
 				local j = 0
 				while true do
-					local objectTypeKey = string.format("%s.objectType(%d)", loadingTypeKey, j)
+					local objectTypeKey = string.format("%s.objectType(%d)", containerTypeKey, j)
 					
 					if not xmlFile:hasProperty(objectTypeKey) then
 						break
@@ -132,8 +127,8 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.loadingType = loadingType or "ANY"
-					newType.loadingIndex = UniversalAutoload.INDEX[loadingType] or 1
+					newType.containerType = containerType or "ALL"
+					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
 					newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
@@ -155,7 +150,7 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 				end
 				
 			else
-				print("  UNKNOWN LOADING TYPE: "..loadingType)
+				print("  UNKNOWN CONTAINER TYPE: "..containerType)
 			end
 
 			i = i + 1
@@ -164,10 +159,10 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 		xmlFile:delete()
 	end
 
-	print("  ADD default loading types")
+	print("  ADDITIONAL container types:")
 	local palletTypes = {}
     for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
-        if fillType.palletFilename ~= nil then
+        if fillType.palletFilename ~= nil then	
 			local xmlFile = XMLFile.load("configXml", fillType.palletFilename, Vehicle.xmlSchema)
 			if xmlFile ~= 0 then
 				--print( "  >> " .. fillType.palletFilename )
@@ -182,20 +177,21 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 					local height = xmlFile:getValue("vehicle.base.size#height", 2.0)
 					local length = xmlFile:getValue("vehicle.base.size#length", 2.0)
 					
-					local loadingType
-					if category == "bigbagPallets" then loadingType = "BIGBAG_PALLET"
-					elseif name == "liquidTank" then loadingType = "LIQUID_TANK"
-					elseif name == "bigBag" then loadingType = "BIGBAG"
-					elseif string.find(i3d_path, "Pallet") then loadingType = "EURO_PALLET"
-					elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then loadingType = "POTATOBOX"
-					else loadingType = "ANY"
+					local containerType
+					if category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
+					elseif name == "liquidTank" then containerType = "LIQUID_TANK"
+					elseif name == "bigBag" then containerType = "BIGBAG"
+					elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then containerType = "POTATOBOX"
+					else containerType = "ALL"
 					end
 
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.loadingType = loadingType or "ANY"
-					newType.loadingIndex = UniversalAutoload.INDEX[loadingType] or 1
+					newType.materialType = fillType.name
+					newType.materialIndex = index
+					newType.containerType = containerType or "ALL"
+					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
 					newType.sizeX = width
 					newType.sizeY = height
 					newType.sizeZ = length
@@ -204,7 +200,7 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 					newType.length = math.max(newType.sizeX, newType.sizeZ)
 						
 					print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
-						newType.sizeX, newType.sizeY, newType.sizeZ, loadingType ))
+						newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
 						
 				end
 	
@@ -218,17 +214,31 @@ function UniversalAutoload.ImportLoadingTypeConfigurations(xmlFilename)
 end
 
 function UniversalAutoloadManager:loadMap(name)
-	print("  Loaded: Universal Autoload Manager")
-	
+
+	print("  IMPORT KNOWN MODS:")
+	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
+		print("** Seedpotato Farm Pack is loaded **")
+		table.insert(UniversalAutoload.TYPES, "POTATOBOX")
+		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
+	end
+
 	UniversalAutoload.INDEX = {}
 	for i, key in ipairs(UniversalAutoload.TYPES) do
 		UniversalAutoload.INDEX[key] = i
 	end
+	
+	UniversalAutoload.MATERIALS = {}
+	table.insert(UniversalAutoload.MATERIALS, "ALL")
+	for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
+		if fillType.palletFilename ~= nil then
+			table.insert(UniversalAutoload.MATERIALS, fillType.name)
+		end
+	end
 		
 	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)
 	UniversalAutoload.ImportVehicleConfigurations(vehicleSettingsFile)
-	local LoadingTypeSettingsFile = Utils.getFilename("config/LoadingTypes.xml", UniversalAutoload.path)
-	UniversalAutoload.ImportLoadingTypeConfigurations(LoadingTypeSettingsFile)
+	local ContainerTypeSettingsFile = Utils.getFilename("config/ContainerTypes.xml", UniversalAutoload.path)
+	UniversalAutoload.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
 
 end
 

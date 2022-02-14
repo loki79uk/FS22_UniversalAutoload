@@ -61,9 +61,10 @@ Configured for the following trailers:
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_SELECT_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 	</actions>
 	
@@ -86,14 +87,17 @@ Configured for the following trailers:
 		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
 		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
+		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_t" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_t" />
 		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
+		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_l" />
@@ -122,29 +126,34 @@ Configured for the following trailers:
 			<fr>Basculer le sélection de chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
-			<en>Cycle material type</en>
-			<de>Zyklusladegut</de>
-			<fr>Chargement de cycle</fr>
+			<en>Change selected material type (next)</en>
+			<de>Materialtyp wechseln (vorwärts)</de>
+			<fr>Sélection du type de marchandise (suivant)</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
-			<en>Cycle material type back</en>
-			<de>Zyklusladegut zurück</de>
-			<fr>Chargement de cycle retour</fr>
+			<en>Change selected material type (previous)</en>
+			<de>Materialtyp wechseln (rückwärts)</de>
+			<fr>Sélection du type de marchandise (précédent)</fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
+			<en>Select all material types</en>
+			<de>Alle Materialtyp auswählen</de>
+			<fr>Sélectionner tous types de chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
-			<en>Cycle container type</en>
-			<de>Zyklusladeart</de>
-			<fr>Type de chargement de cycle</fr>
+			<en>Change selected container type (next)</en>
+			<de>Containertyp wechseln (vorwärts)</de>
+			<fr>Sélection du type de conditionnement (suivant)</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
-			<en>Cycle container type back</en>
-			<de>Zyklusladeart zurück</de>
-			<fr>Type de chargement de cycle retour</fr>
+			<en>Change selected container type (previous)</en>
+			<de>Containertyp wechseln (rückwärts)</de>
+			<fr>Sélection du type de conditionnement (précédent)</fr>
 		</text>
-		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL">
-			<en>Select all loading types</en>
-			<de>Alle Ladearten auswählen</de>
-			<fr>Sélectionner tous types de chargement</fr>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
+			<en>Select all container types</en>
+			<de>Alle Containertypen auswählen</de>
+			<fr>Sélectionner tous types de conditionnement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -210,13 +219,13 @@ Configured for the following trailers:
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
-			<de>Ladegut</de>
-			<fr>Chargement</fr>
+			<de>Materialtyp</de>
+			<fr>Marchandise sélectionnée</fr>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
-			<de>Ladungsart</de>
-			<fr>Type de chargement</fr>
+			<de>Containertyp</de>
+			<fr>Condtionnement sélectionné</fr>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>ALL</en>

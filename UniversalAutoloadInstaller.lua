@@ -20,16 +20,17 @@ end
 
 -- tables
 UniversalAutoload.ACTIONS = {
-	["TOGGLE_LOADING"]     = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
-	["UNLOAD_ALL"]         = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
-	["TOGGLE_TIPSIDE"]     = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
-	["TOGGLE_FILTER"]      = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
-	["CYCLE_MATERIAL_FW"]  = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
-	["CYCLE_MATERIAL_BW"]  = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
-	["CYCLE_CONTAINER_FW"] = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
-	["CYCLE_CONTAINER_BW"] = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
-	["SELECT_ALL"]         = "UNIVERSALAUTOLOAD_SELECT_ALL",
-	["TOGGLE_BELTS"]	   = "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
+	["TOGGLE_LOADING"]        = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
+	["UNLOAD_ALL"]            = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
+	["TOGGLE_TIPSIDE"]        = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
+	["TOGGLE_FILTER"]         = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
+	["CYCLE_MATERIAL_FW"]     = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
+	["CYCLE_MATERIAL_BW"]     = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
+	["SELECT_ALL_MATERIALS"]  = "UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS",
+	["CYCLE_CONTAINER_FW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
+	["CYCLE_CONTAINER_BW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
+	["SELECT_ALL_CONTAINERS"] = "UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS",
+	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
 }
 
 UniversalAutoload.TYPES = {
@@ -58,22 +59,19 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 	-- define the loading area parameters from settings file
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
-
-		local key = "universalAutoload.vehicleConfigurations"
+	
 		local i = 0
 		while true do
-			local configKey = string.format("%s.vehicleConfiguration(%d)", key, i)
+			local configKey = string.format("universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
 
 			if not xmlFile:hasProperty(configKey) then
 				break
 			end
 
-			local xmlName = xmlFile:getValue(configKey.."#name")
+			local configFileName = xmlFile:getValue(configKey.."#configFileName")
 			
-			UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName] = {}
-			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[xmlName]
-			
-			config.xmlName = xmlName
+			UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
+			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
 			config.width  = xmlFile:getValue(configKey..".loadingArea#width")
 			config.length = xmlFile:getValue(configKey..".loadingArea#length")
 			config.height = xmlFile:getValue(configKey..".loadingArea#height")
@@ -82,7 +80,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
 			
-			print("  >> "..xmlName)
+			print("  >> "..configFileName)
 
 			i = i + 1
 		end
@@ -127,6 +125,8 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
+					--newType.materialType = fillType.name
+					--newType.materialIndex = index
 					newType.containerType = containerType or "ALL"
 					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
 					newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)

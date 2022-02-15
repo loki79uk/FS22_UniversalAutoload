@@ -42,11 +42,11 @@ UniversalAutoload.TYPES = {
 }
 
 -- DEFINE DEFAULTS FOR LOADING TYPES
-UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850, alwaysRotate = false }
-UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850, alwaysRotate = false }
-UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200, alwaysRotate = false }
-UniversalAutoload.LIQUID_TANK    = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415, alwaysRotate = false }
-UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900, alwaysRotate = true }
+UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850 }
+UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850 }
+UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200 }
+UniversalAutoload.LIQUID_TANK    = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415 }
+UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900 }
 
 UniversalAutoload.VEHICLES = {}
 UniversalAutoload.UNKNOWN_TYPES = {}
@@ -54,9 +54,8 @@ UniversalAutoload.UNKNOWN_TYPES = {}
 -- IMPORT LOADING TYPE DEFINITIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
 function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
+
 	print("  IMPORT supported vehicle configurations")
-	
-	-- define the loading area parameters from settings file
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 	
@@ -72,6 +71,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			
 			UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
 			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
+			config.selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs")
 			config.width  = xmlFile:getValue(configKey..".loadingArea#width")
 			config.length = xmlFile:getValue(configKey..".loadingArea#length")
 			config.height = xmlFile:getValue(configKey..".loadingArea#height")
@@ -79,6 +79,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+			config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
 			
 			print("  >> "..configFileName)
 
@@ -93,8 +94,7 @@ end
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
 function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 
-	print("  IMPORT custom container types")
-	-- define the container area parameters from settings file
+	print("  IMPORT container types")
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 
@@ -125,18 +125,16 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					--newType.materialType = fillType.name
-					--newType.materialIndex = index
 					newType.containerType = containerType or "ALL"
 					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
 					newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
-					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate)
+					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", false)
 					
 					if alwaysRotate then
-						newType.width = newType.sizeX
-						newType.length = newType.sizeZ
+						newType.width = newType.sizeZ
+						newType.length = newType.sizeX
 					else
 						newType.width = math.min(newType.sizeX, newType.sizeZ)
 						newType.length = math.max(newType.sizeX, newType.sizeZ)
@@ -160,7 +158,6 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 	end
 
 	print("  ADDITIONAL container types:")
-	local palletTypes = {}
     for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
         if fillType.palletFilename ~= nil then	
 			local xmlFile = XMLFile.load("configXml", fillType.palletFilename, Vehicle.xmlSchema)
@@ -188,8 +185,6 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.materialType = fillType.name
-					newType.materialIndex = index
 					newType.containerType = containerType or "ALL"
 					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
 					newType.sizeX = width
@@ -219,7 +214,7 @@ function UniversalAutoloadManager:loadMap(name)
 	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
 		print("** Seedpotato Farm Pack is loaded **")
 		table.insert(UniversalAutoload.TYPES, "POTATOBOX")
-		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200, alwaysRotate = false }
+		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200 }
 	end
 
 	UniversalAutoload.INDEX = {}
@@ -253,14 +248,3 @@ function tableContainsValue(container, value)
 	end
 	return false
 end
-
--- Welger DK 115
--- Brantner DD 24073/2 XXL
--- Fliegl DTS 5.9
--- Demco Steel Drop Deck
--- LODE KING Renown Drop Deck
--- KRONE Trailer Profi Liner
--- Farmtech DPW 1800
--- Kröger PWO 24
--- Bremer Transportwagen TP 500 S
--- BÖCKMANN MH-AL 4320/35

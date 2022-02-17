@@ -8,7 +8,7 @@ UniversalAutoload.path = g_currentModDirectory
 UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
-print("  UNIVERSAL AUTOLOAD TEST VERSION: 009")
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 010")
 
 -- EVENTS
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
@@ -168,12 +168,7 @@ end
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS
 function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 
-	if self.mission.player.isControlled ~= self.mission.player.isEntered then
-		print("self.mission.player.isControlled: "..tostring(self.mission.player.isControlled))
-		print("self.mission.player.isEntered: "..tostring(self.mission.player.isEntered))
-	end
-
-	if self.mission.player.isControlled or self.mission.player.isEntered then
+	if self.mission.player.isControlled then
 		local player = self.mission.player
 		local playerId = player.userId
 	
@@ -239,7 +234,7 @@ function UniversalAutoload:onRegisterActionEvents(isActiveForInput, isActiveForI
         self:clearActionEventsTable(spec.actionEvents)
 
         if isActiveForInputIgnoreSelection then
-			print("onRegisterActionEvents: "..self:getFullName())
+			-- print("onRegisterActionEvents: "..self:getFullName())
 			self:updateActionEventKeys()
         end
     end
@@ -253,12 +248,7 @@ function UniversalAutoload:updateActionEventKeys()
 			-- print("updateActionEventKeys: "..self:getFullName())
 			local actions = UniversalAutoload.ACTIONS
 			local ignoreCollisions = false
-			
-			--function Vehicle:addActionEvent(actionEventsTable, inputAction, target, callback, triggerUp, triggerDown, triggerAlways, startActive, callbackState, customIconName, ignoreCollisions, reportAnyDeviceCollision)
-			
-			-- function InputBinding:registerActionEvent(actionName, targetObject, eventCallback, triggerUp, triggerDown, triggerAlways, startActive, callbackState, disableConflictingBindings, reportAnyDeviceCollision)
-			--g_inputBinding:registerActionEvent(inputAction, target, callback, triggerUp, triggerDown, triggerAlways, startActive, callbackState, true, reportAnyDeviceCollision)
-		
+
 			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.toggleLoadingActionEventId = actionEventId
@@ -303,6 +293,20 @@ function UniversalAutoload:updateActionEventKeys()
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			spec.toggleBeltsActionEventId = actionEventId
 			
+			
+			if spec.isCurtainTrailer and g_currentMission.player.isControlled then
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, true, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				spec.toggleDoorActionEventId = actionEventId
+				
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_CURTAIN, self, UniversalAutoload.actionEventToggleCurtain, false, true, false, true, nil, nil, true, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				spec.toggleCurtainActionEventId = actionEventId
+				
+				UniversalAutoload.updateToggleDoorActionEvent(self)
+				UniversalAutoload.updateToggleCurtainActionEvent(self)
+			end
+			
 			UniversalAutoload.updateToggleBeltsActionEvent(self)
 			UniversalAutoload.updateCycleMaterialActionEvent(self)
 			UniversalAutoload.updateCycleContainerActionEvent(self)
@@ -333,15 +337,54 @@ function UniversalAutoload:updateToggleBeltsActionEvent()
 	end
 end
 --
+function UniversalAutoload:updateToggleDoorActionEvent()
+	local spec = self.spec_universalAutoload
+	local foldable = self.spec_foldable
+	
+	if #foldable.foldingParts > 0 then
+		local toggleDoorText = ""
+		local foldingPart = foldable.foldingParts[1]
+		if self:getIsAnimationPlaying(foldingPart.animationName) then
+			if self:getAnimationSpeed(foldingPart.animationName) > 0 then
+				toggleDoorText = foldable.negDirectionText
+			else
+				toggleDoorText = foldable.posDirectionText
+			end
+		elseif self:getAnimationTime(foldingPart.animationName) <= 0 then
+			toggleDoorText = foldable.posDirectionText
+		else
+			toggleDoorText = foldable.negDirectionText
+		end
+		g_inputBinding:setActionEventText(spec.toggleDoorActionEventId, toggleDoorText)
+		g_inputBinding:setActionEventTextVisibility(spec.toggleDoorActionEventId, true)
+	end
+end
+--
+function UniversalAutoload:updateToggleCurtainActionEvent()
+	local spec = self.spec_universalAutoload
+	local trailer = self.spec_trailer
+	local tipSide = trailer.tipSides[trailer.preferedTipSideIndex]
+	
+	if tipSide ~= nil then
+		local toggleCurtainText = nil
+		local tipState = self:getTipState()
+		if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
+			toggleCurtainText = tipSide.manualTipToggleActionTextPos
+		else
+			toggleCurtainText = tipSide.manualTipToggleActionTextNeg
+		end
+		g_inputBinding:setActionEventText(spec.toggleCurtainActionEventId, toggleCurtainText)
+		g_inputBinding:setActionEventTextVisibility(spec.toggleCurtainActionEventId, true)
+	end
+end
+
+--
 function UniversalAutoload:updateCycleMaterialActionEvent()
 	local spec = self.spec_universalAutoload
-	
 	if spec.cycleMaterialActionEventId ~= nil then
-	
 		-- Material Type: ALL / <MATERIAL>
 		if not spec.isLoading then
-			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.getSelectedMaterialType(self)
-			--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedMaterialType(self))
+			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.getSelectedMaterialText(self)
 			g_inputBinding:setActionEventText(spec.cycleMaterialActionEventId, materialTypeText)
 		end
 
@@ -350,23 +393,18 @@ end
 --
 function UniversalAutoload:updateCycleContainerActionEvent()
 	local spec = self.spec_universalAutoload
-	
 	if spec.cycleContainerActionEventId ~= nil then
-	
 		-- Container Type: ALL / <PALLET_TYPE>
 		if not spec.isLoading then
-			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedContainerType(self))
+			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..UniversalAutoload.getSelectedContainerText(self)
 			g_inputBinding:setActionEventText(spec.cycleContainerActionEventId, containerTypeText)
 		end
-
 	end
 end
 --
 function UniversalAutoload:updateToggleFilterActionEvent()
 	local spec = self.spec_universalAutoload
-	
 	if spec.toggleLoadingFilterActionEventId ~= nil then
-	
 		-- Loading Filter: ANY / FULL ONLY
 		local loadingFilterText
 		if spec.currentLoadingFilter then
@@ -375,15 +413,12 @@ function UniversalAutoload:updateToggleFilterActionEvent()
 			loadingFilterText = g_i18n:getText("universalAutoload_loadingFilter")..": "..g_i18n:getText("universalAutoload_disabled")
 		end
 		g_inputBinding:setActionEventText(spec.toggleLoadingFilterActionEventId, loadingFilterText)
-
 	end
 end
 --
 function UniversalAutoload:updateToggleTipsideActionEvent()
 	local spec = self.spec_universalAutoload
-	
 	if spec.toggleTipsideActionEventId ~= nil then
-		
 		-- Tipside: NONE/BOTH/LEFT/RIGHT/
 		if spec.currentTipside == "none" then
 			g_inputBinding:setActionEventActive(spec.toggleTipsideActionEventId, false)
@@ -391,7 +426,6 @@ function UniversalAutoload:updateToggleTipsideActionEvent()
 			local tipsideText = g_i18n:getText("universalAutoload_tipside")..": "..g_i18n:getText("universalAutoload_"..spec.currentTipside)
 			g_inputBinding:setActionEventText(spec.toggleTipsideActionEventId, tipsideText)
 		end
-
 	end
 end
 --
@@ -399,7 +433,6 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 	local spec = self.spec_universalAutoload
 	
 	if spec.toggleLoadingActionEventId ~= nil and spec.unloadAllActionEventId ~= nil  then
-
 		-- Activate/Deactivate the LOAD key binding
 		--print("UPDATE LOADING ACTION EVENT")
 		if spec.isLoading then
@@ -441,7 +474,7 @@ end
 
 -- ACTION EVENTS
 function UniversalAutoload.actionEventToggleBelts(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventToggleBelts: "..self:getFullName())
+	-- print("actionEventToggleBelts: "..self:getFullName())
 	local spec = self.spec_universalAutoload
 	if self.spec_tensionBelts.areBeltsFasten then
 		self:setAllTensionBeltsActive(false)
@@ -451,77 +484,94 @@ function UniversalAutoload.actionEventToggleBelts(self, actionName, inputValue, 
 	UniversalAutoload.updateToggleBeltsActionEvent(self)
 end
 --
+function UniversalAutoload.actionEventToggleDoor(self, actionName, inputValue, callbackState, isAnalog)
+	-- print("actionEventToggleDoor: "..self:getFullName())
+	local spec = self.spec_foldable
+	if #spec.foldingParts > 0 then
+		local toggleDirection = self:getToggledFoldDirection()
+		if toggleDirection == spec.turnOnFoldDirection then
+			self:setFoldState(toggleDirection, true)
+		else
+			self:setFoldState(toggleDirection, false)
+		end
+	end
+	UniversalAutoload.updateToggleDoorActionEvent(self)
+end
+function UniversalAutoload.actionEventToggleCurtain(self, actionName, inputValue, callbackState, isAnalog)
+	-- print("actionEventToggleCurtain: "..self:getFullName())
+	local tipState = self:getTipState()
+	if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
+		self:startTipping(nil, false)
+		TrailerToggleManualTipEvent.sendEvent(self, true)
+	else
+		self:stopTipping()
+		TrailerToggleManualTipEvent.sendEvent(self, false)
+	end
+	UniversalAutoload.updateToggleCurtainActionEvent(self)
+end
+--
 function UniversalAutoload.actionEventCycleMaterial_FW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleMaterial_FW: "..self:getFullName())
+	-- print("actionEventCycleMaterial_FW: "..self:getFullName())
 	self:changeMaterialTypeIndex(1)
 end
 --
 function UniversalAutoload.actionEventCycleMaterial_BW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleMaterial_BW: "..self:getFullName())
+	-- print("actionEventCycleMaterial_BW: "..self:getFullName())
 	self:changeMaterialTypeIndex(-1)
 end
 --
 function UniversalAutoload.actionEventSelectAllMaterials(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventSelectAllMaterials: "..self:getFullName())
+	-- print("actionEventSelectAllMaterials: "..self:getFullName())
 	self:setMaterialTypeIndex(1)
 end
 --
 function UniversalAutoload.actionEventCycleContainer_FW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleContainer_FW: "..self:getFullName())
+	-- print("actionEventCycleContainer_FW: "..self:getFullName())
 	self:changeContainerTypeIndex(1)
 end
 -- --
 function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventCycleContainer_BW: "..self:getFullName())
+	-- print("actionEventCycleContainer_BW: "..self:getFullName())
 	self:changeContainerTypeIndex(-1)
 end
 --
 function UniversalAutoload.actionEventSelectAllContainers(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventSelectAllContainers: "..self:getFullName())
+	-- print("actionEventSelectAllContainers: "..self:getFullName())
 	self:setContainerTypeIndex(1)
 end
 --
 function UniversalAutoload.actionEventToggleFilter(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventToggleFilter: "..self:getFullName())
+	-- print("actionEventToggleFilter: "..self:getFullName())
 	local spec = self.spec_universalAutoload
-	
 	local state = not spec.currentLoadingFilter
-
 	self:setLoadingFilter(state)
 end
 --
 function UniversalAutoload.actionEventToggleTipside(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventToggleTipside: "..self:getFullName())
+	-- print("actionEventToggleTipside: "..self:getFullName())
 	local spec = self.spec_universalAutoload
-	
 	local tipside
 	if spec.currentTipside == "left" then
 		tipside = "right"
 	else
 		tipside = "left"
 	end
-	
 	self:setCurrentTipside(tipside)
-	
 end
 --
 function UniversalAutoload.actionEventToggleLoading(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventToggleLoading: "..self:getFullName())
+	-- print("actionEventToggleLoading: "..self:getFullName())
     local spec = self.spec_universalAutoload
-
 	if not spec.isLoading then
 		self:startLoading()
 	else
 		self:stopLoading()
 	end
-
 end
 --
 function UniversalAutoload.actionEventUnloadAll(self, actionName, inputValue, callbackState, isAnalog)
-	print("actionEventUnloadAll: "..self:getFullName())
-	
+	-- print("actionEventUnloadAll: "..self:getFullName())
 	self:startUnloading()
-	
 end
 
 -- EVENT FUNCTIONS
@@ -539,7 +589,7 @@ function UniversalAutoload:changeMaterialTypeIndex(increment)
 end
 --
 function UniversalAutoload:setMaterialTypeIndex(typeIndex, noEventSend)
-	print("setMaterialTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
+	-- print("setMaterialTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
 	local spec = self.spec_universalAutoload
 
 	spec.currentMaterialIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.MATERIALS))
@@ -565,7 +615,7 @@ function UniversalAutoload:changeContainerTypeIndex(increment)
 end
 --
 function UniversalAutoload:setContainerTypeIndex(typeIndex, noEventSend)
-	print("setContainerTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
+	-- print("setContainerTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
 	local spec = self.spec_universalAutoload
 
 	spec.currentContainerIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.CONTAINERS))
@@ -578,7 +628,7 @@ function UniversalAutoload:setContainerTypeIndex(typeIndex, noEventSend)
 end
 --
 function UniversalAutoload:setLoadingFilter(state, noEventSend)
-	print("setLoadingFilter: "..self:getFullName().." "..tostring(state))
+	-- print("setLoadingFilter: "..self:getFullName().." "..tostring(state))
 	local spec = self.spec_universalAutoload
 	
 	spec.currentLoadingFilter = state
@@ -591,7 +641,7 @@ function UniversalAutoload:setLoadingFilter(state, noEventSend)
 end
 --
 function UniversalAutoload:setCurrentTipside(tipside, noEventSend)
-	print("setTipside: "..self:getFullName().." - "..tostring(tipside))
+	-- print("setTipside: "..self:getFullName().." - "..tostring(tipside))
 	local spec = self.spec_universalAutoload
 	
 	spec.currentTipside = tipside
@@ -601,7 +651,7 @@ function UniversalAutoload:setCurrentTipside(tipside, noEventSend)
 end
 --
 function UniversalAutoload:setCurrentLoadside(loadside, noEventSend)
-	print("setLoadside: "..self:getFullName().." - "..tostring(loadside))
+	-- print("setLoadside: "..self:getFullName().." - "..tostring(loadside))
 	local spec = self.spec_universalAutoload
 	
 	spec.currentLoadside = loadside
@@ -616,7 +666,7 @@ function UniversalAutoload:startLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 
 	if not spec.isLoading then
-		print("Start Loading: "..self:getFullName() )
+		-- print("Start Loading: "..self:getFullName() )
 		spec.isLoading = true
 		
 		if self.isServer then
@@ -632,6 +682,15 @@ function UniversalAutoload:startLoading(noEventSend)
 					object.distance = math.abs(x) + math.abs(z) - y
 					
 					local containerType = UniversalAutoload.getContainerType(object)
+					if containerType.alwaysRotate then
+						containerType.width = containerType.sizeZ
+						containerType.length = containerType.sizeX
+					else
+						containerType.width = math.min(containerType.sizeX, containerType.sizeZ)
+						containerType.length = math.max(containerType.sizeX, containerType.sizeZ)
+					end
+					containerType.height = containerType.sizeY
+					
 					object.width = containerType.width or 1
 					object.length = containerType.length or 1
 					object.height = containerType.height or 1
@@ -652,7 +711,7 @@ function UniversalAutoload:startLoading(noEventSend)
 		UniversalAutoloadStartLoadingEvent.sendEvent(self, noEventSend)
 		UniversalAutoload.updateToggleLoadingActionEvent(self)
 	else
-		print("Start Loading CALLED TWICE...")
+		print("Start Loading was CALLED TWICE...")
 	end
 end
 --
@@ -677,7 +736,7 @@ function UniversalAutoload:stopLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 	
 	if spec.isLoading then
-		print("Stop Loading: "..self:getFullName() )
+		-- print("Stop Loading: "..self:getFullName() )
 		spec.isLoading = false
 		spec.doPostLoadDelay = true
 		
@@ -689,7 +748,7 @@ function UniversalAutoload:stopLoading(noEventSend)
 		UniversalAutoloadStopLoadingEvent.sendEvent(self, noEventSend)
 		UniversalAutoload.updateToggleLoadingActionEvent(self)
 	else
-		print("Stop Loading CALLED TWICE...")
+		print("Stop Loading was CALLED TWICE...")
 	end
 end
 --
@@ -697,89 +756,81 @@ function UniversalAutoload:startUnloading(noEventSend)
 	local spec = self.spec_universalAutoload
 
 	if not spec.isUnloading then
-		print("Start Unloading: "..self:getFullName() )
-		if spec.currentTipside ~= "none" then
-			--spec.isUnloading = true
+		-- print("Start Unloading: "..self:getFullName() )
+		--spec.isUnloading = true
 
-			if self.isServer then
-			
-				--UniversalAutoload.countActivePallets(self)
-				if spec.loadedObjects ~= nil then
-	
-					spec.objectsToUnload = {}
-					for _, object in pairs(spec.loadedObjects) do
-						if self:isValidForUnloading(object) then
-						
-							local p = {}
-							p.x, p.y, p.z, p.rx, p.ry, p.rz = UniversalAutoload.getUnloadingTransform(self, object)
-							
-							local unloadPlace = {}
-							unloadPlace.node = createTransformGroup("unloadPlace")
-							setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
-							setTranslation(unloadPlace.node, p.x, p.y, p.z)
-							
-							local containerType = UniversalAutoload.getContainerType(object)
-							unloadPlace.sizeX = containerType.sizeX
-							unloadPlace.sizeY = containerType.sizeY
-							unloadPlace.sizeZ = containerType.sizeZ
-							
-							local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
-							local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
-							--local heightAboveGround = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, p.x, p.y, p.z) + 0.1
-							unloadPlace.heightAbovePlace = heightAbovePlace
-							unloadPlace.heightAboveGround = heightAboveGround - p.y
+		if self.isServer then
+			if spec.loadedObjects ~= nil then
 
-							spec.objectsToUnload[object] = unloadPlace
-							
-						end
-					end
-				
-					spec.unloadingAreaClear = true
-					for object, unloadPlace in pairs(spec.objectsToUnload) do
+				spec.objectsToUnload = {}
+				for _, object in pairs(spec.loadedObjects) do
+					if self:isValidForUnloading(object) then
 					
-						local thisAreaClear = false
-						local x, y, z = getTranslation(unloadPlace.node)
-						for height = unloadPlace.heightAboveGround, 0, 0.1 do
+						local p = {}
+						p.x, p.y, p.z, p.rx, p.ry, p.rz = UniversalAutoload.getUnloadingTransform(self, object)
 						
-							setTranslation(unloadPlace.node, x, y+height, z)
-							if self:testUnloadLocationIsEmpty(unloadPlace) then
-								local offset = unloadPlace.heightAbovePlace
-								setTranslation(unloadPlace.node, x, y+offset+height, z)
-								thisAreaClear = true
-								break
-							end
-						end
-							
-						if not thisAreaClear then
-							spec.unloadingAreaClear = false
-						end
+						local unloadPlace = {}
+						unloadPlace.node = createTransformGroup("unloadPlace")
+						setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
+						setTranslation(unloadPlace.node, p.x, p.y, p.z)
+						
+						local containerType = UniversalAutoload.getContainerType(object)
+						unloadPlace.sizeX = containerType.sizeX
+						unloadPlace.sizeY = containerType.sizeY
+						unloadPlace.sizeZ = containerType.sizeZ
+						
+						local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
+						local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
+						--local heightAboveGround = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, p.x, p.y, p.z) + 0.1
+						unloadPlace.heightAbovePlace = heightAbovePlace
+						unloadPlace.heightAboveGround = heightAboveGround - p.y
 
+						spec.objectsToUnload[object] = unloadPlace
+						
 					end
 				end
-	
-				if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
-					self:setAllTensionBeltsActive(false)
-					for object, unloadPlace in pairs(spec.objectsToUnload) do
-						self:unloadObject(object, unloadPlace)
+			
+				spec.unloadingAreaClear = true
+				for object, unloadPlace in pairs(spec.objectsToUnload) do
+				
+					local thisAreaClear = false
+					local x, y, z = getTranslation(unloadPlace.node)
+					for height = unloadPlace.heightAboveGround, 0, 0.1 do
+					
+						setTranslation(unloadPlace.node, x, y+height, z)
+						if self:testUnloadLocationIsEmpty(unloadPlace) then
+							local offset = unloadPlace.heightAbovePlace
+							setTranslation(unloadPlace.node, x, y+offset+height, z)
+							thisAreaClear = true
+							break
+						end
 					end
-					spec.objectsToUnload = {}
-					spec.resetLoadingPattern = true
+						
+					if not thisAreaClear then
+						spec.unloadingAreaClear = false
+					end
 
-					if spec.totalUnloadCount > 0  then
-						spec.doSetTensionBelts = true
-					end
-				else
-					g_currentMission:showBlinkingWarning(g_i18n:getText("warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA"), 2000);
 				end
 			end
-			
-			--spec.isUnloading = false
-			spec.doPostLoadDelay = true
 
-		else
-			print("CANNOT UNLOAD IN THIS STATE")
+			if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
+				self:setAllTensionBeltsActive(false)
+				for object, unloadPlace in pairs(spec.objectsToUnload) do
+					self:unloadObject(object, unloadPlace)
+				end
+				spec.objectsToUnload = {}
+				spec.resetLoadingPattern = true
+
+				if spec.totalUnloadCount > 0  then
+					spec.doSetTensionBelts = true
+				end
+			else
+				g_currentMission:showBlinkingWarning(g_i18n:getText("warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA"), 2000);
+			end
 		end
-
+		
+		--spec.isUnloading = false
+		spec.doPostLoadDelay = true
 
 		UniversalAutoloadStartUnloadingEvent.sendEvent(self, noEventSend)
 		UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -789,7 +840,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 end
 --
 function UniversalAutoload:resetLoadingState(noEventSend)
-	print("RESET Loading State: "..self:getFullName() )
+	-- print("RESET Loading State: "..self:getFullName() )
 	local spec = self.spec_universalAutoload
 	
 	if self.isServer then
@@ -818,11 +869,13 @@ function UniversalAutoload:updateActionEventText(loadCount, unloadCount, noEvent
 		if unloadCount ~= nil then
 			spec.validUnloadCount = unloadCount
 		end
-		print("Valid Load Count = " .. tostring(spec.validLoadCount) .. " / " .. tostring(spec.validUnloadCount) )
+		if UniversalAutoload.showDebug then
+			print("Valid Load Count = " .. tostring(spec.validLoadCount) .. " / " .. tostring(spec.validUnloadCount) )
+		end
 	end
 	
 	if self.isServer then
-		print("updateActionEventText - SEND EVENT")
+		-- print("updateActionEventText - SEND EVENT")
 		UniversalAutoloadUpdateActionEvents.sendEvent(self, spec.validLoadCount, spec.validUnloadCount, noEventSend)
 	end
 	
@@ -1175,7 +1228,7 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	--if self.isClient and g_dedicatedServer==nil then
 	if self.isServer then
 		local spec = self.spec_universalAutoload
-		print("onFoldStateChanged: "..self:getFullName())
+		-- print("onFoldStateChanged: "..self:getFullName())
 		spec.foldAnimationStarted = true
 		spec.foldAnimationRemaining = self.spec_foldable.maxFoldAnimDuration
 		self:updateActionEventText()
@@ -1249,7 +1302,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
 			if spec.foldAnimationRemaining < 0 then
-				print("*** FOLDING COMPLETE ***")
+				-- print("*** FOLDING COMPLETE ***")
 				spec.foldAnimationStarted = false
 				spec.foldAnimationRemaining = 0
 				self:updateActionEventText()
@@ -1453,7 +1506,7 @@ function UniversalAutoload:loadObject(object)
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
-		print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+		-- print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
 		local placeIndex, thisLoadHeight = self:getLoadPlace(containerType)
 		if placeIndex ~= -1 then
 
@@ -1635,21 +1688,21 @@ function UniversalAutoload:getLoadPlace(containerType)
 		end
 	
 		if spec.makeNewLoadingPlace ~= false then
-			print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+			-- print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
 			self:addLoadPlace(containerType)
 			spec.makeNewLoadingPlace = false
 		end
 
-		local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
 		local thisLoadHeight = spec.currentLoadHeight
-		
-		if self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight) then
-			print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
+		local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
+		local containerFitsInLoadSpace = containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ
+		if containerFitsInLoadSpace and self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight) then
+			-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
 			spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
 			return spec.currentPlaceIndex, thisLoadHeight
 		end
 		
-		print("DID NOT FIT HERE...")
+		-- print("DID NOT FIT HERE...")
 		spec.makeNewLoadingPlace = true
 	end
 
@@ -2052,9 +2105,20 @@ function UniversalAutoload:getSelectedContainerType()
 	return UniversalAutoload.CONTAINERS[spec.currentContainerIndex]
 end
 --
+function UniversalAutoload:getSelectedContainerText()
+   return g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedContainerType(self))
+end
+--
 function UniversalAutoload:getSelectedMaterialType()
 	local spec = self.spec_universalAutoload
 	return UniversalAutoload.MATERIALS[spec.currentMaterialIndex]
+end
+--
+function UniversalAutoload:getSelectedMaterialText()
+	return string.gsub(UniversalAutoload.getSelectedMaterialType(self), "_", " ") 
+	--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedMaterialType(self))
+	--<e k="fillType_wheat" v="Wheat"/>
+	--fillType.index, fillType.name, fillType.title, fillType.palletFilename
 end
 --
 function UniversalAutoload:getPalletIsSelectedLoadside(object)

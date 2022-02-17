@@ -30,7 +30,9 @@ UniversalAutoload.ACTIONS = {
 	["CYCLE_CONTAINER_FW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
 	["CYCLE_CONTAINER_BW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
 	["SELECT_ALL_CONTAINERS"] = "UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS",
-	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
+	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS",
+	["TOGGLE_DOOR"]           = "UNIVERSALAUTOLOAD_TOGGLE_DOOR",
+	["TOGGLE_CURTAIN"]	      = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN"
 }
 
 UniversalAutoload.CONTAINERS = {
@@ -131,16 +133,6 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
 					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", false)
-					
-					if alwaysRotate then
-						newType.width = newType.sizeZ
-						newType.length = newType.sizeX
-					else
-						newType.width = math.min(newType.sizeX, newType.sizeZ)
-						newType.length = math.max(newType.sizeX, newType.sizeZ)
-					end
-					newType.height = newType.sizeY
-					
 					print(string.format("  >> %s [%.3f, %.3f, %.3f] %s", newType.name,
 						newType.sizeX, newType.sizeY, newType.sizeZ, tostring(newType.alwaysRotate) ))
 					

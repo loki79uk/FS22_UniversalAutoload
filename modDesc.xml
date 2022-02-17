@@ -66,6 +66,10 @@ Configured for the following trailers:
 		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+
 	</actions>
 	
 	<inputBinding>
@@ -102,6 +106,14 @@ Configured for the following trailers:
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_l" />
 		</actionBinding>
+		
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
+		</actionBinding>
+		
 	</inputBinding>
 	
 	<l10n>
@@ -159,6 +171,18 @@ Configured for the following trailers:
 			<en>Fasten/Unfasten tension belts</en>
 			<de>Spanngurte anbringen/lösen</de>
 			<fr>Attacher/détacher les sangles de serrage</fr>
+		</text>
+		
+		
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
+			<en>Open/Close rear door</en>
+			<de></de>
+			<fr></fr>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
+			<en>Open/Close curtain</en>
+			<de></de>
+			<fr></fr>
 		</text>
 		
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">

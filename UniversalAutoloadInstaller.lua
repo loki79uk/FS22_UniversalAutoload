@@ -33,7 +33,7 @@ UniversalAutoload.ACTIONS = {
 	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS"
 }
 
-UniversalAutoload.TYPES = {
+UniversalAutoload.CONTAINERS = {
 	[1] = "ALL",
 	[2] = "EURO_PALLET",
 	[3] = "BIGBAG_PALLET",
@@ -41,7 +41,7 @@ UniversalAutoload.TYPES = {
 	[5] = "BIGBAG"
 }
 
--- DEFINE DEFAULTS FOR LOADING TYPES
+-- DEFINE DEFAULTS FOR CONTAINER TYPES
 UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850 }
 UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850 }
 UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200 }
@@ -51,7 +51,7 @@ UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900
 UniversalAutoload.VEHICLES = {}
 UniversalAutoload.UNKNOWN_TYPES = {}
 
--- IMPORT LOADING TYPE DEFINITIONS
+-- IMPORT VEHICLE CONFIGURATIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
 function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 
@@ -90,7 +90,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 	end
 end
 
--- IMPORT LOADING TYPE DEFINITIONS
+-- IMPORT CONTAINER TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
 function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 
@@ -108,7 +108,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 			end
 
 			local containerType = xmlFile:getValue(containerTypeKey.."#containerType")
-			if tableContainsValue(UniversalAutoload.TYPES, containerType) then
+			if tableContainsValue(UniversalAutoload.CONTAINERS, containerType) then
 			
 				local default = UniversalAutoload[containerType]
 				print("  "..containerType..":")
@@ -178,7 +178,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					if category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
 					elseif name == "liquidTank" then containerType = "LIQUID_TANK"
 					elseif name == "bigBag" then containerType = "BIGBAG"
-					elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then containerType = "POTATOBOX"
+					--elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then containerType = "POTATOBOX"
 					else containerType = "ALL"
 					end
 
@@ -213,12 +213,12 @@ function UniversalAutoloadManager:loadMap(name)
 	print("  IMPORT KNOWN MODS:")
 	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
 		print("** Seedpotato Farm Pack is loaded **")
-		table.insert(UniversalAutoload.TYPES, "POTATOBOX")
+		table.insert(UniversalAutoload.CONTAINERS, "POTATOBOX")
 		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200 }
 	end
 
 	UniversalAutoload.INDEX = {}
-	for i, key in ipairs(UniversalAutoload.TYPES) do
+	for i, key in ipairs(UniversalAutoload.CONTAINERS) do
 		UniversalAutoload.INDEX[key] = i
 	end
 	

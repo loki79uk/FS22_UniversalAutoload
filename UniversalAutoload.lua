@@ -8,7 +8,7 @@ UniversalAutoload.path = g_currentModDirectory
 UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
-print("  UNIVERSAL AUTOLOAD TEST VERSION: 006")
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 009")
 
 -- EVENTS
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
@@ -78,8 +78,9 @@ end
 function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "isValidForLoading", UniversalAutoload.isValidForLoading)
     SpecializationUtil.registerFunction(vehicleType, "isValidForUnloading", UniversalAutoload.isValidForUnloading)
-    SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedType", UniversalAutoload.getPalletIsSelectedType)
     SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedLoadside", UniversalAutoload.getPalletIsSelectedLoadside)
+    SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedMaterial", UniversalAutoload.getPalletIsSelectedMaterial)
+    SpecializationUtil.registerFunction(vehicleType, "getPalletIsSelectedContainer", UniversalAutoload.getPalletIsSelectedContainer)
 	
 	SpecializationUtil.registerFunction(vehicleType, "changeMaterialTypeIndex", UniversalAutoload.changeMaterialTypeIndex)
 	SpecializationUtil.registerFunction(vehicleType, "setMaterialTypeIndex", UniversalAutoload.setMaterialTypeIndex)
@@ -101,8 +102,19 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	
     SpecializationUtil.registerFunction(vehicleType, "getIsValidObject", UniversalAutoload.getIsValidObject)
     SpecializationUtil.registerFunction(vehicleType, "getIsAutoloadingAllowed", UniversalAutoload.getIsAutoloadingAllowed)
+	
     SpecializationUtil.registerFunction(vehicleType, "addLoadedObject", UniversalAutoload.addLoadedObject)
     SpecializationUtil.registerFunction(vehicleType, "removeLoadedObject", UniversalAutoload.removeLoadedObject)
+    SpecializationUtil.registerFunction(vehicleType, "onDeleteLoadedObject", UniversalAutoload.onDeleteLoadedObject)
+	
+    SpecializationUtil.registerFunction(vehicleType, "addAvailableObject", UniversalAutoload.addAvailableObject)
+    SpecializationUtil.registerFunction(vehicleType, "removeAvailableObject", UniversalAutoload.removeAvailableObject)
+    SpecializationUtil.registerFunction(vehicleType, "removeFromSortedObjectsToLoad", UniversalAutoload.removeFromSortedObjectsToLoad)
+    SpecializationUtil.registerFunction(vehicleType, "onDeleteAvailableObject", UniversalAutoload.onDeleteAvailableObject)
+	
+    SpecializationUtil.registerFunction(vehicleType, "addRearLoadingObject", UniversalAutoload.addRearLoadingObject)
+    SpecializationUtil.registerFunction(vehicleType, "removeRearLoadingObject", UniversalAutoload.removeRearLoadingObject)
+    SpecializationUtil.registerFunction(vehicleType, "onDeleteRearLoadingObject", UniversalAutoload.onDeleteRearLoadingObject)
 	
 	SpecializationUtil.registerFunction(vehicleType, "testPalletLocationIsFull", UniversalAutoload.testPalletLocationIsFull)
 	SpecializationUtil.registerFunction(vehicleType, "testPalletLocationIsEmpty", UniversalAutoload.testPalletLocationIsEmpty)
@@ -113,8 +125,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "playerTriggerCallback", UniversalAutoload.playerTriggerCallback)
     SpecializationUtil.registerFunction(vehicleType, "loadingTriggerCallback", UniversalAutoload.loadingTriggerCallback)
     SpecializationUtil.registerFunction(vehicleType, "unloadingTriggerCallback", UniversalAutoload.unloadingTriggerCallback)
-    SpecializationUtil.registerFunction(vehicleType, "rearLoadingTriggerCallback", UniversalAutoload.rearLoadingTriggerCallback)					
-    SpecializationUtil.registerFunction(vehicleType, "onDeleteLoadedObject", UniversalAutoload.onDeleteLoadedObject)
+    SpecializationUtil.registerFunction(vehicleType, "rearLoadingTriggerCallback", UniversalAutoload.rearLoadingTriggerCallback)
 	
     SpecializationUtil.registerFunction(vehicleType, "updateActionEventText", UniversalAutoload.updateActionEventText)
     SpecializationUtil.registerFunction(vehicleType, "updateActionEventKeys", UniversalAutoload.updateActionEventKeys)
@@ -288,7 +299,7 @@ function UniversalAutoload:updateActionEventKeys()
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			spec.toggleTipsideActionEventId = actionEventId
 			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, true, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			spec.toggleBeltsActionEventId = actionEventId
 			
@@ -317,6 +328,7 @@ function UniversalAutoload:updateToggleBeltsActionEvent()
 			tensionBeltsText = g_i18n:getText("action_fastenTensionBelts")
 		end
 		g_inputBinding:setActionEventText(spec.toggleBeltsActionEventId, tensionBeltsText)
+		g_inputBinding:setActionEventTextVisibility(spec.toggleBeltsActionEventId, true)
 
 	end
 end
@@ -328,8 +340,8 @@ function UniversalAutoload:updateCycleMaterialActionEvent()
 	
 		-- Material Type: ALL / <MATERIAL>
 		if not spec.isLoading then
-			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.MATERIALS[spec.currentMaterialIndex]
-			--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedTypeName(self))
+			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.getSelectedMaterialType(self)
+			--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedMaterialType(self))
 			g_inputBinding:setActionEventText(spec.cycleMaterialActionEventId, materialTypeText)
 		end
 
@@ -343,7 +355,7 @@ function UniversalAutoload:updateCycleContainerActionEvent()
 	
 		-- Container Type: ALL / <PALLET_TYPE>
 		if not spec.isLoading then
-			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedTypeName(self))
+			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedContainerType(self))
 			g_inputBinding:setActionEventText(spec.cycleContainerActionEventId, containerTypeText)
 		end
 
@@ -541,22 +553,22 @@ end
 --
 function UniversalAutoload:changeContainerTypeIndex(increment)
 	local spec = self.spec_universalAutoload
-	local loadType = spec.currentContainerIndex + increment
+	local containerType = spec.currentContainerIndex + increment
 
-	if loadType > #UniversalAutoload.TYPES then
-		loadType = 1
-	elseif loadType < 1 then
-		loadType = #UniversalAutoload.TYPES
+	if containerType > #UniversalAutoload.CONTAINERS then
+		containerType = 1
+	elseif containerType < 1 then
+		containerType = #UniversalAutoload.CONTAINERS
 	end
 
-	self:setContainerTypeIndex(loadType)
+	self:setContainerTypeIndex(containerType)
 end
 --
 function UniversalAutoload:setContainerTypeIndex(typeIndex, noEventSend)
 	print("setContainerTypeIndex: "..self:getFullName().." "..tostring(typeIndex))
 	local spec = self.spec_universalAutoload
 
-	spec.currentContainerIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.TYPES))
+	spec.currentContainerIndex = math.min(math.max(typeIndex, 1), table.getn(UniversalAutoload.CONTAINERS))
 
 	UniversalAutoloadSetContainerTypeEvent.sendEvent(self, typeIndex, noEventSend)
 	UniversalAutoload.updateCycleContainerActionEvent(self)
@@ -611,9 +623,11 @@ function UniversalAutoload:startLoading(noEventSend)
 			spec.loadDelayTime = math.huge
 		
 			spec.sortedObjectsToLoad = {}
-			for _, object in pairs(spec.objectsToLoad) do
-				if self:isValidForLoading(object) then
-					local node = object.nodeId or object.components[1].node
+			for _, object in pairs(spec.availableObjects) do
+			
+				local node = UniversalAutoload.getObjectNode(object)
+				if self:isValidForLoading(object) and node~=nil then
+
 					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
 					object.distance = math.abs(x) + math.abs(z) - y
 					
@@ -621,8 +635,10 @@ function UniversalAutoload:startLoading(noEventSend)
 					object.width = containerType.width or 1
 					object.length = containerType.length or 1
 					object.height = containerType.height or 1
-					--object.index = containerType.materialIndex
-					object.index = containerType.containerIndex or 1
+					
+					object.material = UniversalAutoload.getMaterialType(object) or 1
+					object.container = containerType.containerIndex or 1
+					
 					table.insert(spec.sortedObjectsToLoad, object)
 				end
 			end
@@ -641,16 +657,18 @@ function UniversalAutoload:startLoading(noEventSend)
 end
 --
 function sortPalletsForLoading(w1,w2)
-
-	if w1.index == w2.index and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
+	
+	if w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
 		return true
-	elseif w1.index == w2.index and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
+	elseif w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
 		return true
-	elseif w1.index == w2.index and w1.width == w2.width and  w1.length > w2.length then
+	elseif w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and  w1.length > w2.length then
 		return true
-	elseif w1.index == w2.index and w1.width > w2.width then
+	elseif w1.container == w2.container and w1.material == w2.material and w1.width > w2.width then
 		return true
-	elseif w1.index < w2.index then
+	elseif w1.container == w2.container and w1.material < w2.material then
+		return true
+	elseif w1.container < w2.container then
 		return true
 	end
 end
@@ -700,10 +718,10 @@ function UniversalAutoload:startUnloading(noEventSend)
 							setRotation(unloadPlace.node, p.rx, p.ry, p.rz)
 							setTranslation(unloadPlace.node, p.x, p.y, p.z)
 							
-							local autoLoadType = UniversalAutoload.getContainerType(object)
-							unloadPlace.sizeX = autoLoadType.sizeX
-							unloadPlace.sizeY = autoLoadType.sizeY
-							unloadPlace.sizeZ = autoLoadType.sizeZ
+							local containerType = UniversalAutoload.getContainerType(object)
+							unloadPlace.sizeX = containerType.sizeX
+							unloadPlace.sizeY = containerType.sizeY
+							unloadPlace.sizeZ = containerType.sizeZ
 							
 							local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
 							local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
@@ -742,9 +760,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 				if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
 					self:setAllTensionBeltsActive(false)
 					for object, unloadPlace in pairs(spec.objectsToUnload) do
-						if self:isValidForUnloading(object) then
-							self:unloadObject(object, unloadPlace)
-						end
+						self:unloadObject(object, unloadPlace)
 					end
 					spec.objectsToUnload = {}
 					spec.resetLoadingPattern = true
@@ -811,6 +827,7 @@ function UniversalAutoload:updateActionEventText(loadCount, unloadCount, noEvent
 	end
 	
 	UniversalAutoload.updateToggleLoadingActionEvent(self)
+	
 end
 function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	--print("forceRaiseActive: "..self:getFullName() )
@@ -827,7 +844,9 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	end
 	
 	UniversalAutoloadRaiseActiveEvent.sendEvent(self, state, noEventSend)
+	
 	UniversalAutoload.updateToggleLoadingActionEvent(self)
+	UniversalAutoload.updateToggleBeltsActionEvent(self)
 
 end
 --
@@ -947,7 +966,7 @@ function UniversalAutoload:onLoad(savegame)
 		--initialise server only arrays
 		spec.triggers = {}
 		spec.currentLoadingPattern = {}
-		spec.objectsToLoad = {}
+		spec.availableObjects = {}
 		spec.loadedObjects = {}
 		spec.rearLoadingObjects = {}
 		
@@ -1054,7 +1073,7 @@ function UniversalAutoload:onLoad(savegame)
 		spec.isUnloading = false
 		spec.doPostLoadDelay = false
 		spec.doSetTensionBelts = false
-		spec.totalLoadCount = 0
+		spec.totalAvailableCount = 0
 		spec.totalUnloadCount = 0
 		spec.validLoadCount = 0
 		spec.validUnloadCount = 0
@@ -1270,14 +1289,12 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				if spec.loadDelayTime > UniversalAutoload.delayTime then
 					local foundObject = false
 					for index, object in ipairs(spec.sortedObjectsToLoad) do
-						if self:isValidForLoading(object) then
-							if self:loadObject(object) then
-								table.remove(spec.sortedObjectsToLoad, index)
-								spec.loadDelayTime = 0
-								foundObject = true
-							end
-							break
+						if self:loadObject(object) then
+							table.remove(spec.sortedObjectsToLoad, index)
+							spec.loadDelayTime = 0
+							foundObject = true
 						end
+						break
 					end
 					if not foundObject then
 						if #spec.sortedObjectsToLoad > 0 then
@@ -1359,25 +1376,27 @@ end
 --
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
-	return self:getPalletIsSelectedType(object) and self:getPalletIsSelectedLoadside(object) and
-		(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )
+	
+	return self:getPalletIsSelectedMaterial(object) and self:getPalletIsSelectedContainer(object) and 
+	self:getPalletIsSelectedLoadside(object) and (spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil)
+	and (not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )
 end
 --
 function UniversalAutoload:isValidForUnloading(object)
 	local spec = self.spec_universalAutoload
-	return self:getPalletIsSelectedType(object) and spec.rearLoadingObjects[object] == nil
+	return self:getPalletIsSelectedMaterial(object) and self:getPalletIsSelectedContainer(object) and spec.rearLoadingObjects[object] == nil
 end
 --
 function UniversalAutoload:countActivePallets()
 	local spec = self.spec_universalAutoload
 	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
 	
-	local totalLoadCount = 0
+	local totalAvailableCount = 0
 	local validLoadCount = 0
-	if spec.objectsToLoad ~= nil then
-		for _, object in pairs(spec.objectsToLoad) do
+	if spec.availableObjects ~= nil then
+		for _, object in pairs(spec.availableObjects) do
 			if object ~= nil then
-				totalLoadCount = totalLoadCount + 1
+				totalAvailableCount = totalAvailableCount + 1
 				if self:isValidForLoading(object) then
 					validLoadCount = validLoadCount + 1
 				end
@@ -1416,9 +1435,9 @@ function UniversalAutoload:countActivePallets()
 		end
 	end
 
-	if spec.totalLoadCount ~= totalLoadCount then
-		--spec.totalLoadCount = totalLoadCount
-		print("TOTAL LOAD COUNT ERROR: "..tostring(spec.totalLoadCount).." vs "..tostring(totalLoadCount))
+	if spec.totalAvailableCount ~= totalAvailableCount then
+		--spec.totalAvailableCount = totalAvailableCount
+		print("TOTAL AVAILABLE COUNT ERROR: "..tostring(spec.totalAvailableCount).." vs "..tostring(totalAvailableCount))
 	end
 	if spec.totalUnloadCount ~= totalUnloadCount then
 		--spec.totalUnloadCount = totalUnloadCount
@@ -1427,42 +1446,39 @@ function UniversalAutoload:countActivePallets()
 end
 
 -- LOADING AND UNLOADING FUNCTIONS
-
 function UniversalAutoload:loadObject(object)
 	--print("UniversalAutoload - loadObject")
-	if object ~= nil then
-		if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
-			local spec = self.spec_universalAutoload
-			if spec.loadedObjects[object] == nil or spec.rearLoadingObjects[object] ~= nil then
-				local thisLoadType = UniversalAutoload.getContainerType(object)
-				print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", thisLoadType.name, thisLoadType.sizeX, thisLoadType.sizeY, thisLoadType.sizeZ))
-				local placeIndex, thisLoadHeight = self:getLoadPlace(thisLoadType)
-				if placeIndex ~= -1 then
+	
+	if object ~= nil and self:getIsAutoloadingAllowed() and self:isValidForLoading(object) then
 
-					local p = {}
-					local loadPlace = spec.currentLoadingPattern[placeIndex]
-					p.x, p.y, p.z = localToWorld(loadPlace.node, 0, thisLoadHeight, 0)
-					p.rx, p.ry, p.rz = getWorldRotation(loadPlace.node)
-					p.vx, p.vy, p.vz = getLinearVelocity(self.rootNode)
-					
-					moveObjectNodes(object, p)
+		local spec = self.spec_universalAutoload
+		local containerType = UniversalAutoload.getContainerType(object)
+		print(string.format("LOADING OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+		local placeIndex, thisLoadHeight = self:getLoadPlace(containerType)
+		if placeIndex ~= -1 then
 
-					UniversalAutoload.clearPalletFromAllVehicles(self, object)
-					
-					self:addLoadedObject(object)
+			local p = {}
+			local loadPlace = spec.currentLoadingPattern[placeIndex]
+			p.x, p.y, p.z = localToWorld(loadPlace.node, 0, thisLoadHeight, 0)
+			p.rx, p.ry, p.rz = getWorldRotation(loadPlace.node)
+			p.vx, p.vy, p.vz = getLinearVelocity(self.rootNode)
+			
+			moveObjectNodes(object, p)
+			UniversalAutoload.clearPalletFromAllVehicles(self, object)
+			self:addLoadedObject(object)
 
-					--g_currentMission:addMoney(-100, self:getOwnerFarmId(), MoneyType.AI)
-					return true
-				end
-			end
+			--g_currentMission:addMoney(-100, self:getOwnerFarmId(), MoneyType.AI)
+			return true
 		end
+
 	end
+
 	return false
 end
 --
 function UniversalAutoload:unloadObject(object, unloadPlace)
 	--print("UniversalAutoload - unloadObject")
-	if object ~= nil then
+	if object ~= nil and self:isValidForUnloading(object) then
 		local p = {}
 		p.x, p.y, p.z = localToWorld(unloadPlace.node, 0, 0, 0)
 		p.rx, p.ry, p.rz = getWorldRotation(unloadPlace.node)
@@ -1470,39 +1486,41 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 
 		moveObjectNodes(object, p)
 		UniversalAutoload.clearPalletFromAllVehicles(self, object)
+		self:addAvailableObject(object)
 	end
 end
-
 --
 function UniversalAutoload.getUnloadingTransform(vehicle, object)
 	
 	--get object node and intial postion
 	local spec = vehicle.spec_universalAutoload
-	local node = object.nodeId or object.components[1].node
-	local x0, y0, z0 = getTranslation(node)
-	
-	--calculate unload offset according to tipside
-	local offsetX = 1.5*spec.loadArea.width
-	if spec.currentTipside == "right" then offsetX = -offsetX end
-	local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, offsetX, 0, 0)
-	
-	return x0+dx, y0+dy, z0+dz, getRotation(node)	
+	local node = UniversalAutoload.getObjectNode(object)
+	if node ~= nil then
+		local x0, y0, z0 = getTranslation(node)
+		
+		--calculate unload offset according to tipside
+		local offsetX = 1.5*spec.loadArea.width
+		if spec.currentTipside == "right" then offsetX = -offsetX end
+		local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, offsetX, 0, 0)
+		
+		return x0+dx, y0+dy, z0+dz, getRotation(node)
+	else
+		return 0, 0, 0, 0, 0, 0
+	end
 end	
 --
 function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-		local SPEC = vehicle.spec_universalAutoload
-		if SPEC.objectsToLoad[object] ~= nil then
-			SPEC.objectsToLoad[object] = nil
-			SPEC.totalLoadCount = SPEC.totalLoadCount - 1
-		end
-		if SPEC.loadedObjects[object] ~= nil then
-			vehicle:removeLoadedObject(object)
+		vehicle:removeLoadedObject(object)
+		vehicle:removeAvailableObject(object)
+		vehicle:removeRearLoadingObject(object)
+		
+		if self ~= vehicle then
+			local SPEC = vehicle.spec_universalAutoload
 			if SPEC.totalUnloadCount == 0 then
 				SPEC.resetLoadingPattern = true
-			else
-				vehicle:setAllTensionBeltsActive(false)
 			end
+			vehicle:setAllTensionBeltsActive(false)
 		end
 	end
 end
@@ -1519,21 +1537,8 @@ function UniversalAutoload.unmountDynamicMount(object)
 		end
 	end
 end
---
-function UniversalAutoload:onDeleteLoadedObject(object)
-    local spec = self.spec_universalAutoload
 
-	if spec.loadedObjects[object] ~= nil then
-		spec.loadedObjects[object] = nil
-		spec.totalUnloadCount = spec.totalUnloadCount - 1
-		
-		if spec.totalUnloadCount == 0 then
-			spec.resetLoadingPattern = true
-		end
-	end
-end
-
-function UniversalAutoload:addLoadPlace(autoLoadType)
+function UniversalAutoload:addLoadPlace(containerType)
     local spec = self.spec_universalAutoload
 
 	spec.currentLoadWidth = spec.currentLoadWidth or 0
@@ -1543,31 +1548,31 @@ function UniversalAutoload:addLoadPlace(autoLoadType)
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea.width
 	local length = spec.loadArea.length - spec.currentLoadLength
-	local N1 = math.floor(width / autoLoadType.sizeX)
-	local M1 = math.floor(length / autoLoadType.sizeZ)
-	local N2 = math.floor(width / autoLoadType.sizeZ)
-	local M2 = math.floor(length / autoLoadType.sizeX)
+	local N1 = math.floor(width / containerType.sizeX)
+	local M1 = math.floor(length / containerType.sizeZ)
+	local N2 = math.floor(width / containerType.sizeZ)
+	local M2 = math.floor(length / containerType.sizeX)
 	
 	if N2*M2 == N1*M1 then
 	-- if equal use same packing as an empty trailer
-		M1 = math.floor(spec.loadArea.length / autoLoadType.sizeX)
-		M2 = math.floor(spec.loadArea.length / autoLoadType.sizeZ)
+		M1 = math.floor(spec.loadArea.length / containerType.sizeX)
+		M2 = math.floor(spec.loadArea.length / containerType.sizeZ)
 	end
 	
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	if N2*M2 > N1*M1  or autoLoadType.alwaysRotate then
+	if N2*M2 > N1*M1  or containerType.alwaysRotate then
 		N, M = N2, M2
 		rotation = math.pi/2
-		sizeZ = autoLoadType.sizeX
-		sizeY = autoLoadType.sizeY
-		sizeX = autoLoadType.sizeZ
+		sizeZ = containerType.sizeX
+		sizeY = containerType.sizeY
+		sizeX = containerType.sizeZ
 	else
 		N, M = N1, M1
 		rotation = 0
-		sizeX = autoLoadType.sizeX
-		sizeY = autoLoadType.sizeY
-		sizeZ = autoLoadType.sizeZ
+		sizeX = containerType.sizeX
+		sizeY = containerType.sizeY
+		sizeZ = containerType.sizeZ
 	end
 	
 	-- UPDATE NEW PACKING DIMENSIONS
@@ -1588,9 +1593,9 @@ function UniversalAutoload:addLoadPlace(autoLoadType)
 		loadPlace = {}
 		loadPlace.index = #spec.currentLoadingPattern + 1
 		loadPlace.node = createTransformGroup("loadPlace")
-		loadPlace.sizeX = autoLoadType.sizeX
-		loadPlace.sizeY = autoLoadType.sizeY
-		loadPlace.sizeZ = autoLoadType.sizeZ
+		loadPlace.sizeX = containerType.sizeX
+		loadPlace.sizeY = containerType.sizeY
+		loadPlace.sizeZ = containerType.sizeZ
 		loadPlace.isRotated = rotation == math.pi/2
 		
 		--LOAD FROM THE CORRECT SIDE
@@ -1610,7 +1615,7 @@ function UniversalAutoload:addLoadPlace(autoLoadType)
 
 end
 
-function UniversalAutoload:getLoadPlace(thisLoadType)
+function UniversalAutoload:getLoadPlace(containerType)
     local spec = self.spec_universalAutoload
 	
 	if spec.resetLoadingPattern ~= false then
@@ -1625,26 +1630,26 @@ function UniversalAutoload:getLoadPlace(thisLoadType)
 	while spec.currentLoadLength < spec.loadArea.length do
 	
 		spec.currentLoadHeight = spec.currentLoadHeight or 0
-		if spec.currentLoadHeight + thisLoadType.sizeY > spec.loadArea.height then
+		if spec.currentLoadHeight + containerType.sizeY > spec.loadArea.height then
 			spec.makeNewLoadingPlace = true
 		end
 	
 		if spec.makeNewLoadingPlace ~= false then
-			--print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", thisLoadType.name, thisLoadType.sizeX, thisLoadType.sizeY, thisLoadType.sizeZ))
-			self:addLoadPlace(thisLoadType)
+			print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+			self:addLoadPlace(containerType)
 			spec.makeNewLoadingPlace = false
 		end
 
 		local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
 		local thisLoadHeight = spec.currentLoadHeight
 		
-		if self:testPalletLocationIsEmpty(thisLoadPlace, thisLoadType, thisLoadHeight) then
+		if self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight) then
 			print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-			spec.currentLoadHeight = spec.currentLoadHeight + thisLoadType.sizeY
+			spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
 			return spec.currentPlaceIndex, thisLoadHeight
 		end
 		
-		--print("DID NOT FIT HERE...")
+		print("DID NOT FIT HERE...")
 		spec.makeNewLoadingPlace = true
 	end
 
@@ -1658,6 +1663,7 @@ function UniversalAutoload:getIsValidObject(object)
 	if object.spec_mountable == nil or object.spec_mountable.componentNode ~= object.rootNode then
 		return false
 	end
+	
 	if object.i3dFilename ~= nil and object.typeName == "pallet" or object.typeName == "bigBag" then
 		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
 			return UniversalAutoload.getContainerType(object) ~= nil
@@ -1682,9 +1688,9 @@ function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
 	return self:getIsAutoloadingAllowed() and -1 or math.huge
 end
 --
-function UniversalAutoload:testPalletLocationIsFull(loadPlace, autoLoadType, testLoadHeight)
+function UniversalAutoload:testPalletLocationIsFull(loadPlace, containerType, testLoadHeight)
 	local spec = self.spec_universalAutoload
-	local sizeX, sizeY, sizeZ = autoLoadType.sizeX/2, autoLoadType.sizeY/2, autoLoadType.sizeZ/2
+	local sizeX, sizeY, sizeZ = containerType.sizeX/2, containerType.sizeY/2, containerType.sizeZ/2
 	local x, y, z = localToWorld(loadPlace.node, 0, testLoadHeight, 0)
 	local rx, ry, rz = getWorldRotation(loadPlace.node)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
@@ -1702,9 +1708,9 @@ function UniversalAutoload:testPalletLocationIsFull(loadPlace, autoLoadType, tes
 	end
 end
 --
-function UniversalAutoload:testPalletLocationIsEmpty(loadPlace, autoLoadType, testLoadHeight)
+function UniversalAutoload:testPalletLocationIsEmpty(loadPlace, containerType, testLoadHeight)
 	local spec = self.spec_universalAutoload
-	local sizeX, sizeY, sizeZ = autoLoadType.sizeX/2, autoLoadType.sizeY/2, autoLoadType.sizeZ/2
+	local sizeX, sizeY, sizeZ = containerType.sizeX/2, containerType.sizeY/2, containerType.sizeZ/2
 	local x, y, z = localToWorld(loadPlace.node, 0, testLoadHeight, 0)
 	local rx, ry, rz = getWorldRotation(loadPlace.node)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
@@ -1748,7 +1754,6 @@ function UniversalAutoload:testUnloadLocationIsEmpty(loadPlace)
 end
 --
 function UniversalAutoload:overlapCallback(hitObjectId, x, y, z, distance)
-
 	if hitObjectId ~= g_currentMission.terrainRootNode then
 		local spec = self.spec_universalAutoload
 		spec.hasOverlap = true
@@ -1758,27 +1763,24 @@ function UniversalAutoload:overlapCallback(hitObjectId, x, y, z, distance)
 end
 
 -- OBJECT MOVEMENT FUNCTIONS
+function UniversalAutoload.getObjectNode( object )
+	local node = object.nodeId or object.components[1].node
+	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
+		return node
+	end
+end
+--
 function moveObjectNode( objectNodeId, p )
-
 	if p.x ~= nil then
 		setTranslation(objectNodeId, p.x, p.y, p.z)
 	end
 	if p.rx ~= nil then
 		setWorldRotation(objectNodeId, p.rx, p.ry, p.rz)
 	end
-
 end
 --
 function moveObjectNodes( object, p )
 
-	UniversalAutoload.unmountDynamicMount(object)
-	
-	local wasAddedToPhysics = false
-	if object.isAddedToPhysics then
-		wasAddedToPhysics = true
-		object:removeFromPhysics()
-	end
-	
 	local nodes = {}
 	if object.components ~= nil then
 		for i = 1, #object.components do
@@ -1788,33 +1790,44 @@ function moveObjectNodes( object, p )
 		table.insert(nodes, object.nodeId)
 	end
 	
-	local n = {}
-	for i = 1, #nodes do
-		n[i] = {} for k, v in pairs(p) do (n[i])[k] = v end
-		if n[i].x ~= nil then
-			local dx, dy, dz = localToLocal(nodes[i], nodes[1], 0, 0, 0)
-			n[i].x = n[i].x + dx
-			n[i].y = n[i].y + dy
-			n[i].z = n[i].z + dz
-		end
-	end
-	for i = 1, #nodes do
-		moveObjectNode(nodes[i], n[i] )
-	end
+	local node = nodes[1]
+	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
 	
-	if wasAddedToPhysics then
-		object:addToPhysics()
-	end
-
-	if p.vx ~= nil then
+		UniversalAutoload.unmountDynamicMount(object)
+	
+		local wasAddedToPhysics = false
+		if object.isAddedToPhysics then
+			wasAddedToPhysics = true
+			object:removeFromPhysics()
+		end
+	
+		local n = {}
 		for i = 1, #nodes do
-			setLinearVelocity(nodes[i], p.vx, p.vy, p.vz)
+			n[i] = {} for k, v in pairs(p) do (n[i])[k] = v end
+			if n[i].x ~= nil then
+				local dx, dy, dz = localToLocal(nodes[i], nodes[1], 0, 0, 0)
+				n[i].x = n[i].x + dx
+				n[i].y = n[i].y + dy
+				n[i].z = n[i].z + dz
+			end
 		end
-	end
-	
-	object.networkTimeInterpolator:reset()
-	object:raiseDirtyFlags(object.vehicleDirtyFlag)
+		for i = 1, #nodes do
+			moveObjectNode(nodes[i], n[i] )
+		end
+		
+		if wasAddedToPhysics then
+			object:addToPhysics()
+		end
 
+		if p.vx ~= nil then
+			for i = 1, #nodes do
+				setLinearVelocity(nodes[i], p.vx, p.vy, p.vz)
+			end
+		end
+		
+		object.networkTimeInterpolator:reset()
+		object:raiseDirtyFlags(object.vehicleDirtyFlag)
+	end
 end
 
 -- TRIGGER CALLBACK FUNCTIONS
@@ -1850,15 +1863,9 @@ function UniversalAutoload:loadingTriggerCallback(triggerId, otherActorId, onEnt
 		if object ~= nil then
 			if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
 				if onEnter then
-					if spec.objectsToLoad[object] == nil and spec.loadedObjects[object] == nil then
-						spec.objectsToLoad[object] = object
-						spec.totalLoadCount = spec.totalLoadCount + 1
-					end
+					self:addAvailableObject(object)
 				elseif onLeave then
-					if spec.objectsToLoad[object] ~= nil then
-						spec.objectsToLoad[object] = nil
-						spec.totalLoadCount = spec.totalLoadCount - 1
-					end
+					self:removeAvailableObject(object)
 				end
 			end
 		end
@@ -1888,17 +1895,9 @@ function UniversalAutoload:rearLoadingTriggerCallback(triggerId, otherActorId, o
 		if object ~= nil then
 			if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
 				if onEnter then
-					if object.dynamicMountObject ~= nil then
-						if spec.rearLoadingObjects[object] == nil then
-							spec.rearLoadingObjects[object] = object
-							object:raiseDirtyFlags(object.vehicleDirtyFlag)
-						end
-						self:forceRaiseActive()
-					end
+					self:addRearLoadingObject(object)
 				elseif onLeave then
-					if spec.rearLoadingObjects[object] ~= nil then
-						spec.rearLoadingObjects[object] = nil
-					end
+					self:removeRearLoadingObject(object)
 				end
 			end
 		end
@@ -1911,6 +1910,7 @@ function UniversalAutoload:addLoadedObject(object)
 		spec.loadedObjects[object] = object
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
 		if object.addDeleteListener ~= nil then
+			--print("Add Loaded Delete Listener")
 			object:addDeleteListener(self, "onDeleteLoadedObject")
 		end
 		object:raiseDirtyFlags(object.vehicleDirtyFlag)
@@ -1923,10 +1923,92 @@ function UniversalAutoload:removeLoadedObject(object)
 		spec.loadedObjects[object] = nil
 		spec.totalUnloadCount = spec.totalUnloadCount - 1
 		if object.removeDeleteListener ~= nil then
-			object:removeDeleteListener(self)
+			--print("Remove Loaded Delete Listener")
+			object:removeDeleteListener(self, "onDeleteLoadedObject")
 		end
 		object:raiseDirtyFlags(object.vehicleDirtyFlag)
 	end
+end
+--
+function UniversalAutoload:onDeleteLoadedObject(object)
+	self:removeLoadedObject(object)
+end
+--
+function UniversalAutoload:addAvailableObject(object)
+	local spec = self.spec_universalAutoload
+	
+	if spec.availableObjects[object] == nil and spec.loadedObjects[object] == nil then
+		spec.availableObjects[object] = object
+		spec.totalAvailableCount = spec.totalAvailableCount + 1
+		if object.addDeleteListener ~= nil then
+			--print("Add Available Delete Listener")
+			object:addDeleteListener(self, "onDeleteAvailableObject")
+		end
+	end
+
+end
+--
+function UniversalAutoload:removeAvailableObject(object)
+	local spec = self.spec_universalAutoload
+	
+	if spec.availableObjects[object] ~= nil then
+		spec.availableObjects[object] = nil
+		spec.totalAvailableCount = spec.totalAvailableCount - 1
+		if object.removeDeleteListener ~= nil then
+			--print("Remove Available Delete Listener")
+			object:removeDeleteListener(self, "onDeleteAvailableObject")
+		end
+	end
+end
+--
+function UniversalAutoload:removeFromSortedObjectsToLoad(object)
+	local spec = self.spec_universalAutoload
+	
+	if spec.sortedObjectsToLoad ~= nil then
+		for index, sortedobject in ipairs(spec.sortedObjectsToLoad) do
+			if object == sortedobject then
+				table.remove(spec.sortedObjectsToLoad, index)
+				break
+			end
+		end
+	end
+end
+--
+function UniversalAutoload:onDeleteAvailableObject(object)
+	self:removeAvailableObject(object)
+	self:removeFromSortedObjectsToLoad(object)
+end
+--
+function UniversalAutoload:addRearLoadingObject(object)
+	local spec = self.spec_universalAutoload
+	
+	if object.dynamicMountObject ~= nil then
+		if spec.rearLoadingObjects[object] == nil then
+			spec.rearLoadingObjects[object] = object
+			if object.addDeleteListener ~= nil then
+				--print("Add RearLoading Delete Listener")
+				object:addDeleteListener(self, "onDeleteRearLoadingObject")
+			end
+			object:raiseDirtyFlags(object.vehicleDirtyFlag)
+		end
+		self:forceRaiseActive()
+	end
+end
+--
+function UniversalAutoload:removeRearLoadingObject(object)
+	local spec = self.spec_universalAutoload
+	
+	if spec.rearLoadingObjects[object] ~= nil then
+		spec.rearLoadingObjects[object] = nil
+		if object.removeDeleteListener ~= nil then
+			--print("Remove RearLoading Delete Listener")
+			object:removeDeleteListener(self, "onDeleteRearLoadingObject")
+		end
+	end
+end
+--
+function UniversalAutoload:onDeleteRearLoadingObject(object)
+	self:removeRearLoadingObject(object)
 end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
@@ -1954,33 +2036,25 @@ function UniversalAutoload.getContainerType(object)
 	return palletType
 end
 --
-function UniversalAutoload.getLoadingIndex(containerType)
-	for index, indexType in ipairs(UniversalAutoload.TYPES) do
-		if containerType == indexType then
-			return index
-		end
-	end
+function UniversalAutoload.getMaterialType(object)
+	local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
+	return fillUnitIndex
 end
 --
-function UniversalAutoload:getSelectedTypeName()
+function UniversalAutoload.getMaterialTypeName(object)
+	local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
+	local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(fillUnitIndex)
+	return fillTypeName
+end
+--
+function UniversalAutoload:getSelectedContainerType()
 	local spec = self.spec_universalAutoload
-	return UniversalAutoload.TYPES[spec.currentContainerIndex]
+	return UniversalAutoload.CONTAINERS[spec.currentContainerIndex]
 end
 --
-function UniversalAutoload:getPalletIsSelectedType(object)
-
-	local objectContainerType = UniversalAutoload.getContainerTypeName(object)
-	local selectedContainerType = UniversalAutoload.getSelectedTypeName(self)
-	
-	if objectContainerType~=nil and selectedContainerType~=nil then
-		if selectedContainerType == "ALL" then
-			return true
-		else
-			return objectContainerType == selectedContainerType
-		end
-	else
-		return false
-	end
+function UniversalAutoload:getSelectedMaterialType()
+	local spec = self.spec_universalAutoload
+	return UniversalAutoload.MATERIALS[spec.currentMaterialIndex]
 end
 --
 function UniversalAutoload:getPalletIsSelectedLoadside(object)
@@ -1989,16 +2063,48 @@ function UniversalAutoload:getPalletIsSelectedLoadside(object)
 	if spec.currentLoadside == "both" then
 		return true
 	end
-	
-	local node = object.nodeId or object.components[1].node
+
+	local node = UniversalAutoload.getObjectNode(object)
 	if node == nil then
 		return false
 	end
 	
 	local x, y, z = localToLocal(node, spec.loadArea.rootNode, 0, 0, 0)
-	if (x > 0 and spec.currentLoadside == "left") or 
-	   (x < 0 and spec.currentLoadside == "right") then
+	if ( x > 0 and spec.currentLoadside == "left") or 
+	   ( x < 0 and spec.currentLoadside == "right") then
 		return true
+	else
+		return false
+	end
+end
+--
+function UniversalAutoload:getPalletIsSelectedMaterial(object)
+
+	local objectMaterialType = UniversalAutoload.getMaterialTypeName(object)
+	local selectedMaterialType = UniversalAutoload.getSelectedMaterialType(self)
+	
+	if objectMaterialType~=nil and selectedMaterialType~=nil then
+		if selectedMaterialType == "ALL" then
+			return true
+		else
+			return objectMaterialType == selectedMaterialType
+		end
+	else
+		return false
+	end
+end
+--
+function UniversalAutoload:getPalletIsSelectedContainer(object)
+
+	local objectContainerType = UniversalAutoload.getContainerTypeName(object)
+	local selectedContainerType = UniversalAutoload.getSelectedContainerType(self)
+	
+	if objectContainerType~=nil and selectedContainerType~=nil then
+		if selectedContainerType == "ALL" then
+			return true
+		else
+			return objectContainerType == selectedContainerType
+		end
 	else
 		return false
 	end
@@ -2020,28 +2126,32 @@ function UniversalAutoload:drawDebugDisplay()
 
 	if (UniversalAutoload.debugEnabled or spec.showDebug) and not g_gui:getIsGuiVisible() then
 		
-		for _,object in pairs(spec.objectsToLoad) do
+		for _,object in pairs(spec.availableObjects) do
 			if object ~= nil then
-				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getContainerType(object)
-				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
-				if self:isValidForLoading(object) then
-					DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0 )
-				else
-					DrawDebugPallet( node, w, h, l, true, false, 1, 0, 0 )
+				local node = UniversalAutoload.getObjectNode(object)
+				if node ~= nil then
+					local containerType = UniversalAutoload.getContainerType(object)
+					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+					if self:isValidForLoading(object) then
+						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0 )
+					else
+						DrawDebugPallet( node, w, h, l, true, false, 1, 0, 0 )
+					end
 				end
 			end
 		end
 		
 		for _,object in pairs(spec.loadedObjects) do
 			if object ~= nil then
-				local node = object.nodeId or object.components[1].node
-				local autoLoadType = UniversalAutoload.getContainerType(object)
-				local w, h, l = autoLoadType.sizeX, autoLoadType.sizeY, autoLoadType.sizeZ
-				if self:isValidForUnloading(object) then
-					DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0 )
-				else
-					DrawDebugPallet( node, w, h, l, true, false, 1, 1, 0 )
+				local node = UniversalAutoload.getObjectNode(object)
+				if node ~= nil then
+					local containerType = UniversalAutoload.getContainerType(object)
+					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+					if self:isValidForUnloading(object) then
+						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0 )
+					else
+						DrawDebugPallet( node, w, h, l, true, false, 1, 1, 0 )
+					end
 				end
 			end
 		end
@@ -2082,7 +2192,7 @@ end
 --
 function DrawDebugPallet( node, w, h, l, showCube, showAxis, r, g, b )
 
-	if node ~= nil and node ~= 0 then
+	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
 		-- colour for square
 		local r, g, b = (r or 1), (g or 1), (b or 1)
 		local w, h, l = (w or 1), (h or 1), (l or 1)

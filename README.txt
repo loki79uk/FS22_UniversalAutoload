@@ -9,16 +9,16 @@
   Base game supported trailers are defined in the file "SupportedVehicles.xml".  For some trailers only certain configurations are supported, such as the bale trailer (see below).  It is a requirement that the configuration also includes the "tension belts" specialisation.
   
   SUPPORTED TRAILERS: Name (specialisation)
-   · Welger DK 115 (bale trailer)
    · Brantner DD 24073/2 XXL (bale trailer)
-   · Fliegl DTS 5.9
    · Bremer Transportwagen TP 500 S
-   · Demco Steel Drop Deck
-   · LODE KING Renown Drop Deck
-   · KRONE Trailer Profi Liner
-   · Farmtech DPW 1800 (standard)
-   · Kröger PWO 24 (standard)
    · BÖCKMANN MH-AL 4320/35
+   · Demco Steel Drop Deck
+   · Farmtech DPW 1800 (standard)
+   · Fliegl DTS 5.9
+   · KRONE Trailer Profi Liner
+   · Kröger PWO 24 (standard)
+   · LODE KING Renown Drop Deck
+   · Welger DK 115 (bale trailer)
 
 
 ==============================================================
@@ -72,7 +72,7 @@
   OPTIONS:
     [noLoadingIfUnfolded] - If true this parameter will prevent loading if the trailer is folded.  It will also prevent loading while it is folding or unfolding.  Use this if your unfolded trailer is not level or if the folding animation somehow blocks the loading area.
 
-    [isCurtainTrailer] - This is an option specifically designed for the KRONE Profi Liner curtain trailer.  If true the autoloading script will detect the correct load side when open IF the tipSide.name contains the string "Left" or "Right". Where:
+    [isCurtainTrailer] - This is an option specifically designed for the KRONE Profi Liner curtain trailer.  If true the autoloading script will detect the correct load side when open IF the tipSide.animation.name contains the string "Left" or "Right". Where:
 	tipSide = self.spec_trailer.tipSides[self.spec_trailer.currentTipSideIndex] and self.spec_trailer.tipState == 2
 
     [enableRearLoading] - This is also designed for the KRONE Profi Liner curtain trailer, but can be applied to any trailer where automatic loading is required.  A pallet trigger is created at the rear of the trailer, and will load any valid objects detected here that are dynamically mounted to another vehcile (e.g. a forklift).

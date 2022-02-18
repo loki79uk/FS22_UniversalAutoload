@@ -9,41 +9,116 @@
     </title>
 	
     <description>
-<en><![CDATA[Autoloading specialsiation for flatbed trailers.  This modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.
+<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see README file for instructions on adding to your own mod trailers or pallets.
 
 Features:
-- Loads any compatible pallet types (see list below)
+- Loads any compatible pallet/container types (see list below)
 - Installed automatically on any compatible trailers (see list below)
-- Load/Unload by selected type only or select 'ALL' to load mixed types in sequence 
-- Optional filter to prevent partially full pallets from being loaded
+- Load and Unload by selected material or container type
+- Can also restrict loading to full pallets only
+- Select 'ALL' to load mixed types in sequence 
+- Mixed pallets are loaded in size order for best packing efficiency
+- Can interact with trailers when player is on foot (even when not attached to a vehicle)
 
 Special Features for 'KRONE Trailer Profi Liner'
 - Load/Unload only available on the side that curtain is open
 - Rear loading directly from forklift
+- Rear door and curtain can be opened and closed by player on foot
 
-Configured for the following items:
+Configured for the following container types:
 - BigBags
 - BigBag Pallets
-- IBC Liquid Tanks
 - Euro Pallets
-- Pioneer pallets
+- IBC Liquid Tanks
 - Potato Boxes (requires mod: Seed Potato Pack)
 
 Configured for the following trailers:
-- Welger DK 115
-- Brantner DD 24073/2 XXL
-- Fliegl DTS 5.9
-- Demco Steel Drop Deck
-- LODE KING Renown Drop Deck
-- KRONE Trailer Profi Liner
-- Farmtech DPW 1800
-- Kröger PWO 24
+- Brantner DD 24073/2 XXL (bale trailer)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (standard)
+- LODE KING Renown Drop Deck
+- Welger DK 115 (bale trailer)
 ]]>
 </en>
 
+<de><![CDATA[Fügt die automatische Ladefähigkeit für Transportanhänger und Pritschen hinzu.  Die Änderung gilt automatisch für alle kompatiblen Grundausrüstungen im Spiel. Sie wird sowohl für die bereits auf deiner Farm vorhandenen Geräte als auch für zukünftige Käufe angewendet. Die README-Datei enthält die notwendigen Hinweise, um Ihre eigenen modellierten Anhänger oder Paletten hinzuzufügen.
 
+Funktionen:
+- Lädt jede Art von kompatiblen Paletten oder Containern (siehe Liste unten)
+- Wird automatisch auf allen kompatiblen Anhängern installiert (siehe Liste unten)
+- Be- und Entladen durch Auswahl der Warenart oder des Containertyps
+- Möglichkeit, nur vollständig gefüllte Paletten zu laden
+- Modus 'Alle', um alle gemischten Typen nacheinander zu laden
+- Die Paletten werden in der Reihenfolge ihrer Größe geladen, um den Lagerraum zu optimieren
+- Kann auch verwendet werden, wenn man zu Fuß neben dem Gerät steht (auch wenn das Gerät nicht angehängt ist)
+
+Sonderfunktionen für den Anhänger 'KRONE Trailer Profi Liner'
+- Be- und Entladen nur von der Öffnungsseite der Plane aus nutzbar
+- Beladen von der Rückseite bei Verwendung eines Gabelstaplers
+- Die Hecktür und die Plane können auch bedient werden, wenn man zu Fuß daneben steht
+
+Liste der kompatiblen Behältertypen: 
+- BigBags
+- BigBag in Paletten
+- Europalette
+- IBC Flüssigkeitsbehälter
+- Palox Kartoffel (erfordert Mod: Seed Potato Pack).
+
+Liste der kompatiblen Anhänger und Pritschen: 
+- Brantner DD 24073/2 XXL (Ballenpritsche)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (Standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (Standard)
+- LODE KING Renown Drop Deck
+- Welger DK 115 (Bale Trailer)
+]]>
+</de>
+
+<fr><![CDATA[Ajoute la capacité de chargement automatique pour les remorques de transport et les plateaux.  La modification est automatique pour tous les équipements compatibles de base dans le jeu. Elle est appliquée pour les équipements déjà présents dans votre ferme aussi bien que pour vos futurs achats. Le fichier README donne les indications nécessaires pour ajouter vos propres remorques ou palettes moddées.
+
+Fonctionnalités :
+- Charge tout type de palettes ou conteneurs compatibles (voir liste ci-dessous) 
+- Installé automatiquement sur toutes les remorques ou plateaux compatibles (voir liste ci-dessous)
+- Chargement et déchargement par sélection du type de marchandises ou par type de conditonnement 
+- Possibilité de ne charger que les palettes complètement remplies
+- Mode 'Tous' pour charger tous les types mélangés en séquence
+- Les palettes sont chargées par ordre de taille pour optimiser l'espace de stockage
+- Peut être utilisé même en étant à pied à côté de l'équipement (y compris si celui-ci n'est pas attelé)
+
+Fonctions spéciales pour la remorque 'KRONE Trailer Profi Liner'
+- Chargement et déchargement utilisables seulement du côté d'ouverture de la bâche
+- Chargement depuis l'arrière si vous utilisez un chariot élévateur
+- La porte arrière et la bâche peuvent être manipulées même en étant à pied à côté
+
+Liste des types de conteneurs compatibles : 
+- BigBags
+- BigBag en palette
+- Palette Euro
+- Réservoir liquide IBC
+- Palox Pommes de terre (nécessite le mod : Seed Potato Pack)
+
+Liste des remorques et plateaux compatibles : 
+- Brantner DD 24073/2 XXL (plateau à balles)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (standard)
+- LODE KING Renown Drop Deck
+- Welger DK 115 (bale trailer)
+]]>
+</fr>
 
     </description>
 	
@@ -66,10 +141,8 @@ Configured for the following trailers:
 		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-
 	</actions>
 	
 	<inputBinding>
@@ -106,36 +179,34 @@ Configured for the following trailers:
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_l" />
 		</actionBinding>
-		
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
 		</actionBinding>
-		
 	</inputBinding>
 	
 	<l10n>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
 			<en>Toggle loading</en>
 			<de>Laden umschalten</de>
-			<fr>Basculer le chargement</fr>
+			<fr>Activer le chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
 			<de>Auskippen</de>
-			<fr>Décharger</fr>
+			<fr>Décharger tous</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
 			<de>Aktive entladeseite umschalten</de>
-			<fr>Basculer le côté actif</fr>
+			<fr>Choix du côté actif</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
 			<de>Filter laden umschalten</de>
-			<fr>Basculer le sélection de chargement</fr>
+			<fr>Sélection du chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -150,7 +221,7 @@ Configured for the following trailers:
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
 			<de>Alle Materialtyp auswählen</de>
-			<fr>Sélectionner tous types de chargement</fr>
+			<fr>Sélectionner tous types de marchandises</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -187,40 +258,45 @@ Configured for the following trailers:
 			<de>Der Entladebereich ist blockiert. Bitte räumen Sie den Abladebereich.</de>
 			<fr>La zone de déchargement est bloquée. Veuillez libérer la zone de déchargement.</fr>
 		</text>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
+			<en>No compatible goods are available for loading or unloading.</en>
+			<de>Es sind keine kompatiblen Waren zum Be- oder Entladen vorhanden.</de>
+			<fr>Aucune marchandise compatible n'est disponible pour le chargement ou le déchargement.</fr>
+		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
 			<de>Aktive entladeseite</de>
 			<fr>Côté actif</fr>
 		</text>
 		<text name="universalAutoload_left">
-			<en>LEFT</en>
-			<de>LINKS</de>
-			<fr>GAUCHE</fr>
+			<en>Left</en>
+			<de>Links</de>
+			<fr>Gauche</fr>
 		</text>
 		<text name="universalAutoload_right">
-			<en>RIGHT</en>
-			<de>RECHTS</de>
-			<fr>DROIT</fr>
+			<en>Right</en>
+			<de>Rechts</de>
+			<fr>Droit</fr>
 		</text>
 		<text name="universalAutoload_none">
-			<en>NONE</en>
-			<de>KEINE</de>
-			<fr>AUCUN</fr>
+			<en>None</en>
+			<de>Keine</de>
+			<fr>Aucun</fr>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
 			<de>Filter laden</de>
-			<fr>Sélection de chargement</fr>
+			<fr>Choix du chargement</fr>
 		</text>
 		<text name="universalAutoload_enabled">
-			<en>FULL ONLY</en>
-			<de>NUR FULL</de>
-			<fr>COMPLET UNIQUEMENT</fr>
+			<en>Full only</en>
+			<de>Nur full</de>
+			<fr>Complet uniquement</fr>
 		</text>
 		<text name="universalAutoload_disabled">
-			<en>ANY</en>
-			<de>JEDE</de>
-			<fr>TOUT</fr>
+			<en>Any</en>
+			<de>Jede</de>
+			<fr>Tout</fr>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -245,57 +321,57 @@ Configured for the following trailers:
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
 			<de>Containertyp</de>
-			<fr>Condtionnement sélectionné</fr>
+			<fr>Conditionnement sélectionné</fr>
 		</text>
 		<text name="universalAutoload_ALL">
-			<en>ALL</en>
-			<de>ALLE</de>
-			<fr>TOUS</fr>
+			<en>All</en>
+			<de>Alle</de>
+			<fr>Tous</fr>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
-			<en>IBC TANK</en>
-			<de>FLÜSSIGKEITSTANK</de>
-			<fr>RÉSERVOIR DE LIQUIDE</fr>
+			<en>IBC Tank</en>
+			<de>Flüssigkeitstank</de>
+			<fr>Réservoir de liquide IBC</fr>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
-			<en>EURO PALLET</en>
-			<de>EURO-PALETTE</de>
-			<fr>PALETTE EURO</fr>
+			<en>Euro Pallet</en>
+			<de>Euro-palette</de>
+			<fr>Palette euro</fr>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
-			<en>PIONEER PALLET</en>
-			<de>PIONEER-PALETTE</de>
-			<fr>PALETTE PIONEER</fr>
+			<en>Pioneer Pallet</en>
+			<de>Pioneer-palette</de>
+			<fr>Palette pioneer</fr>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
-			<en>BIGBAG PALLET</en>
-			<de>BIGBAG-PALETTE</de>
-			<fr>PALETTE DE BIG BAG</fr>
+			<en>Bigbag Pallet</en>
+			<de>Bigbag-palette</de>
+			<fr>Palette de big bag</fr>
 		</text>
 		<text name="universalAutoload_BIGBAG">
-			<en>BIGBAG</en>
-			<de>BIGBAG</de>
-			<fr>BIG BAG</fr>
+			<en>Bigbag</en>
+			<de>Bigbag</de>
+			<fr>Big bag</fr>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
-			<en>POTATO BOX</en>
-			<de>KARTOFFELKISTE</de>
-			<fr>PALOX POMMES DE TERRE</fr>
+			<en>Potato Box</en>
+			<de>Kartoffelkiste</de>
+			<fr>Palox pommes de terre</fr>
 		</text>
 		<text name="universalAutoload_BALE">
-			<en>BALE</en>
-			<de>BALE</de>
-			<fr>BALLE</fr>
+			<en>Bale</en>
+			<de>Bale</de>
+			<fr>Balle</fr>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
-			<en>ROUND BALE</en>
-			<de>RUNDBALLEN</de>
-			<fr>BALLE RONDE</fr>
+			<en>Round bale</en>
+			<de>Rundballen</de>
+			<fr>Balle Ronde</fr>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
-			<en>SQUARE BALE</en>
-			<de>QUADRATBALE</de>
-			<fr>BALLE CARRÉE</fr>
+			<en>Square bale</en>
+			<de>Quadratbale</de>
+			<fr>Balle carrée</fr>
 		</text>
 	</l10n>
 	

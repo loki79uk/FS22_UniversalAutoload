@@ -35,6 +35,11 @@ UniversalAutoload.ACTIONS = {
 	["TOGGLE_CURTAIN"]	      = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN"
 }
 
+UniversalAutoload.WARNINGS = {
+	[1] = "warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA",
+	[2] = "warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND"
+}
+
 UniversalAutoload.CONTAINERS = {
 	[1] = "ALL",
 	[2] = "EURO_PALLET",
@@ -177,7 +182,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.containerType = containerType or "ALL"
+					newType.type = containerType or "ALL"
 					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
 					newType.sizeX = width
 					newType.sizeY = height
@@ -217,7 +222,7 @@ function UniversalAutoloadManager:loadMap(name)
 	UniversalAutoload.MATERIALS = {}
 	table.insert(UniversalAutoload.MATERIALS, "ALL" )
 	UniversalAutoload.MATERIALS_FILLTYPE = {}
-	table.insert(UniversalAutoload.MATERIALS_FILLTYPE, {["title"]="ALL"} )
+	table.insert( UniversalAutoload.MATERIALS_FILLTYPE, {["title"]= g_i18n:getText("universalAutoload_ALL")} )
 	for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
 		if fillType.palletFilename ~= nil then
 			table.insert(UniversalAutoload.MATERIALS, fillType.name )

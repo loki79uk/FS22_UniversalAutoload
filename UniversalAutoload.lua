@@ -8,7 +8,7 @@ UniversalAutoload.path = g_currentModDirectory
 UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
-print("  UNIVERSAL AUTOLOAD TEST VERSION: 010")
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 011")
 
 -- EVENTS
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
@@ -522,6 +522,13 @@ function UniversalAutoload.actionEventCycleMaterial_FW(self, actionName, inputVa
 			materialIndex = objectMaterialIndex
 		end
 	end
+	for _, object in pairs(spec.loadedObjects) do
+		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		if objectMaterialIndex > spec.currentMaterialIndex and objectMaterialIndex < materialIndex then
+			materialIndex = objectMaterialIndex
+		end
+	end
 	if materialIndex == 999 then
 		materialIndex = 1
 	end
@@ -535,6 +542,13 @@ function UniversalAutoload.actionEventCycleMaterial_BW(self, actionName, inputVa
 	local materialIndex = 0
 	local startingValue = (spec.currentMaterialIndex==1) and #UniversalAutoload.MATERIALS or spec.currentMaterialIndex
 	for _, object in pairs(spec.availableObjects) do
+		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)	
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		if objectMaterialIndex < startingValue and objectMaterialIndex > materialIndex then
+			materialIndex = objectMaterialIndex
+		end
+	end
+	for _, object in pairs(spec.loadedObjects) do
 		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)	
 		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
 		if objectMaterialIndex < startingValue and objectMaterialIndex > materialIndex then
@@ -565,13 +579,20 @@ function UniversalAutoload.actionEventCycleContainer_FW(self, actionName, inputV
 			containerIndex = objectContainerIndex
 		end
 	end
+	for _, object in pairs(spec.loadedObjects) do
+		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		if objectContainerIndex > spec.currentContainerIndex and objectContainerIndex < containerIndex then
+			containerIndex = objectContainerIndex
+		end
+	end
 	if containerIndex == 999 then
 		containerIndex = 1
 	end
 	self:setContainerTypeIndex(containerIndex)
 	
 end
--- --
+--
 function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventCycleContainer_BW: "..self:getFullName())
 	local spec = self.spec_universalAutoload
@@ -579,6 +600,13 @@ function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputV
 	local containerIndex = 0
 	local startingValue = (spec.currentContainerIndex==1) and #UniversalAutoload.CONTAINERS or spec.currentContainerIndex
 	for _, object in pairs(spec.availableObjects) do
+		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		if objectContainerIndex < startingValue and objectContainerIndex > containerIndex then
+			containerIndex = objectContainerIndex
+		end
+	end
+	for _, object in pairs(spec.loadedObjects) do
 		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
 		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
 		if objectContainerIndex < startingValue and objectContainerIndex > containerIndex then

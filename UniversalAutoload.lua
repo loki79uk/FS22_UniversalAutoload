@@ -512,12 +512,40 @@ end
 --
 function UniversalAutoload.actionEventCycleMaterial_FW(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventCycleMaterial_FW: "..self:getFullName())
-	self:changeMaterialTypeIndex(1)
+	local spec = self.spec_universalAutoload
+	
+	local materialIndex = 999
+	for _, object in pairs(spec.availableObjects) do
+		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		if objectMaterialIndex > spec.currentMaterialIndex and objectMaterialIndex < materialIndex then
+			materialIndex = objectMaterialIndex
+		end
+	end
+	if materialIndex == 999 then
+		materialIndex = 1
+	end
+	self:setMaterialTypeIndex(materialIndex)
 end
 --
 function UniversalAutoload.actionEventCycleMaterial_BW(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventCycleMaterial_BW: "..self:getFullName())
-	self:changeMaterialTypeIndex(-1)
+	local spec = self.spec_universalAutoload
+	
+	local materialIndex = 0
+	local startingValue = (spec.currentMaterialIndex==1) and #UniversalAutoload.MATERIALS or spec.currentMaterialIndex
+	for _, object in pairs(spec.availableObjects) do
+		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)	
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		if objectMaterialIndex < startingValue and objectMaterialIndex > materialIndex then
+			materialIndex = objectMaterialIndex
+		end
+	end
+	if materialIndex == 0 then
+		materialIndex = 1
+	end
+
+	self:setMaterialTypeIndex(materialIndex)
 end
 --
 function UniversalAutoload.actionEventSelectAllMaterials(self, actionName, inputValue, callbackState, isAnalog)
@@ -527,12 +555,41 @@ end
 --
 function UniversalAutoload.actionEventCycleContainer_FW(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventCycleContainer_FW: "..self:getFullName())
-	self:changeContainerTypeIndex(1)
+	local spec = self.spec_universalAutoload
+	
+	local containerIndex = 999
+	for _, object in pairs(spec.availableObjects) do
+		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		if objectContainerIndex > spec.currentContainerIndex and objectContainerIndex < containerIndex then
+			containerIndex = objectContainerIndex
+		end
+	end
+	if containerIndex == 999 then
+		containerIndex = 1
+	end
+	self:setContainerTypeIndex(containerIndex)
+	
 end
 -- --
 function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventCycleContainer_BW: "..self:getFullName())
-	self:changeContainerTypeIndex(-1)
+	local spec = self.spec_universalAutoload
+	
+	local containerIndex = 0
+	local startingValue = (spec.currentContainerIndex==1) and #UniversalAutoload.CONTAINERS or spec.currentContainerIndex
+	for _, object in pairs(spec.availableObjects) do
+		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		if objectContainerIndex < startingValue and objectContainerIndex > containerIndex then
+			containerIndex = objectContainerIndex
+		end
+	end
+	if containerIndex == 0 then
+		containerIndex = 1
+	end
+
+	self:setContainerTypeIndex(containerIndex)
 end
 --
 function UniversalAutoload.actionEventSelectAllContainers(self, actionName, inputValue, callbackState, isAnalog)
@@ -1315,6 +1372,12 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		if spec.rearLoadingObjects ~= nil then
 			for _, object in pairs(spec.rearLoadingObjects) do
 				--print("LOADING PALLET FROM REAR TRIGGER")
+				if not self:getPalletIsSelectedMaterial(object) then
+					self:setMaterialTypeIndex(1)
+				end
+				if not self:getPalletIsSelectedContainer(object) then
+					self:setContainerTypeIndex(1)
+				end
 				self:setAllTensionBeltsActive(false)
 				spec.doSetTensionBelts = true
 				spec.doPostLoadDelay = true
@@ -2011,6 +2074,15 @@ function UniversalAutoload:removeAvailableObject(object)
 			--print("Remove Available Delete Listener")
 			object:removeDeleteListener(self, "onDeleteAvailableObject")
 		end
+		
+		if spec.totalAvailableCount == 0 then
+			if spec.currentMaterialIndex ~= 1 then
+				self:setMaterialTypeIndex(1)
+			end
+			if spec.currentContainerIndex ~= 1 then
+				self:setContainerTypeIndex(1)
+			end
+		end
 	end
 end
 --
@@ -2071,8 +2143,8 @@ function UniversalAutoload.getObjectNameFromPath(i3d_path)
 end
 --
 function UniversalAutoload.getContainerTypeName(object)
-	local palletType = UniversalAutoload.getContainerType(object)
-	return palletType.containerType
+	local containerType = UniversalAutoload.getContainerType(object)
+	return containerType.type
 end
 --
 function UniversalAutoload.getContainerType(object)
@@ -2115,10 +2187,10 @@ function UniversalAutoload:getSelectedMaterialType()
 end
 --
 function UniversalAutoload:getSelectedMaterialText()
-	return string.gsub(UniversalAutoload.getSelectedMaterialType(self), "_", " ") 
-	--g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedMaterialType(self))
-	--<e k="fillType_wheat" v="Wheat"/>
-	--fillType.index, fillType.name, fillType.title, fillType.palletFilename
+	local materialType = UniversalAutoload.getSelectedMaterialType(self)
+	local materialIndex = UniversalAutoload.MATERIALS_INDEX[materialType]
+	local fillType = UniversalAutoload.MATERIALS_FILLTYPE[materialIndex]
+	return fillType.title:upper()
 end
 --
 function UniversalAutoload:getPalletIsSelectedLoadside(object)

@@ -3,10 +3,7 @@
     <containerTypeConfigurations>
 	
 		<containerTypeConfiguration containerType="ALL">
-			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
-			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
-			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
-			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
+			<objectType name="treeSaplingPallet" sizeY="2.000"/>
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="EURO_PALLET">
@@ -37,7 +34,10 @@
 			<objectType name="flourBoxPallet" sizeY="1.125"/>
 			<objectType name="sugarBoxPallet" sizeY="1.125"/>
 			<objectType name="woolPallet" sizeY="1.200"/>
-			<objectType name="treeSaplingPallet" sizeY="2.000"/>
+			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
+			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
+			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="BIGBAG">

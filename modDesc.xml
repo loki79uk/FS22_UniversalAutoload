@@ -172,25 +172,21 @@ Configured for the following trailers:
 			<de>Spanngurte anbringen/lösen</de>
 			<fr>Attacher/détacher les sangles de serrage</fr>
 		</text>
-		
-		
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
-			<de></de>
-			<fr></fr>
+			<de>Hintertür Öffnen/Schließen</de>
+			<fr>Ouvrir/fermer la porte arrière</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
-			<en>Open/Close curtain</en>
-			<de></de>
-			<fr></fr>
+			<en>Open/Close curtain side</en>
+			<de>Plane öffnen/schließen</de>
+			<fr>Ouvrir/fermer la bâche</fr>
 		</text>
-		
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
 			<en>Unloading area is blocked. Please clear the unloading area.</en>
-			<de></de>
-			<fr></fr>
+			<de>Der Entladebereich ist blockiert. Bitte räumen Sie den Abladebereich.</de>
+			<fr>La zone de déchargement est bloquée. Veuillez libérer la zone de déchargement.</fr>
 		</text>
-		
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
 			<de>Aktive entladeseite</de>

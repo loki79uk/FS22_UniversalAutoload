@@ -127,8 +127,8 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.containerType = containerType or "ALL"
-					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
+					newType.type = containerType or "ALL"
+					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
 					newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ)
@@ -178,7 +178,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
 					newType.containerType = containerType or "ALL"
-					newType.containerIndex = UniversalAutoload.INDEX[containerType] or 1
+					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
 					newType.sizeX = width
 					newType.sizeY = height
 					newType.sizeZ = length
@@ -209,17 +209,26 @@ function UniversalAutoloadManager:loadMap(name)
 		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200 }
 	end
 
-	UniversalAutoload.INDEX = {}
+	UniversalAutoload.CONTAINERS_INDEX = {}
 	for i, key in ipairs(UniversalAutoload.CONTAINERS) do
-		UniversalAutoload.INDEX[key] = i
+		UniversalAutoload.CONTAINERS_INDEX[key] = i
 	end
 	
 	UniversalAutoload.MATERIALS = {}
-	table.insert(UniversalAutoload.MATERIALS, "ALL")
+	table.insert(UniversalAutoload.MATERIALS, "ALL" )
+	UniversalAutoload.MATERIALS_FILLTYPE = {}
+	table.insert(UniversalAutoload.MATERIALS_FILLTYPE, {["title"]="ALL"} )
 	for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
 		if fillType.palletFilename ~= nil then
-			table.insert(UniversalAutoload.MATERIALS, fillType.name)
+			table.insert(UniversalAutoload.MATERIALS, fillType.name )
+			table.insert(UniversalAutoload.MATERIALS_FILLTYPE, fillType )
 		end
+	end
+	
+	UniversalAutoload.MATERIALS_INDEX = {}
+	for i, key in ipairs(UniversalAutoload.MATERIALS) do
+		--print("  "..i.." - "..key)
+		UniversalAutoload.MATERIALS_INDEX[key] = i
 	end
 		
 	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)

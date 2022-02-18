@@ -8,7 +8,7 @@ UniversalAutoload.path = g_currentModDirectory
 UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
-print("  UNIVERSAL AUTOLOAD TEST VERSION: 011")
+print("  UNIVERSAL AUTOLOAD TEST VERSION: 012")
 
 -- EVENTS
 source(g_currentModDirectory.."events/PlayerTriggerEvent.lua")
@@ -247,7 +247,7 @@ function UniversalAutoload:updateActionEventKeys()
 		if spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
 			-- print("updateActionEventKeys: "..self:getFullName())
 			local actions = UniversalAutoload.ACTIONS
-			local ignoreCollisions = false
+			local ignoreCollisions = not g_currentMission.player.isControlled
 
 			local _, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
@@ -517,14 +517,14 @@ function UniversalAutoload.actionEventCycleMaterial_FW(self, actionName, inputVa
 	local materialIndex = 999
 	for _, object in pairs(spec.availableObjects) do
 		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)
-		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName] or 1
 		if objectMaterialIndex > spec.currentMaterialIndex and objectMaterialIndex < materialIndex then
 			materialIndex = objectMaterialIndex
 		end
 	end
 	for _, object in pairs(spec.loadedObjects) do
 		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)
-		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName] or 1
 		if objectMaterialIndex > spec.currentMaterialIndex and objectMaterialIndex < materialIndex then
 			materialIndex = objectMaterialIndex
 		end
@@ -543,14 +543,14 @@ function UniversalAutoload.actionEventCycleMaterial_BW(self, actionName, inputVa
 	local startingValue = (spec.currentMaterialIndex==1) and #UniversalAutoload.MATERIALS or spec.currentMaterialIndex
 	for _, object in pairs(spec.availableObjects) do
 		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)	
-		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName] or 1
 		if objectMaterialIndex < startingValue and objectMaterialIndex > materialIndex then
 			materialIndex = objectMaterialIndex
 		end
 	end
 	for _, object in pairs(spec.loadedObjects) do
 		local objectMaterialName = UniversalAutoload.getMaterialTypeName(object)	
-		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName]
+		local objectMaterialIndex = UniversalAutoload.MATERIALS_INDEX[objectMaterialName] or 1
 		if objectMaterialIndex < startingValue and objectMaterialIndex > materialIndex then
 			materialIndex = objectMaterialIndex
 		end
@@ -574,14 +574,14 @@ function UniversalAutoload.actionEventCycleContainer_FW(self, actionName, inputV
 	local containerIndex = 999
 	for _, object in pairs(spec.availableObjects) do
 		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
-		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName] or 1
 		if objectContainerIndex > spec.currentContainerIndex and objectContainerIndex < containerIndex then
 			containerIndex = objectContainerIndex
 		end
 	end
 	for _, object in pairs(spec.loadedObjects) do
 		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
-		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName] or 1
 		if objectContainerIndex > spec.currentContainerIndex and objectContainerIndex < containerIndex then
 			containerIndex = objectContainerIndex
 		end
@@ -601,14 +601,14 @@ function UniversalAutoload.actionEventCycleContainer_BW(self, actionName, inputV
 	local startingValue = (spec.currentContainerIndex==1) and #UniversalAutoload.CONTAINERS or spec.currentContainerIndex
 	for _, object in pairs(spec.availableObjects) do
 		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
-		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName] or 1
 		if objectContainerIndex < startingValue and objectContainerIndex > containerIndex then
 			containerIndex = objectContainerIndex
 		end
 	end
 	for _, object in pairs(spec.loadedObjects) do
 		local objectContainerName = UniversalAutoload.getContainerTypeName(object)
-		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName]
+		local objectContainerIndex = UniversalAutoload.CONTAINERS_INDEX[objectContainerName] or 1
 		if objectContainerIndex < startingValue and objectContainerIndex > containerIndex then
 			containerIndex = objectContainerIndex
 		end
@@ -767,21 +767,9 @@ function UniversalAutoload:startLoading(noEventSend)
 					object.distance = math.abs(x) + math.abs(z) - y
 					
 					local containerType = UniversalAutoload.getContainerType(object)
-					if containerType.alwaysRotate then
-						containerType.width = containerType.sizeZ
-						containerType.length = containerType.sizeX
-					else
-						containerType.width = math.min(containerType.sizeX, containerType.sizeZ)
-						containerType.length = math.max(containerType.sizeX, containerType.sizeZ)
-					end
-					containerType.height = containerType.sizeY
-					
-					object.width = containerType.width or 1
-					object.length = containerType.length or 1
-					object.height = containerType.height or 1
-					
+					object.area = (containerType.sizeX * containerType.sizeZ) or 1
+					object.height = containerType.sizeY or 1
 					object.material = UniversalAutoload.getMaterialType(object) or 1
-					object.container = containerType.containerIndex or 1
 					
 					table.insert(spec.sortedObjectsToLoad, object)
 				end
@@ -801,18 +789,14 @@ function UniversalAutoload:startLoading(noEventSend)
 end
 --
 function sortPalletsForLoading(w1,w2)
-	
-	if w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and w1.length == w2.length and w1.height == w2.height and  w1.distance < w2.distance then
+	-- SORT BY:  AREA > MATERIAL > HEIGHT > DISTANCE
+	if w1.area == w2.area and w1.material == w2.material and w1.height == w2.height and w1.distance < w2.distance then
 		return true
-	elseif w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and  w1.length == w2.length and  w1.height > w2.height then
+	elseif w1.area == w2.area and w1.material == w2.material and w1.height > w2.height then
 		return true
-	elseif w1.container == w2.container and w1.material == w2.material and w1.width == w2.width and  w1.length > w2.length then
+	elseif w1.area == w2.area and w1.material < w2.material then
 		return true
-	elseif w1.container == w2.container and w1.material == w2.material and w1.width > w2.width then
-		return true
-	elseif w1.container == w2.container and w1.material < w2.material then
-		return true
-	elseif w1.container < w2.container then
+	elseif w1.area > w2.area then
 		return true
 	end
 end

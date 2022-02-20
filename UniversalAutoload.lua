@@ -219,6 +219,8 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 		if not closestVehicle then
 			return superFunc(self)
 		end	
+	else
+		return superFunc(self)
 	end
 end
 ActivatableObjectsSystem.updateObjects = Utils.overwrittenFunction(ActivatableObjectsSystem.updateObjects, UniversalAutoload.OverwrittenUpdateObjects)

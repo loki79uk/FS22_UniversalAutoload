@@ -30,6 +30,7 @@ Configured for the following container types:
 - BigBag Pallets
 - Euro Pallets
 - IBC Liquid Tanks
+- Square Bales
 - Potato Boxes (requires mod: Seed Potato Pack)
 
 Configured for the following trailers:
@@ -67,6 +68,7 @@ Liste der kompatiblen Behältertypen:
 - BigBag in Paletten
 - Europalette
 - IBC Flüssigkeitsbehälter
+- Quadratballen
 - Palox Kartoffel (erfordert Mod: Seed Potato Pack).
 
 Liste der kompatiblen Anhänger und Pritschen: 
@@ -104,6 +106,7 @@ Liste des types de conteneurs compatibles :
 - BigBag en palette
 - Palette Euro
 - Réservoir liquide IBC
+- Balle carrée
 - Palox Pommes de terre (nécessite le mod : Seed Potato Pack)
 
 Liste des remorques et plateaux compatibles : 
@@ -365,12 +368,12 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
-			<de>Rundballen</de>
+			<de>Rundballe</de>
 			<fr>Balle Ronde</fr>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
-			<de>Quadratbale</de>
+			<de>Quadratballe</de>
 			<fr>Balle carrée</fr>
 		</text>
 	</l10n>

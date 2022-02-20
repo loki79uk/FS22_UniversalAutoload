@@ -1,7 +1,7 @@
 UniversalAutoloadStartUnloadingEvent = {}
-UniversalAutoloadStartUnloadingEvent_mt = Class(UniversalAutoloadStartUnloadingEvent, Event)
+local UniversalAutoloadStartUnloadingEvent_mt = Class(UniversalAutoloadStartUnloadingEvent, Event)
 InitEventClass(UniversalAutoloadStartUnloadingEvent, "UniversalAutoloadStartUnloadingEvent")
-print("  UniversalAutoload - StartUnloadingEvent")
+-- print("  UniversalAutoload - StartUnloadingEvent")
 
 function UniversalAutoloadStartUnloadingEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadStartUnloadingEvent_mt)

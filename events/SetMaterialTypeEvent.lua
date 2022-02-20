@@ -1,8 +1,7 @@
 UniversalAutoloadSetMaterialTypeEvent = {}
 local UniversalAutoloadSetMaterialTypeEvent_mt = Class(UniversalAutoloadSetMaterialTypeEvent, Event)
-
 InitEventClass(UniversalAutoloadSetMaterialTypeEvent, "UniversalAutoloadSetMaterialTypeEvent")
-print("  UniversalAutoload - SetMaterialTypeEvent")
+-- print("  UniversalAutoload - SetMaterialTypeEvent")
 
 function UniversalAutoloadSetMaterialTypeEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadSetMaterialTypeEvent_mt)

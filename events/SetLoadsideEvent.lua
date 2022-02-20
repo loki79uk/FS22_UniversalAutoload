@@ -1,7 +1,7 @@
 UniversalAutoloadSetLoadsideEvent = {}
-UniversalAutoloadSetLoadsideEvent_mt = Class(UniversalAutoloadSetLoadsideEvent, Event)
+local UniversalAutoloadSetLoadsideEvent_mt = Class(UniversalAutoloadSetLoadsideEvent, Event)
 InitEventClass(UniversalAutoloadSetLoadsideEvent, "UniversalAutoloadSetLoadsideEvent")
-print("  UniversalAutoload - SetLoadsideEvent")
+-- print("  UniversalAutoload - SetLoadsideEvent")
 
 function UniversalAutoloadSetLoadsideEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadSetLoadsideEvent_mt)

@@ -1,7 +1,7 @@
 UniversalAutoloadResetLoadingEvent = {}
-UniversalAutoloadResetLoadingEvent_mt = Class(UniversalAutoloadResetLoadingEvent, Event)
+local UniversalAutoloadResetLoadingEvent_mt = Class(UniversalAutoloadResetLoadingEvent, Event)
 InitEventClass(UniversalAutoloadResetLoadingEvent, "UniversalAutoloadResetLoadingEvent")
-print("  UniversalAutoload - ResetLoadingEvent")
+-- print("  UniversalAutoload - ResetLoadingEvent")
 
 function UniversalAutoloadResetLoadingEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadResetLoadingEvent_mt)

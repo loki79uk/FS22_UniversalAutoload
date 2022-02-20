@@ -1,7 +1,7 @@
 UniversalAutoloadSetTipsideEvent = {}
-UniversalAutoloadSetTipsideEvent_mt = Class(UniversalAutoloadSetTipsideEvent, Event)
+local UniversalAutoloadSetTipsideEvent_mt = Class(UniversalAutoloadSetTipsideEvent, Event)
 InitEventClass(UniversalAutoloadSetTipsideEvent, "UniversalAutoloadSetTipsideEvent")
-print("  UniversalAutoload - SetTipsideEvent")
+-- print("  UniversalAutoload - SetTipsideEvent")
 
 function UniversalAutoloadSetTipsideEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadSetTipsideEvent_mt)

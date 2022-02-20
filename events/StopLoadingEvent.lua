@@ -1,7 +1,7 @@
 UniversalAutoloadStopLoadingEvent = {}
-UniversalAutoloadStopLoadingEvent_mt = Class(UniversalAutoloadStopLoadingEvent, Event)
+local UniversalAutoloadStopLoadingEvent_mt = Class(UniversalAutoloadStopLoadingEvent, Event)
 InitEventClass(UniversalAutoloadStopLoadingEvent, "UniversalAutoloadStopLoadingEvent")
-print("  UniversalAutoload - StopLoadingEvent")
+-- print("  UniversalAutoload - StopLoadingEvent")
 
 function UniversalAutoloadStopLoadingEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadStopLoadingEvent_mt)

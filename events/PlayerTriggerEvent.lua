@@ -1,7 +1,7 @@
 UniversalAutoloadPlayerTriggerEvent = {}
-UniversalAutoloadPlayerTriggerEvent_mt = Class(UniversalAutoloadPlayerTriggerEvent, Event)
+local UniversalAutoloadPlayerTriggerEvent_mt = Class(UniversalAutoloadPlayerTriggerEvent, Event)
 InitEventClass(UniversalAutoloadPlayerTriggerEvent, "UniversalAutoloadPlayerTriggerEvent")
-print("  UniversalAutoload - PlayerTriggerEvent")
+-- print("  UniversalAutoload - PlayerTriggerEvent")
 
 function UniversalAutoloadPlayerTriggerEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadPlayerTriggerEvent_mt)

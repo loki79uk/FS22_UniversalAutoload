@@ -1,7 +1,7 @@
 UniversalAutoloadUpdateActionEvents = {}
-UniversalAutoloadUpdateActionEvents_mt = Class(UniversalAutoloadUpdateActionEvents, Event)
+local UniversalAutoloadUpdateActionEvents_mt = Class(UniversalAutoloadUpdateActionEvents, Event)
 InitEventClass(UniversalAutoloadUpdateActionEvents, "UniversalAutoloadUpdateActionEvents")
-print("  UniversalAutoload - UpdateActionEvents")
+-- print("  UniversalAutoload - UpdateActionEvents")
 
 function UniversalAutoloadUpdateActionEvents.emptyNew()
 	local self = Event.new(UniversalAutoloadUpdateActionEvents_mt)

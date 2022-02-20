@@ -1,7 +1,7 @@
 UniversalAutoloadRaiseActiveEvent = {}
-UniversalAutoloadRaiseActiveEvent_mt = Class(UniversalAutoloadRaiseActiveEvent, Event)
+local UniversalAutoloadRaiseActiveEvent_mt = Class(UniversalAutoloadRaiseActiveEvent, Event)
 InitEventClass(UniversalAutoloadRaiseActiveEvent, "UniversalAutoloadRaiseActiveEvent")
-print("  UniversalAutoload - RaiseActiveEvent")
+-- print("  UniversalAutoload - RaiseActiveEvent")
 
 function UniversalAutoloadRaiseActiveEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadRaiseActiveEvent_mt)

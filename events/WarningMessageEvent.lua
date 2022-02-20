@@ -1,7 +1,7 @@
 UniversalAutoloadWarningMessageEvent = {}
-UniversalAutoloadWarningMessageEvent_mt = Class(UniversalAutoloadWarningMessageEvent, Event)
+local UniversalAutoloadWarningMessageEvent_mt = Class(UniversalAutoloadWarningMessageEvent, Event)
 InitEventClass(UniversalAutoloadWarningMessageEvent, "UniversalAutoloadWarningMessageEvent")
-print("  UniversalAutoload - WarningMessageEvent")
+-- print("  UniversalAutoload - WarningMessageEvent")
 
 function UniversalAutoloadWarningMessageEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadWarningMessageEvent_mt)

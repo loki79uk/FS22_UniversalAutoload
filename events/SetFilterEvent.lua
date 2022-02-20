@@ -1,7 +1,7 @@
 UniversalAutoloadSetFilterEvent = {}
-UniversalAutoloadSetFilterEvent_mt = Class(UniversalAutoloadSetFilterEvent, Event)
+local UniversalAutoloadSetFilterEvent_mt = Class(UniversalAutoloadSetFilterEvent, Event)
 InitEventClass(UniversalAutoloadSetFilterEvent, "UniversalAutoloadSetFilterEvent")
-print("  UniversalAutoload - SetFilterEvent")
+-- print("  UniversalAutoload - SetFilterEvent")
 
 function UniversalAutoloadSetFilterEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadSetFilterEvent_mt)

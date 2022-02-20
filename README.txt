@@ -6,7 +6,7 @@
   
   If you already own a configured vehicle in your save game, then the autoloading specialisation will be applied with the mod, i.e. there is no need to sell and buy each vehicle again.  It can also be removed form all vechicles by simply removing the mod, your trailer will not disappear.
 
-  Base game supported trailers are defined in the file "SupportedVehicles.xml".  For some trailers only certain configurations are supported, such as the bale trailer (see below).  It is a requirement that the configuration also includes the "tension belts" specialisation.
+  Base game supported trailers are defined in the file "SupportedVehicles.xml".  For some trailers only certain configurations are supported, such as the bale trailer configuration (see list below).  It is a requirement that the configuration includes the "tension belts" specialisation.
   
   SUPPORTED TRAILERS: Name (specialisation)
    · Brantner DD 24073/2 XXL (bale trailer)
@@ -25,7 +25,7 @@
   PALLETS/CONTAINERS:
 ==============================================================
 
-  All base game pallets and containers (bigbags, IBCs, etc) are supported for autoloading.  This includes production pallets and any that can be purchased from the shop.  The method for identifying a pallet is to map the i3d file name to a predefined size.  The sizes for base game pallets are defined in the file "ContainerTypes.xml".
+  All base game pallets and containers (bigbags, IBCs, etc) are supported for autoloading.  This includes production pallets and any that can be purchased from the shop.  The method for identifying a pallet is to map the i3d file name to a predefined size.  The sizes for base game pallets are defined in the file "ContainerTypes.xml".  **Please NOTE that currently only square bales are supported** - I plan to include support for round bales and a work mode for collecting bales in a future release.
   
   MOD PALLETS:
   (A) If a mod pallet uses a base game i3d file, e.g. "bakeryBoxPallet.i3d", and the size has not been changed, then your mod pallet should work without any additional configuration.  If the size has changed, then you need to rename the i3d file (and see B).

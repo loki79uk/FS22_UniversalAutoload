@@ -1,8 +1,7 @@
 UniversalAutoloadSetContainerTypeEvent = {}
 local UniversalAutoloadSetContainerTypeEvent_mt = Class(UniversalAutoloadSetContainerTypeEvent, Event)
-
 InitEventClass(UniversalAutoloadSetContainerTypeEvent, "UniversalAutoloadSetContainerTypeEvent")
-print("  UniversalAutoload - SetContainerTypeEvent")
+-- print("  UniversalAutoload - SetContainerTypeEvent")
 
 function UniversalAutoloadSetContainerTypeEvent.emptyNew()
 	local self = Event.new(UniversalAutoloadSetContainerTypeEvent_mt)

@@ -65,8 +65,8 @@ Sonderfunktionen für den Anhänger 'KRONE Trailer Profi Liner'
 
 Liste der kompatiblen Behältertypen: 
 - BigBags
-- BigBag in Paletten
-- Europalette
+- BigBag Paletten
+- Europaletten
 - IBC Flüssigkeitsbehälter
 - Quadratballen
 - Palox Kartoffel (erfordert Mod: Seed Potato Pack).
@@ -198,7 +198,7 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
-			<de>Auskippen</de>
+			<de>Abladen</de>
 			<fr>Décharger tous</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
@@ -208,7 +208,7 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
-			<de>Filter laden umschalten</de>
+			<de>Ladefilter umschalten</de>
 			<fr>Sélection du chargement</fr>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
@@ -288,12 +288,12 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
-			<de>Filter laden</de>
+			<de>Ladefilter</de>
 			<fr>Choix du chargement</fr>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
-			<de>Nur full</de>
+			<de>Nur volle</de>
 			<fr>Complet uniquement</fr>
 		</text>
 		<text name="universalAutoload_disabled">
@@ -313,7 +313,7 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
-			<de>Auskippen</de>
+			<de>Abladen</de>
 			<fr>Décharger</fr>
 		</text>
 		<text name="universalAutoload_materialType">
@@ -338,17 +338,17 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
-			<de>Euro-palette</de>
+			<de>Euro-Palette</de>
 			<fr>Palette euro</fr>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
-			<de>Pioneer-palette</de>
+			<de>Pioneer-Palette</de>
 			<fr>Palette pioneer</fr>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
-			<de>Bigbag-palette</de>
+			<de>Bigbag-Palette</de>
 			<fr>Palette de big bag</fr>
 		</text>
 		<text name="universalAutoload_BIGBAG">
@@ -363,17 +363,17 @@ Liste des remorques et plateaux compatibles :
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
-			<de>Bale</de>
+			<de>Ballen</de>
 			<fr>Balle</fr>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
-			<de>Rundballe</de>
+			<de>Rundballen</de>
 			<fr>Balle Ronde</fr>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
-			<de>Quadratballe</de>
+			<de>Quaderballen</de>
 			<fr>Balle carrée</fr>
 		</text>
 	</l10n>

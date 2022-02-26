@@ -11,8 +11,7 @@ g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoloa
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
 	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer' then
-		if SpecializationUtil.hasSpecialization(FillUnit, vehicleType.specializations) and
-		   SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
+		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
 			g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
 		end
 	end
@@ -54,7 +53,7 @@ UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850
 UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850 }
 UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200 }
 UniversalAutoload.LIQUID_TANK    = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415 }
-UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 2.000, sizeZ = 0.900 }
+UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 1.666, sizeZ = 0.900, neverStack=true }
 UniversalAutoload.BALE           = { isBale=true }
 
 UniversalAutoload.VEHICLES = {}
@@ -140,9 +139,10 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY or 1.5)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ or 1.5)
 					newType.isBale = xmlFile:getValue(objectTypeKey.."#isBale", default.isBale or false)
+					newType.neverStack = xmlFile:getValue(objectTypeKey.."#neverStack", default.neverStack or false)
+					newType.neverRotate = xmlFile:getValue(objectTypeKey.."#neverRotate", default.neverRotate or false)
 					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate or false)
-					print(string.format("  >> %s [%.3f, %.3f, %.3f] %s", newType.name,
-						newType.sizeX, newType.sizeY, newType.sizeZ, tostring(newType.alwaysRotate) ))
+					print(string.format("  >> %s [%.3f, %.3f, %.3f]", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
 					
 					j = j + 1
 				end
@@ -193,6 +193,8 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeY = height
 					newType.sizeZ = length
 					newType.isBale = false
+					newType.neverStack = false
+					newType.neverRotate = false
 					newType.alwaysRotate = false
 					newType.width = math.min(newType.sizeX, newType.sizeZ)
 					newType.length = math.max(newType.sizeX, newType.sizeZ)
@@ -201,7 +203,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 						newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
 						
 				end
-	
+				xmlFile:delete()
 			end
 			--DebugUtil.printTableRecursively(fillType, "--", 0, 1)
         end

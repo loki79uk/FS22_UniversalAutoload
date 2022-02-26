@@ -125,7 +125,8 @@ Liste des remorques et plateaux compatibles :
 
     </description>
 	
-	<multiplayer supported="true" />
+<!-- MULTIPLAYER CURRENTLY DISABLED until the object synchronisation bug in v1.3.0.0 has been resolved -->
+	<multiplayer supported="false" />
 	<iconFilename>modIcon.dds</iconFilename>
 	
 	<extraSourceFiles>
@@ -150,10 +151,10 @@ Liste des remorques et plateaux compatibles :
 	
 	<inputBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_r" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_r" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_i" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_i" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_u" />
@@ -180,13 +181,13 @@ Liste des remorques et plateaux compatibles :
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_l" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_l" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
 		</actionBinding>
 	</inputBinding>
 	

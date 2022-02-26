@@ -60,6 +60,8 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeY", "Height of the pallet", 2.0)
     UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeZ", "Length of the pallet", 1.5)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#isBale", "If the object is either a round bale or square bale", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverStack", "Should never load another pallet on top of this one when loading", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverRotate", "Should never rotate object when loading", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
 	
 	
@@ -170,15 +172,18 @@ function UniversalAutoload.removeEventListeners(vehicleType)
 end
 
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS
+UniversalAutoload.lastClosestVehicle = nil
 function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 
+	superFunc(self)
+		
 	if self.mission.player.isControlled and not g_gui:getIsGuiVisible() then
 		-- print("Player Is Controlled")
 		local player = self.mission.player
 		local playerId = player.userId
 	
 		local closestVehicle = nil
-		local closestVehicleDistance = 50 --math.huge
+		local closestVehicleDistance = 25 --math.huge
 		for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 			if vehicle ~= nil then
 				local SPEC = vehicle.spec_universalAutoload
@@ -193,34 +198,23 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 			end
 		end
 
-		for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-			if vehicle ~= nil then
-				local SPEC = vehicle.spec_universalAutoload
-				if SPEC.playerInTrigger[playerId] == true then
-					if vehicle == closestVehicle then
-						-- print("USE THIS FOR PLAYER")
-						vehicle:forceRaiseActive()
-						vehicle:updateActionEventKeys()
-						g_currentMission:addExtraPrintText(vehicle:getFullName())
-					else
-						-- print("NOT CLOSEST FOR PLAYER")
-						vehicle:forceRaiseActive()
-						vehicle:clearActionEventsTable(SPEC.actionEvents)
-					end
-				else
-					if SPEC.playerInTrigger[playerId] == false then
-						-- print("PLAYER LEFT TRIGGER")
-						vehicle:updatePlayerTriggerState(playerId, nil)
-						vehicle:clearActionEventsTable(SPEC.actionEvents)
-					end
+		if UniversalAutoload.lastClosestVehicle~=closestVehicle then
+			UniversalAutoload.lastClosestVehicle = closestVehicle
+			for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+				if vehicle ~= nil then
+					local SPEC = vehicle.spec_universalAutoload
+					vehicle:clearActionEventsTable(SPEC.actionEvents)
 				end
 			end
+			if closestVehicle ~= nil then
+				closestVehicle:updateActionEventKeys()
+				--closestVehicle:forceRaiseActive()
+			end
 		end
-		if not closestVehicle then
-			return superFunc(self)
-		end	
-	else
-		return superFunc(self)
+		if closestVehicle ~= nil then
+			-- --closestVehicle:forceRaiseActive()
+			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
+		end
 	end
 end
 ActivatableObjectsSystem.updateObjects = Utils.overwrittenFunction(ActivatableObjectsSystem.updateObjects, UniversalAutoload.OverwrittenUpdateObjects)
@@ -231,7 +225,7 @@ function UniversalAutoload:onRegisterActionEvents(isActiveForInput, isActiveForI
     if self.isClient then
         local spec = self.spec_universalAutoload
 		
-		if not spec.available or spec.actionEvents==nil then
+		if not spec.isAutoloadEnabled or spec.actionEvents==nil then
             return
         end
         self:clearActionEventsTable(spec.actionEvents)
@@ -250,77 +244,77 @@ function UniversalAutoload:updateActionEventKeys()
 		if spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
 			-- print("updateActionEventKeys: "..self:getFullName())
 			local actions = UniversalAutoload.ACTIONS
-			local normal = false
-			local conflict = false
-			local ignoreCollisions = not g_currentMission.player.isControlled
+			local ignoreCollisions = true
 
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, conflict, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.toggleLoadingActionEventId = actionEventId
 			-- print("TOGGLE_LOADING: "..tostring(valid))
 
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, conflict, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.unloadAllActionEventId = actionEventId
 			-- print("UNLOAD_ALL: "..tostring(valid))
 
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, normal, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			spec.toggleLoadingFilterActionEventId = actionEventId
 			-- print("TOGGLE_FILTER: "..tostring(valid))
 			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, normal, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			spec.toggleTipsideActionEventId = actionEventId
-			-- print("TOGGLE_TIPSIDE: "..tostring(valid))
-			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			spec.toggleBeltsActionEventId = actionEventId
-			-- print("TOGGLE_BELTS: "..tostring(valid))
-			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, normal, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			spec.cycleMaterialActionEventId = actionEventId
 			-- print("CYCLE_MATERIAL_FW: "..tostring(valid))
 
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, normal, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
 			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 			-- print("CYCLE_MATERIAL_BW: "..tostring(valid))
 			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_MATERIALS, self, UniversalAutoload.actionEventSelectAllMaterials, false, true, false, true, nil, nil, normal, true)
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_MATERIALS, self, UniversalAutoload.actionEventSelectAllMaterials, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 			-- print("SELECT_ALL_MATERIALS: "..tostring(valid))
 			
 			if UniversalAutoload.chatKeyConflict ~= true then
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, normal, true)
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 				spec.cycleContainerActionEventId = actionEventId
 				-- print("CYCLE_CONTAINER_FW: "..tostring(valid))
 
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, normal, true)
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 				-- print("CYCLE_CONTAINER_BW: "..tostring(valid))
 
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_CONTAINERS, self, UniversalAutoload.actionEventSelectAllContainers, false, true, false, true, nil, nil, normal, true)
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_CONTAINERS, self, UniversalAutoload.actionEventSelectAllContainers, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 				-- print("SELECT_ALL_CONTAINERS: "..tostring(valid))
 			end
-
-			if spec.isCurtainTrailer and g_currentMission.player.isControlled then
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, ignoreCollisions, true)
+			
+			if g_currentMission.player.isControlled then
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-				spec.toggleDoorActionEventId = actionEventId
-				-- print("TOGGLE_DOOR: "..tostring(valid))
+				spec.toggleBeltsActionEventId = actionEventId
+				-- print("TOGGLE_BELTS: "..tostring(valid))
 				
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_CURTAIN, self, UniversalAutoload.actionEventToggleCurtain, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-				spec.toggleCurtainActionEventId = actionEventId
-				-- print("TOGGLE_CURTAIN: "..tostring(valid))
+				if spec.isCurtainTrailer then
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.toggleDoorActionEventId = actionEventId
+					-- print("TOGGLE_DOOR: "..tostring(valid))
+					
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_CURTAIN, self, UniversalAutoload.actionEventToggleCurtain, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.toggleCurtainActionEventId = actionEventId
+					-- print("TOGGLE_CURTAIN: "..tostring(valid))
+				else
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.toggleTipsideActionEventId = actionEventId
+					-- print("TOGGLE_TIPSIDE: "..tostring(valid))
+				end
 			end
 
 			UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -781,13 +775,13 @@ function UniversalAutoload:startLoading(noEventSend)
 			
 				local node = UniversalAutoload.getObjectNode(object)
 				if self:isValidForLoading(object) and node~=nil then
-
+				
 					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
-					object.distance = math.abs(x) + math.abs(z) - y
+					object.height = y
+					object.distance = math.abs(x) + math.abs(z)
 					
 					local containerType = UniversalAutoload.getContainerType(object)
 					object.area = (containerType.sizeX * containerType.sizeZ) or 1
-					object.height = containerType.sizeY or 1
 					object.material = UniversalAutoload.getMaterialType(object) or 1
 					
 					table.insert(spec.sortedObjectsToLoad, object)
@@ -849,7 +843,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 				spec.objectsToUnload = {}
 				for _, object in pairs(spec.loadedObjects) do
 					if self:isValidForUnloading(object) then
-					
+
 						local p = {}
 						p.x, p.y, p.z, p.rx, p.ry, p.rz = UniversalAutoload.getUnloadingTransform(self, object)
 						
@@ -979,7 +973,7 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	local spec = self.spec_universalAutoload
 	
 	if self.isServer then
-		-- print("SERVER RAISE ACTIVE "..tostring(state))
+		-- print("SERVER RAISE ACTIVE: "..self:getFullName().." ("..tostring(state)..")")
 		self:raiseActive()
 		self:raiseDirtyFlags(self.vehicleDirtyFlag)
 	end
@@ -1041,10 +1035,9 @@ end
 
 -- MAIN "ON LOAD" INITIALISATION FUNCTION
 function UniversalAutoload:onLoad(savegame)
-
 	self.spec_universalAutoload = {}
 	local spec = self.spec_universalAutoload
-	
+
 	local configFileName = self.configFileName
 	local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
 
@@ -1097,13 +1090,14 @@ function UniversalAutoload:onLoad(savegame)
 				i = i + 1
 			end
 		end
+		xmlFile:delete()
 	end
 	
 	if  spec.loadArea ~= nil and spec.loadArea.width ~= nil and spec.loadArea.length ~= nil and spec.loadArea.height ~= nil and spec.loadArea.offset ~= nil then
-		spec.available = true
+		spec.isAutoloadEnabled = true
 	else
 		-- print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
-		spec.available = false
+		spec.isAutoloadEnabled = false
 		UniversalAutoload.removeEventListeners(self)
 		return
 	end
@@ -1245,7 +1239,7 @@ function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil and self.spec_universalAutoload ~= nil then
 		local spec = self.spec_universalAutoload
 		
-		if not spec.available then
+		if not spec.isAutoloadEnabled then
             return
         end
 
@@ -1278,8 +1272,14 @@ end
 function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	if self.spec_universalAutoload ~= nil then
 		local spec = self.spec_universalAutoload
-		if spec.available then
+		if spec.isAutoloadEnabled then
 			-- print("UniversalAutoload - saveToXMLFile: "..self:getFullName())
+			if spec.resetLoadingPattern ~= false then
+				spec.currentLoadWidth = 0
+				spec.currentLoadHeight = 0
+				spec.currentLoadLength = 0
+			end
+		
 			--client+server
 			xmlFile:setValue(key.."#tipside", spec.currentTipside)
 			xmlFile:setValue(key.."#loadside", spec.currentLoadside)
@@ -1356,40 +1356,48 @@ function UniversalAutoload:onReadStream(streamId, connection)
 	-- print("onReadStream")
     local spec = self.spec_universalAutoload
 	
-	spec.currentTipside = streamReadString(streamId)
-	spec.currentLoadside = streamReadString(streamId)
-	spec.currentMaterialIndex = streamReadInt32(streamId)
-	spec.currentContainerIndex = streamReadInt32(streamId)
-	spec.currentLoadingFilter = streamReadBool(streamId)
-	spec.isLoading = streamReadBool(streamId)
-	spec.isUnloading = streamReadBool(streamId)
-	spec.validLoadCount = streamReadInt32(streamId)
-	spec.validUnloadCount = streamReadInt32(streamId)
+	if streamReadBool(streamId) then
+		spec.isAutoloadEnabled = true
+		spec.currentTipside = streamReadString(streamId)
+		spec.currentLoadside = streamReadString(streamId)
+		spec.currentMaterialIndex = streamReadInt32(streamId)
+		spec.currentContainerIndex = streamReadInt32(streamId)
+		spec.currentLoadingFilter = streamReadBool(streamId)
+		spec.isLoading = streamReadBool(streamId)
+		spec.isUnloading = streamReadBool(streamId)
+		spec.validLoadCount = streamReadInt32(streamId)
+		spec.validUnloadCount = streamReadInt32(streamId)
+	else
+		spec.isAutoloadEnabled = false
+	end
 end
 --
 function UniversalAutoload:onWriteStream(streamId, connection)
 	-- print("onWriteStream")
     local spec = self.spec_universalAutoload
 	
-	spec.currentTipside = spec.currentTipside or "left"
-    spec.currentLoadside = spec.currentLoadside or "both"
-    spec.currentMaterialIndex = spec.currentMaterialIndex or 1
-    spec.currentContainerIndex = spec.currentContainerIndex or 1
-	spec.currentLoadingFilter = spec.currentLoadingFilter or true
-	spec.isLoading = spec.isLoading or false
-	spec.isUnloading = spec.isUnloading or false
-	spec.validLoadCount = spec.validLoadCount or 0
-	spec.validUnloadCount = spec.validUnloadCount or 0
-	
-	streamWriteString(streamId, spec.currentTipside)
-	streamWriteString(streamId, spec.currentLoadside)
-	streamWriteInt32(streamId, spec.currentMaterialIndex)
-	streamWriteInt32(streamId, spec.currentContainerIndex)
-	streamWriteBool(streamId, spec.currentLoadingFilter)
-	streamWriteBool(streamId, spec.isLoading)
-	streamWriteBool(streamId, spec.isUnloading)
-	streamWriteInt32(streamId, spec.validLoadCount)
-	streamWriteInt32(streamId, spec.validUnloadCount)
+	streamWriteBool(streamId, spec.isAutoloadEnabled)
+	if spec.isAutoloadEnabled then
+		spec.currentTipside = spec.currentTipside or "left"
+		spec.currentLoadside = spec.currentLoadside or "both"
+		spec.currentMaterialIndex = spec.currentMaterialIndex or 1
+		spec.currentContainerIndex = spec.currentContainerIndex or 1
+		spec.currentLoadingFilter = spec.currentLoadingFilter or true
+		spec.isLoading = spec.isLoading or false
+		spec.isUnloading = spec.isUnloading or false
+		spec.validLoadCount = spec.validLoadCount or 0
+		spec.validUnloadCount = spec.validUnloadCount or 0
+		
+		streamWriteString(streamId, spec.currentTipside)
+		streamWriteString(streamId, spec.currentLoadside)
+		streamWriteInt32(streamId, spec.currentMaterialIndex)
+		streamWriteInt32(streamId, spec.currentContainerIndex)
+		streamWriteBool(streamId, spec.currentLoadingFilter)
+		streamWriteBool(streamId, spec.isLoading)
+		streamWriteBool(streamId, spec.isUnloading)
+		streamWriteInt32(streamId, spec.validLoadCount)
+		streamWriteInt32(streamId, spec.validUnloadCount)
+	end
 end
 
 -- MAIN AUTOLOAD ONUPDATE LOOP
@@ -1397,7 +1405,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
 	
-	if not spec.available then
+	if not spec.isAutoloadEnabled then
 		return
 	end
 
@@ -1450,16 +1458,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			if spec.isLoading then
 				spec.loadDelayTime = spec.loadDelayTime or 0
 				if spec.loadDelayTime > UniversalAutoload.delayTime then
-					local foundObject = false
+					local loadedObject = false
 					for index, object in ipairs(spec.sortedObjectsToLoad) do
 						if self:loadObject(object) then
-							table.remove(spec.sortedObjectsToLoad, index)
+							loadedObject = true
 							spec.loadDelayTime = 0
-							foundObject = true
 						end
+						table.remove(spec.sortedObjectsToLoad, index)
 						break
 					end
-					if not foundObject then
+					if not loadedObject then
 						if #spec.sortedObjectsToLoad > 0 then
 							spec.resetLoadingPattern = true
 						end
@@ -1683,17 +1691,24 @@ end
 function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 		if vehicle ~= nil then
-			vehicle:removeLoadedObject(object)
-			vehicle:removeAvailableObject(object)
-			vehicle:removeRearLoadingObject(object)
-			if self ~= vehicle then
-				local SPEC = vehicle.spec_universalAutoload
-				if SPEC.totalUnloadCount == 0 then
-					SPEC.resetLoadingPattern = true
+			local loadedObjectRemoved = vehicle:removeLoadedObject(object)
+			local availableObjectRemoved = vehicle:removeAvailableObject(object)
+			local rearLoadingObjectRemoved = vehicle:removeRearLoadingObject(object)
+			if loadedObjectRemoved or availableObjectRemoved then
+				if self ~= vehicle then
+					local SPEC = vehicle.spec_universalAutoload
+					if SPEC.totalUnloadCount == 0 then
+						SPEC.resetLoadingPattern = true
+						vehicle:setAllTensionBeltsActive(false)
+					elseif loadedObjectRemoved then
+						vehicle:setAllTensionBeltsActive(false)
+						vehicle:setAllTensionBeltsActive(true)
+					end
 				end
-				vehicle:setAllTensionBeltsActive(false)
+				--vehicle:forceRaiseActive()
+				--UniversalAutoload.raiseObjectDirtyFlags(object)
+				UniversalAutoload.countActivePallets(vehicle)
 			end
-			UniversalAutoload.countActivePallets(vehicle)
 		end
 	end
 end
@@ -1736,7 +1751,8 @@ function UniversalAutoload:addLoadPlace(containerType)
 
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	if N2*M2 >= N1*M1 or containerType.alwaysRotate then
+	if (((N2*M2) >= (N1*M1)) or containerType.alwaysRotate)
+	and not containerType.neverRotate then
 		-- print("ROTATE")
 		N, M = N2, M2
 		rotation = math.pi/2
@@ -1825,25 +1841,30 @@ function UniversalAutoload:getLoadPlace(containerType)
 			
 			local thisLoadHeight = spec.currentLoadHeight
 			local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
-			local containerFitsInLoadSpace = containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ
-			
-			-- if containerFitsInLoadSpace and self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) then
-				-- if thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY) then
-					-- -- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-					-- spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-					-- return spec.currentPlaceIndex, thisLoadHeight+baleOffset
+			if thisLoadPlace ~= nil then
+				local containerFitsInLoadSpace = containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ
+				
+				-- if containerFitsInLoadSpace and self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) then
+					-- if thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY) then
+						-- -- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
+						-- spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+						-- return spec.currentPlaceIndex, thisLoadHeight+baleOffset
+					-- end
 				-- end
-			-- end
-			
-			if containerFitsInLoadSpace then
-				while thisLoadHeight >= 0 do
-					if self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) and
-					(thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY)) then
-						-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-						spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-						return spec.currentPlaceIndex, thisLoadHeight+baleOffset
+				
+				if containerFitsInLoadSpace then
+					while thisLoadHeight >= 0 do
+						if self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) and
+						(thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY)) then
+							-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
+							if containerType.neverStack then
+								spec.makeNewLoadingPlace = true
+							end
+							spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+							return spec.currentPlaceIndex, thisLoadHeight+baleOffset
+						end
+						thisLoadHeight = thisLoadHeight - 0.1
 					end
-					thisLoadHeight = thisLoadHeight - 0.1
 				end
 			end
 
@@ -1859,7 +1880,12 @@ end
 function UniversalAutoload:getIsValidObject(object)
     local spec = self.spec_universalAutoload
 	
-	if object.i3dFilename ~= nil and (object.typeName == "pallet" or object.typeName == "bigBag" or object.isRoundbale~=nil) then
+	if object.i3dFilename ~= nil and (
+		object.typeName=="pallet" or
+		object.typeName=="bigBag" or
+		object.typeName=="treeSaplingPallet" or
+		object.isRoundbale~=nil
+	) then
 		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
 			return UniversalAutoload.getContainerType(object) ~= nil
 		end
@@ -1954,9 +1980,16 @@ end
 
 -- OBJECT MOVEMENT FUNCTIONS
 function UniversalAutoload.getObjectNode( object )
-	local node = object.nodeId or object.components[1].node
+	local node = nil
+	if object.components ~= nil then
+		node = object.components[1].node
+	else
+		node = object.nodeId
+	end
 	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
 		return node
+	else
+		print("ERROR GETTING NODE")
 	end
 end
 --
@@ -1981,6 +2014,11 @@ function moveObjectNodes( object, p )
 	
 	local node = nodes[1]	
 	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
+	
+	
+		--print("MOVE OBJECT NODE (BEFORE): "..tostring(node))
+		--DebugUtil.printTableRecursively(object, "--", 0, 1)
+		--object.highPrecisionPositionSynchronization = true
 	
 		UniversalAutoload.unmountDynamicMount(object)
 	
@@ -2018,8 +2056,16 @@ function moveObjectNodes( object, p )
 			end
 		end
 		
+		object:raiseActive()
 		object.networkTimeInterpolator:reset()
 		UniversalAutoload.raiseObjectDirtyFlags(object)
+		
+		object.synchronizePosition = true
+		object:updateTick(0)
+		
+		
+		--print("MOVE OBJECT NODE (AFTER): "..tostring(node))
+		--DebugUtil.printTableRecursively(object, "--", 0, 1)
 
 		return true
 	end
@@ -2107,6 +2153,7 @@ function UniversalAutoload:addLoadedObject(object)
 		if object.addDeleteListener ~= nil then
 			object:addDeleteListener(self, "onDeleteLoadedObject")
 		end
+		return true
 	end
 end
 --
@@ -2118,6 +2165,7 @@ function UniversalAutoload:removeLoadedObject(object)
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "onDeleteLoadedObject")
 		end
+		return true
 	end
 end
 --
@@ -2134,6 +2182,7 @@ function UniversalAutoload:addAvailableObject(object)
 		if object.addDeleteListener ~= nil then
 			object:addDeleteListener(self, "onDeleteAvailableObject")
 		end
+		return true
 	end
 
 end
@@ -2158,6 +2207,7 @@ function UniversalAutoload:removeAvailableObject(object)
 				self:setContainerTypeIndex(1)
 			end
 		end
+		return true
 	end
 end
 --
@@ -2168,7 +2218,7 @@ function UniversalAutoload:removeFromSortedObjectsToLoad(object)
 		for index, sortedobject in ipairs(spec.sortedObjectsToLoad) do
 			if object == sortedobject then
 				table.remove(spec.sortedObjectsToLoad, index)
-				break
+				return true
 			end
 		end
 	end
@@ -2188,9 +2238,8 @@ function UniversalAutoload:addRearLoadingObject(object)
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "onDeleteRearLoadingObject")
 			end
-			--UniversalAutoload.raiseObjectDirtyFlags(object)
+			return true
 		end
-		self:forceRaiseActive()
 	end
 end
 --
@@ -2202,6 +2251,7 @@ function UniversalAutoload:removeRearLoadingObject(object)
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "onDeleteRearLoadingObject")
 		end
+		return true
 	end
 end
 --

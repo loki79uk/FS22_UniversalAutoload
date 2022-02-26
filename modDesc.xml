@@ -268,7 +268,7 @@ Liste des remorques et plateaux compatibles :
 			<en>Open/Close curtain side</en>
 			<de>Plane öffnen/schließen</de>
 			<fr>Ouvrir/fermer la bâche</fr>
-			<ru>Открыть/Закрыть сторону шторы</ru> <!-- ????? -->
+			<ru>Открыть/Закрыть боковой тент</ru>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
 			<en>Unloading area is blocked. Please clear the unloading area.</en>
@@ -292,13 +292,13 @@ Liste des remorques et plateaux compatibles :
 			<en>Left</en>
 			<de>Links</de>
 			<fr>Gauche</fr>
-			<ru>Левая</ru>
+			<ru>Слева</ru>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
 			<de>Rechts</de>
 			<fr>Droit</fr>
-			<ru>Правая</ru>
+			<ru>Справа</ru>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>

@@ -33,5 +33,13 @@
             <loadingArea offset="0 0.646 -0.895" width="2.00" height="2.00" length="4.32"/>
 			<options noLoadingIfUnfolded="true"/>
         </vehicleConfiguration>
+        <vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
+            <loadingArea offset="0 0.85 -1.50" width="1.25" height="1.25" length="3.10"/>
+			<options enableRearLoading="true" noLoadingIfFolded="true"/>
+        </vehicleConfiguration>
+        <vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
+            <loadingArea offset="0 0.78 -1.72" width="1.25" height="1.25" length="3.10"/>
+			<options enableRearLoading="true" noLoadingIfFolded="true"/>
+        </vehicleConfiguration>
     </vehicleConfigurations>
 </universalAutoLoad>

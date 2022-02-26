@@ -10,7 +10,7 @@ addModEventListener(UniversalAutoloadManager)
 g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), true)
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
-	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer' then
+	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer' or vehicleName == 'carFillable' or vehicleName == 'car' then
 		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
 			g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
 		end
@@ -87,6 +87,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+			config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
 			config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
 			
 			print("  >> "..configFileName)

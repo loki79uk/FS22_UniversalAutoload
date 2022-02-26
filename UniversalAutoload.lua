@@ -49,6 +49,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfFolded", "Prevent loading when folded", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the grahpical debugging display for this vehicle", false)
 	end
 
@@ -458,7 +459,8 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 			g_inputBinding:setActionEventText(spec.toggleLoadingActionEventId, stopLoadingText)
 		else
 			if spec.doPostLoadDelay or spec.validLoadCount == 0 or spec.currentLoadside == "none" or
-			   (spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())) then
+			   (spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())) or
+			   (spec.noLoadingIfFolded and (self:getIsFolding() or self:getIsUnfolded() == false)) then
 				g_inputBinding:setActionEventActive(spec.toggleLoadingActionEventId, false)
 			else
 				local startLoadingText = g_i18n:getText("universalAutoload_startLoading")
@@ -1058,6 +1060,7 @@ function UniversalAutoload:onLoad(savegame)
 				spec.isCurtainTrailer = config.isCurtainTrailer
 				spec.enableRearLoading = config.enableRearLoading
 				spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
+				spec.noLoadingIfFolded = config.noLoadingIfFolded
 				spec.showDebug = config.showDebug
 			end
 		else
@@ -1082,6 +1085,7 @@ function UniversalAutoload:onLoad(savegame)
 					spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
 					spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
 					spec.noLoadingIfUnfolded = xmlFile:getValue(key..".options#noLoadingIfUnfolded", false)
+					spec.noLoadingIfFolded = xmlFile:getValue(key..".options#noLoadingIfFolded", false)
 					spec.showDebug = xmlFile:getValue(key..".options#showDebug", false)
 					-- print("  >> "..configFileName)
 					break
@@ -2134,7 +2138,9 @@ function UniversalAutoload:rearLoadingTriggerCallback(triggerId, otherActorId, o
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) then
+			if self:getIsAutoloadingAllowed() and self:getIsValidObject(object) and
+				(spec.noLoadingIfFolded == nil or spec.noLoadingIfFolded == false or
+				(spec.noLoadingIfFolded == true and (self:getIsFolding() == false and self:getIsUnfolded()))) then
 				if onEnter then
 					self:addRearLoadingObject(object)
 				elseif onLeave then

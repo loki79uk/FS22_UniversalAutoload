@@ -212,7 +212,7 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 			end
 		end
 		if closestVehicle ~= nil then
-			-- --closestVehicle:forceRaiseActive()
+			closestVehicle:forceRaiseActive()
 			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
 		end
 	end

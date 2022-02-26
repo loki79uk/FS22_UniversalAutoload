@@ -126,7 +126,7 @@ Liste des remorques et plateaux compatibles :
     </description>
 	
 <!-- MULTIPLAYER CURRENTLY DISABLED until the object synchronisation bug in v1.3.0.0 has been resolved -->
-	<multiplayer supported="false" />
+	<multiplayer supported="true" />
 	<iconFilename>modIcon.dds</iconFilename>
 	
 	<extraSourceFiles>
@@ -282,6 +282,14 @@ Liste des remorques et plateaux compatibles :
 			<fr>Aucune marchandise compatible n'est disponible pour le chargement ou le déchargement.</fr>
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
 		</text>
+		
+		<text name="warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED">
+			<en>Sorry! Tension belts are currently disabled in multiplayer.</en>
+			<de>Entschuldigung! Spanngurte sind derzeit im Mehrspielermodus deaktiviert.</de>
+			<fr>Désolé, les sangles ne sont pas disponibles en multijoueurs.</fr>
+			<ru>Извините! В настоящее время натяжные ремни отключены в многопользовательской игре.</ru>
+		</text>
+		
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
 			<de>Aktive entladeseite</de>

@@ -25,6 +25,20 @@ source(g_currentModDirectory.."events/UnloadingEvent.lua")
 source(g_currentModDirectory.."events/UpdateActionEvents.lua")
 source(g_currentModDirectory.."events/WarningMessageEvent.lua")
 
+function UniversalAutoload.fastenTensionBelts(vehicle, state)
+	if not g_currentMission.missionDynamicInfo.isMultiplayer then
+		vehicle:setAllTensionBeltsActive(state)
+	end
+end
+
+function UniversalAutoload:setTensionBeltsActive(superFunc, isActive, beltId, noEventSend, playSound)
+	if not g_currentMission.missionDynamicInfo.isMultiplayer then
+		superFunc(self, isActive, beltId, noEventSend, playSound)
+	else
+		self:showWarningMessage(99)
+	end
+end
+
 -- REQUIRED SPECIALISATION FUNCTIONS
 function UniversalAutoload.prerequisitesPresent(specializations)
     return SpecializationUtil.hasSpecialization(TensionBelts, specializations)
@@ -141,6 +155,7 @@ end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "setTensionBeltsActive", UniversalAutoload.setTensionBeltsActive)
 end
 --
 function UniversalAutoload.registerEventListeners(vehicleType)
@@ -161,8 +176,6 @@ function UniversalAutoload.removeEventListeners(vehicleType)
     SpecializationUtil.removeEventListener(vehicleType, "onLoad", UniversalAutoload)
     SpecializationUtil.removeEventListener(vehicleType, "onPostLoad", UniversalAutoload)
     SpecializationUtil.removeEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onReadStream", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onWriteStream", UniversalAutoload)
     SpecializationUtil.removeEventListener(vehicleType, "onDelete", UniversalAutoload)
     SpecializationUtil.removeEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onUpdate", UniversalAutoload)
@@ -197,23 +210,31 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 				end
 			end
 		end
-
+		
 		if UniversalAutoload.lastClosestVehicle~=closestVehicle then
 			UniversalAutoload.lastClosestVehicle = closestVehicle
 			for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 				if vehicle ~= nil then
 					local SPEC = vehicle.spec_universalAutoload
+					vehicle:forceRaiseActive()
 					vehicle:clearActionEventsTable(SPEC.actionEvents)
+					
+					-- if SPEC.playerInTrigger[playerId] == false then
+						-- print("PLAYER LEFT TRIGGER")
+						-- vehicle:updatePlayerTriggerState(playerId, nil)
+						-- vehicle:clearActionEventsTable(SPEC.actionEvents)
+					-- end
 				end
 			end
 			if closestVehicle ~= nil then
 				closestVehicle:updateActionEventKeys()
-				--closestVehicle:forceRaiseActive()
 			end
 		end
 		if closestVehicle ~= nil then
 			closestVehicle:forceRaiseActive()
 			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
+			
+			closestVehicle:updateActionEventKeys()
 		end
 	end
 end
@@ -293,11 +314,21 @@ function UniversalAutoload:updateActionEventKeys()
 				-- print("SELECT_ALL_CONTAINERS: "..tostring(valid))
 			end
 			
-			if g_currentMission.player.isControlled then
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
+			if not spec.isCurtainTrailer then
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-				spec.toggleBeltsActionEventId = actionEventId
-				-- print("TOGGLE_BELTS: "..tostring(valid))
+				spec.toggleTipsideActionEventId = actionEventId
+				-- print("TOGGLE_TIPSIDE: "..tostring(valid))
+			end
+			
+			if g_currentMission.player.isControlled then
+			
+				if not g_currentMission.missionDynamicInfo.isMultiplayer then
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.toggleBeltsActionEventId = actionEventId
+					-- print("TOGGLE_BELTS: "..tostring(valid))
+				end
 				
 				if spec.isCurtainTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, ignoreCollisions, true)
@@ -309,12 +340,8 @@ function UniversalAutoload:updateActionEventKeys()
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleCurtainActionEventId = actionEventId
 					-- print("TOGGLE_CURTAIN: "..tostring(valid))
-				else
-					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-					spec.toggleTipsideActionEventId = actionEventId
-					-- print("TOGGLE_TIPSIDE: "..tostring(valid))
 				end
+				
 			end
 
 			UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -495,9 +522,11 @@ function UniversalAutoload.actionEventToggleBelts(self, actionName, inputValue, 
 	-- print("actionEventToggleBelts: "..self:getFullName())
 	local spec = self.spec_universalAutoload
 	if self.spec_tensionBelts.areBeltsFasten then
-		self:setAllTensionBeltsActive(false)
+		--self:setAllTensionBeltsActive(false)
+		UniversalAutoload.fastenTensionBelts(self, false)
 	else
-		self:setAllTensionBeltsActive(true)
+		--self:setAllTensionBeltsActive(true)
+		UniversalAutoload.fastenTensionBelts(self, true)
 	end
 	UniversalAutoload.updateToggleBeltsActionEvent(self)
 end
@@ -791,7 +820,8 @@ function UniversalAutoload:startLoading(noEventSend)
 				table.sort(spec.sortedObjectsToLoad, sortPalletsForLoading)
 			end
 			
-			self:setAllTensionBeltsActive(false)
+			--self:setAllTensionBeltsActive(false)
+			UniversalAutoload.fastenTensionBelts(self, false)
 		end
 		
 		UniversalAutoloadStartLoadingEvent.sendEvent(self, noEventSend)
@@ -888,7 +918,8 @@ function UniversalAutoload:startUnloading(noEventSend)
 			end
 
 			if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
-				self:setAllTensionBeltsActive(false)
+				--self:setAllTensionBeltsActive(false)
+				UniversalAutoload.fastenTensionBelts(self, false)
 				for object, unloadPlace in pairs(spec.objectsToUnload) do
 					if not self:unloadObject(object, unloadPlace) then
 						-- print("THERE WAS A PROBLEM UNLOADING...")
@@ -934,7 +965,8 @@ function UniversalAutoload:resetLoadingState(noEventSend)
 	if self.isServer then
 		if spec.doSetTensionBelts then
 			spec.doSetTensionBelts = false
-			self:setAllTensionBeltsActive(true)
+			--self:setAllTensionBeltsActive(true)
+			UniversalAutoload.fastenTensionBelts(self, true)
 		end
 		spec.postLoadDelayTime = 0
 	end
@@ -976,6 +1008,9 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 		-- print("SERVER RAISE ACTIVE: "..self:getFullName().." ("..tostring(state)..")")
 		self:raiseActive()
 		self:raiseDirtyFlags(self.vehicleDirtyFlag)
+		
+		UniversalAutoload.determineTipside(self)
+		UniversalAutoload.countActivePallets(self)
 	end
 	
 	if state ~= nil then
@@ -1408,6 +1443,14 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	if not spec.isAutoloadEnabled then
 		return
 	end
+	
+	if UniversalAutoload.showTensionBeltMessage == nil then
+		UniversalAutoload.showTensionBeltMessage = true
+		if g_currentMission.missionDynamicInfo.isMultiplayer then
+			print("*** TENSION BELTS TEMPORARILY DISABLED FOR MULTIPLAYER ONLY ***")
+			print("Tension belts are currently disabled on autoloading vehicles due to a bug introduced with patch 1.3.0.0 - hopefully GIANTS can fix it soon")
+		end
+	end
 
 	if self.isServer and not g_gui:getIsGuiVisible() then
 	
@@ -1433,7 +1476,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				if not self:getPalletIsSelectedContainer(object) then
 					self:setContainerTypeIndex(1)
 				end
-				self:setAllTensionBeltsActive(false)
+				--self:setAllTensionBeltsActive(false)
+				UniversalAutoload.fastenTensionBelts(self, false)
 				spec.doSetTensionBelts = true
 				spec.doPostLoadDelay = true
 				if self:loadObject(object) then
@@ -1500,9 +1544,6 @@ end
 function UniversalAutoload:onActivate(isControlling)
 	-- print("onActivate: "..self:getFullName())
 	if self.isServer then
-		local spec = self.spec_universalAutoload
-		UniversalAutoload.determineTipside(self)
-		UniversalAutoload.countActivePallets(self)
 		self:forceRaiseActive(true)
 	end
 end
@@ -1699,15 +1740,16 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 					local SPEC = vehicle.spec_universalAutoload
 					if SPEC.totalUnloadCount == 0 then
 						SPEC.resetLoadingPattern = true
-						vehicle:setAllTensionBeltsActive(false)
+						--vehicle:setAllTensionBeltsActive(false)
+						UniversalAutoload.fastenTensionBelts(vehicle, false)
 					elseif loadedObjectRemoved then
-						vehicle:setAllTensionBeltsActive(false)
-						vehicle:setAllTensionBeltsActive(true)
+						--vehicle:setAllTensionBeltsActive(false)
+						UniversalAutoload.fastenTensionBelts(vehicle, false)
+						--vehicle:setAllTensionBeltsActive(true)
+						UniversalAutoload.fastenTensionBelts(vehicle, true)
 					end
 				end
-				--vehicle:forceRaiseActive()
-				--UniversalAutoload.raiseObjectDirtyFlags(object)
-				UniversalAutoload.countActivePallets(vehicle)
+				vehicle:forceRaiseActive()
 			end
 		end
 	end
@@ -2060,8 +2102,8 @@ function moveObjectNodes( object, p )
 		object.networkTimeInterpolator:reset()
 		UniversalAutoload.raiseObjectDirtyFlags(object)
 		
-		object.synchronizePosition = true
-		object:updateTick(0)
+		-- object.synchronizePosition = true
+		-- object:updateTick(0)
 		
 		
 		--print("MOVE OBJECT NODE (AFTER): "..tostring(node))

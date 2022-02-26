@@ -56,10 +56,10 @@
 			<!-- <objectType name="roundbale125" sizeX="1.200" sizeY="1.250" sizeZ="1.250"/> -->
 			<!-- <objectType name="roundbale150" sizeX="1.200" sizeY="1.500" sizeZ="1.500"/> -->
 			<!-- <objectType name="roundbale180" sizeX="1.200" sizeY="1.800" sizeZ="1.800"/> -->
-			<objectType name="squarebale120" sizeX="0.460" sizeY="0.360" sizeZ="1.200"/>/>
-			<objectType name="squarebale180" sizeX="1.210" sizeY="0.910" sizeZ="1.800"/>/>
-			<objectType name="squarebale220" sizeX="1.210" sizeY="0.910" sizeZ="2.200"/>/>
-			<objectType name="squarebale240" sizeX="1.210" sizeY="0.910" sizeZ="2.400"/>/>
+			<objectType name="squarebale120" sizeX="0.460" sizeY="0.360" sizeZ="1.200"/>
+			<objectType name="squarebale180" sizeX="1.210" sizeY="0.910" sizeZ="1.800"/>
+			<objectType name="squarebale220" sizeX="1.210" sizeY="0.910" sizeZ="2.200"/>
+			<objectType name="squarebale240" sizeX="1.210" sizeY="0.910" sizeZ="2.400"/>
 			<objectType name="packedSquareBale120" sizeX="1.210" sizeY="0.910" sizeZ="2.400"/>
 		</containerTypeConfiguration>
 		

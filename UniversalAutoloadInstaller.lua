@@ -10,7 +10,9 @@ addModEventListener(UniversalAutoloadManager)
 g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), true)
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
-	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer' then
+	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer'
+	--or vehicleName == 'car' or vehicleName == 'carFillable'
+	then
 		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
 			g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
 		end
@@ -36,7 +38,8 @@ UniversalAutoload.ACTIONS = {
 
 UniversalAutoload.WARNINGS = {
 	[1] = "warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA",
-	[2] = "warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND"
+	[2] = "warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND",
+	[99] = "warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED"
 }
 
 UniversalAutoload.CONTAINERS = {

@@ -173,11 +173,6 @@ function UniversalAutoload.registerEventListeners(vehicleType)
 end
 --
 function UniversalAutoload.removeEventListeners(vehicleType)
-    SpecializationUtil.removeEventListener(vehicleType, "onLoad", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onPostLoad", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onDelete", UniversalAutoload)
-    SpecializationUtil.removeEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onUpdate", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onActivate", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onDeactivate", UniversalAutoload)
@@ -1378,7 +1373,7 @@ function UniversalAutoload:onLoad(savegame)
 				addTrigger(rearTrigger.node, "rearLoadingTriggerCallback", self)
 			end
 		end
-		
+		delete(triggersRootNode)
 
 		--server only
 		spec.isLoading = false

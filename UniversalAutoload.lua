@@ -1585,7 +1585,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		end
 	end
 
-	if self.isServer and not g_gui:getIsGuiVisible() then
+	if self.isServer then
 	
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then

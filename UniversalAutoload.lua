@@ -209,8 +209,7 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 		if UniversalAutoload.lastClosestVehicle~=closestVehicle then
 			local lastVehicle = UniversalAutoload.lastClosestVehicle
 			if lastVehicle ~= nil then
-				local SPEC = lastVehicle.spec_universalAutoload
-				lastVehicle:clearActionEventsTable(SPEC.actionEvents)
+				UniversalAutoload.clearActionEvents(lastVehicle)
 				lastVehicle:forceRaiseActive()
 			end
 			
@@ -229,20 +228,23 @@ ActivatableObjectsSystem.updateObjects = Utils.overwrittenFunction(ActivatableOb
 
 
 -- ACTION EVENT FUNCTIONS
+function UniversalAutoload:clearActionEvents()
+	local spec = self.spec_universalAutoload
+	if spec~=nil and spec.isAutoloadEnabled and spec.actionEvents~=nil then
+		self:clearActionEventsTable(spec.actionEvents)
+	end
+end
+--
 function UniversalAutoload:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
-    if self.isClient then
-        local spec = self.spec_universalAutoload
-		
-		if not spec.isAutoloadEnabled or spec.actionEvents==nil then
-            return
-        end
-        self:clearActionEventsTable(spec.actionEvents)
+	if self.isClient then
+		local spec = self.spec_universalAutoload
+		UniversalAutoload.clearActionEvents(self)
 
-        if isActiveForInputIgnoreSelection then
+		if isActiveForInputIgnoreSelection then
 			-- print("onRegisterActionEvents: "..self:getFullName())
 			self:updateActionEventKeys()
-        end
-    end
+		end
+	end
 end
 --
 function UniversalAutoload:updateActionEventKeys()
@@ -1685,7 +1687,7 @@ function UniversalAutoload:onDeactivate()
 	if self.isServer then
 		self:forceRaiseActive(false)
 	end
-	self:clearActionEventsTable(spec.actionEvents)
+	UniversalAutoload:clearActionEvents(self)
 end
 --
 function UniversalAutoload:determineTipside()

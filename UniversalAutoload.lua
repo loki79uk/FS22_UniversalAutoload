@@ -212,29 +212,21 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
 		end
 		
 		if UniversalAutoload.lastClosestVehicle~=closestVehicle then
-			UniversalAutoload.lastClosestVehicle = closestVehicle
-			for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-				if vehicle ~= nil then
-					local SPEC = vehicle.spec_universalAutoload
-					vehicle:forceRaiseActive()
-					vehicle:clearActionEventsTable(SPEC.actionEvents)
-					
-					-- if SPEC.playerInTrigger[playerId] == false then
-						-- print("PLAYER LEFT TRIGGER")
-						-- vehicle:updatePlayerTriggerState(playerId, nil)
-						-- vehicle:clearActionEventsTable(SPEC.actionEvents)
-					-- end
-				end
+			local lastVehicle = UniversalAutoload.lastClosestVehicle
+			if lastVehicle ~= nil then
+				local SPEC = lastVehicle.spec_universalAutoload
+				lastVehicle:clearActionEventsTable(SPEC.actionEvents)
+				lastVehicle:forceRaiseActive()
 			end
+			
+			UniversalAutoload.lastClosestVehicle = closestVehicle
 			if closestVehicle ~= nil then
-				closestVehicle:updateActionEventKeys()
+				closestVehicle.spec_universalAutoload.updateKeys = true
 			end
 		end
 		if closestVehicle ~= nil then
 			closestVehicle:forceRaiseActive()
 			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
-			
-			closestVehicle:updateActionEventKeys()
 		end
 	end
 end
@@ -1003,6 +995,12 @@ end
 function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	-- print("forceRaiseActive: "..self:getFullName() )
 	local spec = self.spec_universalAutoload
+	
+	if spec.updateKeys then
+		--print("UPDATE KEYS: "..self:getFullName())
+		spec.updateKeys = false
+		self:updateActionEventKeys()
+	end
 	
 	if self.isServer then
 		-- print("SERVER RAISE ACTIVE: "..self:getFullName().." ("..tostring(state)..")")

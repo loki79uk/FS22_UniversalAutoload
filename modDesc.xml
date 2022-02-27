@@ -197,90 +197,105 @@ Liste des remorques et plateaux compatibles :
 			<de>Laden umschalten</de>
 			<fr>Activer le chargement</fr>
 			<ru>Переключить загрузку</ru>
+			<nl>Laden starten/stoppen</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
 			<de>Abladen</de>
 			<fr>Décharger tous</fr>
 			<ru>Разгрузка</ru>
+			<nl>Lossen</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
 			<de>Aktive entladeseite umschalten</de>
 			<fr>Choix du côté actif</fr>
 			<ru>Сменить сторону разгрузки</ru>
+			<nl>Schakelaar loszijde</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
 			<de>Ladefilter umschalten</de>
 			<fr>Sélection du chargement</fr>
 			<ru>Переключить фильтр загрузки</ru>
+			<nl>Schakelaar laad filter</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
 			<de>Materialtyp wechseln (vorwärts)</de>
 			<fr>Sélection du type de marchandise (suivant)</fr>
 			<ru>Изменить выбранный тип материала (след.)</ru>
+			<nl>Geselecteerd producttype wijzigen (volgende)</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
 			<de>Materialtyp wechseln (rückwärts)</de>
 			<fr>Sélection du type de marchandise (précédent)</fr>
 			<ru>Изменить выбранный тип материала (пред.)</ru>
+			<nl>Geselecteerd producttype wijzigen (vorige)</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
 			<de>Alle Materialtyp auswählen</de>
 			<fr>Sélectionner tous types de marchandises</fr>
 			<ru>Выбрать все типы материалов</ru>
+			<nl>Selecteer alle producttypes</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
 			<de>Containertyp wechseln (vorwärts)</de>
 			<fr>Sélection du type de conditionnement (suivant)</fr>
 			<ru>Изменить выбранный тип контейнера (след.)</ru>
+			<nl>Geselecteerd containertype wijzigen (volgende)</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
 			<de>Containertyp wechseln (rückwärts)</de>
 			<fr>Sélection du type de conditionnement (précédent)</fr>
 			<ru>Изменить выбранный тип контейнера (пред.)</ru>
+			<nl>Geselecteerd containertype wijzigen (vorige)</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
 			<de>Alle Containertypen auswählen</de>
 			<fr>Sélectionner tous types de conditionnement</fr>
 			<ru>Выбрать все типы контейнеров</ru>
+			<nl>Selecteer alle containertypes</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
 			<de>Spanngurte anbringen/lösen</de>
 			<fr>Attacher/détacher les sangles de serrage</fr>
 			<ru>Прикрепить/открепить ремни</ru>
+			<nl>Spanbanden vast-/losmaken</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
 			<de>Hintertür Öffnen/Schließen</de>
 			<fr>Ouvrir/fermer la porte arrière</fr>
 			<ru>Открыть/Закрыть заднюю дверь</ru>
+			<nl>Openen/sluiten achterdeur</nl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
 			<de>Plane öffnen/schließen</de>
 			<fr>Ouvrir/fermer la bâche</fr>
 			<ru>Открыть/Закрыть боковой тент</ru>
+			<nl>Openen/sluiten schuifzeil</nl>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
 			<en>Unloading area is blocked. Please clear the unloading area.</en>
 			<de>Der Entladebereich ist blockiert. Bitte räumen Sie den Abladebereich.</de>
 			<fr>La zone de déchargement est bloquée. Veuillez libérer la zone de déchargement.</fr>
 			<ru>Зона разгрузки занята. Пожалуйста, очистите зону разгрузки.</ru>
+			<nl>Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats.</nl>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
 			<de>Es sind keine kompatiblen Waren zum Be- oder Entladen vorhanden.</de>
 			<fr>Aucune marchandise compatible n'est disponible pour le chargement ou le déchargement.</fr>
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
+			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
 		</text>
 		
 		<text name="warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED">
@@ -288,6 +303,7 @@ Liste des remorques et plateaux compatibles :
 			<de>Entschuldigung! Spanngurte sind derzeit im Mehrspielermodus deaktiviert.</de>
 			<fr>Désolé, les sangles ne sont pas disponibles en multijoueurs.</fr>
 			<ru>Извините! В настоящее время натяжные ремни отключены в многопользовательской игре.</ru>
+			<nl>Sorry! Spangordels zijn momenteel uitgeschakeld in multiplayer.</nl>
 		</text>
 		
 		<text name="universalAutoload_tipside">
@@ -295,132 +311,154 @@ Liste des remorques et plateaux compatibles :
 			<de>Aktive entladeseite</de>
 			<fr>Côté actif</fr>
 			<ru>Сторона разгрузки</ru>
+			<nl>Loszijde</nl>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
 			<de>Links</de>
 			<fr>Gauche</fr>
 			<ru>Слева</ru>
+			<nl>Links</nl>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
 			<de>Rechts</de>
 			<fr>Droit</fr>
 			<ru>Справа</ru>
+			<nl>Rechts</nl>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
 			<de>Keine</de>
 			<fr>Aucun</fr>
 			<ru>Нет</ru>
+			<nl>Niks</nl>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
 			<de>Ladefilter</de>
 			<fr>Choix du chargement</fr>
 			<ru>Фильтр загрузки</ru>
+			<nl>Laad filter</nl>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
 			<de>Nur volle</de>
 			<fr>Complet uniquement</fr>
 			<ru>Только полные</ru>
+			<nl>Alleen volle</nl>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Any</en>
 			<de>Jede</de>
 			<fr>Tout</fr>
 			<ru>Любой</ru>
+			<nl>Alles</nl>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
 			<de>Laden starten</de>
 			<fr>Démarrer chargement</fr>
 			<ru>Начать загрузку</ru>
+			<nl>Start laden</nl>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
 			<de>Laden stoppen</de>
 			<fr>Arrêter le chargement</fr>
 			<ru>Остановить загрузку</ru>
+			<nl>Stop laden</nl>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
 			<de>Abladen</de>
 			<fr>Décharger</fr>
 			<ru>Разгрузка</ru>
+			<nl>Lossen</nl>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
 			<de>Materialtyp</de>
 			<fr>Marchandise sélectionnée</fr>
 			<ru>Тип материала</ru>
+			<nl>Producttype</nl>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
 			<de>Containertyp</de>
 			<fr>Conditionnement sélectionné</fr>
 			<ru>Тип контейнера</ru>
+			<nl>Containertype</nl>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
 			<de>Alle</de>
 			<fr>Tous</fr>
 			<ru>Все</ru>
+			<nl>Alles</nl>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
 			<de>Flüssigkeitstank</de>
 			<fr>Réservoir de liquide IBC</fr>
 			<ru>IBC-бак</ru>
+			<nl>IBC VloeistofTank</nl>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
 			<de>Euro-Palette</de>
 			<fr>Palette euro</fr>
 			<ru>Европоддон</ru>
+			<nl>Europallet</nl>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
 			<de>Pioneer-Palette</de>
 			<fr>Palette pioneer</fr>
 			<ru>Поддон Pioneer</ru>
+			<nl>Pioneer-pallet</nl>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
 			<de>Bigbag-Palette</de>
 			<fr>Palette de big bag</fr>
 			<ru>Поддон Bigbag</ru>
+			<nl>Bigbag-pallet</nl>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
 			<de>Bigbag</de>
 			<fr>Big bag</fr>
 			<ru>Bigbag</ru>
+			<nl>Bigbag</nl>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
 			<de>Kartoffelkiste</de>
 			<fr>Palox pommes de terre</fr>
 			<ru>Ящик картофеля</ru>
+			<nl>Aardappelkist</nl>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
 			<de>Ballen</de>
 			<fr>Balle</fr>
 			<ru>Тюк</ru>
+			<nl>Balen</nl>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
 			<de>Rundballen</de>
 			<fr>Balle Ronde</fr>
 			<ru>Круглый рулон</ru>
+			<nl>Ronde balen</nl>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
 			<de>Quaderballen</de>
 			<fr>Balle carrée</fr>
 			<ru>Квадратный тюк</ru>
+			<nl>Vierkante balen</nl>
 		</text>
 	</l10n>
 	

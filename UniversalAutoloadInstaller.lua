@@ -208,7 +208,6 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 				end
 				xmlFile:delete()
 			end
-			--DebugUtil.printTableRecursively(fillType, "--", 0, 1)
         end
     end
 

@@ -917,7 +917,6 @@ function UniversalAutoload:startUnloading(noEventSend)
 						-- print("THERE WAS A PROBLEM UNLOADING...")
 					end
 				end
-				--spec.objectsToUnload = {}
 				if spec.totalUnloadCount == 0 then
 					spec.resetLoadingPattern = true
 				end
@@ -1044,12 +1043,11 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 		local selectedConfigs = selectedConfigs:split(",")
 		
 		local item = {}
-		item.configurations, _ = StoreItemUtil.getConfigurationsFromXML(xmlFile, "vehicle", nil, self.customEnvironment, nil, item)
-		item.configurationSets = StoreItemUtil.getConfigurationSetsFromXML(item, xmlFile, "vehicle", nil, self.customEnvironment, nil)
+		item.configurations, _ = UniversalAutoload.getConfigurationsFromXML(xmlFile, "vehicle", self.customEnvironment, item)
+		item.configurationSets = UniversalAutoload.getConfigurationSetsFromXML(item, xmlFile, "vehicle", self.customEnvironment)
 
-		--if StoreItemUtil.getConfigurationsMatchConfigSets(self.configurations, item.configurationSets) then
 		if item.configurationSets ~= nil and #item.configurationSets > 0  then
-			local closestSet, _ = StoreItemUtil.getClosestConfigurationSet(self.configurations, item.configurationSets)
+			local closestSet, _ = UniversalAutoload.getClosestConfigurationSet(self.configurations, item.configurationSets)
 			
 			for k, v in pairs(item.configurationSets) do
 				if v == closestSet then
@@ -1064,6 +1062,146 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 		end
 	end
 	return validConfig
+
+end
+--
+function UniversalAutoload.getConfigurationsFromXML(xmlFile, key, customEnvironment, storeItem)
+	local configurations = {}
+	local numConfigs = 0
+	local configurationTypes = g_configurationManager:getConfigurationTypes()
+
+	for _, name in pairs(configurationTypes) do
+		local configuration = g_configurationManager:getConfigurationDescByName(name)
+		local configurationItems = {}
+		local i = 0
+		local xmlKey = configuration.xmlKey
+
+		if xmlKey ~= nil then
+			xmlKey = "." .. xmlKey
+		else
+			xmlKey = ""
+		end
+
+		local baseKey = key .. xmlKey .. "." .. name .. "Configurations"
+
+		local overwrittenTitle = xmlFile:getValue(baseKey .. "#title", nil, customEnvironment, false)
+		local loadedSaveIds = {}
+
+		while true do
+			local configKey = string.format(baseKey .. "." .. name .. "Configuration(%d)", i)
+
+			if not xmlFile:hasProperty(configKey) then
+				break
+			end
+
+			local configName = ConfigurationUtil.loadConfigurationNameFromXML(xmlFile, configKey, customEnvironment)
+			local desc = xmlFile:getValue(configKey .. "#desc", nil, customEnvironment, false)
+			local price = xmlFile:getValue(configKey .. "#price", 0)
+			local dailyUpkeep = xmlFile:getValue(configKey .. "#dailyUpkeep", 0)
+			local isDefault = xmlFile:getValue(configKey .. "#isDefault", false)
+			local isSelectable = xmlFile:getValue(configKey .. "#isSelectable", true)
+			local saveId = xmlFile:getValue(configKey .. "#saveId")
+			local vehicleBrandName = xmlFile:getValue(configKey .. "#vehicleBrand")
+			local vehicleBrand = g_brandManager:getBrandIndexByName(vehicleBrandName)
+			local vehicleName = xmlFile:getValue(configKey .. "#vehicleName")
+			local vehicleIcon = xmlFile:getValue(configKey .. "#vehicleIcon")
+
+
+			local brandName = xmlFile:getValue(configKey .. "#displayBrand")
+			local brandIndex = g_brandManager:getBrandIndexByName(brandName)
+			local configItem = StoreItemUtil.addConfigurationItem(configurationItems, configName, desc, price, dailyUpkeep, isDefault, overwrittenTitle, saveId, brandIndex, isSelectable, vehicleBrand, vehicleName, vehicleIcon)
+			
+			StoreItemUtil.renameDuplicatedConfigurationNames(configurationItems, configItem)
+
+			i = i + 1
+		end
+		
+		if #configurationItems > 0 then
+			configurations[name] = configurationItems
+			numConfigs = numConfigs + 1
+		end
+	end
+
+	if numConfigs == 0 then
+		configurations = nil
+	end
+
+	return configurations
+end
+--
+function UniversalAutoload.getConfigurationSetsFromXML(storeItem, xmlFile, key, customEnvironment)
+	local configurationSetsKey = string.format("%s.configurationSets", key)
+	local overwrittenTitle = xmlFile:getValue(configurationSetsKey .. "#title", nil, customEnvironment, false)
+	local configurationsSets = {}
+	local i = 0
+
+	while true do
+		local key = string.format("%s.configurationSet(%d)", configurationSetsKey, i)
+		if not xmlFile:hasProperty(key) then
+			break
+		end
+		local configSet = {
+			name = xmlFile:getValue(key .. "#name", nil, customEnvironment, false)
+		}
+		
+		local params = xmlFile:getValue(key .. "#params")
+		if params ~= nil then
+			params = params:split("|")
+			configSet.name = string.format(configSet.name, unpack(params))
+		end
+
+		configSet.isDefault = xmlFile:getValue(key .. "#isDefault", false)
+		configSet.overwrittenTitle = overwrittenTitle
+		configSet.configurations = {}
+		local j = 0
+
+		while true do
+			local configKey = string.format("%s.configuration(%d)", key, j)
+			if not xmlFile:hasProperty(configKey) then
+				break
+			end
+			local name = xmlFile:getValue(configKey .. "#name")
+			if name ~= nil then
+				if storeItem.configurations[name] ~= nil then
+					local index = xmlFile:getValue(configKey .. "#index")
+
+					if index ~= nil then
+						if storeItem.configurations[name][index] ~= nil then
+							configSet.configurations[name] = index
+						end
+					end
+				end
+			end
+			j = j + 1
+		end
+
+		table.insert(configurationsSets, configSet)
+		i = i + 1
+	end
+
+	return configurationsSets
+end
+--
+function UniversalAutoload.getClosestConfigurationSet(configurations, configSets)
+	local closestSet = nil
+	local closestSetMatches = 0
+
+	for _, configSet in pairs(configSets) do
+		local numMatches = 0
+
+		for configName, index in pairs(configSet.configurations) do
+			if configurations[configName] == index then
+				numMatches = numMatches + 1
+			end
+		end
+
+		if closestSetMatches < numMatches then
+			closestSet = configSet
+			closestSetMatches = numMatches
+		end
+	end
+
+	return closestSet, closestSetMatches
 end
 
 -- MAIN "ON LOAD" INITIALISATION FUNCTION

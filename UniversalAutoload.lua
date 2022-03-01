@@ -117,6 +117,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "unloadObject", UniversalAutoload.unloadObject)
     SpecializationUtil.registerFunction(vehicleType, "addLoadPlace", UniversalAutoload.addLoadPlace)
 	SpecializationUtil.registerFunction(vehicleType, "getLoadPlace", UniversalAutoload.getLoadPlace)
+	SpecializationUtil.registerFunction(vehicleType, "moveObjectNodes", UniversalAutoload.moveObjectNodes)
 	
     SpecializationUtil.registerFunction(vehicleType, "getIsValidObject", UniversalAutoload.getIsValidObject)
     SpecializationUtil.registerFunction(vehicleType, "getIsAutoloadingAllowed", UniversalAutoload.getIsAutoloadingAllowed)
@@ -136,6 +137,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	
 	SpecializationUtil.registerFunction(vehicleType, "testPalletLocationIsFull", UniversalAutoload.testPalletLocationIsFull)
 	SpecializationUtil.registerFunction(vehicleType, "testPalletLocationIsEmpty", UniversalAutoload.testPalletLocationIsEmpty)
+	SpecializationUtil.registerFunction(vehicleType, "testLoadAreaIsEmpty", UniversalAutoload.testLoadAreaIsEmpty)
 	SpecializationUtil.registerFunction(vehicleType, "testUnloadLocationIsEmpty", UniversalAutoload.testUnloadLocationIsEmpty)
     SpecializationUtil.registerFunction(vehicleType, "overlapCallback", UniversalAutoload.overlapCallback)
     SpecializationUtil.registerFunction(vehicleType, "palletOverlapCallback", UniversalAutoload.palletOverlapCallback)
@@ -781,8 +783,11 @@ end
 function UniversalAutoload:startLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 
-	if not spec.isLoading then
+	if not spec.isLoading and self:getIsAutoloadingAllowed() then
 		-- print("Start Loading: "..self:getFullName() )
+		-- spec.loadAreaIsEmpty = self:testLoadAreaIsEmpty()
+		-- print("testLoadAreaIsEmpty: "..tostring(spec.loadAreaIsEmpty))
+		
 		spec.isLoading = true
 		
 		if self.isServer then
@@ -878,7 +883,6 @@ function UniversalAutoload:startUnloading(noEventSend)
 						
 						local _, heightAbovePlace, _ = localToLocal(unloadPlace.node, spec.loadArea.rootNode, 0, 0, 0)
 						local heightAboveGround = DensityMapHeightUtil.getCollisionHeightAtWorldPos(p.x, p.y, p.z) + 0.1
-						--local heightAboveGround = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, p.x, p.y, p.z) + 0.1
 						unloadPlace.heightAbovePlace = math.max(0, heightAbovePlace)
 						unloadPlace.heightAboveGround = heightAboveGround - p.y
 
@@ -914,8 +918,12 @@ function UniversalAutoload:startUnloading(noEventSend)
 						-- print("THERE WAS A PROBLEM UNLOADING...")
 					end
 				end
+				spec.objectsToUnload = {}
 				if spec.totalUnloadCount == 0 then
+					spec.partiallyUnloaded = false
 					spec.resetLoadingPattern = true
+				else
+					spec.partiallyUnloaded = true
 				end
 			else
 				-- CLEAR_UNLOADING_AREA
@@ -1586,7 +1594,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	end
 
 	if self.isServer then
-	
+
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
 			if spec.foldAnimationRemaining < 0 then
@@ -1669,6 +1677,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			UniversalAutoload.determineTipside(self)
 			UniversalAutoload.countActivePallets(self)
 			UniversalAutoload.drawDebugDisplay(self)
+			
+			--self.lastX, self.lastY, self.lastZ = getWorldTranslation(self.rootNode)
 
 		end
 	end
@@ -1799,15 +1809,10 @@ function UniversalAutoload:loadObject(object)
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
-		local placeIndex, thisLoadHeight = self:getLoadPlace(containerType)
-		if placeIndex ~= -1 then
-			local p = {}
-			local loadPlace = spec.currentLoadingPattern[placeIndex]
-			p.x, p.y, p.z = localToWorld(loadPlace.node, 0, thisLoadHeight, 0)
-			p.rx, p.ry, p.rz = getWorldRotation(loadPlace.node)
-			p.vx, p.vy, p.vz = getLinearVelocity(self.rootNode)
-			
-			if moveObjectNodes(object, p) then
+		local loadPlace = self:getLoadPlace(containerType)
+		if loadPlace ~= nil then
+
+			if self:moveObjectNodes(object, loadPlace) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				self:addLoadedObject(object)
 			
@@ -1826,12 +1831,7 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 	-- print("UniversalAutoload - unloadObject")
 	if object ~= nil and self:isValidForUnloading(object) then
 	
-		local p = {}
-		p.x, p.y, p.z = localToWorld(unloadPlace.node, 0, 0, 0)
-		p.rx, p.ry, p.rz = getWorldRotation(unloadPlace.node)
-		p.vx, p.vy, p.vz = getLinearVelocity(self.rootNode)
-		
-		if moveObjectNodes(object, p) then
+		if self:moveObjectNodes(object, unloadPlace) then
 			self:removeLoadedObject(object)
 			self:addAvailableObject(object)
 			return true
@@ -1848,13 +1848,9 @@ function UniversalAutoload.getUnloadingTransform(vehicle, object)
 	if node ~= nil and containerType ~= nil then
 		local x0, y0, z0 = getTranslation(node)
 		
-		local offsetY = 0
-		if containerType.isBale then
-			offsetY = -containerType.sizeY/2
-		end
 		local offsetX = 1.5*spec.loadArea.width
 		if spec.currentTipside == "right" then offsetX = -offsetX end
-		local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, offsetX, offsetY, 0)
+		local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, offsetX, 0, 0)
 		
 		return x0+dx, y0+dy, z0+dz, getRotation(node)
 	else
@@ -1965,6 +1961,9 @@ function UniversalAutoload:addLoadPlace(containerType)
 		loadPlace.sizeY = containerType.sizeY
 		loadPlace.sizeZ = containerType.sizeZ
 		loadPlace.isRotated = rotation == math.pi/2
+		if containerType.isBale then
+			loadPlace.baleOffset = containerType.sizeY/2
+		end
 		
 		--LOAD FROM THE CORRECT SIDE
 		local posX = -( spec.currentLoadWidth - (spec.currentActualWidth/2) - (sizeX/2) )
@@ -2009,36 +2008,44 @@ function UniversalAutoload:getLoadPlace(containerType)
 				spec.makeNewLoadingPlace = false
 			end
 
-			local baleOffset = 0
-			if containerType.isBale then
-				baleOffset = containerType.sizeY/2
-			end
-			
 			local thisLoadHeight = spec.currentLoadHeight
 			local thisLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
 			if thisLoadPlace ~= nil then
+			
 				local containerFitsInLoadSpace = containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ
-				
-				-- if containerFitsInLoadSpace and self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) then
-					-- if thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY) then
-						-- -- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-						-- spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-						-- return spec.currentPlaceIndex, thisLoadHeight+baleOffset
-					-- end
-				-- end
+
+				local x0,y0,z0 = getTranslation(thisLoadPlace.node)
+				setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 				
 				if containerFitsInLoadSpace then
-					while thisLoadHeight >= 0 do
-						if self:testPalletLocationIsEmpty(thisLoadPlace, containerType, thisLoadHeight+baleOffset) and
-						(thisLoadHeight==0 or self:testPalletLocationIsFull(thisLoadPlace, containerType, thisLoadHeight+baleOffset-containerType.sizeY)) then
-							-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-							if containerType.neverStack then
-								spec.makeNewLoadingPlace = true
+					local useThisLoadSpace = false
+					if self.lastSpeedReal < 0.0005 then
+						while thisLoadHeight >= 0 do
+							if self:testPalletLocationIsEmpty(thisLoadPlace, containerType) and (thisLoadHeight==0 or
+							self:testPalletLocationIsFull(thisLoadPlace, containerType, -containerType.sizeY)) then
+								useThisLoadSpace = true
+								break
 							end
-							spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-							return spec.currentPlaceIndex, thisLoadHeight+baleOffset
+							-- print("No pallet found below position")
+							thisLoadHeight = thisLoadHeight - 0.1
 						end
-						thisLoadHeight = thisLoadHeight - 0.1
+					else
+						if containerType.isBale and not spec.partiallyUnloaded then
+							-- print("LOADING WHILE MOVING")
+							useThisLoadSpace = true
+						else
+							-- print("NO LOADING UNLESS STATIONARY")
+							self:showWarningMessage(3)
+						end
+					end
+					
+					if useThisLoadSpace then
+						-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
+						if containerType.neverStack then
+							spec.makeNewLoadingPlace = true
+						end
+						spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+						return thisLoadPlace
 					end
 				end
 			end
@@ -2048,7 +2055,6 @@ function UniversalAutoload:getLoadPlace(containerType)
 		end
 	end
 
-    return -1, 0
 end
 
 -- OBJECT PICKUP LOGIC FUNCTIONS
@@ -2084,10 +2090,10 @@ function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
 	return self:getIsAutoloadingAllowed() and -1 or math.huge
 end
 --
-function UniversalAutoload:testPalletLocationIsFull(loadPlace, containerType, testLoadHeight)
+function UniversalAutoload:testPalletLocationIsFull(loadPlace, containerType, offset)
 	local spec = self.spec_universalAutoload
 	local sizeX, sizeY, sizeZ = containerType.sizeX/2, containerType.sizeY/2, containerType.sizeZ/2
-	local x, y, z = localToWorld(loadPlace.node, 0, testLoadHeight, 0)
+	local x, y, z = localToWorld(loadPlace.node, 0, offset or 0, 0)
 	local rx, ry, rz = getWorldRotation(loadPlace.node)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
 	
@@ -2099,10 +2105,10 @@ function UniversalAutoload:testPalletLocationIsFull(loadPlace, containerType, te
 	return spec.foundObject
 end
 --
-function UniversalAutoload:testPalletLocationIsEmpty(loadPlace, containerType, testLoadHeight)
+function UniversalAutoload:testPalletLocationIsEmpty(loadPlace, containerType, offset)
 	local spec = self.spec_universalAutoload
 	local sizeX, sizeY, sizeZ = containerType.sizeX/2, containerType.sizeY/2, containerType.sizeZ/2
-	local x, y, z = localToWorld(loadPlace.node, 0, testLoadHeight, 0)
+	local x, y, z = localToWorld(loadPlace.node, 0, offset or 0, 0)
 	local rx, ry, rz = getWorldRotation(loadPlace.node)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
 	
@@ -2111,6 +2117,14 @@ function UniversalAutoload:testPalletLocationIsEmpty(loadPlace, containerType, t
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "palletOverlapCallback", self, collisionMask, true, false, true)
+	
+	if spec.test == nil then
+		spec.test = {}
+	end
+	spec.test.node = loadPlace.node
+	spec.test.sizeX = 2*sizeX
+	spec.test.sizeY = 2*sizeY
+	spec.test.sizeZ = 2*sizeZ
 
 	return not spec.foundObject
 end
@@ -2126,6 +2140,22 @@ function UniversalAutoload:palletOverlapCallback(hitObjectId, x, y, z, distance)
 			spec.foundObjectId = hitObjectId
         end
     end
+end
+--
+function UniversalAutoload:testLoadAreaIsEmpty()
+	local spec = self.spec_universalAutoload
+	local sizeX, sizeY, sizeZ = spec.loadArea.width/2, spec.loadArea.height/2, spec.loadArea.length/2
+	local x, y, z = localToWorld(spec.loadArea.rootNode, 0, 0, 0)
+	local rx, ry, rz = getWorldRotation(spec.loadArea.rootNode)
+	local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, 0, sizeY, 0)
+	
+	spec.foundObject = false
+	spec.foundObjectId = 0
+
+	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
+	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "palletOverlapCallback", self, collisionMask, true, false, true)
+
+	return not spec.foundObject
 end
 --
 function UniversalAutoload:testUnloadLocationIsEmpty(loadPlace)
@@ -2168,16 +2198,16 @@ function UniversalAutoload.getObjectNode( object )
 	end
 end
 --
-function moveObjectNode( objectNodeId, p )
+function UniversalAutoload.moveObjectNode( objectNodeId, p )
 	if p.x ~= nil then
-		setTranslation(objectNodeId, p.x, p.y, p.z)
+		setWorldTranslation(objectNodeId, p.x, p.y, p.z)
 	end
 	if p.rx ~= nil then
 		setWorldRotation(objectNodeId, p.rx, p.ry, p.rz)
 	end
 end
 --
-function moveObjectNodes( object, p )
+function UniversalAutoload:moveObjectNodes( object, position )
 	local nodes = {}
 	if object.components ~= nil then
 		for i = 1, #object.components do
@@ -2190,13 +2220,16 @@ function moveObjectNodes( object, p )
 	local node = nodes[1]	
 	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
 	
-	
-		--print("MOVE OBJECT NODE (BEFORE): "..tostring(node))
-		--DebugUtil.printTableRecursively(object, "--", 0, 1)
-		--object.highPrecisionPositionSynchronization = true
-	
 		UniversalAutoload.unmountDynamicMount(object)
-	
+
+		-- if self.lastSpeedReal > 0.001 then
+			-- print("Last Speed: " .. tostring(self.lastSpeedReal))
+			-- print("Last Distance: " .. tostring(self.lastMovedDistance))
+			-- print("Last Acceleration: " .. tostring(self.lastSpeedAcceleration * 1000 * 1000))
+			-- --print("g_physicsDt: " .. tostring(g_physicsDt))
+			-- --print("g_physicsDtNonInterpolated: " .. tostring(g_physicsDtNonInterpolated))
+		-- end
+
 		local wasAddedToPhysics = false
 		if object.isAddedToPhysics then
 			wasAddedToPhysics = true
@@ -2204,19 +2237,24 @@ function moveObjectNodes( object, p )
 		elseif object.isRoundbale~=nil then
 			removeFromPhysics(node)
 		end
-	
+
 		local n = {}
 		for i = 1, #nodes do
-			n[i] = {} for k, v in pairs(p) do (n[i])[k] = v end
-			if n[i].x ~= nil then
+			n[i] = {}
+			n[i].x, n[i].y, n[i].z = localToWorld(position.node, 0, position.baleOffset or 0, 0)
+			n[i].rx, n[i].ry, n[i].rz = getWorldRotation(position.node)
+			if i > 1 then
 				local dx, dy, dz = localToLocal(nodes[i], nodes[1], 0, 0, 0)
 				n[i].x = n[i].x + dx
 				n[i].y = n[i].y + dy
 				n[i].z = n[i].z + dz
 			end
+			n[i].x = n[i].x
+			n[i].y = n[i].y
+			n[i].z = n[i].z
 		end
 		for i = 1, #nodes do
-			moveObjectNode(nodes[i], n[i] )
+			UniversalAutoload.moveObjectNode(nodes[i], n[i])
 		end
 		
 		if wasAddedToPhysics then
@@ -2225,22 +2263,13 @@ function moveObjectNodes( object, p )
 			addToPhysics(node)
 		end
 
-		if p.vx ~= nil then
-			for i = 1, #nodes do
-				setLinearVelocity(nodes[i], p.vx, p.vy, p.vz)
-			end
+		for i = 1, #nodes do
+			setLinearVelocity(nodes[i], getLinearVelocity(self.rootNode))
 		end
 		
 		object:raiseActive()
 		object.networkTimeInterpolator:reset()
 		UniversalAutoload.raiseObjectDirtyFlags(object)
-		
-		-- object.synchronizePosition = true
-		-- object:updateTick(0)
-		
-		
-		--print("MOVE OBJECT NODE (AFTER): "..tostring(node))
-		--DebugUtil.printTableRecursively(object, "--", 0, 1)
 
 		return true
 	end
@@ -2492,7 +2521,7 @@ function UniversalAutoload:getSelectedMaterialText()
 	local materialType = UniversalAutoload.getSelectedMaterialType(self)
 	local materialIndex = UniversalAutoload.MATERIALS_INDEX[materialType]
 	local fillType = UniversalAutoload.MATERIALS_FILLTYPE[materialIndex]
-	return fillType.title --:upper()
+	return fillType.title
 end
 --
 function UniversalAutoload:getPalletIsSelectedLoadside(object)
@@ -2584,10 +2613,11 @@ function UniversalAutoload:drawDebugDisplay()
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
 					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+					local offset = 0 if containerType.isBale then offset = h/2 end
 					if self:isValidForLoading(object) then
-						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0, containerType.isBale )
+						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0, offset )
 					else
-						DrawDebugPallet( node, w, h, l, true, false, 1, 0, 0, containerType.isBale )
+						DrawDebugPallet( node, w, h, l, true, false, 1, 0, 0, offset )
 					end
 				end
 			end
@@ -2599,10 +2629,11 @@ function UniversalAutoload:drawDebugDisplay()
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
 					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+					local offset = 0 if containerType.isBale then offset = h/2 end
 					if self:isValidForUnloading(object) then
-						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0, containerType.isBale )
+						DrawDebugPallet( node, w, h, l, true, false, 0, 1, 0, offset )
 					else
-						DrawDebugPallet( node, w, h, l, true, false, 1, 1, 0, containerType.isBale )
+						DrawDebugPallet( node, w, h, l, true, false, 1, 1, 0, offset )
 					end
 				end
 			end
@@ -2628,40 +2659,48 @@ function UniversalAutoload:drawDebugDisplay()
 		for _, trigger in pairs(spec.triggers) do
 			if trigger.name == "rearTrigger" then
 				DebugUtil.drawDebugCube(trigger.node, 1,1,1, 1,0,1)
-			else
+			elseif trigger.name == "leftTrigger" or trigger.name == "rightTrigger" then
 				DebugUtil.drawDebugCube(trigger.node, 1,1,1, 1,1,0)
 			end
 		end
 		
 		local W, H, L = spec.loadArea.width, spec.loadArea.height, spec.loadArea.length
-		DrawDebugPallet( spec.loadArea.rootNode,  W, H, L, false, false, 1, 1, 1 )
-		DrawDebugPallet( spec.loadArea.startNode, W, 0, 0, false, false, 0, 1, 0 )
-		DrawDebugPallet( spec.loadArea.endNode,   W, 0, 0, false, false, 1, 0, 0 )	
+		DrawDebugPallet( spec.loadArea.rootNode,  W, H, L, true, false, 1, 1, 1 )
+		DrawDebugPallet( spec.loadArea.startNode, W, 0, 0, true, false, 0, 1, 0 )
+		DrawDebugPallet( spec.loadArea.endNode,   W, 0, 0, true, false, 1, 0, 0 )
+		
+		if spec.currentLoadingPattern ~= nil then
+			for _, test in pairs(spec.currentLoadingPattern) do
+				DrawDebugPallet( test.node, test.sizeX, test.sizeY, test.sizeZ, true, false, 0, 1, 1)
+			end
+		end
+		if spec.test ~= nil then
+			DrawDebugPallet( spec.test.node, spec.test.sizeX, spec.test.sizeY, spec.test.sizeZ, true, false, 1, 0, 1)
+		end
+
 	end
 end
 --
-function DrawDebugPallet( node, w, h, l, showCube, showAxis, r, g, b, isBale )
+function DrawDebugPallet( node, w, h, l, showCube, showAxis, r, g, b, offset )
 
-	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
+	if node ~= nil and node ~= 0 then
 		-- colour for square
 		local r, g, b = (r or 1), (g or 1), (b or 1)
 		local w, h, l = (w or 1), (h or 1), (l or 1)
-		
-		local offset = 0
-		if isBale then offset = -h/2 end
+		local offset = offset or 0
 
 		local xx,xy,xz = localDirectionToWorld(node, w,0,0)
 		local yx,yy,yz = localDirectionToWorld(node, 0,h,0)
 		local zx,zy,zz = localDirectionToWorld(node, 0,0,l)
 		
-		local x0,y0,z0 = localToWorld(node, -w/2, offset, -l/2)
+		local x0,y0,z0 = localToWorld(node, -w/2, -offset, -l/2)
 		drawDebugLine(x0,y0,z0,r,g,b,x0+xx,y0+xy,z0+xz,r,g,b)
 		drawDebugLine(x0,y0,z0,r,g,b,x0+zx,y0+zy,z0+zz,r,g,b)
 		drawDebugLine(x0+xx,y0+xy,z0+xz,r,g,b,x0+xx+zx,y0+xy+zy,z0+xz+zz,r,g,b)
 		drawDebugLine(x0+zx,y0+zy,z0+zz,r,g,b,x0+xx+zx,y0+xy+zy,z0+xz+zz,r,g,b)
 
 		if showCube then			
-			local x1,y1,z1 = localToWorld(node, -w/2, h+offset, -l/2)
+			local x1,y1,z1 = localToWorld(node, -w/2, h-offset, -l/2)
 			drawDebugLine(x1,y1,z1,r,g,b,x1+xx,y1+xy,z1+xz,r,g,b)
 			drawDebugLine(x1,y1,z1,r,g,b,x1+zx,y1+zy,z1+zz,r,g,b)
 			drawDebugLine(x1+xx,y1+xy,z1+xz,r,g,b,x1+xx+zx,y1+xy+zy,z1+xz+zz,r,g,b)
@@ -2674,7 +2713,7 @@ function DrawDebugPallet( node, w, h, l, showCube, showAxis, r, g, b, isBale )
 		end
 		
 		if showAxis then
-			local x,y,z = localToWorld(node, 0, (h/2)+offset, 0)
+			local x,y,z = localToWorld(node, 0, (h/2)-offset, 0)
 			Utils.renderTextAtWorldPosition(x-xx/2,y-xy/2,z-xz/2, "-x", getCorrectTextSize(0.012), 0)
 			Utils.renderTextAtWorldPosition(x+xx/2,y+xy/2,z+xz/2, "+x", getCorrectTextSize(0.012), 0)
 			Utils.renderTextAtWorldPosition(x-yx/2,y-yy/2,z-yz/2, "-y", getCorrectTextSize(0.012), 0)

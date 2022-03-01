@@ -297,7 +297,14 @@ Liste des remorques et plateaux compatibles :
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
 			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
 		</text>
-		
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
+			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
+			<de>Das Beladen ist nur im Stillstand erlaubt. Bitte halten Sie vor dem Beladen des Anhängers vollständig an.</de>
+			<fr>Le chargement est interdit à moins d'être à l'arrêt. Veuillez vous arrêter complètement avant de charger la remorque.</fr>
+			<ru>Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться.</ru>
+			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
+		</text>
+
 		<text name="warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED">
 			<en>Sorry! Tension belts are currently disabled in multiplayer.</en>
 			<de>Entschuldigung! Spanngurte sind derzeit im Mehrspielermodus deaktiviert.</de>

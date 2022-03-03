@@ -799,13 +799,13 @@ function UniversalAutoload:startLoading(noEventSend)
 				local node = UniversalAutoload.getObjectNode(object)
 				if self:isValidForLoading(object) and node~=nil then
 				
-					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
-					object.height = y
-					object.distance = math.abs(x) + math.abs(z)
-					
 					local containerType = UniversalAutoload.getContainerType(object)
-					object.area = (containerType.sizeX * containerType.sizeZ) or 1
-					object.material = UniversalAutoload.getMaterialType(object) or 1
+					local x, y, z = localToLocal(node, spec.loadArea.startNode, 0, 0, 0)
+					object.sort = {}
+					object.sort.height = y
+					object.sort.distance = math.abs(x) + math.abs(z)
+					object.sort.area = (containerType.sizeX * containerType.sizeZ) or 1
+					object.sort.material = UniversalAutoload.getMaterialType(object) or 1
 					
 					table.insert(spec.sortedObjectsToLoad, object)
 				end
@@ -816,6 +816,9 @@ function UniversalAutoload:startLoading(noEventSend)
 			
 			--self:setAllTensionBeltsActive(false)
 			UniversalAutoload.fastenTensionBelts(self, false)
+			for _, object in pairs(spec.sortedObjectsToLoad) do
+				object.sort = nil
+			end
 		end
 		
 		UniversalAutoloadStartLoadingEvent.sendEvent(self, noEventSend)
@@ -825,13 +828,13 @@ end
 --
 function sortPalletsForLoading(w1,w2)
 	-- SORT BY:  AREA > MATERIAL > HEIGHT > DISTANCE
-	if w1.area == w2.area and w1.material == w2.material and w1.height == w2.height and w1.distance < w2.distance then
+	if w1.sort.area == w2.sort.area and w1.sort.material == w2.sort.material and w1.sort.height == w2.sort.height and w1.sort.distance < w2.sort.distance then
 		return true
-	elseif w1.area == w2.area and w1.material == w2.material and w1.height > w2.height then
+	elseif w1.sort.area == w2.sort.area and w1.sort.material == w2.sort.material and w1.sort.height > w2.sort.height then
 		return true
-	elseif w1.area == w2.area and w1.material < w2.material then
+	elseif w1.sort.area == w2.sort.area and w1.sort.material < w2.sort.material then
 		return true
-	elseif w1.area > w2.area then
+	elseif w1.sort.area > w2.sort.area then
 		return true
 	end
 end

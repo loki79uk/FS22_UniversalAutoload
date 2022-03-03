@@ -143,6 +143,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY or 1.5)
 					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ or 1.5)
 					newType.isBale = xmlFile:getValue(objectTypeKey.."#isBale", default.isBale or false)
+					newType.flipYZ = xmlFile:getValue(objectTypeKey.."#flipYZ", default.flipYZ or false)
 					newType.neverStack = xmlFile:getValue(objectTypeKey.."#neverStack", default.neverStack or false)
 					newType.neverRotate = xmlFile:getValue(objectTypeKey.."#neverRotate", default.neverRotate or false)
 					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate or false)
@@ -197,6 +198,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeY = height
 					newType.sizeZ = length
 					newType.isBale = false
+					newType.flipYZ = false
 					newType.neverStack = false
 					newType.neverRotate = false
 					newType.alwaysRotate = false

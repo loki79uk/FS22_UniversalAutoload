@@ -1832,7 +1832,7 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 	if object ~= nil and self:isValidForUnloading(object) then
 	
 		if self:moveObjectNodes(object, unloadPlace) then
-			self:removeLoadedObject(object)
+			UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			self:addAvailableObject(object)
 			return true
 		end
@@ -2193,8 +2193,6 @@ function UniversalAutoload.getObjectNode( object )
 	end
 	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
 		return node
-	else
-		print("ERROR GETTING NODE")
 	end
 end
 --

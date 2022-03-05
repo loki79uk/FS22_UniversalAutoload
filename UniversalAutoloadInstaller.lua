@@ -33,14 +33,15 @@ UniversalAutoload.ACTIONS = {
 	["SELECT_ALL_CONTAINERS"] = "UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS",
 	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS",
 	["TOGGLE_DOOR"]           = "UNIVERSALAUTOLOAD_TOGGLE_DOOR",
-	["TOGGLE_CURTAIN"]	      = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN"
+	["TOGGLE_CURTAIN"]	      = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN",
+	["TOGGLE_DEBUG"]	      = "UNIVERSALAUTOLOAD_TOGGLE_DEBUG"
 }
 
 UniversalAutoload.WARNINGS = {
 	[1] = "warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA",
 	[2] = "warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND",
-	[3] = "warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY",
-	[99] = "warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED"
+	[3] = "warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT",
+	[4] = "warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY"
 }
 
 UniversalAutoload.CONTAINERS = {
@@ -90,9 +91,12 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
 			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
+			config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
+			config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
 			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+			--config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 			config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
-			
+
 			print("  >> "..configFileName)
 
 			i = i + 1

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="63">
+<modDesc descVersion="64">
 
     <author>Loki_79</author>
     <version>1.0.0.0</version>
@@ -9,7 +9,7 @@
     </title>
 	
     <description>
-<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see README file for instructions on adding to your own mod trailers or pallets.
+<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included README file for instructions on adding to your own mod trailers or pallets.
 
 Features:
 - Loads any compatible pallet/container types (see list below)
@@ -146,6 +146,7 @@ Liste des remorques et plateaux compatibles :
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_DEBUG" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 	</actions>
 	
 	<inputBinding>
@@ -187,6 +188,9 @@ Liste des remorques et plateaux compatibles :
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DEBUG" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f12" />
 		</actionBinding>
 	</inputBinding>
 	
@@ -282,6 +286,14 @@ Liste des remorques et plateaux compatibles :
 			<ru>Открыть/Закрыть боковой тент</ru>
 			<nl>Openen/sluiten schuifzeil</nl>
 		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
+			<en>Debug mode</en>
+			<de>Debug-Modus</de>
+			<fr>Mode débogage</fr>
+			<ru>Режим отладки</ru>
+			<nl>Debug-modus</nl>
+		</text>
+
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
 			<en>Unloading area is blocked. Please clear the unloading area.</en>
 			<de>Der Entladebereich ist blockiert. Bitte räumen Sie den Abladebereich.</de>
@@ -296,6 +308,13 @@ Liste des remorques et plateaux compatibles :
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
 			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
 		</text>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
+			<en>Loading area is full. Unable to load any more items of this size.</en>
+			<de>Der Ladebereich ist voll. Es können keine weiteren Artikel dieser Größe geladen werden.</de>
+			<fr>La zone de chargement est pleine. Impossible de charger d'autres articles de cette taille.</fr>
+			<ru>Загрузочное пространство заполнено. Невозможно загрузить больше предметов такого размера.</ru>
+			<nl>Laadruimte is vol. Kan geen items van deze grootte meer laden.</nl>
+		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
 			<de>Das Beladen ist nur im Stillstand erlaubt. Bitte halten Sie vor dem Beladen des Anhängers vollständig an.</de>
@@ -303,15 +322,6 @@ Liste des remorques et plateaux compatibles :
 			<ru>Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться.</ru>
 			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
 		</text>
-
-		<text name="warning_UNIVERSALAUTOLOAD_TENSION_BELTS_DISABLED">
-			<en>Sorry! Tension belts are currently disabled in multiplayer.</en>
-			<de>Entschuldigung! Spanngurte sind derzeit im Mehrspielermodus deaktiviert.</de>
-			<fr>Désolé, les sangles ne sont pas disponibles en multijoueurs.</fr>
-			<ru>Извините! В настоящее время натяжные ремни отключены в многопользовательской игре.</ru>
-			<nl>Sorry! Spangordels zijn momenteel uitgeschakeld in multiplayer.</nl>
-		</text>
-		
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
 			<de>Aktive entladeseite</de>

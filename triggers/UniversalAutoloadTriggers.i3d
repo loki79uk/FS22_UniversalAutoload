@@ -23,12 +23,14 @@
   </Dynamics>
 
   <Scene>
-      <TransformGroup name="AutoloadTriggers" nodeId="1">
+      <TransformGroup name="AutoloadTriggers" nodeId="7">
         <Shape shapeId="1" name="playerTrigger" kinematic="true" trigger="true" collisionMask="1048576" nodeId="10" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
         <Shape shapeId="1" name="pickupTrigger1" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="11" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
         <Shape shapeId="1" name="pickupTrigger2" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="12" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
-        <Shape shapeId="1" name="pickupTrigger3" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="13" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
-        <Shape shapeId="1" name="unloadingTrigger" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="14" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        <Shape shapeId="1" name="autoTrigger1" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="13" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        <Shape shapeId="1" name="autoTrigger2" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="14" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        <Shape shapeId="1" name="autoTrigger3" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="15" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        <Shape shapeId="1" name="unloadingTrigger" kinematic="true" trigger="true" collisionMask="1092616192" nodeId="16" materialIds="4" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
       </TransformGroup>
   </Scene>
 

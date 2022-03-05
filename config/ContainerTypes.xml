@@ -33,7 +33,7 @@
 			<objectType name="cerealsPallet" sizeY="1.100"/>
 			<objectType name="flourBoxPallet" sizeY="1.125"/>
 			<objectType name="sugarBoxPallet" sizeY="1.125"/>
-			<objectType name="woolPallet" sizeY="1.200"/>
+			<objectType name="woolPallet" sizeY="1.250"/>
 			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
 			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
 			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
@@ -53,14 +53,14 @@
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="BALE">
-			<objectType name="roundbale125" sizeX="1.300" sizeY="1.200" sizeZ="1.300" flipYZ="true"/>
-			<objectType name="roundbale150" sizeX="1.575" sizeY="1.200" sizeZ="1.575" flipYZ="true"/>
-			<objectType name="roundbale180" sizeX="1.850" sizeY="1.200" sizeZ="1.850" flipYZ="true"/>
-			<objectType name="squarebale120" sizeX="0.460" sizeY="0.360" sizeZ="1.200"/>
-			<objectType name="squarebale180" sizeX="1.210" sizeY="0.910" sizeZ="1.800"/>
-			<objectType name="squarebale220" sizeX="1.210" sizeY="0.910" sizeZ="2.200"/>
-			<objectType name="squarebale240" sizeX="1.210" sizeY="0.910" sizeZ="2.400"/>
-			<objectType name="packedSquareBale120" sizeX="1.210" sizeY="0.910" sizeZ="2.400"/>
+			<objectType name="roundbale125" sizeX="1.300" sizeY="1.20" sizeZ="1.300" isRoundbale="true" flipYZ="true"/>
+			<objectType name="roundbale150" sizeX="1.560" sizeY="1.20" sizeZ="1.560" isRoundbale="true" flipYZ="true"/>
+			<objectType name="roundbale180" sizeX="1.835" sizeY="1.20" sizeZ="1.835" isRoundbale="true" flipYZ="true"/>
+			<objectType name="squarebale120" sizeX="0.455" sizeY="0.355" sizeZ="1.20" neverRotate="true"/>
+			<objectType name="squarebale180" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
+			<objectType name="squarebale220" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/>
+			<objectType name="squarebale240" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
+			<objectType name="packedSquareBale120" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="POTATOBOX">

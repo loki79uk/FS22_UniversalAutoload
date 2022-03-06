@@ -1636,7 +1636,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					-- print("LOADED PALLET FROM AUTO TRIGGER")
 					spec.autoLoadingObjects[object] = nil
 				else
-					self:showWarningMessage(3)
+					if self.lastSpeedReal < 0.0005 then
+						self:showWarningMessage(3)
+					end
 					spec.trailerIsFull = true
 				end
 			end
@@ -1679,7 +1681,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							end
 						else
 							if spec.firstAttemptToLoad then
-								self:showWarningMessage(3)
+								if self.lastSpeedReal < 0.0005 then
+									self:showWarningMessage(3)
+								end
 								spec.trailerIsFull = true
 								spec.resetLoadingPattern = true
 							end

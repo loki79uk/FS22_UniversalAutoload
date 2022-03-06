@@ -1638,8 +1638,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				else
 					if self.lastSpeedReal < 0.0005 then
 						self:showWarningMessage(3)
+						spec.trailerIsFull = true
 					end
-					spec.trailerIsFull = true
 				end
 			end
 		end
@@ -1674,18 +1674,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					end
 					if not loadedObject then
 						if #spec.sortedObjectsToLoad > 0 then
-							if spec.firstAttemptToLoad then
-								table.remove(spec.sortedObjectsToLoad, 1)
-							else
+							if not spec.firstAttemptToLoad then
 								spec.resetLoadingPattern = true
 							end
 						else
 							if spec.firstAttemptToLoad then
 								if self.lastSpeedReal < 0.0005 then
 									self:showWarningMessage(3)
+									spec.trailerIsFull = true
+									spec.resetLoadingPattern = true
 								end
-								spec.trailerIsFull = true
-								spec.resetLoadingPattern = true
 							end
 							self:stopLoading()
 						end
@@ -2144,6 +2142,7 @@ function UniversalAutoload:getLoadPlace(containerType)
 						else
 							-- print("NO LOADING UNLESS STATIONARY")
 							self:showWarningMessage(4)
+							return
 						end
 					end
 					

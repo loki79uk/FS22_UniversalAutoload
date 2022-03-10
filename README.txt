@@ -19,6 +19,10 @@
    · Kröger PWO 24 (standard)
    · LODE KING Renown Drop Deck
    · Welger DK 115 (bale trailer)
+   . Pickup 1986
+   . Pickup 2017
+   . Mahindra Retriever
+   . JohnDeer xuv865M
 
 
 ==============================================================

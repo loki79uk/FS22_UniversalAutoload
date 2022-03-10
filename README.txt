@@ -50,6 +50,17 @@
   
 
   Add the following to your xml to use the specialisation in your mod trailer:
+  	<vehicle>
+		<universalAutoLoad>
+			<vehicleConfigurations>
+				<vehicleConfiguration>
+					<loadingArea offset="0.000 1.050 -1.055" width="2.40" height="2.20" length="4.50"/>
+				</vehicleConfiguration>
+			</vehicleConfigurations>
+		</universalAutoLoad>
+	</vehicle>
+	
+  A more complicated version with different options for different configurations:
 	<vehicle>
 		<universalAutoLoad>
 			<vehicleConfigurations>
@@ -70,7 +81,9 @@
     [selectedConfigs] - The index (or comma separated indexes) for configurations autoloading will be applied to.  Use the index corresponding to the order in which the configurations were defined.  If this parameter is not provided, autoloading will be applied to all configurations.
 
   OPTIONS:
-    [noLoadingIfUnfolded] - If true this parameter will prevent loading if the trailer is folded.  It will also prevent loading while it is folding or unfolding.  Use this if your unfolded trailer is not level or if the folding animation somehow blocks the loading area.
+    [noLoadingIfFolded] - If true this parameter will prevent loading when the trailer is folded.  It will also prevent loading while it is folding or unfolding.  Use this if the loading area is only vaild for the unfolded state.
+	
+    [noLoadingIfUnfolded] - If true this parameter will prevent loading when the trailer is unfolded.  It will also prevent loading while it is folding or unfolding.  Use this if your unfolded trailer is not level or if the folding animation somehow blocks the loading area.
 
     [isCurtainTrailer] - This is an option specifically designed for the KRONE Profi Liner curtain trailer.  If true the autoloading script will detect the correct load side when open IF the tipSide.animation.name contains the string "Left" or "Right". Where:
 	tipSide = self.spec_trailer.tipSides[self.spec_trailer.currentTipSideIndex] and self.spec_trailer.tipState == 2

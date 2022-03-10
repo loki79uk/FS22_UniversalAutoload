@@ -787,14 +787,16 @@ function UniversalAutoload:startLoading(noEventSend)
 
 	if not spec.isLoading and self:getIsAutoloadingAllowed() then
 		-- print("Start Loading: "..self:getFullName() )
-		-- spec.loadAreaIsEmpty = self:testLoadAreaIsEmpty()
-		-- print("testLoadAreaIsEmpty: "..tostring(spec.loadAreaIsEmpty))
-		
+
 		spec.isLoading = true
 		spec.firstAttemptToLoad = true
 		
 		if self.isServer then
+		
 			spec.loadDelayTime = math.huge
+			if self:testLoadAreaIsEmpty() then
+				spec.resetLoadingPattern = true
+			end
 		
 			spec.sortedObjectsToLoad = {}
 			for _, object in pairs(spec.availableObjects) do
@@ -849,7 +851,8 @@ function UniversalAutoload:stopLoading(noEventSend)
 		
 		if self.isServer then
 			spec.loadDelayTime = 0
-			if not spec.trailerIsFull then
+
+			if not (spec.trailerIsFull and self.spec_tensionBelts.areBeltsFasten) then
 				spec.doSetTensionBelts = true
 			end
 		end
@@ -1636,10 +1639,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					-- print("LOADED PALLET FROM AUTO TRIGGER")
 					spec.autoLoadingObjects[object] = nil
 				else
-					if self.lastSpeedReal < 0.0005 then
-						self:showWarningMessage(3)
-						spec.trailerIsFull = true
-					end
+					--UNABLE_TO_LOAD_OBJECT
+					self:showWarningMessage(3)
 				end
 			end
 		end
@@ -1675,16 +1676,18 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					if not loadedObject then
 						if #spec.sortedObjectsToLoad > 0 then
 							if not spec.firstAttemptToLoad then
+								-- print("RESET PATTERN to fill in any gaps")
+								spec.partiallyUnloaded = true
 								spec.resetLoadingPattern = true
 							end
 						else
-							if spec.firstAttemptToLoad then
-								if self.lastSpeedReal < 0.0005 then
-									self:showWarningMessage(3)
-									spec.trailerIsFull = true
-									spec.resetLoadingPattern = true
-								end
+							if spec.firstAttemptToLoad and not spec.trailerIsMoving then
+								--UNABLE_TO_LOAD_OBJECT
+								self:showWarningMessage(3)
+								spec.partiallyUnloaded = true
+								spec.resetLoadingPattern = true
 							end
+							-- print("STOP LOADING")
 							self:stopLoading()
 						end
 					end
@@ -1816,9 +1819,7 @@ function UniversalAutoload:countActivePallets()
 		if spec.validUnloadCount ~= validUnloadCount then
 			spec.validUnloadCount = validUnloadCount
 		end
-		--if not isActiveForLoading then
-			self:updateActionEventText()
-		--end
+		self:updateActionEventText()
 	end
 
 	-- if spec.totalAvailableCount ~= totalAvailableCount then
@@ -2081,9 +2082,11 @@ function UniversalAutoload:addLoadPlace(containerType)
 		
 		--INSERT PLACE INTO CURRENT TABLE
 		table.insert(spec.currentLoadingPattern, loadPlace)
-		spec.currentPlaceIndex = #spec.currentLoadingPattern
+		spec.currentPlaceIndex = #spec.currentLoadingPattern	
+	else
+		-- print("FULL - NO MORE ROOM")
+		spec.trailerIsFull = true
 	end
-
 end
 
 function UniversalAutoload:getLoadPlace(containerType)
@@ -2091,6 +2094,7 @@ function UniversalAutoload:getLoadPlace(containerType)
 	
 	if containerType ~= nil then
 		if spec.resetLoadingPattern ~= false then
+			-- print("RESET LOADING PATTERN")
 			spec.currentLoadingPattern = {}
 			spec.currentLoadWidth = 0
 			spec.currentLoadHeight = 0
@@ -2126,8 +2130,9 @@ function UniversalAutoload:getLoadPlace(containerType)
 				if containerFitsInLoadSpace then
 					local useThisLoadSpace = false
 					if self.lastSpeedReal < 0.0005 then
+						spec.trailerIsMoving = false
 						while thisLoadHeight >= 0 do
-							if self:testPalletLocationIsEmpty(thisLoadPlace) and (thisLoadHeight==0 or
+							if self:testPalletLocationIsEmpty(thisLoadPlace) and (thisLoadHeight==0 or containerType.isBale or
 							self:testPalletLocationIsFull(thisLoadPlace, -containerType.sizeY)) then
 								useThisLoadSpace = true
 								break
@@ -2136,12 +2141,14 @@ function UniversalAutoload:getLoadPlace(containerType)
 							thisLoadHeight = thisLoadHeight - 0.1
 						end
 					else
+						spec.trailerIsMoving = true
 						if containerType.isBale and not spec.partiallyUnloaded and not spec.trailerIsFull then
-							-- print("LOADING WHILE MOVING")
 							useThisLoadSpace = true
 						else
-							-- print("NO LOADING UNLESS STATIONARY")
-							self:showWarningMessage(4)
+							if not spec.trailerIsFull then
+								--NO_LOADING_UNLESS_STATIONARY
+								self:showWarningMessage(4)
+							end
 							return
 						end
 					end
@@ -2504,6 +2511,11 @@ function UniversalAutoload:addAvailableObject(object)
 		if object.addDeleteListener ~= nil then
 			object:addDeleteListener(self, "onDeleteAvailableObject")
 		end
+		
+		if spec.isLoading and self:isValidForLoading(object) then
+			table.insert(spec.sortedObjectsToLoad, object)
+		end
+		
 		return true
 	end
 

@@ -6,11 +6,15 @@
 	
     <title>
         <en>Universal Autoload</en>
+		<de>Universal-Autoload</de>
+		<fr>Autoload Universel</fr>
+		<ru>Универсальная автозагрузка</ru>
+		<nl>Universele Autoload</nl>
 		<cz>Univerzální Autoload</cz>
     </title>
 	
     <description>
-<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included README file for instructions on adding to your own mod trailers or pallets.
+<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the README file for instructions on adding to your own mod trailers or pallets.
 
 Features:
 - Loads any compatible pallet/container types (see list below)
@@ -558,12 +562,5 @@ CZ překlad: SniperKittenCZ
 			<cz>Hranatý balík</cz>
 		</text>
 	</l10n>
-	
-	<i3dMappings>
-        <i3dMapping id="AutoloadTriggers" node="0>"/>
-        <i3dMapping id="pickupTriggerLeft" node="0>0" />
-        <i3dMapping id="triggerNode" node="0>1" />
-        <i3dMapping id="pickupTriggerRight" node="0>2" />
-    </i3dMappings>
-	
+
 </modDesc>

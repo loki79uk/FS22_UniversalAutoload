@@ -6,6 +6,7 @@
 	
     <title>
         <en>Universal Autoload</en>
+		<cz>Univerzální Autoload</cz>
     </title>
 	
     <description>
@@ -123,6 +124,46 @@ Liste des remorques et plateaux compatibles :
 ]]>
 </fr>
 
+<cz><![CDATA[Specializace automatického nakládání pro valníkové přívěsy. Mód automaticky upraví přívěsy ze základní hry a použije se na všechny nové nebo stávající přívěsy na vaší farmě. Pokyny pro přidávání do vašich vlastních modifikačních přívěsů nebo palet naleznete v přiloženém souboru README.
+
+Funkce:
+- Naloží všechny kompatibilní typy palet/kontejnerů (viz seznam níže)
+- Instaluje se automaticky na všechny kompatibilní přívěsy (viz seznam níže)
+- Nakládka a vykládka podle vybraného materiálu nebo typu kontejneru
+- Může také omezit nakládání pouze na plné palety
+- Vyberte 'VŠE', chcete-li načíst smíšené typy v pořadí
+- Smíšené palety jsou nakládány v pořadí podle velikosti pro nejlepší efektivitu balení
+- Může komunikovat s přívěsy, když je hráč pěšky (i když není připojen k vozidlu)
+
+Speciální funkce pro „KRONE Trailer Profi Liner“
+- Nakládání/vykládání je k dispozici pouze na straně, na které je otevřený závěs
+- Zadní nakládání přímo z vysokozdvižného vozíku
+- Zadní dveře a závěs může hráč otevřít a zavřít pěšky
+
+Nakonfigurováno pro následující typy kontejnerů:
+- BigBagy
+- BigBag palety
+- Euro palety
+- IBC nádrže na kapaliny
+- Hranaté balíky
+- Bramborové krabice (vyžaduje mod: Sadba brambor)
+
+Nakonfigurováno pro následující přívěsy:
+- Brantner DD 24073/2 XXL (přívěs na balíky)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standardní)
+- Fliegl DTS 5.9
+- Přívěs KRONE Profi Liner
+- Kröger PWO 24 (standardní)
+- LODE KING Renomovaný Drop Deck
+- Welger DK 115 (přívěs na balíky)
+
+CZ překlad: SniperKittenCZ
+]]>
+</cz>
+
     </description>
 	
 	<multiplayer supported="true" />
@@ -201,6 +242,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Activer le chargement</fr>
 			<ru>Переключить загрузку</ru>
 			<nl>Laden starten/stoppen</nl>
+			<cz>Přepnout nakládání</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -208,6 +250,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Décharger tous</fr>
 			<ru>Разгрузка</ru>
 			<nl>Lossen</nl>
+			<cz>Vyložit</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
@@ -215,6 +258,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Choix du côté actif</fr>
 			<ru>Сменить сторону разгрузки</ru>
 			<nl>Schakelaar loszijde</nl>
+			<cz>Přepnout stranu vykládky</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
@@ -222,6 +266,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélection du chargement</fr>
 			<ru>Переключить фильтр загрузки</ru>
 			<nl>Schakelaar laad filter</nl>
+			<cz>Přepnout filtr nakládky</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -229,6 +274,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélection du type de marchandise (suivant)</fr>
 			<ru>Изменить выбранный тип материала (след.)</ru>
 			<nl>Geselecteerd producttype wijzigen (volgende)</nl>
+			<cz>Změnit vybraný typ materiálu (další)</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
@@ -236,6 +282,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélection du type de marchandise (précédent)</fr>
 			<ru>Изменить выбранный тип материала (пред.)</ru>
 			<nl>Geselecteerd producttype wijzigen (vorige)</nl>
+			<cz>Změnit vybraný typ materiálu (předchozí)</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
@@ -243,6 +290,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélectionner tous types de marchandises</fr>
 			<ru>Выбрать все типы материалов</ru>
 			<nl>Selecteer alle producttypes</nl>
+			<cz>Vyberte všechny typy materiálů</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -250,6 +298,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélection du type de conditionnement (suivant)</fr>
 			<ru>Изменить выбранный тип контейнера (след.)</ru>
 			<nl>Geselecteerd containertype wijzigen (volgende)</nl>
+			<cz>Změnit vybraný typ kontejneru (další)</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
@@ -257,6 +306,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélection du type de conditionnement (précédent)</fr>
 			<ru>Изменить выбранный тип контейнера (пред.)</ru>
 			<nl>Geselecteerd containertype wijzigen (vorige)</nl>
+			<cz>Změnit vybraný typ kontejneru (předchozí)</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
@@ -264,6 +314,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Sélectionner tous types de conditionnement</fr>
 			<ru>Выбрать все типы контейнеров</ru>
 			<nl>Selecteer alle containertypes</nl>
+			<cz>Vyberte všechny typy kontejnerů</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -271,6 +322,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Attacher/détacher les sangles de serrage</fr>
 			<ru>Прикрепить/открепить ремни</ru>
 			<nl>Spanbanden vast-/losmaken</nl>
+			<cz>Zapnout/odepnout upínací pásy</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
@@ -278,6 +330,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Ouvrir/fermer la porte arrière</fr>
 			<ru>Открыть/Закрыть заднюю дверь</ru>
 			<nl>Openen/sluiten achterdeur</nl>
+			<cz>Otevřít/zavřít zadní dveře</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
@@ -285,6 +338,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Ouvrir/fermer la bâche</fr>
 			<ru>Открыть/Закрыть боковой тент</ru>
 			<nl>Openen/sluiten schuifzeil</nl>
+			<cz>Otevřít/zavřít boční závěs</cz>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
 			<en>Debug mode</en>
@@ -292,6 +346,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Mode débogage</fr>
 			<ru>Режим отладки</ru>
 			<nl>Debug-modus</nl>
+			<cz>Režim ladění</cz>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -300,6 +355,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>La zone de déchargement est bloquée. Veuillez libérer la zone de déchargement.</fr>
 			<ru>Зона разгрузки занята. Пожалуйста, очистите зону разгрузки.</ru>
 			<nl>Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats.</nl>
+			<cz>Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky.</cz>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
@@ -307,6 +363,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Aucune marchandise compatible n'est disponible pour le chargement ou le déchargement.</fr>
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
 			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
+			<cz>Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku.</cz>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
 			<en>Loading area is full. Unable to load any more items of this size.</en>
@@ -314,6 +371,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>La zone de chargement est pleine. Impossible de charger d'autres articles de cette taille.</fr>
 			<ru>Загрузочное пространство заполнено. Невозможно загрузить больше предметов такого размера.</ru>
 			<nl>Laadruimte is vol. Kan geen items van deze grootte meer laden.</nl>
+			<cz>Ložná plocha je plná. Nelze načíst další položky této velikosti.</cz>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
@@ -321,6 +379,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Le chargement est interdit à moins d'être à l'arrêt. Veuillez vous arrêter complètement avant de charger la remorque.</fr>
 			<ru>Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться.</ru>
 			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
+			<cz>Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte.</cz>
 		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
@@ -328,6 +387,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Côté actif</fr>
 			<ru>Сторона разгрузки</ru>
 			<nl>Loszijde</nl>
+			<cz>Vykládací strana</cz>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
@@ -335,6 +395,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Gauche</fr>
 			<ru>Слева</ru>
 			<nl>Links</nl>
+			<cz>Vlevo</cz>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
@@ -342,6 +403,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Droit</fr>
 			<ru>Справа</ru>
 			<nl>Rechts</nl>
+			<cz>Vpravo</cz>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
@@ -349,6 +411,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Aucun</fr>
 			<ru>Нет</ru>
 			<nl>Niks</nl>
+			<cz>Nic</cz>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
@@ -356,6 +419,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Choix du chargement</fr>
 			<ru>Фильтр загрузки</ru>
 			<nl>Laad filter</nl>
+			<cz>Filtr nakládky</cz>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
@@ -363,6 +427,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Complet uniquement</fr>
 			<ru>Только полные</ru>
 			<nl>Alleen volle</nl>
+			<cz>Pouze plné</cz>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Any</en>
@@ -370,6 +435,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Tout</fr>
 			<ru>Любой</ru>
 			<nl>Alles</nl>
+			<cz>Vše</cz>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -377,6 +443,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Démarrer chargement</fr>
 			<ru>Начать загрузку</ru>
 			<nl>Start laden</nl>
+			<cz>Začít nakládku</cz>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
@@ -384,6 +451,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Arrêter le chargement</fr>
 			<ru>Остановить загрузку</ru>
 			<nl>Stop laden</nl>
+			<cz>Zastavit nakládku</cz>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
@@ -391,6 +459,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Décharger</fr>
 			<ru>Разгрузка</ru>
 			<nl>Lossen</nl>
+			<cz>Vyložit</cz>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
@@ -398,6 +467,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Marchandise sélectionnée</fr>
 			<ru>Тип материала</ru>
 			<nl>Producttype</nl>
+			<cz>Typ materiálu</cz>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
@@ -405,6 +475,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Conditionnement sélectionné</fr>
 			<ru>Тип контейнера</ru>
 			<nl>Containertype</nl>
+			<cz>Typ kontejneru</cz>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
@@ -412,6 +483,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Tous</fr>
 			<ru>Все</ru>
 			<nl>Alles</nl>
+			<cz>Vše</cz>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
@@ -419,6 +491,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Réservoir de liquide IBC</fr>
 			<ru>IBC-бак</ru>
 			<nl>IBC VloeistofTank</nl>
+			<cz>IBC nádrž</cz>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
@@ -426,6 +499,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Palette euro</fr>
 			<ru>Европоддон</ru>
 			<nl>Europallet</nl>
+			<cz>Europaleta</cz>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
@@ -433,6 +507,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Palette pioneer</fr>
 			<ru>Поддон Pioneer</ru>
 			<nl>Pioneer-pallet</nl>
+			<cz>Pioneer paleta</cz>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
@@ -440,6 +515,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Palette de big bag</fr>
 			<ru>Поддон Bigbag</ru>
 			<nl>Bigbag-pallet</nl>
+			<cz>Bigbag paleta</cz>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
@@ -447,6 +523,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Big bag</fr>
 			<ru>Bigbag</ru>
 			<nl>Bigbag</nl>
+			<cz>Bigbag</cz>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
@@ -454,6 +531,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Palox pommes de terre</fr>
 			<ru>Ящик картофеля</ru>
 			<nl>Aardappelkist</nl>
+			<cz>Krabice brambor</cz>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
@@ -461,6 +539,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Balle</fr>
 			<ru>Тюк</ru>
 			<nl>Balen</nl>
+			<cz>Balík</cz>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
@@ -468,6 +547,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Balle Ronde</fr>
 			<ru>Круглый рулон</ru>
 			<nl>Ronde balen</nl>
+			<cz>Kulatý balík</cz>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
@@ -475,6 +555,7 @@ Liste des remorques et plateaux compatibles :
 			<fr>Balle carrée</fr>
 			<ru>Квадратный тюк</ru>
 			<nl>Vierkante balen</nl>
+			<cz>Hranatý balík</cz>
 		</text>
 	</l10n>
 	

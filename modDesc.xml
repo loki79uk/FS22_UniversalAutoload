@@ -6,9 +6,9 @@
     <version>1.0.0.0</version>
 	
     <title>
-        <en>Universal Autoload</en>
-	      <pl>Universalne Autoładowanie</pl>
-		    <cz>Univerzální Autoload</cz>
+	    <pl>Universalne Autoładowanie</pl>
+	    <en>Universal Autoload</en>
+	    <cz>Univerzální Autoload</cz>	    
     </title>
 	
     <description>
@@ -47,10 +47,6 @@ Configured for the following trailers:
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
-- Pickup 1986
-- Pickup 2017
-- Mahindra Retriever
-- JohnDeer xuv865M
 ]]>
 </en>
 
@@ -88,10 +84,6 @@ Skonfigurowany dla następujących przyczep:
 - Kröger PWO 24 (standard)
 - Zrzut talii LODE KING Renown
 - Welger DK 115 (przyczepa do bel)
-- Pickup 1986
-- Pickup 2017
-- Mahindra Retriever
-- JohnDeer xuv865M
 ]]>
 </pl>
 
@@ -130,10 +122,6 @@ Liste der kompatiblen Anhänger und Pritschen:
 - Kröger PWO 24 (Standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (Bale Trailer)
-- Pickup 1986
-- Pickup 2017
-- Mahindra Retriever
-- JohnDeer xuv865M
 ]]>
 </de>
 
@@ -172,10 +160,6 @@ Liste des remorques et plateaux compatibles :
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
-- Pickup 1986
-- Pickup 2017
-- Mahindra Retriever
-- JohnDeer xuv865M
 ]]>
 </fr>
 

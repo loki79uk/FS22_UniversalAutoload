@@ -13,7 +13,7 @@
    · Bremer Transportwagen TP 500 S
    · BÖCKMANN MH-AL 4320/35
    · Demco Steel Drop Deck
-   · Farmtech DPW 1800 (standard)
+   · Farmtech DPW 1800 (standard)rere
    · Fliegl DTS 5.9
    · KRONE Trailer Profi Liner
    · Kröger PWO 24 (standard)

@@ -28,6 +28,18 @@
         <vehicleConfiguration configFileName="data/vehicles/farmtech/dpw1800/dpw1800.xml">
             <loadingArea offset="0 1.130 -0.82" width="2.41" height="2.80" length="9.3"/>
         </vehicleConfiguration>
+	<vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
+            <loadingArea offset="0 0.83 -1.6" width="1.4" height="2.6" length="3.2"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
+            <loadingArea offset="0 0.83 -1.75" width="1.4" height="2.6" length="3"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/johnDeere/xuv865M/xuv865M.xml">
+            <loadingArea offset="0 1.4 -1.1" width="1.6" height="2.6" length="1"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/mahindra/retriever/retriever.xml">
+            <loadingArea offset="0 0.77 -1.1" width="1.6" height="2.6" length="1"/>
+        </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/kroeger/pwo24/pwo24.xml" selectedConfigs="1">
             <loadingArea offset="0 1.275 -0.20" width="2.41" height="2.80" length="9.75"/>
 			<!-- <options noLoadingIfFolded="true"/> -->

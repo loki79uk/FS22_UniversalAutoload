@@ -185,8 +185,8 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					
 					local containerType
 					if category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
-					elseif name == "liquidTank" then containerType = "LIQUID_TANK"
-					elseif name == "bigBag" then containerType = "BIGBAG"
+					elseif name == "liquidTank" or name == "liquidTankFillable" then containerType = "LIQUID_TANK"
+					elseif name == "bigBag" or name == "bigBagFillable" then containerType = "BIGBAG"
 					--elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then containerType = "POTATOBOX"
 					else
 						containerType = "ALL"
@@ -203,8 +203,8 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 					newType.sizeZ = length
 					newType.isBale = false
 					newType.flipYZ = false
-					newType.neverStack = false
-					newType.neverRotate = false
+					newType.neverStack = (containerType == "BIGBAG") or false
+					newType.neverRotate = (containerType == "BIGBAG") or false
 					newType.alwaysRotate = false
 					newType.width = math.min(newType.sizeX, newType.sizeZ)
 					newType.length = math.max(newType.sizeX, newType.sizeZ)

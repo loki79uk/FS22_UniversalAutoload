@@ -1660,8 +1660,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			if spec.isLoading then
 				spec.loadDelayTime = spec.loadDelayTime or 0
 				if spec.loadDelayTime > UniversalAutoload.delayTime then
+					local lastObjectType = nil
 					local loadedObject = false
 					for index, object in ipairs(spec.sortedObjectsToLoad) do
+						lastObjectType = UniversalAutoload.getContainerType(object)
 						if self:loadObject(object) then
 							loadedObject = true
 							if spec.firstAttemptToLoad then
@@ -1674,6 +1676,18 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						break
 					end
 					if not loadedObject then
+						if #spec.sortedObjectsToLoad > 0 and lastObjectType ~= nil then
+							local i = 1
+							for _ = 1, #spec.sortedObjectsToLoad do
+								local nextObject = spec.sortedObjectsToLoad[i]
+								if lastObjectType == UniversalAutoload.getContainerType(nextObject) then
+									-- print("DELETE SAME OBJECT TYPE")
+									table.remove(spec.sortedObjectsToLoad, i)
+								else
+									i = i + 1
+								end
+							end
+						end
 						if #spec.sortedObjectsToLoad > 0 then
 							if not spec.firstAttemptToLoad then
 								-- print("RESET PATTERN to fill in any gaps")
@@ -1976,7 +1990,8 @@ function UniversalAutoload:addLoadPlace(containerType)
 	spec.currentLoadWidth = spec.currentLoadWidth or 0
 	spec.currentLoadLength = spec.currentLoadLength or 0
 	spec.currentActualWidth = spec.currentActualWidth or 0
-
+	local lastLoadPlace = spec.currentLoadingPattern[spec.currentPlaceIndex]
+	
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea.width
 	local length = spec.loadArea.length - spec.currentLoadLength
@@ -1986,7 +2001,7 @@ function UniversalAutoload:addLoadPlace(containerType)
 	local M2 = math.floor(length / containerType.sizeX)
 	
 	if N2*M2 == N1*M1 then
-	-- if equal use same packing as an empty trailer
+		-- if equal then use same packing as an empty trailer
 		N1 = math.floor(spec.loadArea.width / containerType.sizeX)
 		M1 = math.floor(spec.loadArea.length / containerType.sizeZ)
 		N2 = math.floor(spec.loadArea.width / containerType.sizeZ)
@@ -1995,16 +2010,19 @@ function UniversalAutoload:addLoadPlace(containerType)
 
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	if (((N2*M2) > (N1*M1)) or containerType.alwaysRotate)
-	and not containerType.neverRotate then
-		-- print("ROTATE")
+	local doRotate = nil
+	if lastLoadPlace~=nil and lastLoadPlace.containerType==containerType then
+		doRotate = (lastLoadPlace.rotation == (math.pi/2))
+	else
+		doRotate = (((N2*M2) > (N1*M1)) or containerType.alwaysRotate) and not containerType.neverRotate
+	end
+	if doRotate then
 		N, M = N2, M2
 		rotation = math.pi/2
 		sizeZ = containerType.sizeX
 		sizeY = containerType.sizeY
 		sizeX = containerType.sizeZ
 	else
-		-- print("NORMAL")
 		N, M = N1, M1
 		rotation = 0
 		sizeX = containerType.sizeX
@@ -2027,9 +2045,8 @@ function UniversalAutoload:addLoadPlace(containerType)
 		end
 	end
 	
-	local lastObject = spec.currentLoadingPattern[spec.currentPlaceIndex]
-	if not useRoundbalePacking and (lastObject~=nil and lastObject.useRoundbalePacking) then
-		spec.currentLoadLength = spec.currentLoadLength + lastObject.roundbaleOffset + 0.01
+	if not useRoundbalePacking and (lastLoadPlace~=nil and lastLoadPlace.useRoundbalePacking) then
+		spec.currentLoadLength = spec.currentLoadLength + lastLoadPlace.roundbaleOffset + 0.01
 	end
 
 	--UPDATE NEW PACKING DIMENSIONS
@@ -2062,6 +2079,8 @@ function UniversalAutoload:addLoadPlace(containerType)
 		loadPlace.isRoundbale = isRoundbale
 		loadPlace.roundbaleOffset = roundbaleOffset
 		loadPlace.useRoundbalePacking = useRoundbalePacking
+		loadPlace.containerType = containerType
+		loadPlace.rotation = rotation
 		if useRoundbalePacking then
 			loadPlace.sizeX = r*containerType.sizeX
 			loadPlace.sizeZ = r*containerType.sizeZ
@@ -2137,7 +2156,7 @@ function UniversalAutoload:getLoadPlace(containerType)
 								useThisLoadSpace = true
 								break
 							end
-							-- print("No pallet found below position")
+							-- print("Not empty OR no pallet found below position")
 							thisLoadHeight = thisLoadHeight - 0.1
 						end
 					else
@@ -2513,6 +2532,7 @@ function UniversalAutoload:addAvailableObject(object)
 		end
 		
 		if spec.isLoading and self:isValidForLoading(object) then
+			-- print("ADDING OBJECT")
 			table.insert(spec.sortedObjectsToLoad, object)
 		end
 		

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="64">
 
-    <author>Loki_79</author>
+    <author>loki_79</author>
     <version>1.0.0.0</version>
 	
     <title>
         <en>Universal Autoload</en>
-		<de>Universal-Autoload</de>
+		<de>Universal Autoload</de>
 		<fr>Autoload Universel</fr>
 		<ru>Универсальная автозагрузка</ru>
 		<nl>Universele Autoload</nl>

@@ -2310,7 +2310,8 @@ function UniversalAutoload:testUnloadLocationIsEmpty(unloadPlace)
 	spec.hasOverlap = false
 
 	-- local collisionMask = CollisionMask.ALL - CollisionMask.TRIGGERS - CollisionFlag.FILLABLE
-	local collisionMask = CollisionFlag.STATIC_WORLD + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.TREE + CollisionFlag.PLAYER + CollisionFlag.ANIMAL + CollisionFlag.WATER
+	local collisionMask = CollisionFlag.STATIC_WORLD + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER + CollisionFlag.ANIMAL + CollisionFlag.WATER
+	-- + CollisionFlag.TREE
 	
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "overlapCallback", self, collisionMask, true, true, true)
 

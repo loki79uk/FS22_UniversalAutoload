@@ -36,5 +36,17 @@
             <loadingArea offset="0 0.650 -0.895" width="2.00" height="2.20" length="4.25"/>
 			<options noLoadingIfUnfolded="true"/>
         </vehicleConfiguration>
+		
+		<!-- SUPPORTED MODS -->
+		<!-- <vehicleConfiguration configFileName="FS22_Mack_Flatbed_Pack/anthem.xml"> -->
+            <!-- <loadingArea offset="0 1.341 -4.0" width="2.40" height="2.50" length="6.60"/> -->
+        <!-- </vehicleConfiguration> -->
+		<!-- <vehicleConfiguration configFileName="FS22_Mack_Flatbed_Pack/pinnacle.xml"> -->
+            <!-- <loadingArea offset="0 1.341 -4.0" width="2.40" height="2.50" length="6.60"/> -->
+        <!-- </vehicleConfiguration> -->
+		<!-- <vehicleConfiguration configFileName="FS22_Mack_Flatbed_Pack/superliner1979.xml"> -->
+            <!-- <loadingArea offset="0 1.415 -3.8" width="2.40" height="2.50" length="6.50"/> -->
+        <!-- </vehicleConfiguration> -->
+
     </vehicleConfigurations>
 </universalAutoLoad>

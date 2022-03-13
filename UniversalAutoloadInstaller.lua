@@ -11,7 +11,7 @@ g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoloa
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
 	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer'
-	--or vehicleName == 'car' or vehicleName == 'carFillable'
+	or vehicleName == 'car' or vehicleName == 'carFillable'
 	then
 		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
 			g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
@@ -191,7 +191,7 @@ function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnviron
 		-- print( "  >> " .. xmlFilename )
 		local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
 
-		if xmlFile~=nil and hasXMLProperty(xmlFile.handle, "vehicle.base") then
+		if xmlFile~=nil and xmlFile:hasProperty("vehicle.base") then
 			local i3d_path = xmlFile:getValue("vehicle.base.filename")
 			local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
 			

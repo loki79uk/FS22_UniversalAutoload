@@ -1181,6 +1181,10 @@ function UniversalAutoload:onLoad(savegame)
 	local configFileName = self.configFileName
 	local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
 
+	if self.customEnvironment ~= nil then
+		configFileName = configFileName:gsub(g_modsDirectory, "")
+	end
+	
 	if xmlFile ~= 0 then
 		if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
 

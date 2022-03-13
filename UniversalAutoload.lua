@@ -1685,7 +1685,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							for _ = 1, #spec.sortedObjectsToLoad do
 								local nextObject = spec.sortedObjectsToLoad[i]
 								if lastObjectType == UniversalAutoload.getContainerType(nextObject) then
-									-- print("DELETE SAME OBJECT TYPE")
+									-- print("DELETE SAME OBJECT TYPE: "..lastObjectType.name)
 									table.remove(spec.sortedObjectsToLoad, i)
 								else
 									i = i + 1
@@ -1693,7 +1693,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							end
 						end
 						if #spec.sortedObjectsToLoad > 0 then
-							if not spec.firstAttemptToLoad then
+							if spec.trailerIsFull or self:testLoadAreaIsEmpty() then
 								-- print("RESET PATTERN to fill in any gaps")
 								spec.partiallyUnloaded = true
 								spec.resetLoadingPattern = true
@@ -2726,8 +2726,7 @@ function UniversalAutoload:getPalletIsSelectedContainer(object)
 
 	local objectContainerType = UniversalAutoload.getContainerTypeName(object)
 	local selectedContainerType = UniversalAutoload.getSelectedContainerType(self)
-	
-	
+
 	if objectContainerType~=nil and selectedContainerType~=nil then
 		if selectedContainerType == "ALL" then
 			return true

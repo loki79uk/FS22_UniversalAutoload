@@ -58,7 +58,7 @@ UniversalAutoload.ALL            = { sizeX = 1.250, sizeY = 0.850, sizeZ = 0.850
 UniversalAutoload.EURO_PALLET    = { sizeX = 1.250, sizeY = 0.790, sizeZ = 0.850 }
 UniversalAutoload.BIGBAG_PALLET  = { sizeX = 1.525, sizeY = 1.075, sizeZ = 1.200 }
 UniversalAutoload.LIQUID_TANK    = { sizeX = 1.433, sizeY = 1.500, sizeZ = 1.415 }
-UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 1.666, sizeZ = 0.900, neverStack=true }
+UniversalAutoload.BIGBAG         = { sizeX = 1.050, sizeY = 1.666, sizeZ = 0.866, neverStack=true }
 UniversalAutoload.BALE           = { isBale=true }
 
 UniversalAutoload.VEHICLES = {}
@@ -233,7 +233,7 @@ function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnviron
 					newType.isBale = false
 					newType.flipYZ = false
 					newType.neverStack = (containerType == "BIGBAG") or false
-					newType.neverRotate = (containerType == "BIGBAG") or false
+					newType.neverRotate = false
 					newType.alwaysRotate = false
 					newType.width = math.min(newType.sizeX, newType.sizeZ)
 					newType.length = math.max(newType.sizeX, newType.sizeZ)

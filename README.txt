@@ -8,7 +8,7 @@
 
   Base game supported trailers are defined in the file "SupportedVehicles.xml".  For some trailers only certain configurations are supported, such as the bale trailer configuration (see list below).  It is a requirement that the configuration includes the "tension belts" specialisation.
   
-  SUPPORTED TRAILERS: Name (specialisation)
+  SUPPORTED TRAILERS:
    · Brantner DD 24073/2 XXL (bale trailer)
    · Bremer Transportwagen TP 500 S
    · BÖCKMANN MH-AL 4320/35

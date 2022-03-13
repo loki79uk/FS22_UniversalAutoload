@@ -165,32 +165,61 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 
 		xmlFile:delete()
 	end
-
-	print("  ADDITIONAL container types:")
+	
+	print("  ADDITIONAL fill type containers:")
     for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
-        if fillType.palletFilename ~= nil then	
-			local xmlFile = XMLFile.load("configXml", fillType.palletFilename, Vehicle.xmlSchema)
-			if xmlFile ~= 0 then
-				--print( "  >> " .. fillType.palletFilename )
+        UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, fillType.customEnvironment)
+    end
+	
+	print("  ADDITIONAL store item containers:")
+	for _, storeItem in pairs(g_storeManager:getItems()) do
+		if storeItem.isMod and
+		   storeItem.categoryName == "BALES" or
+		   storeItem.categoryName == "BIGBAGS" or
+		   storeItem.categoryName == "PALLETS" or
+		   storeItem.categoryName == "BIGBAGPALLETS"
+		then
+			UniversalAutoload.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
+		end	
+	end
 
-				local i3d_path = xmlFile:getValue("vehicle.base.filename")
-				local name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+end
+--
+function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnvironment)
+
+	if xmlFilename ~= nil and not string.find(xmlFilename, "multiPurchase") then	
+		-- print( "  >> " .. xmlFilename )
+		local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
+
+		if xmlFile~=nil and hasXMLProperty(xmlFile.handle, "vehicle.base") then
+			local i3d_path = xmlFile:getValue("vehicle.base.filename")
+			local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+			
+			if i3d_name ~= nil then
+				local name
+				if customEnvironment == nil then
+					name = i3d_name
+				else
+					name = customEnvironment..":"..i3d_name
+				end
 				
 				if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] == nil then
 				
-					local category = xmlFile:getValue("vehicle.storeData.category")
+					local category = xmlFile:getValue("vehicle.storeData.category", "NONE")
 					local width = xmlFile:getValue("vehicle.base.size#width", 1.5)
 					local height = xmlFile:getValue("vehicle.base.size#height", 1.5)
 					local length = xmlFile:getValue("vehicle.base.size#length", 1.5)
 					
 					local containerType
-					if category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
-					elseif name == "liquidTank" or name == "liquidTankFillable" then containerType = "LIQUID_TANK"
-					elseif name == "bigBag" or name == "bigBagFillable" then containerType = "BIGBAG"
-					--elseif string.find(i3d_path, "FS22_Seedpotato_Farm_Pack") then containerType = "POTATOBOX"
+					if string.find(i3d_name, "liquidTank") or string.find(i3d_name, "IBC") then containerType = "LIQUID_TANK"
+					elseif string.find(i3d_name, "bigBag") or string.find(i3d_name, "BigBag") then containerType = "BIGBAG"
+					elseif string.find(i3d_name, "pallet") or string.find(i3d_name, "Pallet") then containerType = "EURO_PALLET"
+					elseif category == "pallets" then containerType = "EURO_PALLET"
+					elseif category == "bigbags" then containerType = "BIGBAG"
+					elseif category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
 					else
 						containerType = "ALL"
-						print("UNKNOWN CONTAINER TYPE: "..name.." - "..category)
+						print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category)
 					end
 
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
@@ -213,14 +242,12 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 						newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
 						
 				end
-				xmlFile:delete()
 			end
-        end
-    end
-
-
-	
+		end
+		xmlFile:delete()
+	end
 end
+--
 
 function UniversalAutoload.detectKeybindingConflicts()
 	--DETECT 'T' KEYS CONFLICT

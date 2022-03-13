@@ -2059,6 +2059,7 @@ function UniversalAutoload:addLoadPlace(containerType)
 		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
 	end
 	if spec.currentLoadLength == 0 then
+		-- print("LOAD LENGTH WAS ZERO")
 		spec.currentLoadLength = sizeZ
 	end
 	if useRoundbalePacking then
@@ -2625,8 +2626,11 @@ end
 --
 function UniversalAutoload.getContainerType(object)
 	local name = UniversalAutoload.getObjectNameFromPath(object.i3dFilename)
-	local objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+	if object.customEnvironment ~= nil then
+		name = object.customEnvironment..":"..name
+	end
 	
+	local objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 	if objectType == nil then
 		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
 			UniversalAutoload.UNKNOWN_TYPES[name] = true

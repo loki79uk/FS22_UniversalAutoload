@@ -10,12 +10,9 @@ addModEventListener(UniversalAutoloadManager)
 g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), true)
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
-	if vehicleName == 'trailer' or vehicleName == 'dynamicMountAttacherTrailer'
-	or vehicleName == 'car' or vehicleName == 'carFillable'
-	then
-		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
-			g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
-		end
+	-- Anything with tension belts could potentially require autoload
+	if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
+		g_vehicleTypeManager:addSpecialization(vehicleName, 'universalAutoload')
 	end
 end
 

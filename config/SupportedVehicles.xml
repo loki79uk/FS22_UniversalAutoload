@@ -38,18 +38,18 @@
         </vehicleConfiguration>
 		
 		<!-- SUPPORTED VEHICLES -->
-		<!-- <vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml"> -->
-            <!-- <loadingArea offset="0 0.810 -1.225" width="1.00" height="2.20" length="2.35"/> -->
-        <!-- </vehicleConfiguration> -->
-		<!-- <vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml"> -->
-            <!-- <loadingArea offset="0 0.763 -1.370" width="1.05" height="2.20" length="2.25"/> -->
-        <!-- </vehicleConfiguration> -->
-		<!-- <vehicleConfiguration configFileName="data/vehicles/johnDeere/xuv865M/xuv865M.xml"> -->
-            <!-- <loadingArea offset="0 0.741 -0.99" width="1.30" height="1.00" length="1.05"/> -->
-        <!-- </vehicleConfiguration> -->
-		<!-- <vehicleConfiguration configFileName="data/vehicles/mahindra/retriever/retriever.xml"> -->
-            <!-- <loadingArea offset="0 0.777 -1.04" width="1.30" height="1.40" length="0.88"/> -->
-        <!-- </vehicleConfiguration> -->
+		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
+            <loadingArea offset="0 0.810 -1.225" width="1.00" height="2.20" length="2.35"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
+            <loadingArea offset="0 0.763 -1.370" width="1.05" height="2.20" length="2.25"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/johnDeere/xuv865M/xuv865M.xml">
+            <loadingArea offset="0 0.741 -0.99" width="1.30" height="1.00" length="1.05"/>
+        </vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/mahindra/retriever/retriever.xml">
+            <loadingArea offset="0 0.777 -1.04" width="1.30" height="1.40" length="0.88"/>
+        </vehicleConfiguration>
 		
 		<!-- SUPPORTED MODS -->
 		<!-- <vehicleConfiguration configFileName="FS22_Mack_Flatbed_Pack/anthem.xml"> -->

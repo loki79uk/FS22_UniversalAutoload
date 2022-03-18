@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadCycleMaterialEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:cycleMaterialTypeIndex(self.direction, true) 
+		UniversalAutoload.cycleMaterialTypeIndex(self.vehicle, self.direction, true) 
 	end
 end
 

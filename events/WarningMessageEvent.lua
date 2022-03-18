@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadWarningMessageEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:showWarningMessage(self.messageId, true)
+		UniversalAutoload.showWarningMessage(self.vehicle, self.messageId, true)
 	end
 end
 

@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadSetTipsideEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:setCurrentTipside(self.tipside, true)
+		UniversalAutoload.setCurrentTipside(self.vehicle, self.tipside, true)
 	end
 end
 

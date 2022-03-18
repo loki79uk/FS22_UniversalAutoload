@@ -25,7 +25,7 @@ end
 
 function UniversalAutoloadStartUnloadingEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:startUnloading(true)
+		UniversalAutoload.startUnloading(self.vehicle, true)
 	end
 end
 

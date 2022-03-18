@@ -46,7 +46,7 @@ end
 function UniversalAutoloadPlayerTriggerEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
 		--print("PLAYER IN TRIGGER: "..tostring(self.inTrigger))
-		self.vehicle:updatePlayerTriggerState(self.player, self.inTrigger, true)
+		UniversalAutoload.updatePlayerTriggerState(self.vehicle, self.player, self.inTrigger, true)
 	end
 end
 

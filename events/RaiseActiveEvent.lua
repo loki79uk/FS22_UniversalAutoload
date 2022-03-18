@@ -36,7 +36,7 @@ end
 function UniversalAutoloadRaiseActiveEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
 		--print("RAISE ACTIVE "..tostring(self.inTrigger))
-		self.vehicle:forceRaiseActive(self.state, true)
+		UniversalAutoload.forceRaiseActive(self.vehicle, self.state, true)
 	end
 end
 

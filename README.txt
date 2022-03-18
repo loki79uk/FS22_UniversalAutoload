@@ -20,6 +20,11 @@
    · LODE KING Renown Drop Deck
    · Welger DK 115 (bale trailer)
 
+  SUPPORTED VEHCILES:
+   · Lizard Pickup 1986
+   · Lizard Pickup 2017
+   · Mahindra Retriever
+   · JohnDeer XUV865M
 
 ==============================================================
   PALLETS/CONTAINERS:

@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadSetContainerTypeEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:setContainerTypeIndex(self.typeIndex, true) 
+		UniversalAutoload.setContainerTypeIndex(self.vehicle, self.typeIndex, true) 
 	end
 end
 

@@ -25,7 +25,7 @@ end
 
 function UniversalAutoloadResetLoadingEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:resetLoadingState(true)
+		UniversalAutoload.resetLoadingState(self.vehicle, true)
 	end
 end
 

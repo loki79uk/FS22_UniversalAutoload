@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadSetMaterialTypeEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:setMaterialTypeIndex(self.typeIndex, true) 
+		UniversalAutoload.setMaterialTypeIndex(self.vehicle, self.typeIndex, true) 
 	end
 end
 

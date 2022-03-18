@@ -25,7 +25,7 @@ end
 
 function UniversalAutoloadStopLoadingEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:stopLoading(true)
+		UniversalAutoload.stopLoading(self.vehicle, true)
 	end
 end
 

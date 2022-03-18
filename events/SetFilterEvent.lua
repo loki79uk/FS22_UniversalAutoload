@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadSetFilterEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:setLoadingFilter(self.state, true)
+		UniversalAutoload.setLoadingFilter(self.vehicle, self.state, true)
 	end
 end
 

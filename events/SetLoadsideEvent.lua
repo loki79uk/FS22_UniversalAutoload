@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadSetLoadsideEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:setCurrentLoadside(self.loadside, true)
+		UniversalAutoload.setCurrentLoadside(self.vehicle, self.loadside, true)
 	end
 end
 

@@ -11,6 +11,7 @@
 		<ru>Универсальная автозагрузка</ru>
 		<nl>Universele Autoload</nl>
 		<cz>Univerzální Autoload</cz>
+		<pl>Universalne Autoładowanie</pl>
     </title>
 	
     <description>
@@ -49,6 +50,12 @@ Configured for the following trailers:
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
+
+Configured for the following vehicles:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
 ]]>
 </en>
 
@@ -86,7 +93,13 @@ Liste der kompatiblen Anhänger und Pritschen:
 - KRONE Trailer Profi Liner
 - Kröger PWO 24 (Standard)
 - LODE KING Renown Drop Deck
-- Welger DK 115 (Bale Trailer)
+- Welger DK 115 (Ballenpritsche)
+
+Liste der kompatiblen Fahrzeuge:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
 ]]>
 </de>
 
@@ -125,6 +138,12 @@ Liste des remorques et plateaux compatibles :
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
+
+Liste des véhicules compatibles :
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
 ]]>
 </fr>
 
@@ -164,9 +183,59 @@ Nakonfigurováno pro následující přívěsy:
 - LODE KING Renomovaný Drop Deck
 - Welger DK 115 (přívěs na balíky)
 
+Nakonfigurováno pro následující vozidla:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
+
 CZ překlad: SniperKittenCZ
 ]]>
 </cz>
+
+<pl><![CDATA[Specjalizacja autoloading dla przyczep z platformą. To automatycznie modyfikuje rzeczywiste zwiastuny gry podstawowej i zostanie zastosowane do wszystkich nowych lub istniejących zwiastunów na twojej farmie. Proszę zapoznać się z plikiem README, aby uzyskać instrukcje dotyczące dodawania do własnych przyczep lub palet z modami.
+Cechy:
+- Ładuje dowolne kompatybilne typy palet/kontenerów (patrz lista poniżej)
+- Instalowany automatycznie na dowolnych kompatybilnych przyczepach (patrz lista poniżej)
+- Załadunek i rozładunek według wybranego materiału lub typu kontenera
+- Może również ograniczyć załadunek tylko do pełnych palet
+- Wybierz „WSZYSTKIE”, aby kolejno załadować różne typy
+- Palety mieszane są ładowane w kolejności rozmiarów, aby zapewnić najlepszą wydajność pakowania
+- Może wchodzić w interakcje z przyczepami, gdy gracz jest na piechotę (nawet jeśli nie jest przymocowany do pojazdu)
+
+Specjalne funkcje „KRONE Trailer Profi Liner”
+- Załadunek / rozładunek dostępny tylko po stronie, po której kurtyna jest otwarta
+- Załadunek tylny bezpośrednio z wózka widłowego
+- Tylne drzwi i zasłony mogą być otwierane i zamykane przez gracza na piechotę
+
+Skonfigurowany dla następujących typów kontenerów:
+- Duże torby
+- Palety BigBag
+- Palety Euro
+- Zbiorniki na ciecz IBC
+- Bele Kwadratowe i Okrągłe
+
+Skonfigurowany dla następujących przyczep:
+- Brantner DD 24073/2 XXL (przyczepa do bel)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (standard)
+- Zrzut talii LODE KING Renown
+- Welger DK 115 (przyczepa do bel)
+
+Skonfigurowany dla następujących pojazdów:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
+
+TRANSLATION - PL by ELRICOFATAL
+]]>
+</pl>
 
     </description>
 	
@@ -247,6 +316,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Переключить загрузку</ru>
 			<nl>Laden starten/stoppen</nl>
 			<cz>Přepnout nakládání</cz>
+			<pl>Przełącz ładowanie</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -255,6 +325,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Разгрузка</ru>
 			<nl>Lossen</nl>
 			<cz>Vyložit</cz>
+			<pl>Rozładuj</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
@@ -263,6 +334,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Сменить сторону разгрузки</ru>
 			<nl>Schakelaar loszijde</nl>
 			<cz>Přepnout stranu vykládky</cz>
+			<pl>Przełącz stronę rozładunku</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
@@ -271,6 +343,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Переключить фильтр загрузки</ru>
 			<nl>Schakelaar laad filter</nl>
 			<cz>Přepnout filtr nakládky</cz>
+			<pl>Przełącz filtr ładowania</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -279,6 +352,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Изменить выбранный тип материала (след.)</ru>
 			<nl>Geselecteerd producttype wijzigen (volgende)</nl>
 			<cz>Změnit vybraný typ materiálu (další)</cz>
+			<pl>Zmień wybrany typ materiału (następny)</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
@@ -287,6 +361,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Изменить выбранный тип материала (пред.)</ru>
 			<nl>Geselecteerd producttype wijzigen (vorige)</nl>
 			<cz>Změnit vybraný typ materiálu (předchozí)</cz>
+			<pl>Zmień wybrany typ materiału (poprzedni)</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
@@ -295,6 +370,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Выбрать все типы материалов</ru>
 			<nl>Selecteer alle producttypes</nl>
 			<cz>Vyberte všechny typy materiálů</cz>
+			<pl>Wybierz wszystkie typy materiałów</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -303,6 +379,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Изменить выбранный тип контейнера (след.)</ru>
 			<nl>Geselecteerd containertype wijzigen (volgende)</nl>
 			<cz>Změnit vybraný typ kontejneru (další)</cz>
+			<pl>Zmień wybrany typ kontenera (następny)</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
@@ -311,6 +388,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Изменить выбранный тип контейнера (пред.)</ru>
 			<nl>Geselecteerd containertype wijzigen (vorige)</nl>
 			<cz>Změnit vybraný typ kontejneru (předchozí)</cz>
+			<pl>Zmień wybrany typ kontenera (poprzedni)</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
@@ -319,6 +397,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Выбрать все типы контейнеров</ru>
 			<nl>Selecteer alle containertypes</nl>
 			<cz>Vyberte všechny typy kontejnerů</cz>
+			<pl>Wybierz wszystkie typy kontenerów</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -327,6 +406,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Прикрепить/открепить ремни</ru>
 			<nl>Spanbanden vast-/losmaken</nl>
 			<cz>Zapnout/odepnout upínací pásy</cz>
+			<pl>Zapinanie/Odpinanie pasów napinających</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
@@ -335,6 +415,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Открыть/Закрыть заднюю дверь</ru>
 			<nl>Openen/sluiten achterdeur</nl>
 			<cz>Otevřít/zavřít zadní dveře</cz>
+			<pl>Otwórz/zamknij tylne drzwi</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
@@ -343,6 +424,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Открыть/Закрыть боковой тент</ru>
 			<nl>Openen/sluiten schuifzeil</nl>
 			<cz>Otevřít/zavřít boční závěs</cz>
+			<pl>Otwórz/zamknij kurtyny</pl>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
 			<en>Debug mode</en>
@@ -351,6 +433,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Режим отладки</ru>
 			<nl>Debug-modus</nl>
 			<cz>Režim ladění</cz>
+			<pl>Tryb Debugu</pl>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -360,6 +443,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Зона разгрузки занята. Пожалуйста, очистите зону разгрузки.</ru>
 			<nl>Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats.</nl>
 			<cz>Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky.</cz>
+			<pl>Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku.</pl>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
@@ -368,6 +452,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
 			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
 			<cz>Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku.</cz>
+			<pl>Żadne zgodne towary nie są dostępne do załadunku lub rozładunku.</pl>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
 			<en>Loading area is full. Unable to load any more items of this size.</en>
@@ -376,6 +461,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Загрузочное пространство заполнено. Невозможно загрузить больше предметов такого размера.</ru>
 			<nl>Laadruimte is vol. Kan geen items van deze grootte meer laden.</nl>
 			<cz>Ložná plocha je plná. Nelze načíst další položky této velikosti.</cz>
+			<pl>Jesteś Zapchany. Niemożna więcej załadować.</pl>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
@@ -384,6 +470,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться.</ru>
 			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
 			<cz>Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte.</cz>
+			<pl>Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz.</pl>
 		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
@@ -392,6 +479,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Сторона разгрузки</ru>
 			<nl>Loszijde</nl>
 			<cz>Vykládací strana</cz>
+			<pl>Strona rozładunku</pl>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
@@ -400,6 +488,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Слева</ru>
 			<nl>Links</nl>
 			<cz>Vlevo</cz>
+			<pl>Lewa</pl>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
@@ -408,6 +497,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Справа</ru>
 			<nl>Rechts</nl>
 			<cz>Vpravo</cz>
+			<pl>Prawa</pl>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
@@ -416,6 +506,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Нет</ru>
 			<nl>Niks</nl>
 			<cz>Nic</cz>
+			<pl>Żadna</pl>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
@@ -424,6 +515,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Фильтр загрузки</ru>
 			<nl>Laad filter</nl>
 			<cz>Filtr nakládky</cz>
+			<pl>Filtr ładowania</pl>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
@@ -432,6 +524,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Только полные</ru>
 			<nl>Alleen volle</nl>
 			<cz>Pouze plné</cz>
+			<pl>Tylko pełne</pl>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Any</en>
@@ -440,6 +533,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Любой</ru>
 			<nl>Alles</nl>
 			<cz>Vše</cz>
+			<pl>Każde</pl>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -448,6 +542,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Начать загрузку</ru>
 			<nl>Start laden</nl>
 			<cz>Začít nakládku</cz>
+			<pl>Rozpocznij ładowanie</pl>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
@@ -456,6 +551,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Остановить загрузку</ru>
 			<nl>Stop laden</nl>
 			<cz>Zastavit nakládku</cz>
+			<pl>Zatrzymaj ładowanie</pl>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
@@ -464,6 +560,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Разгрузка</ru>
 			<nl>Lossen</nl>
 			<cz>Vyložit</cz>
+			<pl>Rozładuj</pl>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
@@ -472,6 +569,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Тип материала</ru>
 			<nl>Producttype</nl>
 			<cz>Typ materiálu</cz>
+			<pl>Typ materiału</pl>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
@@ -480,6 +578,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Тип контейнера</ru>
 			<nl>Containertype</nl>
 			<cz>Typ kontejneru</cz>
+			<pl>Typ kontenera</pl>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
@@ -488,6 +587,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Все</ru>
 			<nl>Alles</nl>
 			<cz>Vše</cz>
+			<pl>Wszystko</pl>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
@@ -496,6 +596,7 @@ CZ překlad: SniperKittenCZ
 			<ru>IBC-бак</ru>
 			<nl>IBC VloeistofTank</nl>
 			<cz>IBC nádrž</cz>
+			<pl>Zbiornik Płynów</pl>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
@@ -504,6 +605,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Европоддон</ru>
 			<nl>Europallet</nl>
 			<cz>Europaleta</cz>
+			<pl>Euro Paleta</pl>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
@@ -512,6 +614,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Поддон Pioneer</ru>
 			<nl>Pioneer-pallet</nl>
 			<cz>Pioneer paleta</cz>
+			<pl>Pioneer Paleta</pl>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
@@ -520,6 +623,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Поддон Bigbag</ru>
 			<nl>Bigbag-pallet</nl>
 			<cz>Bigbag paleta</cz>
+			<pl>Bigbag Paleta</pl>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
@@ -528,6 +632,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Bigbag</ru>
 			<nl>Bigbag</nl>
 			<cz>Bigbag</cz>
+			<pl>Torba</pl>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
@@ -536,6 +641,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Ящик картофеля</ru>
 			<nl>Aardappelkist</nl>
 			<cz>Krabice brambor</cz>
+			<pl>Ziemnioki</pl>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
@@ -544,6 +650,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Тюк</ru>
 			<nl>Balen</nl>
 			<cz>Balík</cz>
+			<pl>Bele</pl>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
@@ -552,6 +659,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Круглый рулон</ru>
 			<nl>Ronde balen</nl>
 			<cz>Kulatý balík</cz>
+			<pl>Okrągłe bele</pl>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
@@ -560,6 +668,7 @@ CZ překlad: SniperKittenCZ
 			<ru>Квадратный тюк</ru>
 			<nl>Vierkante balen</nl>
 			<cz>Hranatý balík</cz>
+			<pl>Kańciaste bele</pl>
 		</text>
 	</l10n>
 

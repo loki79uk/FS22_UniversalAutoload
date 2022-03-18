@@ -28,7 +28,7 @@ end
 
 function UniversalAutoloadCycleContainerEvent:run(connection)
 	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
-		self.vehicle:cycleContainerTypeIndex(self.direction, true) 
+		UniversalAutoload.cycleContainerTypeIndex(self.vehicle, self.direction, true) 
 	end
 end
 

@@ -956,7 +956,7 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 
 	local validConfig = nil
 	
-	if selectedConfigs == nil then
+	if selectedConfigs == nil or selectedConfigs == "ALL" then
 		validConfig = "ALL CONFIGURATIONS"
 	else
 		local selectedConfigs = selectedConfigs:split(",")
@@ -1138,25 +1138,28 @@ function UniversalAutoload:onLoad(savegame)
 	if xmlFile ~= 0 then
 		if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
 
-			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
-			local selectedConfigs = config.selectedConfigs
-			local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
-			if validConfig ~= nil then
-				print("UniversalAutoload - supported vehicle: "..self:getFullName() )
-				-- define the loading area parameters from supported vehicles settings file
-				spec.loadArea = {}
-				spec.loadArea.width  = config.width
-				spec.loadArea.length = config.length
-				spec.loadArea.height = config.height
-				spec.loadArea.offset = config.offset	
-				spec.isCurtainTrailer = config.isCurtainTrailer
-				spec.enableRearLoading = config.enableRearLoading
-				spec.enableSideLoading = config.enableSideLoading
-				spec.noLoadingIfFolded = config.noLoadingIfFolded
-				spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
-				--spec.disableAutoStrap = config.disableAutoStrap
-				spec.showDebug = config.showDebug
+			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
+			for selectedConfigs, config in pairs(configGroup) do
+				local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
+				if validConfig ~= nil then
+					print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig)
+					-- define the loading area parameters from supported vehicles settings file
+					spec.loadArea = {}
+					spec.loadArea.width  = config.width
+					spec.loadArea.length = config.length
+					spec.loadArea.height = config.height
+					spec.loadArea.offset = config.offset	
+					spec.isCurtainTrailer = config.isCurtainTrailer
+					spec.enableRearLoading = config.enableRearLoading
+					spec.enableSideLoading = config.enableSideLoading
+					spec.noLoadingIfFolded = config.noLoadingIfFolded
+					spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
+					--spec.disableAutoStrap = config.disableAutoStrap
+					spec.showDebug = config.showDebug
+					break
+				end
 			end
+			
 		else
 			local i = 0
 			while true do

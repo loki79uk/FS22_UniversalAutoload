@@ -78,24 +78,33 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 			end
 
 			local configFileName = xmlFile:getValue(configKey.."#configFileName")
+			if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] == nil then
+				UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
+			end
+				
+			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
+			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs") or "ALL"
+			if configGroup[selectedConfigs] == nil then
+				configGroup[selectedConfigs] = {}
+				
+				local config = configGroup[selectedConfigs]
+				config.width  = xmlFile:getValue(configKey..".loadingArea#width")
+				config.length = xmlFile:getValue(configKey..".loadingArea#length")
+				config.height = xmlFile:getValue(configKey..".loadingArea#height")
+				config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
+				config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
+				config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
+				config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
+				config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
+				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+				--config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
+				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
+
+				print("  >> "..configFileName.." ("..selectedConfigs..")")
+			else
+				print("  CONFIG ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")")
+			end
 			
-			UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
-			local config = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
-			config.selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs")
-			config.width  = xmlFile:getValue(configKey..".loadingArea#width")
-			config.length = xmlFile:getValue(configKey..".loadingArea#length")
-			config.height = xmlFile:getValue(configKey..".loadingArea#height")
-			config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
-			config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
-			config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
-			config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
-			config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
-			config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
-			--config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
-			config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
-
-			print("  >> "..configFileName)
-
 			i = i + 1
 		end
 

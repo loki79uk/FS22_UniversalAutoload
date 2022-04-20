@@ -194,67 +194,126 @@ end
 function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnvironment)
 
 	if xmlFilename ~= nil and not string.find(xmlFilename, "multiPurchase") then	
-		-- print( "  >> " .. xmlFilename )
+		--print( "  >> " .. xmlFilename )
+		local loadedVehicleXML = false
 		local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
 
 		if xmlFile~=nil and xmlFile:hasProperty("vehicle.base") then
-			local i3d_path = xmlFile:getValue("vehicle.base.filename")
-			local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
-			
-			if i3d_name ~= nil then
-				local name
-				if customEnvironment == nil then
-					name = i3d_name
-				else
-					name = customEnvironment..":"..i3d_name
-				end
-				
-				if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] == nil then
-				
-					local category = xmlFile:getValue("vehicle.storeData.category", "NONE")
-					local width = xmlFile:getValue("vehicle.base.size#width", 1.5)
-					local height = xmlFile:getValue("vehicle.base.size#height", 1.5)
-					local length = xmlFile:getValue("vehicle.base.size#length", 1.5)
-					
-					local containerType
-					if string.find(i3d_name, "liquidTank") or string.find(i3d_name, "IBC") then containerType = "LIQUID_TANK"
-					elseif string.find(i3d_name, "bigBag") or string.find(i3d_name, "BigBag") then containerType = "BIGBAG"
-					elseif string.find(i3d_name, "pallet") or string.find(i3d_name, "Pallet") then containerType = "EURO_PALLET"
-					elseif category == "pallets" then containerType = "EURO_PALLET"
-					elseif category == "bigbags" then containerType = "BIGBAG"
-					elseif category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
-					else
-						containerType = "ALL"
-						print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category)
-					end
-
-					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
-					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-					newType.name = name
-					newType.type = containerType or "ALL"
-					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
-					newType.sizeX = width
-					newType.sizeY = height
-					newType.sizeZ = length
-					newType.isBale = false
-					newType.flipYZ = false
-					newType.neverStack = (containerType == "BIGBAG") or false
-					newType.neverRotate = false
-					newType.alwaysRotate = false
-					newType.width = math.min(newType.sizeX, newType.sizeZ)
-					newType.length = math.max(newType.sizeX, newType.sizeZ)
-						
-					print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
-						newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
-						
-				end
-			end
+			loadedVehicleXML = true
+			UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
 		end
 		xmlFile:delete()
+		
+		if not loadedVehicleXML then
+			xmlFile = XMLFile.load("baleConfigXml", xmlFilename, BaleManager.baleXMLSchema)
+			if xmlFile~=nil and xmlFile:hasProperty("bale") then
+				UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
+			end
+			xmlFile:delete()
+		end
+		
 	end
 end
 --
+function UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
+	
+	local i3d_path = xmlFile:getValue("vehicle.base.filename")
+	local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+	
+	if i3d_name ~= nil then
+		local name
+		if customEnvironment == nil then
+			name = i3d_name
+		else
+			name = customEnvironment..":"..i3d_name
+		end
+		
+		if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] == nil then
+		
+			local category = xmlFile:getValue("vehicle.storeData.category", "NONE")
+			local width = xmlFile:getValue("vehicle.base.size#width", 1.5)
+			local height = xmlFile:getValue("vehicle.base.size#height", 1.5)
+			local length = xmlFile:getValue("vehicle.base.size#length", 1.5)
+			
+			local containerType
+			if string.find(i3d_name, "liquidTank") or string.find(i3d_name, "IBC") then containerType = "LIQUID_TANK"
+			elseif string.find(i3d_name, "bigBag") or string.find(i3d_name, "BigBag") then containerType = "BIGBAG"
+			elseif string.find(i3d_name, "pallet") or string.find(i3d_name, "Pallet") then containerType = "EURO_PALLET"
+			elseif category == "pallets" then containerType = "EURO_PALLET"
+			elseif category == "bigbags" then containerType = "BIGBAG"
+			elseif category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
+			else
+				containerType = "ALL"
+				print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category)
+			end
 
+			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
+			newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+			newType.name = name
+			newType.type = containerType or "ALL"
+			newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
+			newType.sizeX = width
+			newType.sizeY = height
+			newType.sizeZ = length
+			newType.isBale = false
+			newType.flipYZ = false
+			newType.neverStack = (containerType == "BIGBAG") or false
+			newType.neverRotate = false
+			newType.alwaysRotate = false
+			newType.width = math.min(newType.sizeX, newType.sizeZ)
+			newType.length = math.max(newType.sizeX, newType.sizeZ)
+				
+			print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
+				newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
+				
+		end
+	end
+end
+--
+function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
+	
+	local i3d_path = xmlFile:getValue("bale.filename")
+	local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+	
+	if i3d_name ~= nil then
+		local name
+		if customEnvironment == nil then
+			name = i3d_name
+		else
+			name = customEnvironment..":"..i3d_name
+		end
+		
+		if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] == nil then
+		
+			local containerType = "BALE"
+			local width = xmlFile:getValue("bale.size#width", 1.5)
+			local height = xmlFile:getValue("bale.size#height", 1.5)
+			local length = xmlFile:getValue("bale.size#length", 2.4)
+			local isRoundbale = xmlFile:getValue("bale.size#isRoundbale", "false")
+
+			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
+			newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+			newType.name = name
+			newType.type = containerType
+			newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
+			newType.sizeX = width
+			newType.sizeY = height
+			newType.sizeZ = length
+			newType.isBale = true
+			newType.flipYZ = isRoundbale
+			newType.neverStack = false
+			newType.neverRotate = false
+			newType.alwaysRotate = false
+			newType.width = math.min(newType.sizeX, newType.sizeZ)
+			newType.length = math.max(newType.sizeX, newType.sizeZ)
+				
+			print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
+				newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
+				
+		end
+	end
+end
+--
 function UniversalAutoload.detectKeybindingConflicts()
 	--DETECT 'T' KEYS CONFLICT
 	if g_currentMission.missionDynamicInfo.isMultiplayer and not g_dedicatedServer then

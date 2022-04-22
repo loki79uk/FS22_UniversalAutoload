@@ -124,10 +124,10 @@ function UniversalAutoload.removeEventListeners(vehicleType)
     -- SpecializationUtil.removeEventListener(vehicleType, "onDelete", UniversalAutoload)
     -- SpecializationUtil.removeEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	
-	SpecializationUtil.removeEventListener(vehicleType, "onUpdate", UniversalAutoload)
-	SpecializationUtil.removeEventListener(vehicleType, "onActivate", UniversalAutoload)
-	SpecializationUtil.removeEventListener(vehicleType, "onDeactivate", UniversalAutoload)
-	SpecializationUtil.removeEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
+	-- SpecializationUtil.removeEventListener(vehicleType, "onUpdate", UniversalAutoload)
+	-- SpecializationUtil.removeEventListener(vehicleType, "onActivate", UniversalAutoload)
+	-- SpecializationUtil.removeEventListener(vehicleType, "onDeactivate", UniversalAutoload)
+	-- SpecializationUtil.removeEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
 end
 
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS

@@ -202,7 +202,7 @@ function UniversalAutoload:updateActionEventKeys()
 	if self.isClient then
 		local spec = self.spec_universalAutoload
 		
-		if spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
+		if spec.isAutoloadEnabled and spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
 			-- print("updateActionEventKeys: "..self:getFullName())
 			local actions = UniversalAutoload.ACTIONS
 			local ignoreCollisions = true
@@ -309,7 +309,7 @@ end
 function UniversalAutoload:updateToggleBeltsActionEvent()
 	local spec = self.spec_universalAutoload
 	
-	if spec.toggleBeltsActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.toggleBeltsActionEventId ~= nil then
 
 		g_inputBinding:setActionEventActive(spec.toggleBeltsActionEventId, true)
 		
@@ -329,7 +329,7 @@ function UniversalAutoload:updateToggleDoorActionEvent()
 	local spec = self.spec_universalAutoload
 	local foldable = self.spec_foldable
 	
-	if #foldable.foldingParts > 0 then
+	if spec.isAutoloadEnabled and #foldable.foldingParts > 0 then
 		local toggleDoorText = ""
 		local foldingPart = foldable.foldingParts[1]
 		if self:getIsAnimationPlaying(foldingPart.animationName) then
@@ -353,7 +353,7 @@ function UniversalAutoload:updateToggleCurtainActionEvent()
 	local trailer = self.spec_trailer
 	local tipSide = trailer.tipSides[trailer.preferedTipSideIndex]
 	
-	if tipSide ~= nil then
+	if spec.isAutoloadEnabled and tipSide ~= nil then
 		local toggleCurtainText = nil
 		local tipState = self:getTipState()
 		if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
@@ -369,7 +369,7 @@ end
 --
 function UniversalAutoload:updateCycleMaterialActionEvent()
 	local spec = self.spec_universalAutoload
-	if spec.cycleMaterialActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.cycleMaterialActionEventId ~= nil then
 		-- Material Type: ALL / <MATERIAL>
 		if not spec.isLoading then
 			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.getSelectedMaterialText(self)
@@ -382,7 +382,7 @@ end
 --
 function UniversalAutoload:updateCycleContainerActionEvent()
 	local spec = self.spec_universalAutoload
-	if spec.cycleContainerActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.cycleContainerActionEventId ~= nil then
 		-- Container Type: ALL / <PALLET_TYPE>
 		if not spec.isLoading then
 			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..UniversalAutoload.getSelectedContainerText(self)
@@ -394,7 +394,7 @@ end
 --
 function UniversalAutoload:updateToggleFilterActionEvent()
 	local spec = self.spec_universalAutoload
-	if spec.toggleLoadingFilterActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.toggleLoadingFilterActionEventId ~= nil then
 		-- Loading Filter: ANY / FULL ONLY
 		local loadingFilterText
 		if spec.currentLoadingFilter then
@@ -409,12 +409,12 @@ end
 --
 function UniversalAutoload:updateToggleTipsideActionEvent()
 	local spec = self.spec_universalAutoload
-	if spec.toggleTipsideActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.toggleTipsideActionEventId ~= nil then
 		-- Tipside: NONE/BOTH/LEFT/RIGHT/
 		if spec.currentTipside == "none" then
 			g_inputBinding:setActionEventActive(spec.toggleTipsideActionEventId, false)
 		else
-			local tipsideText = g_i18n:getText("universalAutoload_tipside")..": "..g_i18n:getText("universalAutoload_"..spec.currentTipside)
+			local tipsideText = g_i18n:getText("universalAutoload_tipside")..": "..g_i18n:getText("universalAutoload_"..(spec.currentTipside or "none"))
 			g_inputBinding:setActionEventText(spec.toggleTipsideActionEventId, tipsideText)
 			g_inputBinding:setActionEventTextVisibility(spec.toggleTipsideActionEventId, true)
 		end
@@ -424,7 +424,7 @@ end
 function UniversalAutoload:updateToggleLoadingActionEvent()
 	local spec = self.spec_universalAutoload
 	
-	if spec.toggleLoadingActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.toggleLoadingActionEventId ~= nil then
 		-- Activate/Deactivate the LOAD key binding
 		-- print("UPDATE LOADING ACTION EVENT")
 		if spec.isLoading then
@@ -446,7 +446,7 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 		end
 	end
 
-	if spec.unloadAllActionEventId ~= nil then
+	if spec.isAutoloadEnabled and spec.unloadAllActionEventId ~= nil then
 		-- Activate/Deactivate the UNLOAD key binding
 		if spec.doPostLoadDelay or spec.isLoading or spec.isUnloading or
 		   spec.validUnloadCount == 0 or spec.currentTipside == "none"
@@ -1138,19 +1138,28 @@ function UniversalAutoload:onLoad(savegame)
 
 	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
+	spec.isAutoloadEnabled = false
 
 	local configFileName = self.configFileName
 	local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
 
 	if self.customEnvironment ~= nil then
+	
+		-- local directory = g_modNameToDirectory[self.customEnvironment]
+		-- print("directory:       " .. directory)
+		-- print("g_modsDirectory: " .. g_modsDirectory)
+		-- configFileName = self.customEnvironment .. "/" .. configFileName:gsub(directory, "")
+		
+		--print("configFileName:    " .. configFileName)
 		configFileName = configFileName:gsub(g_modsDirectory, "")
 	end
 	
 	if xmlFile ~= 0 then
 		if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
-
+			-- print("EXISTS: " .. configFileName)
 			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
 			for selectedConfigs, config in pairs(configGroup) do
+				-- DebugUtil.printTableRecursively(config, "--", 0, 1)
 				local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
 				if validConfig ~= nil then
 					print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig)
@@ -1172,6 +1181,7 @@ function UniversalAutoload:onLoad(savegame)
 			end
 			
 		else
+			-- print("LOOK IN XML: " .. configFileName)
 			local i = 0
 			while true do
 				local key = string.format("vehicle.universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
@@ -1208,9 +1218,10 @@ function UniversalAutoload:onLoad(savegame)
 	end
 	
 	if  spec.loadArea ~= nil and spec.loadArea.width ~= nil and spec.loadArea.length ~= nil and spec.loadArea.height ~= nil and spec.loadArea.offset ~= nil then
+		print("UNIVERSAL AUTOLOAD - SETTINGS FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = true
 	else
-		-- print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
+		print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = false
 		return
 	end
@@ -1405,31 +1416,29 @@ function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil and self.spec_universalAutoload ~= nil then
 		local spec = self.spec_universalAutoload
 		
-		if not spec.isAutoloadEnabled then
-            return
-        end
-
-        if savegame.resetVehicles then
-			--client+server
-            spec.currentTipside = "left"
-            spec.currentLoadside = "both"
-			spec.currentMaterialIndex = 1
-			spec.currentContainerIndex = 1
-			spec.currentLoadingFilter = true
-		else
-			--client+server
-            spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
-            spec.currentLoadside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadside", "both")
-			spec.currentMaterialIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#materialIndex", 1)
-			spec.currentContainerIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#containerIndex", 1)
-			spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
-			--server only
-			spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
-			spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
-			spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
-			spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
-			spec.resetLoadingPattern = false
-        end
+		if spec.isAutoloadEnabled then
+			if savegame.resetVehicles then
+				--client+server
+				spec.currentTipside = "left"
+				spec.currentLoadside = "both"
+				spec.currentMaterialIndex = 1
+				spec.currentContainerIndex = 1
+				spec.currentLoadingFilter = true
+			else
+				--client+server
+				spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
+				spec.currentLoadside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadside", "both")
+				spec.currentMaterialIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#materialIndex", 1)
+				spec.currentContainerIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#containerIndex", 1)
+				spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
+				--server only
+				spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
+				spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
+				spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
+				spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
+				spec.resetLoadingPattern = false
+			end
+		end
 	
 	end
 end
@@ -1579,7 +1588,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		return
 	end
 	
-	if self.isServer then
+	if spec.isAutoloadEnabled and self.isServer then
 
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then

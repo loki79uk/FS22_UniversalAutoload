@@ -5,6 +5,7 @@ UniversalAutoload = {}
 
 UniversalAutoload.name = g_currentModName
 UniversalAutoload.path = g_currentModDirectory
+UniversalAutoload.specName = ("spec_%s.universalAutoload"):format(g_currentModName)
 UniversalAutoload.debugEnabled = false
 UniversalAutoload.delayTime = 200
 
@@ -114,6 +115,15 @@ function UniversalAutoload.registerEventListeners(vehicleType)
 end
 --
 function UniversalAutoload.removeEventListeners(vehicleType)
+
+    -- SpecializationUtil.removeEventListener(vehicleType, "onLoad", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onPostLoad", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onReadStream", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onWriteStream", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onDelete", UniversalAutoload)
+    -- SpecializationUtil.removeEventListener(vehicleType, "onPreDelete", UniversalAutoload)
+	
 	SpecializationUtil.removeEventListener(vehicleType, "onUpdate", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onActivate", UniversalAutoload)
 	SpecializationUtil.removeEventListener(vehicleType, "onDeactivate", UniversalAutoload)
@@ -277,8 +287,8 @@ function UniversalAutoload:updateActionEventKeys()
 			if self.isServer then
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DEBUG, self, UniversalAutoload.actionEventToggleDebug, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
-				spec.toggleCurtainActionEventId = actionEventId
-				-- print("SELECT_ALL_MATERIALS: "..tostring(valid))
+				-- spec.toggleDebugActionEventId = actionEventId
+				-- print("TOGGLE_DEBUG: "..tostring(valid))
 			end
 
 			UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -1125,7 +1135,8 @@ end
 
 -- MAIN "ON LOAD" INITIALISATION FUNCTION
 function UniversalAutoload:onLoad(savegame)
-	self.spec_universalAutoload = {}
+
+	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
 
 	local configFileName = self.configFileName
@@ -1201,7 +1212,6 @@ function UniversalAutoload:onLoad(savegame)
 	else
 		-- print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = false
-		UniversalAutoload.removeEventListeners(self)
 		return
 	end
 
@@ -1562,6 +1572,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	local spec = self.spec_universalAutoload
 	
 	if not spec.isAutoloadEnabled then
+		if not spec.removedEventListeners then
+			spec.removedEventListeners = true
+			UniversalAutoload.removeEventListeners(self)
+		end
 		return
 	end
 	

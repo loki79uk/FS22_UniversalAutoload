@@ -6,15 +6,13 @@
 UniversalAutoloadManager = {}
 addModEventListener(UniversalAutoloadManager)
 
-local modName = g_currentModName or ""
-
 -- specialisation
-g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), nil)
+g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), "")
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
     -- Anything with tension belts could potentially require autoload
     if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
-        g_vehicleTypeManager:addSpecialization(vehicleName, modName .. '.universalAutoload')
+        g_vehicleTypeManager:addSpecialization(vehicleName, g_currentModName .. '.universalAutoload')
     end
 end
 

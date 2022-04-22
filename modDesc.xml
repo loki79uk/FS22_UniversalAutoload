@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="64">
+<modDesc descVersion="65">
 
     <author>loki_79</author>
-    <version>1.0.1.0</version>
+    <version>1.0.2.0</version>
 	
     <title>
         <en>Universal Autoload</en>

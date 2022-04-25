@@ -309,6 +309,15 @@ TRANSLATION - PL by ELRICOFATAL
 	</inputBinding>
 	
 	<l10n>
+		<text name="configuration_universalAutoload">
+			<en>Universal Autoload</en>
+			<de>Universal Autoload</de>
+			<fr>Autoload Universel</fr>
+			<ru>Универсальная автозагрузка</ru>
+			<nl>Universele Autoload</nl>
+			<cz>Univerzální Autoload</cz>
+			<pl>Universalne Autoładowanie</pl>
+		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
 			<en>Toggle loading</en>
 			<de>Laden umschalten</de>

@@ -69,17 +69,19 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverStack", "Should never load another pallet on top of this one when loading", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverRotate", "Should never rotate object when loading", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
-	
-    local schemaSavegame = Vehicle.xmlSchemaSavegame
-    schemaSavegame:register(XMLValueType.STRING, "vehicles.vehicle(?).universalAutoload#tipside", "Last used tip side", "none")
-    schemaSavegame:register(XMLValueType.STRING, "vehicles.vehicle(?).universalAutoload#loadside", "Last used load side", "both")
-    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadWidth", "Last used load width", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadLength", "Last used load length", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#loadHeight", "Last used load height", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?).universalAutoload#actualWidth", "Last used total load width", 0)
-    schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#materialIndex", "Last used material type", 1)
-    schemaSavegame:register(XMLValueType.INT, "vehicles.vehicle(?).universalAutoload#containerIndex", "Last used container type", 1)
-    schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?).universalAutoload#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
+
+	local schemaSavegame = Vehicle.xmlSchemaSavegame
+	--local specKey = "vehicles.vehicle(?)." .. UniversalAutoload.specName
+	local specKey = "vehicles.vehicle(?).universalAutoload"
+    schemaSavegame:register(XMLValueType.STRING, specKey.."#tipside", "Last used tip side", "none")
+    schemaSavegame:register(XMLValueType.STRING, specKey.."#loadside", "Last used load side", "both")
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadWidth", "Last used load width", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadLength", "Last used load length", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadHeight", "Last used load height", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used total load width", 0)
+    schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
+    schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
+    schemaSavegame:register(XMLValueType.BOOL, specKey.."#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
 
 end
 --
@@ -1218,10 +1220,10 @@ function UniversalAutoload:onLoad(savegame)
 	end
 	
 	if  spec.loadArea ~= nil and spec.loadArea.width ~= nil and spec.loadArea.length ~= nil and spec.loadArea.height ~= nil and spec.loadArea.offset ~= nil then
-		print("UNIVERSAL AUTOLOAD - SETTINGS FOUND FOR '"..self:getFullName().."'")
+		-- print("UNIVERSAL AUTOLOAD - SETTINGS FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = true
 	else
-		print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
+		-- print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = false
 		return
 	end
@@ -1455,17 +1457,19 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 				spec.currentLoadLength = 0
 			end
 		
+			-- HACK (FOR NOW) - need to find out if this can be avoided..
+			local correctedKey = key:gsub(UniversalAutoload.name..".", "")
 			--client+server
-			xmlFile:setValue(key.."#tipside", spec.currentTipside)
-			xmlFile:setValue(key.."#loadside", spec.currentLoadside)
-			xmlFile:setValue(key.."#materialIndex", spec.currentMaterialIndex)
-			xmlFile:setValue(key.."#containerIndex", spec.currentContainerIndex)
-			xmlFile:setValue(key.."#loadingFilter", spec.currentLoadingFilter)
+			xmlFile:setValue(correctedKey.."#tipside", spec.currentTipside)
+			xmlFile:setValue(correctedKey.."#loadside", spec.currentLoadside)
+			xmlFile:setValue(correctedKey.."#materialIndex", spec.currentMaterialIndex)
+			xmlFile:setValue(correctedKey.."#containerIndex", spec.currentContainerIndex)
+			xmlFile:setValue(correctedKey.."#loadingFilter", spec.currentLoadingFilter)
 			--server only
-			xmlFile:setValue(key.."#loadWidth", spec.currentLoadWidth)
-			xmlFile:setValue(key.."#loadHeight", spec.currentLoadHeight)
-			xmlFile:setValue(key.."#loadLength", spec.currentLoadLength)
-			xmlFile:setValue(key.."#actualWidth", spec.currentActualWidth)
+			xmlFile:setValue(correctedKey.."#loadWidth", spec.currentLoadWidth)
+			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight)
+			xmlFile:setValue(correctedKey.."#loadLength", spec.currentLoadLength)
+			xmlFile:setValue(correctedKey.."#actualWidth", spec.currentActualWidth)
 		end
 	end
 end

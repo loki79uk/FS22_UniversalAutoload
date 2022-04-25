@@ -1715,6 +1715,7 @@ end
 --
 function UniversalAutoload:onActivate(isControlling)
 	-- print("onActivate: "..self:getFullName())
+	local spec = self.spec_universalAutoload
 	if spec.isAutoloadEnabled and self.isServer then
 		UniversalAutoload.forceRaiseActive(self, true)
 	end

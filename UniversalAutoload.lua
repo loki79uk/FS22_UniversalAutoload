@@ -1496,7 +1496,7 @@ function UniversalAutoload:onDelete()
 	if UniversalAutoload.VEHICLES[self] ~= nil then
 		UniversalAutoload.VEHICLES[self] = nil
 	end
-    if self.isServer then
+    if spec.isAutoloadEnabled and self.isServer then
         if spec.triggers ~= nil then
 			for _, trigger in pairs(spec.triggers) do
 				removeTrigger(trigger.node)
@@ -1509,7 +1509,7 @@ end
 -- SET FOLDING STATE FLAG ON FOLDING STATE CHANGE
 function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	--if self.isClient and g_dedicatedServer==nil then
-	if self.isServer then
+	if spec.isAutoloadEnabled and self.isServer then
 		local spec = self.spec_universalAutoload
 		-- print("onFoldStateChanged: "..self:getFullName())
 		spec.foldAnimationStarted = true
@@ -1715,7 +1715,7 @@ end
 --
 function UniversalAutoload:onActivate(isControlling)
 	-- print("onActivate: "..self:getFullName())
-	if self.isServer then
+	if spec.isAutoloadEnabled and self.isServer then
 		UniversalAutoload.forceRaiseActive(self, true)
 	end
 end
@@ -1723,7 +1723,7 @@ end
 function UniversalAutoload:onDeactivate()
 	-- print("onDeactivate: "..self:getFullName())
 	local spec = self.spec_universalAutoload
-	if self.isServer then
+	if spec.isAutoloadEnabled and self.isServer then
 		UniversalAutoload.forceRaiseActive(self, false)
 	end
 	UniversalAutoload:clearActionEvents(self)
@@ -1734,7 +1734,7 @@ function UniversalAutoload:determineTipside()
 	local spec = self.spec_universalAutoload
 
 	--<trailer tipSideIndex="1" doorState="false" tipAnimationTime="1.000000" tipState="2"/>
-	if spec.isCurtainTrailer and self.spec_trailer ~= nil then
+	if spec.isAutoloadEnabled and spec.isCurtainTrailer and self.spec_trailer ~= nil then
 		if self.spec_trailer.tipState == 2 then
 			local tipSide = self.spec_trailer.tipSides[self.spec_trailer.currentTipSideIndex]
 			

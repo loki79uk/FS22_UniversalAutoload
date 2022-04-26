@@ -2,7 +2,7 @@
 <modDesc descVersion="65">
 
     <author>loki_79</author>
-    <version>1.0.1.4</version>
+    <version>1.0.2.0</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -56,6 +56,9 @@ Configured for the following vehicles:
 - Lizard Pickup 2017
 - Mahindra Retriever
 - JohnDeer XUV865M
+
+Changelog:
+v1.0.2.0 - Updated to work with 1.4.1.0
 ]]>
 </en>
 
@@ -100,6 +103,9 @@ Liste der kompatiblen Fahrzeuge:
 - Lizard Pickup 2017
 - Mahindra Retriever
 - JohnDeer XUV865M
+
+Changelog:
+v1.0.2.0 - Aktualisiert für die Verwendung mit 1.4.1.0
 ]]>
 </de>
 
@@ -144,6 +150,9 @@ Liste des véhicules compatibles :
 - Lizard Pickup 2017
 - Mahindra Retriever
 - JohnDeer XUV865M
+
+Changelog:
+v1.0.2.0 - Mis à jour pour fonctionner avec la version 1.4.1.0
 ]]>
 </fr>
 
@@ -189,6 +198,9 @@ Nakonfigurováno pro následující vozidla:
 - Mahindra Retriever
 - JohnDeer XUV865M
 
+Changelog:
+v1.0.2.0 - Aktualizováno pro práci s verzí 1.4.1.0
+
 CZ překlad: SniperKittenCZ
 ]]>
 </cz>
@@ -232,6 +244,9 @@ Skonfigurowany dla następujących pojazdów:
 - Lizard Pickup 2017
 - Mahindra Retriever
 - JohnDeer XUV865M
+
+Changelog:
+v1.0.2.0 - Zaktualizowano do pracy z wersją 1.4.1.0
 
 TRANSLATION - PL by ELRICOFATAL
 ]]>

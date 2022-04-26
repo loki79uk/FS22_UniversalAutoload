@@ -1509,6 +1509,7 @@ end
 -- SET FOLDING STATE FLAG ON FOLDING STATE CHANGE
 function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	--if self.isClient and g_dedicatedServer==nil then
+    local spec = self.spec_universalAutoload
 	if spec.isAutoloadEnabled and self.isServer then
 		local spec = self.spec_universalAutoload
 		-- print("onFoldStateChanged: "..self:getFullName())

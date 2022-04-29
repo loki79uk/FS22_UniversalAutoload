@@ -2,13 +2,13 @@
 <modDesc descVersion="65">
 
     <author>loki_79</author>
-    <version>1.0.2.0</version>
+    <version>1.0.2.1</version>
 	
     <title>
         <en>Universal Autoload</en>
-		<de>Universal Autoload</de>
+		<!-- <de>Universal Autoload</de> -->
 		<fr>Autoload Universel</fr>
-		<ru>Универсальная автозагрузка</ru>
+		<ru>Универсальная Автозагрузка</ru>
 		<nl>Universele Autoload</nl>
 		<cz>Univerzální Autoload</cz>
 		<pl>Universalne Autoładowanie</pl>

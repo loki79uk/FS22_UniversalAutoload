@@ -1460,16 +1460,16 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			-- HACK (FOR NOW) - need to find out if this can be avoided..
 			local correctedKey = key:gsub(UniversalAutoload.name..".", "")
 			--client+server
-			xmlFile:setValue(correctedKey.."#tipside", spec.currentTipside)
-			xmlFile:setValue(correctedKey.."#loadside", spec.currentLoadside)
-			xmlFile:setValue(correctedKey.."#materialIndex", spec.currentMaterialIndex)
-			xmlFile:setValue(correctedKey.."#containerIndex", spec.currentContainerIndex)
-			xmlFile:setValue(correctedKey.."#loadingFilter", spec.currentLoadingFilter)
+			xmlFile:setValue(correctedKey.."#tipside", spec.currentTipside or "left")
+			xmlFile:setValue(correctedKey.."#loadside", spec.currentLoadside or "both")
+			xmlFile:setValue(correctedKey.."#materialIndex", spec.currentMaterialIndex or 1)
+			xmlFile:setValue(correctedKey.."#containerIndex", spec.currentContainerIndex or 1)
+			xmlFile:setValue(correctedKey.."#loadingFilter", spec.currentLoadingFilter or true)
 			--server only
-			xmlFile:setValue(correctedKey.."#loadWidth", spec.currentLoadWidth)
-			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight)
-			xmlFile:setValue(correctedKey.."#loadLength", spec.currentLoadLength)
-			xmlFile:setValue(correctedKey.."#actualWidth", spec.currentActualWidth)
+			xmlFile:setValue(correctedKey.."#loadWidth", spec.currentLoadWidth or 0)
+			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight or 0)
+			xmlFile:setValue(correctedKey.."#loadLength", spec.currentLoadLength or 0)
+			xmlFile:setValue(correctedKey.."#actualWidth", spec.currentActualWidth or 0)
 		end
 	end
 end

@@ -12,6 +12,7 @@
 		<nl>Universele Autoload</nl>
 		<cz>Univerzální Autoload</cz>
 		<pl>Universalne Autoładowanie</pl>
+		<es>Autoload Universal</es>
     </title>
 	
     <description>
@@ -251,7 +252,54 @@ v1.0.2.0 - Zaktualizowano do pracy z wersją 1.4.1.0
 TRANSLATION - PL by ELRICOFATAL
 ]]>
 </pl>
+<es><![CDATA[Especialización autoload para tráilers. Modifica automáticamente los tráilers del juego base, y se aplica a cualquier existente o nuevo. Por favor consulte el archivo README para instrucciones o para añadir este mod a tus propios tráilers o palés.
 
+Características:
+- Carga cualquier palé/contenedor compatible (ver lista abajo)
+- Instalado automáticamente en cualquier tráiler compatible (ver lista abajo)
+- Carga y descarga por material seleccionado o por tipo de contenedor
+- Se puede restringir para cargar solo palés
+- Seleccionar 'TODO' para cargar tipos distintos secuencialmente
+- Los contenedores distintos se cargan en orden para mayor eficiencia
+- Se puede interactuar con el tráiler cuando el jugador va a pié (incluso sin vehículo conectado)
+
+Características especiales para el 'Krone Trailer Profi Liner'
+- Carga/Descarga solo disponible desde el lado con la cortina abierta
+- Carga desde la puerta trasera directamente con la carretilla elevadora
+- Puerta de atras y cortina se pueden abrir y cerrar con el jugador a pié
+
+Configurado para los siguientes tipos de contenedor:
+- Sacos grandes
+- Palés de saco grande
+- Palés
+- IBC Palé de líquido
+- Pacas cuadradas
+- Cajas de patata (mod necesario: Seed Potato Pack)
+
+Configurado para los siguientes tráilers:
+- Brantner DD 24073/2 XXL (carga de pacas)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (standard)
+- LODE KING Renown Drop Deck
+- Welger DK 115 (carga de pacas)
+
+Configurado para los siguientes vehículos:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
+
+Changelog:
+v1.0.2.0 - Actualizado para funcionar en 1.4.1.0
+
+TRANSLATION - ES by Aphroo7
+]]>
+</es>
     </description>
 	
 	<multiplayer supported="true" />
@@ -332,6 +380,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Universele Autoload</nl>
 			<cz>Univerzální Autoload</cz>
 			<pl>Universalne Autoładowanie</pl>
+			<es>Autoload Universal</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
 			<en>Toggle loading</en>
@@ -341,6 +390,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Laden starten/stoppen</nl>
 			<cz>Přepnout nakládání</cz>
 			<pl>Przełącz ładowanie</pl>
+			<es>Cambiar carga/descarga</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -350,6 +400,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Lossen</nl>
 			<cz>Vyložit</cz>
 			<pl>Rozładuj</pl>
+			<es>Descargar</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
@@ -359,6 +410,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Schakelaar loszijde</nl>
 			<cz>Přepnout stranu vykládky</cz>
 			<pl>Przełącz stronę rozładunku</pl>
+			<es>Cambiar lado de descarga</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
@@ -368,6 +420,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Schakelaar laad filter</nl>
 			<cz>Přepnout filtr nakládky</cz>
 			<pl>Przełącz filtr ładowania</pl>
+			<es>Cambiar filtro de carga</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -377,6 +430,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Geselecteerd producttype wijzigen (volgende)</nl>
 			<cz>Změnit vybraný typ materiálu (další)</cz>
 			<pl>Zmień wybrany typ materiału (następny)</pl>
+			<es>Cambiar material seleccionado (siguiente)</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
@@ -386,6 +440,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Geselecteerd producttype wijzigen (vorige)</nl>
 			<cz>Změnit vybraný typ materiálu (předchozí)</cz>
 			<pl>Zmień wybrany typ materiału (poprzedni)</pl>
+			<es>Cambiar material seleccionado (anterior)</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
@@ -395,6 +450,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Selecteer alle producttypes</nl>
 			<cz>Vyberte všechny typy materiálů</cz>
 			<pl>Wybierz wszystkie typy materiałów</pl>
+			<es>Seleccionar todos los materiales</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -404,6 +460,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Geselecteerd containertype wijzigen (volgende)</nl>
 			<cz>Změnit vybraný typ kontejneru (další)</cz>
 			<pl>Zmień wybrany typ kontenera (następny)</pl>
+			<es>Cambiar tipo de contenedor (siguiente)</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
@@ -413,6 +470,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Geselecteerd containertype wijzigen (vorige)</nl>
 			<cz>Změnit vybraný typ kontejneru (předchozí)</cz>
 			<pl>Zmień wybrany typ kontenera (poprzedni)</pl>
+			<es>Cambiar tipo de contenedor (anterior)</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
@@ -422,6 +480,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Selecteer alle containertypes</nl>
 			<cz>Vyberte všechny typy kontejnerů</cz>
 			<pl>Wybierz wszystkie typy kontenerów</pl>
+			<es>Todos los tipos de contenedor</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -431,6 +490,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Spanbanden vast-/losmaken</nl>
 			<cz>Zapnout/odepnout upínací pásy</cz>
 			<pl>Zapinanie/Odpinanie pasów napinających</pl>
+			<es>Soltar/Sujetar cintas tensoras </es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
@@ -440,6 +500,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Openen/sluiten achterdeur</nl>
 			<cz>Otevřít/zavřít zadní dveře</cz>
 			<pl>Otwórz/zamknij tylne drzwi</pl>
+			<es>Abrir/Cerrar puerta trasera</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
@@ -449,6 +510,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Openen/sluiten schuifzeil</nl>
 			<cz>Otevřít/zavřít boční závěs</cz>
 			<pl>Otwórz/zamknij kurtyny</pl>
+			<es>Abrir/Cerrar cortina lateral</es>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
 			<en>Debug mode</en>
@@ -458,6 +520,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Debug-modus</nl>
 			<cz>Režim ladění</cz>
 			<pl>Tryb Debugu</pl>
+			<es>Modo debug</es>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -468,6 +531,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats.</nl>
 			<cz>Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky.</cz>
 			<pl>Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku.</pl>
+			<es>Area de descarga bloqueada. Por favor despeje la zona.</es>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
@@ -477,6 +541,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
 			<cz>Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku.</cz>
 			<pl>Żadne zgodne towary nie są dostępne do załadunku lub rozładunku.</pl>
+			<es>No hay productos compatibles para cargar o descargar.</es>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
 			<en>Loading area is full. Unable to load any more items of this size.</en>
@@ -486,6 +551,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Laadruimte is vol. Kan geen items van deze grootte meer laden.</nl>
 			<cz>Ložná plocha je plná. Nelze načíst další položky této velikosti.</cz>
 			<pl>Jesteś Zapchany. Niemożna więcej załadować.</pl>
+			<es>Area de carga completa. No es posible cargar mas objetos de este tamaño.</es>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
@@ -495,6 +561,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
 			<cz>Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte.</cz>
 			<pl>Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz.</pl>
+			<es>No es posible cargar en movimiento. Por favor detengase completamente antes de cargar el tráiler.</es>
 		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
@@ -504,6 +571,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Loszijde</nl>
 			<cz>Vykládací strana</cz>
 			<pl>Strona rozładunku</pl>
+			<es>Lado de descarga</es>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
@@ -513,6 +581,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Links</nl>
 			<cz>Vlevo</cz>
 			<pl>Lewa</pl>
+			<es>Izquierda</es>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
@@ -522,6 +591,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Rechts</nl>
 			<cz>Vpravo</cz>
 			<pl>Prawa</pl>
+			<es>Derecha</es>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
@@ -531,6 +601,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Niks</nl>
 			<cz>Nic</cz>
 			<pl>Żadna</pl>
+			<es>Ninguno</es>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
@@ -540,6 +611,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Laad filter</nl>
 			<cz>Filtr nakládky</cz>
 			<pl>Filtr ładowania</pl>
+			<es>Filtro de carga</es>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
@@ -549,6 +621,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Alleen volle</nl>
 			<cz>Pouze plné</cz>
 			<pl>Tylko pełne</pl>
+			<es>Solo completo</es>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Any</en>
@@ -558,6 +631,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Alles</nl>
 			<cz>Vše</cz>
 			<pl>Każde</pl>
+			<es>Cualquiera</es>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -567,6 +641,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Start laden</nl>
 			<cz>Začít nakládku</cz>
 			<pl>Rozpocznij ładowanie</pl>
+			<es>Empezar carga</es>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
@@ -576,6 +651,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Stop laden</nl>
 			<cz>Zastavit nakládku</cz>
 			<pl>Zatrzymaj ładowanie</pl>
+			<es>Detener carga</es>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
@@ -585,6 +661,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Lossen</nl>
 			<cz>Vyložit</cz>
 			<pl>Rozładuj</pl>
+			<es>Descargar</es>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
@@ -594,6 +671,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Producttype</nl>
 			<cz>Typ materiálu</cz>
 			<pl>Typ materiału</pl>
+			<es>Tipo de material</es>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
@@ -603,6 +681,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Containertype</nl>
 			<cz>Typ kontejneru</cz>
 			<pl>Typ kontenera</pl>
+			<es>Tipo de contenedor</es>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
@@ -612,6 +691,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Alles</nl>
 			<cz>Vše</cz>
 			<pl>Wszystko</pl>
+			<es>Cualquiera</es>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
@@ -621,6 +701,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>IBC VloeistofTank</nl>
 			<cz>IBC nádrž</cz>
 			<pl>Zbiornik Płynów</pl>
+			<es>Palé de líquido</es>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
@@ -630,6 +711,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Europallet</nl>
 			<cz>Europaleta</cz>
 			<pl>Euro Paleta</pl>
+			<es>Palé</es>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
@@ -639,6 +721,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Pioneer-pallet</nl>
 			<cz>Pioneer paleta</cz>
 			<pl>Pioneer Paleta</pl>
+			<es>Palé Pioneer</es>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
@@ -648,6 +731,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Bigbag-pallet</nl>
 			<cz>Bigbag paleta</cz>
 			<pl>Bigbag Paleta</pl>
+			<es>Palé de sacos grandes</es>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
@@ -657,6 +741,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Bigbag</nl>
 			<cz>Bigbag</cz>
 			<pl>Torba</pl>
+			<es>Saco grande</es>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
@@ -666,6 +751,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Aardappelkist</nl>
 			<cz>Krabice brambor</cz>
 			<pl>Ziemnioki</pl>
+			<es>Caja de patatas</es>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
@@ -675,6 +761,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Balen</nl>
 			<cz>Balík</cz>
 			<pl>Bele</pl>
+			<es>Paca</es>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
@@ -684,6 +771,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Ronde balen</nl>
 			<cz>Kulatý balík</cz>
 			<pl>Okrągłe bele</pl>
+			<es>Paca redonda</es>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
@@ -693,6 +781,7 @@ TRANSLATION - PL by ELRICOFATAL
 			<nl>Vierkante balen</nl>
 			<cz>Hranatý balík</cz>
 			<pl>Kańciaste bele</pl>
+			<es>Paca rectangular</es>
 		</text>
 	</l10n>
 

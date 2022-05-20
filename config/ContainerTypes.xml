@@ -56,6 +56,7 @@
 			<objectType name="roundbale125" sizeX="1.300" sizeY="1.20" sizeZ="1.300" isRoundbale="true" flipYZ="true"/>
 			<objectType name="roundbale150" sizeX="1.560" sizeY="1.20" sizeZ="1.560" isRoundbale="true" flipYZ="true"/>
 			<objectType name="roundbale180" sizeX="1.835" sizeY="1.20" sizeZ="1.835" isRoundbale="true" flipYZ="true"/>
+			<objectType name="biomassBale125" sizeX="1.300" sizeY="1.20" sizeZ="1.300" isRoundbale="true" flipYZ="true"/>
 			<objectType name="cottonRoundbale238" sizeX="2.38" sizeY="2.38" sizeZ="2.38" isRoundbale="true" flipYZ="true"/>
 			<objectType name="squarebale120" sizeX="0.455" sizeY="0.355" sizeZ="1.20"/>
 			<objectType name="squarebale180" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
@@ -66,10 +67,10 @@
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="POTATOBOX">
-			<objectType name="PotatoBox"/>
-			<objectType name="Potatoboxwaste"/>
-			<objectType name="Potatoboxmedium"/>
-			<objectType name="Potatoboxpremium"/>
+			<objectType name="FS22_Seedpotato_Farm_Pack:PotatoBox"/>
+			<objectType name="FS22_Seedpotato_Farm_Pack:Potatoboxwaste"/>
+			<objectType name="FS22_Seedpotato_Farm_Pack:Potatoboxmedium"/>
+			<objectType name="FS22_Seedpotato_Farm_Pack:Potatoboxpremium"/>
 		</containerTypeConfiguration>
 		
     </containerTypeConfigurations>

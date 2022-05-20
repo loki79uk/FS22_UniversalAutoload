@@ -174,8 +174,19 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 	
 	print("  ADDITIONAL fill type containers:")
     for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
-        UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, fillType.customEnvironment)
+		if fillType.palletFilename then
+			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
+			UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
+		end
     end
+	
+	print("  ADDITIONAL bales:")
+	for index, baleType in ipairs(g_baleManager.bales) do
+		if baleType.isAvailable then
+			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
+			UniversalAutoload.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
+		end
+	end
 	
 	print("  ADDITIONAL store item containers:")
 	for _, storeItem in pairs(g_storeManager:getItems()) do

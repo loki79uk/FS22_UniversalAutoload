@@ -2604,6 +2604,15 @@ function UniversalAutoload.getObjectNameFromPath(i3d_path)
 	return i3d_name:sub(0, #i3d_name - 4)
 end
 --
+function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
+	local customEnvironment = nil
+	if i3d_path:find(g_modsDirectory) then
+		local temp = i3d_path:gsub(g_modsDirectory, "")
+		customEnvironment, _ = temp:match( "^(.-)/(.+)$" )
+	end
+	return customEnvironment
+end
+--
 function UniversalAutoload.getContainerTypeName(object)
 	local containerType = UniversalAutoload.getContainerType(object)
 	return containerType.type

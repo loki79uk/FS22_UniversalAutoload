@@ -35,7 +35,7 @@
 			<objectType name="sugarBoxPallet" sizeY="1.125"/>
 			<objectType name="woolPallet" sizeY="1.250"/>
 			<objectType name="epsoTop" sizeX="1.350" sizeY="0.600" sizeZ="1.050"/>
-			<objectType name="patentkali" sizeX="1.350" sizeY="0.850" sizeZ="1.050"/>
+			<objectType name="patentkali" sizeX="1.350" sizeY="0.855" sizeZ="1.050"/>
 			<objectType name="pioneerPallet" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
 			<objectType name="schaumannPallet" sizeX="1.350" sizeY="0.770" sizeZ="1.050"/>
 		</containerTypeConfiguration>

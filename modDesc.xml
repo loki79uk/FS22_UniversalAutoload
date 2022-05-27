@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="65">
+<modDesc descVersion="66">
 
     <author>loki_79</author>
-    <version>1.0.3.0</version>
+    <version>1.0.4.0</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -44,6 +44,7 @@ Configured for the following trailers:
 - Brantner DD 24073/2 XXL (bale trailer)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
@@ -51,6 +52,7 @@ Configured for the following trailers:
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
+- Salek ANS-1900 (bale trailer)
 
 Configured for the following vehicles:
 - Lizard Pickup 1986
@@ -91,6 +93,7 @@ Liste der kompatiblen Anhänger und Pritschen:
 - Brantner DD 24073/2 XXL (Ballenpritsche)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (Standard)
 - Fliegl DTS 5.9
@@ -98,6 +101,7 @@ Liste der kompatiblen Anhänger und Pritschen:
 - Kröger PWO 24 (Standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (Ballenpritsche)
+- Salek ANS-1900 (Ballenpritsche)
 
 Liste der kompatiblen Fahrzeuge:
 - Lizard Pickup 1986
@@ -138,6 +142,7 @@ Liste des remorques et plateaux compatibles :
 - Brantner DD 24073/2 XXL (plateau à balles)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
@@ -145,6 +150,7 @@ Liste des remorques et plateaux compatibles :
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
+- Salek ANS-1900 (bale trailer)
 
 Liste des véhicules compatibles :
 - Lizard Pickup 1986
@@ -185,6 +191,7 @@ Nakonfigurováno pro následující přívěsy:
 - Brantner DD 24073/2 XXL (přívěs na balíky)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (standardní)
 - Fliegl DTS 5.9
@@ -192,6 +199,7 @@ Nakonfigurováno pro následující přívěsy:
 - Kröger PWO 24 (standardní)
 - LODE KING Renomovaný Drop Deck
 - Welger DK 115 (přívěs na balíky)
+- Salek ANS-1900 (přívěs na balíky)
 
 Nakonfigurováno pro následující vozidla:
 - Lizard Pickup 1986
@@ -232,6 +240,7 @@ Skonfigurowany dla następujących przyczep:
 - Brantner DD 24073/2 XXL (przyczepa do bel)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
@@ -239,6 +248,7 @@ Skonfigurowany dla następujących przyczep:
 - Kröger PWO 24 (standard)
 - Zrzut talii LODE KING Renown
 - Welger DK 115 (przyczepa do bel)
+- Salek ANS-1900 (przyczepa do bel)
 
 Skonfigurowany dla następujących pojazdów:
 - Lizard Pickup 1986
@@ -280,6 +290,7 @@ Configurado para los siguientes tráilers:
 - Brantner DD 24073/2 XXL (carga de pacas)
 - Bremer Transportwagen TP 500 S
 - BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
 - Demco Steel Drop Deck
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
@@ -287,6 +298,7 @@ Configurado para los siguientes tráilers:
 - Kröger PWO 24 (standard)
 - LODE KING Renown Drop Deck
 - Welger DK 115 (carga de pacas)
+- Salek ANS-1900 (carga de pacas)
 
 Configurado para los siguientes vehículos:
 - Lizard Pickup 1986

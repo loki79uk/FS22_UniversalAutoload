@@ -48,6 +48,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#height", "Height of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#length", "Length of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#width", "Width of the loading area", 0)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#isBoxTrailer", "If trailer is enclosed with a rear door", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableSideLoading", "Use the automatic side loading triggers", false)
@@ -272,12 +273,14 @@ function UniversalAutoload:updateActionEventKeys()
 					-- print("TOGGLE_BELTS: "..tostring(valid))
 				end
 				
-				if spec.isCurtainTrailer then
+				if spec.isCurtainTrailer or spec.isBoxTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, ignoreCollisions, true)
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleDoorActionEventId = actionEventId
 					-- print("TOGGLE_DOOR: "..tostring(valid))
+				end
 					
+				if spec.isCurtainTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_CURTAIN, self, UniversalAutoload.actionEventToggleCurtain, false, true, false, true, nil, nil, ignoreCollisions, true)
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleCurtainActionEventId = actionEventId
@@ -299,11 +302,8 @@ function UniversalAutoload:updateActionEventKeys()
 			UniversalAutoload.updateToggleBeltsActionEvent(self)
 			UniversalAutoload.updateCycleMaterialActionEvent(self)
 			UniversalAutoload.updateCycleContainerActionEvent(self)
-			
-			if spec.isCurtainTrailer and g_currentMission.player.isControlled then
-				UniversalAutoload.updateToggleDoorActionEvent(self)
-				UniversalAutoload.updateToggleCurtainActionEvent(self)
-			end
+			UniversalAutoload.updateToggleDoorActionEvent(self)
+			UniversalAutoload.updateToggleCurtainActionEvent(self)
 		end
 	end
 end
@@ -329,22 +329,19 @@ end
 --
 function UniversalAutoload:updateToggleDoorActionEvent()
 	local spec = self.spec_universalAutoload
-	local foldable = self.spec_foldable
-	
-	if spec.isAutoloadEnabled and #foldable.foldingParts > 0 then
+
+	if spec.isAutoloadEnabled and self.spec_foldable and g_currentMission.player.isControlled
+	and (spec.isCurtainTrailer or spec.isBoxTrailer) then
+		local foldable = self.spec_foldable
+		local direction = self:getToggledFoldDirection()
+
 		local toggleDoorText = ""
-		local foldingPart = foldable.foldingParts[1]
-		if self:getIsAnimationPlaying(foldingPart.animationName) then
-			if self:getAnimationSpeed(foldingPart.animationName) > 0 then
-				toggleDoorText = foldable.negDirectionText
-			else
-				toggleDoorText = foldable.posDirectionText
-			end
-		elseif self:getAnimationTime(foldingPart.animationName) <= 0 then
-			toggleDoorText = foldable.posDirectionText
-		else
+		if direction == foldable.turnOnFoldDirection then
 			toggleDoorText = foldable.negDirectionText
+		else
+			toggleDoorText = foldable.posDirectionText
 		end
+
 		g_inputBinding:setActionEventText(spec.toggleDoorActionEventId, toggleDoorText)
 		g_inputBinding:setActionEventTextVisibility(spec.toggleDoorActionEventId, true)
 	end
@@ -352,19 +349,21 @@ end
 --
 function UniversalAutoload:updateToggleCurtainActionEvent()
 	local spec = self.spec_universalAutoload
-	local trailer = self.spec_trailer
-	local tipSide = trailer.tipSides[trailer.preferedTipSideIndex]
-	
-	if spec.isAutoloadEnabled and tipSide ~= nil then
-		local toggleCurtainText = nil
-		local tipState = self:getTipState()
-		if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
-			toggleCurtainText = tipSide.manualTipToggleActionTextPos
-		else
-			toggleCurtainText = tipSide.manualTipToggleActionTextNeg
+	if self.spec_trailer and spec.isCurtainTrailer and g_currentMission.player.isControlled then
+		local trailer = self.spec_trailer
+		local tipSide = trailer.tipSides[trailer.preferedTipSideIndex]
+		
+		if spec.isAutoloadEnabled and tipSide ~= nil then
+			local toggleCurtainText = nil
+			local tipState = self:getTipState()
+			if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
+				toggleCurtainText = tipSide.manualTipToggleActionTextPos
+			else
+				toggleCurtainText = tipSide.manualTipToggleActionTextNeg
+			end
+			g_inputBinding:setActionEventText(spec.toggleCurtainActionEventId, toggleCurtainText)
+			g_inputBinding:setActionEventTextVisibility(spec.toggleCurtainActionEventId, true)
 		end
-		g_inputBinding:setActionEventText(spec.toggleCurtainActionEventId, toggleCurtainText)
-		g_inputBinding:setActionEventTextVisibility(spec.toggleCurtainActionEventId, true)
 	end
 end
 
@@ -920,7 +919,8 @@ function UniversalAutoload:updateActionEventText(loadCount, unloadCount, noEvent
 	end
 	
 	UniversalAutoload.updateToggleLoadingActionEvent(self)
-	
+	UniversalAutoload.updateToggleDoorActionEvent(self)
+	UniversalAutoload.updateToggleCurtainActionEvent(self)
 end
 function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	-- print("forceRaiseActive: "..self:getFullName() )
@@ -1170,7 +1170,8 @@ function UniversalAutoload:onLoad(savegame)
 					spec.loadArea.width  = config.width
 					spec.loadArea.length = config.length
 					spec.loadArea.height = config.height
-					spec.loadArea.offset = config.offset	
+					spec.loadArea.offset = config.offset
+					spec.isBoxTrailer = config.isBoxTrailer
 					spec.isCurtainTrailer = config.isCurtainTrailer
 					spec.enableRearLoading = config.enableRearLoading
 					spec.enableSideLoading = config.enableSideLoading
@@ -1201,7 +1202,8 @@ function UniversalAutoload:onLoad(savegame)
 					spec.loadArea.width  = xmlFile:getValue(key..".loadingArea#width")
 					spec.loadArea.length = xmlFile:getValue(key..".loadingArea#length")
 					spec.loadArea.height = xmlFile:getValue(key..".loadingArea#height")
-					spec.loadArea.offset = xmlFile:getValue(key..".loadingArea#offset", "0 0 0", true)	
+					spec.loadArea.offset = xmlFile:getValue(key..".loadingArea#offset", "0 0 0", true)
+					spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
 					spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
 					spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
 					spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)
@@ -1324,7 +1326,7 @@ function UniversalAutoload:onLoad(savegame)
 				local depth = 0.05
 				local recess = 0
 				local boundary = 0
-				if spec.isCurtainTrailer then
+				if spec.isCurtainTrailer or spec.isBoxTrailer then
 					recess = spec.loadArea.width/3
 					boundary = spec.loadArea.width/4
 				end
@@ -1371,7 +1373,7 @@ function UniversalAutoload:onLoad(savegame)
 				local depth = 0.05
 				local recess = 0
 				local boundary = 0
-				if spec.isCurtainTrailer then
+				if spec.isCurtainTrailer or spec.isBoxTrailer then
 					recess = spec.loadArea.width/3
 					boundary = 2*spec.loadArea.width/3
 				end
@@ -2779,13 +2781,15 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			UniversalAutoload.DrawDebugPallet( spec.test.node, spec.test.sizeX, spec.test.sizeY, spec.test.sizeZ, true, false, WHITE)
 		end
 
-		-- for _, trigger in pairs(spec.triggers) do
-			-- if trigger.name == "rearAutoTrigger" or trigger.name == "leftAutoTrigger" or trigger.name == "rightAutoTrigger" then
-				-- DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(YELLOW))
-			-- elseif trigger.name == "leftPickupTrigger" or trigger.name == "rightPickupTrigger" then
-				-- DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(MAGENTA))
-			-- end
-		-- end
+		if spec.showDebug then
+			for _, trigger in pairs(spec.triggers) do
+				if trigger.name == "rearAutoTrigger" or trigger.name == "leftAutoTrigger" or trigger.name == "rightAutoTrigger" then
+					DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(YELLOW))
+				elseif trigger.name == "leftPickupTrigger" or trigger.name == "rightPickupTrigger" then
+					DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(MAGENTA))
+				end
+			end
+		end
 	
 		for _,object in pairs(spec.availableObjects) do
 			if object ~= nil then
@@ -2841,7 +2845,8 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		end
 
 		local W, H, L = spec.loadArea.width, spec.loadArea.height, spec.loadArea.length
-		UniversalAutoload.DrawDebugPallet( spec.loadArea.rootNode,  W, 0, L, true, false, WHITE )
+		if not spec.showDebug then H = 0 end
+		UniversalAutoload.DrawDebugPallet( spec.loadArea.rootNode,  W, H, L, true, false, WHITE )
 		UniversalAutoload.DrawDebugPallet( spec.loadArea.startNode, W, 0, 0, true, false, GREEN )
 		UniversalAutoload.DrawDebugPallet( spec.loadArea.endNode,   W, 0, 0, true, false, RED )
 

@@ -329,21 +329,26 @@ end
 --
 function UniversalAutoload:updateToggleDoorActionEvent()
 	local spec = self.spec_universalAutoload
+	local foldable = self.spec_foldable
 
-	if spec.isAutoloadEnabled and self.spec_foldable and g_currentMission.player.isControlled
-	and (spec.isCurtainTrailer or spec.isBoxTrailer) then
-		local foldable = self.spec_foldable
-		local direction = self:getToggledFoldDirection()
+	if g_currentMission.player.isControlled then
+		if spec.isAutoloadEnabled and self.spec_foldable and (spec.isCurtainTrailer or spec.isBoxTrailer) then
+			local direction = self:getToggledFoldDirection()
 
-		local toggleDoorText = ""
-		if direction == foldable.turnOnFoldDirection then
-			toggleDoorText = foldable.negDirectionText
-		else
-			toggleDoorText = foldable.posDirectionText
+			local toggleDoorText = ""
+			if direction == foldable.turnOnFoldDirection then
+				toggleDoorText = foldable.negDirectionText
+			else
+				toggleDoorText = foldable.posDirectionText
+			end
+
+			g_inputBinding:setActionEventText(spec.toggleDoorActionEventId, toggleDoorText)
+			g_inputBinding:setActionEventTextVisibility(spec.toggleDoorActionEventId, true)
 		end
-
-		g_inputBinding:setActionEventText(spec.toggleDoorActionEventId, toggleDoorText)
-		g_inputBinding:setActionEventTextVisibility(spec.toggleDoorActionEventId, true)
+	else
+		if spec.isAutoloadEnabled and self.spec_foldable and self.isClient then
+			Foldable.updateActionEventFold(self)
+		end
 	end
 end
 --
@@ -450,7 +455,9 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 	if spec.isAutoloadEnabled and spec.unloadAllActionEventId ~= nil then
 		-- Activate/Deactivate the UNLOAD key binding
 		if spec.doPostLoadDelay or spec.isLoading or spec.isUnloading or
-		   spec.validUnloadCount == 0 or spec.currentTipside == "none"
+		   spec.validUnloadCount == 0 or spec.currentTipside == "none" or
+		  (spec.isBoxTrailer and spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())) or
+		  (spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()))
 		then
 			g_inputBinding:setActionEventActive(spec.unloadAllActionEventId, false)
 		else
@@ -918,9 +925,9 @@ function UniversalAutoload:updateActionEventText(loadCount, unloadCount, noEvent
 		UniversalAutoloadUpdateActionEvents.sendEvent(self, spec.validLoadCount, spec.validUnloadCount, noEventSend)
 	end
 	
-	UniversalAutoload.updateToggleLoadingActionEvent(self)
 	UniversalAutoload.updateToggleDoorActionEvent(self)
 	UniversalAutoload.updateToggleCurtainActionEvent(self)
+	UniversalAutoload.updateToggleLoadingActionEvent(self)
 end
 function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	-- print("forceRaiseActive: "..self:getFullName() )
@@ -1515,7 +1522,6 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	if spec.isAutoloadEnabled and self.isServer then
 		-- print("onFoldStateChanged: "..self:getFullName())
 		spec.foldAnimationStarted = true
-		spec.foldAnimationRemaining = self.spec_foldable.maxFoldAnimDuration
 		UniversalAutoload.updateActionEventText(self)
 	end
 end
@@ -1598,13 +1604,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
-			if spec.foldAnimationRemaining < 0 then
+			if not self:getIsFolding() then
 				-- print("*** FOLDING COMPLETE ***")
 				spec.foldAnimationStarted = false
-				spec.foldAnimationRemaining = 0
 				UniversalAutoload.updateActionEventText(self)
-			else
-				spec.foldAnimationRemaining = spec.foldAnimationRemaining - dt
 			end
 		end
 		

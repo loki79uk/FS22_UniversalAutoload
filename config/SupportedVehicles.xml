@@ -15,15 +15,15 @@
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/demco/steelDropDeck/steelDropDeck.xml">
             <loadingArea offset="0 1.010 -0.33" width="2.40" height="2.60" length="11.2"/>
-			<!-- <options enableRearLoading="true" enableSideLoading="true"/> -->
+			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/lodeKing/renownTriAxleBeavertailLowDrop/renownTriAxleBeavertailLowDrop.xml">
             <loadingArea offset="0 1.010 -1.0" width="2.40" height="2.60" length="11.1"/>
-			<!-- <options enableRearLoading="true" enableSideLoading="true"/> -->
+			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/krone/profiLiner/profiLiner.xml">
             <loadingArea offset="0 1.185 -0.1" width="2.40" height="2.50" length="13.2"/>
-			<options isCurtainTrailer="true" enableRearLoading="true"/>
+			<options isCurtainTrailer="true" enableRearLoading="true" enableSideLoading="true" showDebug="true" />
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/farmtech/dpw1800/dpw1800.xml">
             <loadingArea offset="0 1.130 -0.82" width="2.41" height="2.80" length="9.3"/>

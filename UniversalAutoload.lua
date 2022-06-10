@@ -1331,12 +1331,8 @@ function UniversalAutoload:onLoad(savegame)
 				link(spec.loadArea.rootNode, rearAutoTrigger.node)
 				
 				local depth = 0.05
-				local recess = 0
-				local boundary = 0
-				if spec.isCurtainTrailer or spec.isBoxTrailer then
-					recess = spec.loadArea.width/3
-					boundary = spec.loadArea.width/4
-				end
+				local recess = spec.loadArea.width/4
+				local boundary = spec.loadArea.width/4
 				local width, height, length = spec.loadArea.width-boundary, spec.loadArea.height, depth
 
 				setRotation(rearAutoTrigger.node, 0, 0, 0)
@@ -1345,24 +1341,21 @@ function UniversalAutoload:onLoad(savegame)
 
 				table.insert(spec.triggers, rearAutoTrigger)
 				addTrigger(rearAutoTrigger.node, "autoLoadingTrigger_Callback", self)
+				spec.rearTriggerId = rearAutoTrigger.node
 			end
 		end
 		
 		if spec.enableSideLoading then
+			local depth = 0.05
+			local recess = spec.loadArea.width/7
+			local boundary = 2*spec.loadArea.width/3
+			local width, height, length = depth, spec.loadArea.height, spec.loadArea.length-boundary
+				
 			local leftAutoTrigger = {}
 			leftAutoTrigger.node = I3DUtil.getChildByName(triggersRootNode, "autoTrigger2")
 			if leftAutoTrigger.node ~= nil then
 				leftAutoTrigger.name = "leftAutoTrigger"
 				link(spec.loadArea.rootNode, leftAutoTrigger.node)
-				
-				local depth = 0.05
-				local recess = 0
-				local boundary = 0
-				if spec.isCurtainTrailer then
-					recess = spec.loadArea.width/3
-					boundary = 2*spec.loadArea.width/3
-				end
-				local width, height, length = depth, spec.loadArea.height, spec.loadArea.length-boundary
 
 				setRotation(leftAutoTrigger.node, 0, 0, 0)
 				setTranslation(leftAutoTrigger.node, 2*depth+(spec.loadArea.width/2)-recess, spec.loadArea.height/2, 0)
@@ -1376,16 +1369,7 @@ function UniversalAutoload:onLoad(savegame)
 			if rightAutoTrigger.node ~= nil then
 				rightAutoTrigger.name = "rightAutoTrigger"
 				link(spec.loadArea.rootNode, rightAutoTrigger.node)
-				
-				local depth = 0.05
-				local recess = 0
-				local boundary = 0
-				if spec.isCurtainTrailer or spec.isBoxTrailer then
-					recess = spec.loadArea.width/3
-					boundary = 2*spec.loadArea.width/3
-				end
-				local width, height, length = depth, spec.loadArea.height, spec.loadArea.length-boundary
-
+	
 				setRotation(rightAutoTrigger.node, 0, 0, 0)
 				setTranslation(rightAutoTrigger.node, -(2*depth+(spec.loadArea.width/2)-recess), spec.loadArea.height/2, 0)
 				setScale(rightAutoTrigger.node, width, height, length)
@@ -1622,8 +1606,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					UniversalAutoload.setContainerTypeIndex(self, 1)
 				end
 				self:setAllTensionBeltsActive(false)
-				spec.doSetTensionBelts = true
-				spec.doPostLoadDelay = true
+				-- *** Don't set belts as they can grab the pallet forks ***
+				-- spec.doSetTensionBelts = true -- spec.doPostLoadDelay = true
 				if UniversalAutoload.loadObject(self, object) then
 					-- print("LOADED PALLET FROM AUTO TRIGGER")
 					spec.autoLoadingObjects[object] = nil
@@ -1843,7 +1827,7 @@ function UniversalAutoload:loadObject(object)
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
-		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType)
+		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
 
 			if UniversalAutoload.moveObjectNodes(self, object, loadPlace) then
@@ -1943,19 +1927,13 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			local availableObjectRemoved = UniversalAutoload.removeAvailableObject(vehicle, object)
 			local autoLoadingObjectRemoved = UniversalAutoload.removeAutoLoadingObject(vehicle, object)
 			if loadedObjectRemoved or availableObjectRemoved then
-				if self ~= vehicle then
-					local SPEC = vehicle.spec_universalAutoload
-					if SPEC.totalUnloadCount == 0 then
-						SPEC.resetLoadingPattern = true
-						vehicle:setAllTensionBeltsActive(false)
-					elseif loadedObjectRemoved then
-						if self.spec_tensionBelts.areBeltsFasten then
-							vehicle:setAllTensionBeltsActive(false)
-							vehicle:setAllTensionBeltsActive(true)
-						end
-					end
-				end
 				UniversalAutoload.forceRaiseActive(vehicle)
+			end
+			if loadedObjectRemoved and self ~= vehicle then
+				if vehicle.spec_tensionBelts.areBeltsFasten then
+					vehicle:setAllTensionBeltsActive(false)
+					vehicle:setAllTensionBeltsActive(true)
+				end
 			end
 		end
 	end
@@ -2099,7 +2077,7 @@ function UniversalAutoload:addLoadPlace(containerType)
 	end
 end
 
-function UniversalAutoload:getLoadPlace(containerType)
+function UniversalAutoload:getLoadPlace(containerType, object)
     local spec = self.spec_universalAutoload
 	
 	if containerType ~= nil then
@@ -2142,7 +2120,7 @@ function UniversalAutoload:getLoadPlace(containerType)
 					if self.lastSpeedReal < 0.0005 then
 						spec.trailerIsMoving = false
 						while thisLoadHeight >= 0 do
-							if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace) and (thisLoadHeight==0 or containerType.isBale or
+							if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) and (thisLoadHeight==0 or containerType.isBale or
 							UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)) then
 								useThisLoadSpace = true
 								break
@@ -2199,15 +2177,59 @@ function UniversalAutoload:getIsValidObject(object)
     return false
 end
 --
-function UniversalAutoload:getIsAutoloadingAllowed()
+function UniversalAutoload:getIsAutoloadingAllowed(triggerId)
+
+	local spec = self.spec_universalAutoload
+	local AutoLoadingAllowed = true
+
+	-- check that curtain trailers have an open curtain
+	if spec.isCurtainTrailer and triggerId then
+		-- print("CURTAIN TRAILER")
+		
+		local tipState = self:getTipState()
+		local doorOpen = self:getIsUnfolded()
+		local rearTrigger = triggerId == spec.rearTriggerId
+		local curtainsOpen = not (tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING)
+
+		if spec.enableRearLoading and rearTrigger then
+			if not doorOpen then
+				-- print("NO LOADING IF DOOR CLOSED")
+				AutoLoadingAllowed = false
+			end
+		end
+		
+		if spec.enableSideLoading and not rearTrigger then
+			if not curtainsOpen then
+				-- print("NO LOADING IF CURTAIN CLOSED")
+				AutoLoadingAllowed = false
+			end
+		end
+		
+	end
+
+	-- check that folding state is okay
+	if spec.noLoadingIfFolded then
+		if (self:getIsFolding() or not self:getIsUnfolded()) then
+			-- print("NO LOADING IF FOLDED")
+			AutoLoadingAllowed = false
+		end
+	end
+	if spec.noLoadingIfUnfolded then
+		if (self:getIsFolding() or self:getIsUnfolded()) then
+			-- print("NO LOADING IF UNFOLDED")
+			AutoLoadingAllowed = false
+		end
+	end
+	
     -- check that the vehicle has not fallen on its side
     local _, y1, _ = getWorldTranslation(self.components[1].node)
     local _, y2, _ = localToWorld(self.components[1].node, 0, 1, 0)
     if y2 - y1 < 0.5 then
-        return false
+		-- print("NO LOADING IF FALLEN OVER")
+        AutoLoadingAllowed = false
     end
 
-    return true
+    return AutoLoadingAllowed
 end
 --
 function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
@@ -2223,14 +2245,15 @@ function UniversalAutoload:testLocationIsFull(loadPlace, offset)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
 		
 	spec.foundObject = false
-	spec.foundObjectId = 0
+	spec.currentObject = object
+	
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	return spec.foundObject
 end
 --
-function UniversalAutoload:testLocationIsEmpty(loadPlace, offset)
+function UniversalAutoload:testLocationIsEmpty(loadPlace, object, offset)
 	local spec = self.spec_universalAutoload
 	local r = 0.025
 	local sizeX, sizeY, sizeZ = (loadPlace.sizeX/2)-r, (loadPlace.sizeY/2)-r, (loadPlace.sizeZ/2)-r
@@ -2239,7 +2262,7 @@ function UniversalAutoload:testLocationIsEmpty(loadPlace, offset)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
 	
 	spec.foundObject = false
-	spec.foundObjectId = 0
+	spec.currentObject = object
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
@@ -2261,10 +2284,9 @@ function UniversalAutoload:testLocationOverlap_Callback(hitObjectId, x, y, z, di
         local spec = self.spec_universalAutoload
         local object = g_currentMission:getNodeObject(hitObjectId)
 
-        if object ~= nil and object ~= self then
+        if object ~= nil and object ~= self and object ~= spec.currentObject then
 			-- print(object.i3dFilename)
             spec.foundObject = true
-			spec.foundObjectId = hitObjectId
         end
     end
 end
@@ -2277,7 +2299,7 @@ function UniversalAutoload:testLoadAreaIsEmpty()
 	local dx, dy, dz = localDirectionToWorld(spec.loadArea.rootNode, 0, sizeY, 0)
 	
 	spec.foundObject = false
-	spec.foundObjectId = 0
+	spec.currentObject = nil
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
@@ -2472,7 +2494,7 @@ function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, 
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsAutoloadingAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsAutoloadingAllowed(self, triggerId) and UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAutoLoadingObject(self, object)
 				elseif onLeave then
@@ -2485,7 +2507,7 @@ end
 --
 function UniversalAutoload:addLoadedObject(object)
 	local spec = self.spec_universalAutoload
-	if spec.loadedObjects[object] == nil then
+	if spec.loadedObjects[object] == nil and object.dynamicMountObject == nil then
 		spec.loadedObjects[object] = object
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
 		if object.addDeleteListener ~= nil then
@@ -2503,6 +2525,12 @@ function UniversalAutoload:removeLoadedObject(object)
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "onDeleteLoadedObject_Callback")
 		end
+		
+		if spec.totalUnloadCount == 0 then
+			spec.resetLoadingPattern = true
+			self:setAllTensionBeltsActive(false)
+		end
+		
 		return true
 	end
 end
@@ -2577,7 +2605,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 	local spec = self.spec_universalAutoload
 	
 	if object.dynamicMountObject ~= nil then
-		if spec.autoLoadingObjects[object] == nil then
+		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "onDeleteAutoLoadingObject_Callback")

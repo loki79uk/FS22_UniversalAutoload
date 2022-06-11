@@ -41,7 +41,7 @@
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="BIGBAG">
-			<objectType name="bigBag" neverStack="true"/>
+			<objectType name="bigBag" neverStack="true" alwaysRotate="true"/>
 		</containerTypeConfiguration>
 		
 		<containerTypeConfiguration containerType="LIQUID_TANK">

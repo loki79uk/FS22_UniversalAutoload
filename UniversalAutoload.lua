@@ -2000,16 +2000,18 @@ function UniversalAutoload:addLoadPlace(containerType)
 	
 	--TEST FOR ROUNDBALE PACKING
 	local r = 0.70710678
+	local R = ((3/4)+(r/4))
 	local roundbaleOffset = 0
 	local useRoundbalePacking = false
 	if containerType.isBale and sizeX==sizeZ then
+		-- print("IS ROUNDBALE")
 		isRoundbale = true
-		NR = math.floor(width / (r*containerType.sizeX))
-		MR = math.floor(length / (r*containerType.sizeX))
-		if NR > N and width >= ((3+r)/2)*containerType.sizeX then
+		NR = math.floor(width / (R*containerType.sizeX))
+		MR = math.floor(length / (R*containerType.sizeX))
+		if NR > N and width >= (2*R)*containerType.sizeX then
 			useRoundbalePacking = true
 			N, M = NR, MR
-			sizeX = ((3/4)+(r/4))*containerType.sizeX
+			sizeX = R*containerType.sizeX
 		end
 	end
 	

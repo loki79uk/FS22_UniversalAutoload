@@ -63,7 +63,7 @@ UniversalAutoload.UNKNOWN_TYPES = {}
 
 -- IMPORT VEHICLE CONFIGURATIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
+function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
 
 	print("  IMPORT supported vehicle configurations")
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
@@ -84,7 +84,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename)
 				
 			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
 			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs") or "ALL"
-			if configGroup[selectedConfigs] == nil then
+			if configGroup[selectedConfigs] == nil or overwriteExisting then
 				configGroup[selectedConfigs] = {}
 				
 				local config = configGroup[selectedConfigs]

@@ -1927,13 +1927,19 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			local availableObjectRemoved = UniversalAutoload.removeAvailableObject(vehicle, object)
 			local autoLoadingObjectRemoved = UniversalAutoload.removeAutoLoadingObject(vehicle, object)
 			if loadedObjectRemoved or availableObjectRemoved then
-				UniversalAutoload.forceRaiseActive(vehicle)
-			end
-			if loadedObjectRemoved and self ~= vehicle then
-				if vehicle.spec_tensionBelts.areBeltsFasten then
-					vehicle:setAllTensionBeltsActive(false)
-					vehicle:setAllTensionBeltsActive(true)
+				if self ~= vehicle then
+					local SPEC = vehicle.spec_universalAutoload
+					if SPEC.totalUnloadCount == 0 then
+						SPEC.resetLoadingPattern = true
+						vehicle:setAllTensionBeltsActive(false)
+					elseif loadedObjectRemoved then
+						if self.spec_tensionBelts.areBeltsFasten then
+							vehicle:setAllTensionBeltsActive(false)
+							vehicle:setAllTensionBeltsActive(true)
+						end
+					end
 				end
+				UniversalAutoload.forceRaiseActive(vehicle)
 			end
 		end
 	end
@@ -2527,12 +2533,6 @@ function UniversalAutoload:removeLoadedObject(object)
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "onDeleteLoadedObject_Callback")
 		end
-		
-		if spec.totalUnloadCount == 0 then
-			spec.resetLoadingPattern = true
-			self:setAllTensionBeltsActive(false)
-		end
-		
 		return true
 	end
 end

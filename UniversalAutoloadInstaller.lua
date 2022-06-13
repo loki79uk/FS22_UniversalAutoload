@@ -301,6 +301,7 @@ function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
 			local width = xmlFile:getValue("bale.size#width", 1.5)
 			local height = xmlFile:getValue("bale.size#height", 1.5)
 			local length = xmlFile:getValue("bale.size#length", 2.4)
+			local diameter = xmlFile:getValue("bale.size#diameter", 1.8)
 			local isRoundbale = xmlFile:getValue("bale.size#isRoundbale", "false")
 
 			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
@@ -308,9 +309,15 @@ function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
 			newType.name = name
 			newType.type = containerType
 			newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
-			newType.sizeX = width
-			newType.sizeY = height
-			newType.sizeZ = length
+			if isRoundbale then
+				newType.sizeX = diameter
+				newType.sizeY = width
+				newType.sizeZ = diameter
+			else
+				newType.sizeX = width
+				newType.sizeY = height
+				newType.sizeZ = length
+			end
 			newType.isBale = true
 			newType.flipYZ = isRoundbale
 			newType.neverStack = false

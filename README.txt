@@ -27,16 +27,40 @@
    · JohnDeer XUV865M
 
 ==============================================================
+  USER OPTIONS: (SINGLE PLAYER ONLY)
+==============================================================
+
+	It is possible to overrride any default settings by editing the supplied settings file.  It will be created in the following loacation the first time the game is launched with the mod:  %userprofile%\Documents\My Games\FarmingSimulator2022\modSettings\UniversalAutoload.xml
+
+	A basic structure is supplied in the created file, and the usage should be (e.g.) as follows:
+	
+	<universalAutoLoad>
+		<vehicleConfigurations>
+
+			<vehicleConfiguration configFileName="FS22_20ftGooseneck/lizardgooseneck.xml">  
+				<loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
+				<options enableRearLoading="true" enableSideLoading="true"/>
+			</vehicleConfiguration>
+			
+		</vehicleConfigurations>
+		
+		<containerTypeConfigurations>
+	
+			<containerConfiguration name="FS22_Seedpotato_Farm_Pack:PotatoBox" containerType="POTATOBOX"/>
+
+		</containerTypeConfigurations>
+	</universalAutoLoad>
+	
+
+==============================================================
   PALLETS/CONTAINERS:
 ==============================================================
 
-  All base game pallets and containers (bigbags, IBCs, etc) are supported for autoloading.  This includes production pallets and any that can be purchased from the shop.  The method for identifying a pallet is to map the i3d file name to a predefined size.  The sizes for base game pallets are defined in the file "ContainerTypes.xml".  **Please NOTE that currently only square bales are supported** - I plan to include support for round bales and a work mode for collecting bales in a future release.
+  All base game pallets and containers (bigbags, IBCs, etc) are supported for autoloading.  This includes production pallets and any that can be purchased from the shop.  The method for identifying a pallet is to map the i3d file name to a predefined size.  The sizes for base game pallets are defined in the file "ContainerTypes.xml".
   
-  MOD PALLETS:
-  (A) If a mod pallet uses a base game i3d file, e.g. "bakeryBoxPallet.i3d", and the size has not been changed, then your mod pallet should work without any additional configuration.  If the size has changed, then you need to rename the i3d file (and see B).
-  
-  (B) If a mod file has a unique i3d file name, then the dimensions will be obtained from the object xml file.  Please make sure that the sizes listed are accurate and equal to (or slightly larger than) the collision box for your pallet model.  If any dimension given is too small (or much too large), then the pallets will not pack efficiently.
+  The dimensions for mods are obtained from the object xml file.  Please make sure that the sizes listed are accurate and equal to (or slightly larger than) the collision box for your pallet model.  If any dimension given is too small (or much too large), then the pallets will not pack efficiently.
 
+  PALLETS:
 	<vehicle>
 		<base>
 			<typeDesc>$l10n_typeDesc_pallet</typeDesc>
@@ -46,7 +70,22 @@
 			...
 		</base>
 	</vehicle>
-
+	
+  SQUAREBALES:
+	<bale xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../shared/xml/schema/bale.xsd">
+		<filename>$data/objects/squarebales/squarebale240/squarebale240.i3d</filename>
+		<size isRoundbale="false" width="1.2" height="0.9" length="2.4"/>  <!-- DIMENSIONS OBTAINED FROM HERE -->
+		<mountableObject triggerNode="0" forceAcceleration="7" forceLimitScale="1" axisFreeY="false" axisFreeX="false"/>
+		...
+	</bale>
+	
+  ROUNDBALES
+	<bale xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../shared/xml/schema/bale.xsd">
+		<filename>$data/objects/roundbales/roundbale180/roundbale180.i3d</filename>
+		<size isRoundbale="true" width="1.2" diameter="1.80"/>  <!-- DIMENSIONS OBTAINED FROM HERE -->
+		<mountableObject triggerNode="0" forceAcceleration="5" forceLimitScale="1" axisFreeY="false" axisFreeX="false"/>
+		...
+	</bale>
 
 ==============================================================
   VEHICLES/TRAILERS:
@@ -90,11 +129,15 @@
 	
     [noLoadingIfUnfolded] - If true this parameter will prevent loading when the trailer is unfolded.  It will also prevent loading while it is folding or unfolding.  Use this if your unfolded trailer is not level or if the folding animation somehow blocks the loading area.
 
-    [isCurtainTrailer] - This is an option specifically designed for the KRONE Profi Liner curtain trailer.  If true the autoloading script will detect the correct load side when open IF the tipSide.animation.name contains the string "Left" or "Right". Where:
+    [isBoxTrailer] - This is an option designed for any trailers with rear doors that are opened via the unfolding action.  If true the autoloading script will enable/disable loading according to the noLoadingIfFolded or noLoadingIfUnfolded (one of these two options must be supplied).
+	
+	[isCurtainTrailer] - This is an option specifically designed for the KRONE Profi Liner curtain trailer.  If true the autoloading script will detect the correct load side when open IF the tipSide.animation.name contains the string "Left" or "Right". Where:
 	tipSide = self.spec_trailer.tipSides[self.spec_trailer.currentTipSideIndex] and self.spec_trailer.tipState == 2
 
     [enableRearLoading] - This is also designed for the KRONE Profi Liner curtain trailer, but can be applied to any trailer where automatic loading is required.  A pallet trigger is created at the rear of the trailer, and will load any valid objects detected here that are dynamically mounted to another vehcile (e.g. a forklift).
-
+	
+    [enableSideLoading] - This is designed for any trailer where automatic loading is required.  A pallet trigger is created at either side of the trailer, and will load any valid objects detected here that are dynamically mounted to another vehcile (e.g. a forklift).
+	
     [showDebug] - This option will enable a graphical debugging display for the specific trailer.  It shows the loading triggers, unloading triggers, player trigger, rear loading trigger (if enabled) and detected pallet dimensions.  The detected pallets are also colour coded depending if they are valid for loading/unloading.
   
   LOADING AREA:

@@ -58,18 +58,17 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the grahpical debugging display for this vehicle", false)
 	end
 
-	local containerTypeKey = "universalAutoload.containerTypeConfigurations.containerTypeConfiguration(?)"
-	local objectTypeKey = "universalAutoload.containerTypeConfigurations.containerTypeConfiguration(?).objectType(?)"
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerTypeKey.."#containerType", "The loading type category to group under in the menu)", "ANY")
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, objectTypeKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeX", "Width of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeY", "Height of the pallet", 2.0)
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, objectTypeKey.."#sizeZ", "Length of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#isBale", "If the object is either a round bale or square bale", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#flipYZ", "Should always rotate 90 degrees to stack on end - e.g. for round bales", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverStack", "Should never load another pallet on top of this one when loading", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#neverRotate", "Should never rotate object when loading", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, objectTypeKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+	local containerKey = "universalAutoload.containerConfigurations.containerConfiguration(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerKey.."#containerType", "The loading type category to group under in the menu)", "ANY")
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeX", "Width of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeY", "Height of the pallet", 2.0)
+    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeZ", "Length of the pallet", 1.5)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#isBale", "If the object is either a round bale or square bale", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#flipYZ", "Should always rotate 90 degrees to stack on end - e.g. for round bales", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#neverStack", "Should never load another pallet on top of this one when loading", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#neverRotate", "Should never rotate object when loading", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
 
 	local schemaSavegame = Vehicle.xmlSchemaSavegame
 	--local specKey = "vehicles.vehicle(?)." .. UniversalAutoload.specName

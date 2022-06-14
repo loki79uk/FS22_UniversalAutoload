@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<universalAutoLoad>
+    <vehicleConfigurations>
+	
+        <!-- *** Base Game Example *** -->
+        <!-- <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
+            <loadingArea offset="0 1.339 -0.165" width="1.95" height="2.00" length="4.525"/>
+        </vehicleConfiguration> -->
+		
+        <!-- *** Mod Example *** -->
+        <!-- <vehicleConfiguration configFileName="FS22_20ftGooseneck/lizardgooseneck.xml">  
+            <loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
+            <options enableRearLoading="true" enableSideLoading="true"/>
+        </vehicleConfiguration> -->
+		
+    </vehicleConfigurations>
+	
+    <containerTypeConfigurations>
+		<!-- VALID CONTAINER TYPES: EURO_PALLET, BIGBAG, LIQUID_TANK, BIGBAG_PALLET, BALE, POTATOBOX-->
+		
+		<!-- *** Base Game Example *** -->
+		<!-- <containerConfiguration name="treeSaplingPallet" sizeY="2.500" neverStack="true" containerType="ALL"/> -->
+
+		<!-- *** Mod Example *** -->		
+		<!-- <containerConfiguration name="FS22_Seedpotato_Farm_Pack:PotatoBox" containerType="POTATOBOX"/> -->
+
+    </containerTypeConfigurations>
+</universalAutoLoad>

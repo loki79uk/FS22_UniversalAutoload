@@ -16,6 +16,9 @@ for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
     end
 end
 
+-- variables
+UniversalAutoload.userSettingsFile = "modSettings/UniversalAutoload.xml"
+
 -- tables
 UniversalAutoload.ACTIONS = {
 	["TOGGLE_LOADING"]        = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
@@ -63,9 +66,28 @@ UniversalAutoload.UNKNOWN_TYPES = {}
 
 -- IMPORT VEHICLE CONFIGURATIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
+
+function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteExisting)
+
+	if g_currentMission.isMultiplayer then
+		print("Custom configurations are not supported in multiplayer")
+		return
+	end
+	
+	if fileExists(userSettingsFile) then
+		print("IMPORT user vehicle configurations")
+		UniversalAutoload.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
+		print("IMPORT user container configurations")
+		UniversalAutoload.ImportContainerTypeConfigurations(userSettingsFile, overwriteExisting)
+	else
+		print("CREATING user settings file")
+		local defaultSettingsFile = Utils.getFilename("config/UniversalAutoload.xml", UniversalAutoload.path)
+		copyFile(defaultSettingsFile, userSettingsFile, false)
+	end
+end
+
 function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
 
-	print("  IMPORT supported vehicle configurations")
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 	
@@ -115,54 +137,43 @@ end
 
 -- IMPORT CONTAINER TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
+function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
 
-	print("  IMPORT container types")
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 
-		local key = "universalAutoload.containerTypeConfigurations"
 		local i = 0
 		while true do
-			local containerTypeKey = string.format("%s.containerTypeConfiguration(%d)", key, i)
-
-			if not xmlFile:hasProperty(containerTypeKey) then
+			local configKey = string.format("universalAutoload.containerConfigurations.containerConfiguration(%d)", i)
+			
+			if not xmlFile:hasProperty(configKey) then
 				break
 			end
 
-			local containerType = xmlFile:getValue(containerTypeKey.."#containerType")
+			local containerType = xmlFile:getValue(configKey.."#containerType", "ALL")
 			if tableContainsValue(UniversalAutoload.CONTAINERS, containerType) then
 			
 				local default = UniversalAutoload[containerType] or {}
-				print("  "..containerType..":")
-				
-				local j = 0
-				while true do
-					local objectTypeKey = string.format("%s.objectType(%d)", containerTypeKey, j)
-					
-					if not xmlFile:hasProperty(objectTypeKey) then
-						break
-					end
-				
-					local name = xmlFile:getValue(objectTypeKey.."#name")
+
+				local name = xmlFile:getValue(configKey.."#name")
+				local config = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+				if config == nil or overwriteExisting then
 					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
 					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					newType.name = name
-					newType.type = containerType or "ALL"
+					newType.type = containerType
 					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
-					newType.sizeX = xmlFile:getValue(objectTypeKey.."#sizeX", default.sizeX or 1.5)
-					newType.sizeY = xmlFile:getValue(objectTypeKey.."#sizeY", default.sizeY or 1.5)
-					newType.sizeZ = xmlFile:getValue(objectTypeKey.."#sizeZ", default.sizeZ or 1.5)
-					newType.isBale = xmlFile:getValue(objectTypeKey.."#isBale", default.isBale or false)
-					newType.flipYZ = xmlFile:getValue(objectTypeKey.."#flipYZ", default.flipYZ or false)
-					newType.neverStack = xmlFile:getValue(objectTypeKey.."#neverStack", default.neverStack or false)
-					newType.neverRotate = xmlFile:getValue(objectTypeKey.."#neverRotate", default.neverRotate or false)
-					newType.alwaysRotate = xmlFile:getValue(objectTypeKey.."#alwaysRotate", default.alwaysRotate or false)
-					print(string.format("  >> %s [%.3f, %.3f, %.3f]", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
-					
-					j = j + 1
+					newType.sizeX = xmlFile:getValue(configKey.."#sizeX", default.sizeX or 1.5)
+					newType.sizeY = xmlFile:getValue(configKey.."#sizeY", default.sizeY or 1.5)
+					newType.sizeZ = xmlFile:getValue(configKey.."#sizeZ", default.sizeZ or 1.5)
+					newType.isBale = xmlFile:getValue(configKey.."#isBale", default.isBale or false)
+					newType.flipYZ = xmlFile:getValue(configKey.."#flipYZ", default.flipYZ or false)
+					newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
+					newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
+					newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
+					print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", containerType, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
 				end
-				
+
 			else
 				print("  UNKNOWN CONTAINER TYPE: "..tostring(containerType))
 			end
@@ -171,34 +182,6 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename)
 		end
 
 		xmlFile:delete()
-	end
-	
-	print("  ADDITIONAL fill type containers:")
-    for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
-		if fillType.palletFilename then
-			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
-			UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
-		end
-    end
-	
-	print("  ADDITIONAL bales:")
-	for index, baleType in ipairs(g_baleManager.bales) do
-		if baleType.isAvailable then
-			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
-			UniversalAutoload.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
-		end
-	end
-	
-	print("  ADDITIONAL store item containers:")
-	for _, storeItem in pairs(g_storeManager:getItems()) do
-		if storeItem.isMod and
-		   storeItem.categoryName == "BALES" or
-		   storeItem.categoryName == "BIGBAGS" or
-		   storeItem.categoryName == "PALLETS" or
-		   storeItem.categoryName == "BIGBAGPALLETS"
-		then
-			UniversalAutoload.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
-		end	
 	end
 
 end
@@ -396,7 +379,7 @@ end
 
 function UniversalAutoloadManager:loadMap(name)
 
-	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] then
+	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] or g_modIsLoaded["FS22_SeedPotatoFarmBuildings"] then
 		print("** Seedpotato Farm Pack is loaded **")
 		table.insert(UniversalAutoload.CONTAINERS, "POTATOBOX")
 		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200 }
@@ -424,11 +407,43 @@ function UniversalAutoloadManager:loadMap(name)
 		-- print("  - "..i..": "..key.." = "..UniversalAutoload.MATERIALS_FILLTYPE[i].title)
 		UniversalAutoload.MATERIALS_INDEX[key] = i
 	end
-		
+	
+	-- USER SETTINGS FIRST
+	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
+	UniversalAutoload.ImportUserConfigurations(userSettingsFile)
+	
+	-- DEFAULT SETTINGS SECOND
+	print("IMPORT supported vehicle configurations")
 	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)
 	UniversalAutoload.ImportVehicleConfigurations(vehicleSettingsFile)
+	print("IMPORT supported container configurations")
 	local ContainerTypeSettingsFile = Utils.getFilename("config/ContainerTypes.xml", UniversalAutoload.path)
 	UniversalAutoload.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
+	
+	-- ADDITIONAL SETTINGS THIRD
+	print("ADDITIONAL fill type containers")
+    for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
+		if fillType.palletFilename then
+			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
+			UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
+		end
+    end
+	for index, baleType in ipairs(g_baleManager.bales) do
+		if baleType.isAvailable then
+			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
+			UniversalAutoload.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
+		end
+	end
+	for _, storeItem in pairs(g_storeManager:getItems()) do
+		if storeItem.isMod and
+		   storeItem.categoryName == "BALES" or
+		   storeItem.categoryName == "BIGBAGS" or
+		   storeItem.categoryName == "PALLETS" or
+		   storeItem.categoryName == "BIGBAGPALLETS"
+		then
+			UniversalAutoload.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
+		end	
+	end
 	
 	UniversalAutoload.detectKeybindingConflicts()
 

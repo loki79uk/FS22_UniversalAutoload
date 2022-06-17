@@ -18,7 +18,7 @@
 			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/lodeKing/renownTriAxleBeavertailLowDrop/renownTriAxleBeavertailLowDrop.xml">
-            <loadingArea offset="0 1.010 -1.0" width="2.40" height="2.60" length="11.1"/>
+            <loadingArea offset="0 1.010 -1.0" width="2.42" height="2.74" length="11.1"/>
 			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/krone/profiLiner/profiLiner.xml">

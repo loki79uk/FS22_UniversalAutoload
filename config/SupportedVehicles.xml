@@ -2,27 +2,27 @@
 <universalAutoLoad>
     <vehicleConfigurations>
         <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
-            <loadingArea offset="0 1.339 -0.165" width="1.95" height="2.00" length="4.525"/>
+            <loadingArea offset="0 1.339 -0.165" width="2.21" height="2.20" length="4.525"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/brantner/dd24073/dd24073.xml" selectedConfigs="1">
             <loadingArea offset="0 1.419 -0.75" width="2.41" height="2.80" length="7.25"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/fliegl/dts59/dts59.xml">
-            <loadingArea offset="0 1.205 -1.5" width="2.30" height="2.20" length="5.0"/>
+            <loadingArea offset="0 1.205 -1.5" width="2.40" height="2.40" length="5.0"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/bremerMaschinenbau/transportwagen/transportwagen.xml">
-            <loadingArea offset="0 0.515 -0.265" width="2.30" height="2.20" length="4.75"/>
+            <loadingArea offset="0 0.515 -0.265" width="2.40" height="2.40" length="4.75"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/demco/steelDropDeck/steelDropDeck.xml">
-            <loadingArea offset="0 1.010 -0.33" width="2.40" height="2.60" length="11.2"/>
+            <loadingArea offset="0 1.010 -0.33" width="2.40" height="2.74" length="11.2"/>
 			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/lodeKing/renownTriAxleBeavertailLowDrop/renownTriAxleBeavertailLowDrop.xml">
-            <loadingArea offset="0 1.010 -1.0" width="2.40" height="2.60" length="11.1"/>
+            <loadingArea offset="0 1.010 -1.0" width="2.42" height="2.74" length="11.1"/>
 			<options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/krone/profiLiner/profiLiner.xml">
-            <loadingArea offset="0 1.185 -0.1" width="2.40" height="2.50" length="13.2"/>
+            <loadingArea offset="0 1.185 -0.1" width="2.40" height="2.74" length="13.2"/>
 			<options isCurtainTrailer="true" enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/farmtech/dpw1800/dpw1800.xml">
@@ -32,7 +32,7 @@
             <loadingArea offset="0 1.275 -0.20" width="2.41" height="2.80" length="9.75"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/mhal4320/mhal4320.xml">
-            <loadingArea offset="0 0.650 -0.895" width="2.00" height="2.20" length="4.25"/>
+            <loadingArea offset="0 0.650 -0.895" width="2.00" height="2.43" length="4.25"/>
 			<options noLoadingIfUnfolded="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/kk301827H/kk301827H.xml">
@@ -52,7 +52,7 @@
             <loadingArea offset="0 0.763 -1.370" width="1.05" height="2.20" length="2.25"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/johnDeere/xuv865M/xuv865M.xml">
-            <loadingArea offset="0 0.741 -0.99" width="1.30" height="1.00" length="1.05"/>
+            <loadingArea offset="0 0.741 -0.99" width="1.30" height="1.40" length="1.05"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/mahindra/retriever/retriever.xml">
             <loadingArea offset="0 0.777 -1.04" width="1.30" height="1.40" length="0.88"/>

@@ -2101,7 +2101,29 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 		while spec.currentLoadLength < spec.loadArea.length do
 		
 			spec.currentLoadHeight = spec.currentLoadHeight or 0
-			if spec.currentLoadHeight + containerType.sizeY > spec.loadArea.height then
+
+			local containerVolume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
+			local maxLoadAreaHeight = spec.loadArea.height
+			-- ignore volume if the loading area height is already small (no need to make smaller, would just cause issues)
+			if maxLoadAreaHeight > 1.5 then
+				-- container volume based placement logic
+				if containerVolume < 0.5 then
+					-- "tiny" volume container handling, can only be stacked to half maximum height
+					-- this includes 120cm square bales, empty pallets, silage additive, olive/sunflower/canola oil pallets, cake pallet, egg box pallet
+					maxLoadAreaHeight = spec.loadArea.height * 0.5
+				elseif containerVolume < 0.875 then
+					-- "small" volume container handling, can only be stacked to 2/3 maximum height
+					maxLoadAreaHeight = spec.loadArea.height * 0.67
+				elseif containerVolume < 1.25 then
+					-- "medium" volume container handling, can be stacked to 3/4 maximum height
+					-- smallest container in this category are boards pallets
+					-- largest container in this category is the patentkali fertilizer pallet ~1.21
+					maxLoadAreaHeight = spec.loadArea.height * 0.75
+				end
+				-- Anything larger than a "medium" volume container can be stacked to maximum height
+			end
+
+			if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
 				spec.makeNewLoadingPlace = true
 			end
 		

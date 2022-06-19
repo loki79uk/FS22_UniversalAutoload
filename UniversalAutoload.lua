@@ -2116,19 +2116,15 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				local mass = UniversalAutoload.getContainerMass(object)
 				local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 				local density = mass/volume
-				print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
-				print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
-				
+				-- print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
+				-- print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
 				if density > 0.5 then
 					maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
-				end
-				if maxLoadAreaHeight < 0.5 then
-					maxLoadAreaHeight = 0.5
 				end
 				if maxLoadAreaHeight > 5*containerType.sizeY then
 					maxLoadAreaHeight = 5*containerType.sizeY
 				end
-				print("  height: " .. maxLoadAreaHeight/spec.loadArea.height)
+				-- print("  height scale: " .. maxLoadAreaHeight/spec.loadArea.height)
 			end
 
 			if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then	

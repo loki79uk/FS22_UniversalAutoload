@@ -45,9 +45,10 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vechicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
 		s.schema:register(XMLValueType.VECTOR_TRANS, s.key..".loadingArea#offset", "Offset to the centre of the loading area", "0 0 0")
-		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#height", "Height of the loading area", 0)
-		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#length", "Length of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#width", "Width of the loading area", 0)
+		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#length", "Length of the loading area", 0)
+		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#height", "Height of the loading area", 0)
+		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea#baleHeight", "Height of the loading area for BALES only", 0)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isBoxTrailer", "If trailer is enclosed with a rear door", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
@@ -1176,6 +1177,7 @@ function UniversalAutoload:onLoad(savegame)
 					spec.loadArea.width  = config.width
 					spec.loadArea.length = config.length
 					spec.loadArea.height = config.height
+					spec.loadArea.baleHeight = config.baleHeight or config.height
 					spec.loadArea.offset = config.offset
 					spec.isBoxTrailer = config.isBoxTrailer
 					spec.isCurtainTrailer = config.isCurtainTrailer
@@ -1208,6 +1210,7 @@ function UniversalAutoload:onLoad(savegame)
 					spec.loadArea.width  = xmlFile:getValue(key..".loadingArea#width")
 					spec.loadArea.length = xmlFile:getValue(key..".loadingArea#length")
 					spec.loadArea.height = xmlFile:getValue(key..".loadingArea#height")
+					spec.loadArea.baleHeight = xmlFile:getValue(key..".loadingArea#baleHeight", spec.loadArea.height)
 					spec.loadArea.offset = xmlFile:getValue(key..".loadingArea#offset", "0 0 0", true)
 					spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
 					spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
@@ -1427,8 +1430,8 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
 				--server only
 				spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
-				spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
 				spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
+				spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
 				spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
 				spec.resetLoadingPattern = false
 			end
@@ -2881,6 +2884,11 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		UniversalAutoload.DrawDebugPallet( spec.loadArea.rootNode,  W, H, L, true, false, WHITE )
 		UniversalAutoload.DrawDebugPallet( spec.loadArea.startNode, W, 0, 0, true, false, GREEN )
 		UniversalAutoload.DrawDebugPallet( spec.loadArea.endNode,   W, 0, 0, true, false, RED )
+		
+		if spec.showDebug and spec.loadArea.height ~= spec.loadArea.baleHeight then
+			H = spec.loadArea.baleHeight
+			UniversalAutoload.DrawDebugPallet( spec.loadArea.rootNode,  W, H, L, true, false, YELLOW )
+		end
 
 	end
 end

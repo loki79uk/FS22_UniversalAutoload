@@ -91,6 +91,9 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 	
+		local globalConfigKey = "universalAutoload.vehicleConfigurations"
+		local debugAll = xmlFile:getValue(globalConfigKey.."#showDebug", false)
+		
 		local i = 0
 		while true do
 			local configKey = string.format("universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
@@ -113,6 +116,7 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 				config.width  = xmlFile:getValue(configKey..".loadingArea#width")
 				config.length = xmlFile:getValue(configKey..".loadingArea#length")
 				config.height = xmlFile:getValue(configKey..".loadingArea#height")
+				config.baleHeight = xmlFile:getValue(configKey..".loadingArea#baleHeight")
 				config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
 				config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
 				config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
@@ -121,9 +125,13 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 				config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
 				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
 				--config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
-				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", false)
+				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
-				print("  >> "..configFileName.." ("..selectedConfigs..")")
+				if not config.showDebug then
+					print("  >> "..configFileName.." ("..selectedConfigs..")")
+				else
+					print("  >> "..configFileName.." ("..selectedConfigs..") DEBUG")
+				end
 			else
 				print("  CONFIG ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")")
 			end

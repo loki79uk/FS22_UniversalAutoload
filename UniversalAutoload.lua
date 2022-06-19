@@ -2106,7 +2106,32 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 		while spec.currentLoadLength < spec.loadArea.length do
 		
 			spec.currentLoadHeight = spec.currentLoadHeight or 0
-			if spec.currentLoadHeight + containerType.sizeY > spec.loadArea.height then
+			
+			local maxLoadAreaHeight = spec.loadArea.height
+			if containerType.isBale then
+				maxLoadAreaHeight = spec.loadArea.baleHeight
+			end
+			
+			if maxLoadAreaHeight > containerType.sizeY then
+				local mass = UniversalAutoload.getContainerMass(object)
+				local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
+				local density = mass/volume
+				print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
+				print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
+				
+				if density > 0.5 then
+					maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
+				end
+				if maxLoadAreaHeight < 0.5 then
+					maxLoadAreaHeight = 0.5
+				end
+				if maxLoadAreaHeight > 5*containerType.sizeY then
+					maxLoadAreaHeight = 5*containerType.sizeY
+				end
+				print("  height: " .. maxLoadAreaHeight/spec.loadArea.height)
+			end
+
+			if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then	
 				spec.makeNewLoadingPlace = true
 			end
 		
@@ -2672,6 +2697,20 @@ function UniversalAutoload.getContainerType(object)
 	end
 	
 	return objectType
+end
+--
+function UniversalAutoload.getContainerMass(object)
+	local mass = 1
+	if object.getTotalMass == nil then
+		if object.getMass ~= nil then
+			-- print("GET BALE MASS")
+			mass = object:getMass()
+		end
+	else
+		-- print("GET OBJECT MASS")
+		mass = object:getTotalMass()
+	end
+	return mass
 end
 --
 function UniversalAutoload.getMaterialType(object)

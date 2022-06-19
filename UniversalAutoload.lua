@@ -36,11 +36,13 @@ function UniversalAutoload.initSpecialization()
 	g_configurationManager:addConfigurationType("universalAutoload", g_i18n:getText("configuration_universalAutoload"), "universalAutoload", nil, nil, nil, ConfigurationUtil.SELECTOR_MULTIOPTION)
 	
 	UniversalAutoload.xmlSchema = XMLSchema.new("universalAutoload")
+	UniversalAutoload.globalKey = "universalAutoload.vehicleConfigurations"
 	UniversalAutoload.vehicleKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
 	local schemas = {
 		[1] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = UniversalAutoload.vehicleKey },
 		[2] = { ["schema"] = Vehicle.xmlSchema, ["key"] = "vehicle."..UniversalAutoload.vehicleKey }
 	}
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, UniversalAutoload.globalKey.."#showDebug", "Show the full grahpical debugging display for all vehicles", false)
 	for _, s in ipairs(schemas) do
 		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vechicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
@@ -56,7 +58,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfFolded", "Prevent loading when folded", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
-		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the grahpical debugging display for this vehicle", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full grahpical debugging display for this vehicle", false)
 	end
 
 	local containerKey = "universalAutoload.containerConfigurations.containerConfiguration(?)"

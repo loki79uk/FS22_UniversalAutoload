@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <universalAutoLoad>
-    <vehicleConfigurations>
+    <vehicleConfigurations showDebug="false">
 	
         <!-- *** Base Game Example *** -->
         <!-- <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">

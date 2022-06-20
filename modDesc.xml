@@ -2,7 +2,7 @@
 <modDesc descVersion="66">
 
     <author>loki_79</author>
-    <version>1.0.9.0</version>
+    <version>1.1.0.0</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -61,7 +61,14 @@ Configured for the following vehicles:
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Updated to work with 1.4.1.0
+v1.0.2.0
+ - Updated to work with 1.4.1.0
+v1.1.0.0
+- Added different stacking heights for bales and pallets
+- Pallets stack to different heights based on mass (to improve weight distribution)
+- Improved manual loading and unloading with a forklift
+- Manual side loading added to KRONE and low loader trailers
+- Added Box Trailer vehicle type
 ]]>
 </en>
 
@@ -110,7 +117,14 @@ Liste der kompatiblen Fahrzeuge:
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Aktualisiert für die Verwendung mit 1.4.1.0
+v1.0.2.0
+- Aktualisiert für die Verwendung mit 1.4.1.0
+v1.1.0.0
+- Unterschiedliche Stapelhöhen für Ballen und Paletten hinzugefügt
+- Paletten lassen sich je nach Masse unterschiedlich hoch stapeln (um die Gewichtsverteilung zu verbessern)
+- Verbessertes manuelles Be- und Entladen mit einem Gabelstapler
+- Manuelle Seitenverladung bei KRONE- und Tieflader-Anhängern hinzugefügt
+- Fahrzeugtyp "Box Trailer" hinzugefügt
 ]]>
 </de>
 
@@ -159,7 +173,14 @@ Liste des véhicules compatibles :
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Mis à jour pour fonctionner avec la version 1.4.1.0
+v1.0.2.0
+- Mis à jour pour fonctionner avec la version 1.4.1.0
+v1.1.0.0
+- Ajout de différentes hauteurs d'empilage pour les balles et les palettes
+- Les palettes s'empilent à des hauteurs différentes en fonction de leur masse (pour améliorer la répartition du poids)
+- Amélioration du chargement et du déchargement manuels avec un chariot élévateur à fourche
+- Chargement latéral manuel a été ajouté aux remorques KRONE et aux remorques surbaissées
+- Ajout du type de véhicule Box Trailer
 ]]>
 </fr>
 
@@ -208,7 +229,14 @@ Nakonfigurováno pro následující vozidla:
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Aktualizováno pro práci s verzí 1.4.1.0
+v1.0.2.0
+- Aktualizováno pro práci s verzí 1.4.1.0
+v1.1.0.0
+- Přidány různé výšky stohování balíků a palet
+- Palety se stohují do různých výšek v závislosti na hmotnosti (pro lepší rozložení hmotnosti)
+- Vylepšeno ruční nakládání a vykládání pomocí vysokozdvižného vozíku
+- Ruční boční nakládání přidané do přívěsů KRONE a nízkonákladových přívěsů
+- Přidán typ vozidla Box Trailer
 
 CZ překlad: SniperKittenCZ
 ]]>
@@ -257,7 +285,14 @@ Skonfigurowany dla następujących pojazdów:
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Zaktualizowano do pracy z wersją 1.4.1.0
+v1.0.2.0
+- Zaktualizowano do pracy z wersją 1.4.1.0
+v1.1.0.0
+- Dodano różne wysokości układania w stos dla bel i palet
+- Palety układane są na różnych wysokościach w zależności od masy (aby poprawić rozkład ciężaru)
+- Usprawniono ręczny załadunek i rozładunek za pomocą wózka widłowego
+- Dodano ręczny załadunek boczny w przyczepach KRONE i niskopodwoziowych
+- Dodano typ pojazdu Box Trailer
 
 TRANSLATION - PL by ELRICOFATAL
 ]]>
@@ -307,7 +342,14 @@ Configurado para los siguientes vehículos:
 - JohnDeer XUV865M
 
 Changelog:
-v1.0.2.0 - Actualizado para funcionar en 1.4.1.0
+v1.0.2.0
+- Actualizado para funcionar en 1.4.1.0
+v1.1.0.0
+- Añadidas diferentes alturas de apilamiento para balas y palets
+- Los palés se apilan a diferentes alturas en función de la masa (para mejorar la distribución del peso)
+- Mejora de la carga y descarga manual con una carretilla elevadora
+- Carga lateral manual añadida a los remolques KRONE y de plataforma baja
+- Añadido el tipo de vehículo Box Trailer
 
 TRANSLATION - ES by Aphroo7
 ]]>

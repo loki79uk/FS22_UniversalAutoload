@@ -2112,7 +2112,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				maxLoadAreaHeight = spec.loadArea.baleHeight
 			end
 			
-			if maxLoadAreaHeight > containerType.sizeY then
+			if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
 				local mass = UniversalAutoload.getContainerMass(object)
 				local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 				local density = mass/volume

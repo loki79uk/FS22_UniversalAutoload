@@ -111,13 +111,25 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs") or "ALL"
 			if configGroup[selectedConfigs] == nil or overwriteExisting then
 				configGroup[selectedConfigs] = {}
+				configGroup[selectedConfigs].loadingArea = {}
 				
 				local config = configGroup[selectedConfigs]
-				config.width  = xmlFile:getValue(configKey..".loadingArea#width")
-				config.length = xmlFile:getValue(configKey..".loadingArea#length")
-				config.height = xmlFile:getValue(configKey..".loadingArea#height")
-				config.baleHeight = xmlFile:getValue(configKey..".loadingArea#baleHeight")
-				config.offset = xmlFile:getValue(configKey..".loadingArea#offset", "0 0 0", true)
+				
+					local j = 0
+					while true do
+						local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
+						if not xmlFile:hasProperty(loadAreaKey) then
+							break
+						end
+						config.loadingArea[j+1] = {}
+						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
+						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
+						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
+						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight")
+						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+						j = j + 1
+					end
+					
 				config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
 				config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 				config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)

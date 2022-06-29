@@ -125,8 +125,10 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
 						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
 						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
-						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight")
+						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
 						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
+						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 						j = j + 1
 					end
 					

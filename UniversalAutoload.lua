@@ -50,7 +50,9 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#width", "Width of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#length", "Length of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#height", "Height of the loading area", 0)
-		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#baleHeight", "Height of the loading area for BALES only", 0)
+		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#baleHeight", "Height of the loading area for BALES only", nil)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfFolded", "Prevent loading when folded (for this area only)", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUnfolded", "Prevent loading when unfolded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isBoxTrailer", "If trailer is enclosed with a rear door", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
@@ -81,7 +83,8 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadWidth", "Last used load width", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadLength", "Last used load length", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadHeight", "Last used load height", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used total load width", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used expected load width", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualLength", "Last used complete load length", 0)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
@@ -870,6 +873,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 					spec.trailerIsFull = false
 					spec.partiallyUnloaded = false
 					spec.resetLoadingPattern = true
+					spec.currentLoadAreaIndex = 1
 				else
 					spec.partiallyUnloaded = true
 				end
@@ -1187,8 +1191,10 @@ function UniversalAutoload:onLoad(savegame)
 						spec.loadArea[i].width      = loadArea.width
 						spec.loadArea[i].length     = loadArea.length
 						spec.loadArea[i].height     = loadArea.height
-						spec.loadArea[i].baleHeight = loadArea.baleHeight or loadArea.height
+						spec.loadArea[i].baleHeight = loadArea.baleHeight
 						spec.loadArea[i].offset     = loadArea.offset
+						spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
+						spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
 					end
 					spec.isBoxTrailer = config.isBoxTrailer
 					spec.isCurtainTrailer = config.isCurtainTrailer
@@ -1228,8 +1234,10 @@ function UniversalAutoload:onLoad(savegame)
 						spec.loadArea[j+1].width      = xmlFile:getValue(loadAreaKey.."#width")
 						spec.loadArea[j+1].length     = xmlFile:getValue(loadAreaKey.."#length")
 						spec.loadArea[j+1].height     = xmlFile:getValue(loadAreaKey.."#height")
-						spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", spec.loadArea.height)
+						spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
 						spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+						spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
+						spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 						j = j + 1
 					end
 					spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
@@ -1489,6 +1497,7 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
 				spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
 				spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
+				spec.currentActualLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualLength", 0)
 				spec.currentLoadAreaIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadAreaIndex", 1)
 				spec.resetLoadingPattern = false
 			end
@@ -1504,10 +1513,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 		if spec.isAutoloadEnabled then
 			-- print("UniversalAutoload - saveToXMLFile: "..self:getFullName())
 			if spec.resetLoadingPattern ~= false then
-				spec.currentLoadWidth = 0
-				spec.currentLoadHeight = 0
-				spec.currentLoadLength = 0
-				spec.currentLoadAreaIndex = 1
+				UniversalAutoload.resetLoadingPattern(self)
 			end
 		
 			-- HACK (FOR NOW) - need to find out if this can be avoided..
@@ -1523,6 +1529,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight or 0)
 			xmlFile:setValue(correctedKey.."#loadLength", spec.currentLoadLength or 0)
 			xmlFile:setValue(correctedKey.."#actualWidth", spec.currentActualWidth or 0)
+			xmlFile:setValue(correctedKey.."#actualLength", spec.currentActualLength or 0)
 			xmlFile:setValue(correctedKey.."#loadAreaIndex", spec.currentLoadAreaIndex or 1)
 		end
 	end
@@ -1642,11 +1649,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	end
 	
 	if spec.isAutoloadEnabled and self.isServer then
-	
-		-- if spec.detectCurrentLoad then
-			-- UniversalAutoload.testLoadAreaIsEmpty(self)
-			-- spec.detectCurrentLoad = false
-		-- end
 
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
@@ -1825,6 +1827,18 @@ function UniversalAutoload:isValidForUnloading(object)
 	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and spec.autoLoadingObjects[object] == nil
 end
 --
+function UniversalAutoload.isValidForManualLoading(object)
+	if object.dynamicMountObject ~= nil then
+		return true
+	end
+	if g_currentMission.player ~= nil then
+		local rootNode = UniversalAutoload.getObjectNode(object)
+		if g_currentMission.player.pickedUpObject == rootNode then
+			return true
+		end
+	end
+end
+--
 function UniversalAutoload:countActivePallets()
 	-- print("COUNT ACTIVE PALLETS")
 	local spec = self.spec_universalAutoload
@@ -1880,6 +1894,63 @@ function UniversalAutoload:countActivePallets()
 		-- --spec.totalUnloadCount = totalUnloadCount
 		-- print("TOTAL UNLOAD COUNT ERROR: "..tostring(spec.totalUnloadCount).." vs "..tostring(totalUnloadCount))
 	-- end
+end
+--
+function UniversalAutoload:getBoundingBox()
+	local spec = self.spec_universalAutoload
+	spec.boundingBox = {}
+
+	local x0, y0, z0 = math.huge, math.huge, math.huge
+	local x1, y1, z1 = -math.huge, -math.huge, -math.huge
+	for _, object in pairs(spec.loadedObjects) do
+		print("  loaded object: " .. tostring(object.id).." ("..tostring(object.currentSavegameId or "BALE")..")")
+		
+		local node = UniversalAutoload.getObjectNode(object)
+		if node ~= nil then
+		
+			local containerType = UniversalAutoload.getContainerType(object)
+			local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+			local xx,xy,xz = localDirectionToLocal(node, spec.loadVolume.rootNode, w,0,0)
+			local yx,yy,yz = localDirectionToLocal(node, spec.loadVolume.rootNode, 0,h,0)
+			local zx,zy,zz = localDirectionToLocal(node, spec.loadVolume.rootNode, 0,0,l)
+			
+			local W, H, L = math.abs(xx+yx+zx), math.abs(xy+yy+zy), math.abs(xz+yz+zz)
+			if containerType.flipYZ then
+				L, H = math.abs(xy+yy+zy), math.abs(xz+yz+zz)
+			end
+			
+			local X, Y, Z = localToLocal(node, spec.loadVolume.rootNode, 0, 0, 0)
+			if containerType.isBale then Y = Y-(H/2) end
+			
+			-- include object in bounding box
+			if x0 > X-(W/2) then x0 = X-(W/2) end
+			if x1 < X+(W/2) then x1 = X+(W/2) end
+			if y0 > Y then y0 = Y end
+			if y1 < Y+(H) then y1 = Y+(H) end
+			if z0 > Z-(L/2) then z0 = Z-(L/2) end
+			if z1 < Z+(L/2) then z1 = Z+(L/2) end
+			
+		end
+	end
+	
+	-- create bounding box for all objects
+	local width = x1-x0
+	local height = y1-y0
+	local length = z1-z0
+	
+	local offsetX, offsetY, offsetZ = (x0+x1)/2, y0, (z0+z1)/2
+	
+	print(string.format("(W,H,L) = (%f, %f, %f)", width, height, length))
+	print(string.format("(X,Y,Z) = (%f, %f, %f)", offsetX, offsetY, offsetZ))
+	print(string.format("(X0,Y0,Z0) = (%f, %f, %f)", localToWorld(spec.loadVolume.rootNode, 0, 0, 0)))
+
+	spec.boundingBox.rootNode = createTransformGroup("loadVolumeCentre")
+	link(spec.loadVolume.rootNode, spec.boundingBox.rootNode)
+	setTranslation(spec.boundingBox.rootNode, offsetX, offsetY, offsetZ)
+	
+	spec.boundingBox.width = x1-x0
+	spec.boundingBox.height = y1-y0
+	spec.boundingBox.length = z1-z0
 end
 
 -- LOADING AND UNLOADING FUNCTIONS
@@ -2026,39 +2097,40 @@ function UniversalAutoload.unmountDynamicMount(object)
 	end
 end
 
-function UniversalAutoload:addLoadPlace(containerType)
+function UniversalAutoload:createLoadingPlace(containerType)
     local spec = self.spec_universalAutoload
 	
 	spec.currentLoadWidth = spec.currentLoadWidth or 0
 	spec.currentLoadLength = spec.currentLoadLength or 0
+	
 	spec.currentActualWidth = spec.currentActualWidth or 0
+	spec.currentActualLength = spec.currentActualLength or 0
+	
 	local i = spec.currentLoadAreaIndex or 1
-	local lastLoadPlace = spec.currentLoadingPlace
 	
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea[i].width
-	local length = spec.loadArea[i].length - spec.currentLoadLength
+	local length = spec.loadArea[i].length -- spec.currentActualLength
 	local N1 = math.floor(width / containerType.sizeX)
 	local M1 = math.floor(length / containerType.sizeZ)
 	local N2 = math.floor(width / containerType.sizeZ)
 	local M2 = math.floor(length / containerType.sizeX)
 	
-	if N2*M2 == N1*M1 then
-		-- if equal then use same packing as an empty trailer
-		N1 = math.floor(spec.loadArea[i].width / containerType.sizeX)
-		M1 = math.floor(spec.loadArea[i].length / containerType.sizeZ)
-		N2 = math.floor(spec.loadArea[i].width / containerType.sizeZ)
-		M2 = math.floor(spec.loadArea[i].length / containerType.sizeX)
-	end
-
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	local doRotate = nil
-	if lastLoadPlace~=nil and lastLoadPlace.containerType==containerType then
-		doRotate = (lastLoadPlace.rotation == (math.pi/2))
-	else
-		doRotate = (((N2*M2) > (N1*M1)) or containerType.alwaysRotate) and not containerType.neverRotate
+	local shouldRotate = ((N2*M2) > (N1*M1)) or (N1 > N2)
+
+	if spec.showDebug then
+		print("===============================")
+		print(containerType.name)
+		print("width: " .. tostring(width) )
+		print("length: " .. tostring(length) )
+		print(" N1: "..N1.. " ,  M1: "..M1)
+		print(" N2: "..N2.. " ,  M2: "..M2)
+		print("shouldRotate: " .. tostring(shouldRotate) )
 	end
+	
+	local doRotate = (containerType.alwaysRotate or shouldRotate) and not containerType.neverRotate
 	if doRotate then
 		N, M = N2, M2
 		rotation = math.pi/2
@@ -2084,37 +2156,51 @@ function UniversalAutoload:addLoadPlace(containerType)
 		NR = math.floor(width / (R*containerType.sizeX))
 		MR = math.floor(length / (R*containerType.sizeX))
 		if NR > N and width >= (2*R)*containerType.sizeX then
+			-- print("ROUNDBALE PACKING")
 			useRoundbalePacking = true
 			N, M = NR, MR
 			sizeX = R*containerType.sizeX
 		end
 	end
 	
-	if not useRoundbalePacking and (lastLoadPlace~=nil and lastLoadPlace.useRoundbalePacking) then
-		spec.currentLoadLength = spec.currentLoadLength + lastLoadPlace.roundbaleOffset + 0.01
-	end
+	-- if not useRoundbalePacking and (lastLoadPlace~=nil and lastLoadPlace.useRoundbalePacking) then
+		-- print("ROUNDBALE OFFSET")
+		-- spec.currentLoadLength = spec.currentLoadLength + lastLoadPlace.roundbaleOffset + 0.01
+	-- end
 
 	--UPDATE NEW PACKING DIMENSIONS
 	spec.currentLoadHeight = 0
-	if spec.currentLoadWidth==0 or spec.currentLoadWidth + sizeX > spec.loadArea[i].width then
+	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + sizeX > spec.loadArea[i].width then
 		spec.currentLoadWidth = sizeX
 		spec.currentActualWidth = N * sizeX
+		spec.currentActualLength = spec.currentLoadLength
 		spec.currentLoadLength = spec.currentLoadLength + sizeZ
 	else
 		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
 	end
+
 	if spec.currentLoadLength == 0 then
 		-- print("LOAD LENGTH WAS ZERO")
 		spec.currentLoadLength = sizeZ
 	end
+	
 	if useRoundbalePacking then
 		if (spec.currentLoadWidth/sizeX) % 2 == 0 then
 			roundbaleOffset = containerType.sizeZ/2
 		end
 	end
 	
+	if spec.showDebug then
+		print("LoadingAreaIndex: " .. tostring(spec.currentLoadAreaIndex) )
+		print("currentLoadWidth: " .. tostring(spec.currentLoadWidth) )
+		print("currentLoadLength: " .. tostring(spec.currentLoadLength) )
+		print("currentActualWidth: " .. tostring(spec.currentActualWidth) )
+		print("currentActualLength: " .. tostring(spec.currentActualLength) )
+		print("===============================")
+	end
+	
 	if spec.currentLoadLength<spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
-		--CREATE NEW LOADING PLACE
+		-- print("CREATE NEW LOADING PLACE")
 		loadPlace = {}
 		--loadPlace.index = #spec.currentLoadingPattern + 1
 		loadPlace.node = createTransformGroup("loadPlace")
@@ -2147,117 +2233,153 @@ function UniversalAutoload:addLoadPlace(containerType)
 		
 		--STORE AS CURRENT LOADING PLACE
 		spec.currentLoadingPlace = loadPlace
+
 	else
 		-- print("FULL - NO MORE ROOM")
 		spec.trailerIsFull = true
 	end
 end
-
+--
+function UniversalAutoload:resetLoadingPattern()
+    local spec = self.spec_universalAutoload
+	print("RESET LOADING PATTERN")
+	spec.currentLoadWidth = 0
+	spec.currentLoadHeight = 0
+	spec.currentLoadLength = 0
+	spec.currentActualWidth = 0
+	spec.currentActualLength = 0
+	spec.currentLoadingPlace = nil
+end
+--
 function UniversalAutoload:getLoadPlace(containerType, object)
     local spec = self.spec_universalAutoload
 	
 	if containerType ~= nil then
-		if spec.resetLoadingPattern ~= false then
-			-- print("RESET LOADING PATTERN")
-			spec.currentLoadWidth = 0
-			spec.currentLoadHeight = 0
-			spec.currentLoadLength = 0
-			spec.currentLoadAreaIndex = 1
-			spec.currentLoadingPlace = nil
-			spec.resetLoadingPattern = false
-		end
-		
+
 		local i = spec.currentLoadAreaIndex or 1
 		while i <= #spec.loadArea do
-			while spec.currentLoadLength < spec.loadArea[i].length do
+			if spec.resetLoadingPattern ~= false then
+				UniversalAutoload.resetLoadingPattern(self)
+				spec.resetLoadingPattern = false
+			end
+		
+			local noLoadingFolded = spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())
+			local noLoadingUnfolded = spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())
+			if not (noLoadingFolded or noLoadingUnfolded) then
 			
-				spec.currentLoadHeight = spec.currentLoadHeight or 0
+				while spec.currentLoadLength < spec.loadArea[i].length do
 				
-				local maxLoadAreaHeight = spec.loadArea[i].height
-				if containerType.isBale then
-					maxLoadAreaHeight = spec.loadArea[i].baleHeight
-				end
-				
-				if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
-					local mass = UniversalAutoload.getContainerMass(object)
-					local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
-					local density = mass/volume
-					-- print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
-					-- print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
-					if density > 0.5 then
-						maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
+					spec.currentLoadHeight = spec.currentLoadHeight or 0
+					
+					local maxLoadAreaHeight = spec.loadArea[i].height
+					if containerType.isBale and spec.loadArea[i].baleHeight ~= nil then
+						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
-					if maxLoadAreaHeight > 5*containerType.sizeY then
-						maxLoadAreaHeight = 5*containerType.sizeY
+					
+					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
+						local mass = UniversalAutoload.getContainerMass(object)
+						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
+						local density = mass/volume
+						-- print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
+						-- print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
+						if density > 0.5 then
+							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
+						end
+						if maxLoadAreaHeight > 5*containerType.sizeY then
+							maxLoadAreaHeight = 5*containerType.sizeY
+						end
+						-- print("  height scale: " .. maxLoadAreaHeight/spec.loadArea[i].height)
 					end
-					-- print("  height scale: " .. maxLoadAreaHeight/spec.loadArea[i].height)
-				end
 
-				if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then	
+					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
+						if containerType.isBale or (spec.currentLoadingPlace and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
+							print("SET LOADING PLACE TO NIL")
+							spec.currentLoadingPlace = nil
+						else
+							print("PALLET IS MISSING FROM THIS PLACE - TRY AGAIN")
+						end
+					end
+				
+					if not spec.currentLoadingPlace then
+						-- print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+						UniversalAutoload.createLoadingPlace(self, containerType)
+					end
+
+					local thisLoadHeight = spec.currentLoadHeight
+					local thisLoadPlace = spec.currentLoadingPlace
+					if thisLoadPlace ~= nil then
+					
+						local containerFitsInLoadSpace = containerType.flipYZ == thisLoadPlace.flipYZ and
+							((containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
+							or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
+
+						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
+						-- print("(x0,y0,z0) = " .. x0 .. ",".. y0 .. "," .. z0)
+						-- setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+						
+						if containerFitsInLoadSpace then
+							local useThisLoadSpace = false
+							if self.lastSpeedReal < 0.0005 then
+								spec.trailerIsMoving = false
+								-- while thisLoadHeight >= 0 do
+									-- if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) and (thisLoadHeight==0 or containerType.isBale or
+									-- UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)) then
+										-- useThisLoadSpace = true
+										-- break
+									-- end
+							
+								local increment = 0.1
+								while thisLoadHeight >= -increment do
+								
+									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+								
+									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
+									and (thisLoadHeight<=0 or containerType.isBale
+										or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
+									then
+										spec.currentLoadHeight = math.max(0,thisLoadHeight)
+										useThisLoadSpace = true
+										break
+									end
+									-- print("Not empty OR no pallet found below position")
+									thisLoadHeight = thisLoadHeight - increment
+								end
+							else
+								spec.trailerIsMoving = true
+								if containerType.isBale and not spec.partiallyUnloaded and not spec.trailerIsFull then
+									useThisLoadSpace = true
+								else
+									if not spec.trailerIsFull then
+										--NO_LOADING_UNLESS_STATIONARY
+										UniversalAutoload.showWarningMessage(self, 4)
+									end
+									return
+								end
+							end
+							
+							if useThisLoadSpace then
+								print("USING LOAD PLACE")
+								if containerType.neverStack then
+									spec.currentLoadingPlace = nil
+								end
+								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+								return thisLoadPlace
+							end
+						end
+					end
+
+					print("DID NOT FIT HERE...")
 					spec.currentLoadingPlace = nil
 				end
-			
-				if not spec.currentLoadingPlace then
-					-- print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
-					UniversalAutoload.addLoadPlace(self, containerType)
-				end
-
-				local thisLoadHeight = spec.currentLoadHeight
-				local thisLoadPlace = spec.currentLoadingPlace
-				if thisLoadPlace ~= nil then
-				
-					local containerFitsInLoadSpace = containerType.flipYZ == thisLoadPlace.flipYZ and
-						((containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
-						or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
-
-					local x0,y0,z0 = getTranslation(thisLoadPlace.node)
-					setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-					
-					if containerFitsInLoadSpace then
-						local useThisLoadSpace = false
-						if self.lastSpeedReal < 0.0005 then
-							spec.trailerIsMoving = false
-							while thisLoadHeight >= 0 do
-								if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) and (thisLoadHeight==0 or containerType.isBale or
-								UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)) then
-									useThisLoadSpace = true
-									break
-								end
-								-- print("Not empty OR no pallet found below position")
-								thisLoadHeight = thisLoadHeight - 0.1
-							end
-						else
-							spec.trailerIsMoving = true
-							if containerType.isBale and not spec.partiallyUnloaded and not spec.trailerIsFull then
-								useThisLoadSpace = true
-							else
-								if not spec.trailerIsFull then
-									--NO_LOADING_UNLESS_STATIONARY
-									UniversalAutoload.showWarningMessage(self, 4)
-								end
-								return
-							end
-						end
-						
-						if useThisLoadSpace then
-							-- print("USING LOAD PLACE: " .. tostring(loadPlace.index) )
-							if containerType.neverStack then
-								spec.currentLoadingPlace = nil
-							end
-							spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-							return thisLoadPlace
-						end
-					end
-				end
-
-				-- print("DID NOT FIT HERE...")
-				spec.currentLoadingPlace = nil
 			end
+			print("TRY NEXT LOADING AREA...")
 			i = i + 1
-			spec.currentLoadWidth = 0
-			spec.currentLoadHeight = 0
-			spec.currentLoadLength = 0
-			spec.currentLoadAreaIndex = i
+			spec.resetLoadingPattern = true
+			if i <= #spec.loadArea then
+				spec.currentLoadAreaIndex = i
+			else
+				spec.currentLoadAreaIndex = 1
+			end
 		end
 		spec.currentLoadAreaIndex = 1
 	end
@@ -2349,7 +2471,7 @@ function UniversalAutoload:testLocationIsFull(loadPlace, offset)
 	local dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
 		
 	spec.foundObject = false
-	spec.currentObject = object
+	spec.currentObject = self
 	
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
@@ -2398,7 +2520,7 @@ end
 function UniversalAutoload:testLoadAreaIsEmpty()
 	local spec = self.spec_universalAutoload
 	local i = spec.currentLoadAreaIndex or 1
-	print(self:getFullName() .. " IS EMPTY: " .. tostring(next(spec.loadedObjects) == nil))
+	--print(self:getFullName() .. " IS EMPTY: " .. tostring(next(spec.loadedObjects) == nil))
 	
 	local sizeX, sizeY, sizeZ = spec.loadArea[i].width/2, spec.loadArea[i].height/2, spec.loadArea[i].length/2
 	local x, y, z = localToWorld(spec.loadArea[i].rootNode, 0, 0, 0)
@@ -2411,63 +2533,7 @@ function UniversalAutoload:testLoadAreaIsEmpty()
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
 
-	print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
-	spec.boundingBox = {}
-	if spec.foundObject then
-
-		local x0, y0, z0 = math.huge, math.huge, math.huge
-		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
-		for _, object in pairs(spec.loadedObjects) do
-			print("  loaded object: " .. tostring(object.id).." ("..tostring(object.currentSavegameId or "BALE")..")")
-			
-			local node = UniversalAutoload.getObjectNode(object)
-			if node ~= nil then
-			
-				local containerType = UniversalAutoload.getContainerType(object)
-				local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
-				local xx,xy,xz = localDirectionToLocal(node, spec.loadVolume.rootNode, w,0,0)
-				local yx,yy,yz = localDirectionToLocal(node, spec.loadVolume.rootNode, 0,h,0)
-				local zx,zy,zz = localDirectionToLocal(node, spec.loadVolume.rootNode, 0,0,l)
-				
-				local W, H, L = math.abs(xx+yx+zx), math.abs(xy+yy+zy), math.abs(xz+yz+zz)
-				if containerType.flipYZ then
-					L, H = math.abs(xy+yy+zy), math.abs(xz+yz+zz)
-				end
-				
-				local X, Y, Z = localToLocal(node, spec.loadVolume.rootNode, 0, 0, 0)
-				if containerType.isBale then Y = Y-(H/2) end
-				
-				-- include object in bounding box
-				if x0 > X-(W/2) then x0 = X-(W/2) end
-				if x1 < X+(W/2) then x1 = X+(W/2) end
-				if y0 > Y then y0 = Y end
-				if y1 < Y+(H) then y1 = Y+(H) end
-				if z0 > Z-(L/2) then z0 = Z-(L/2) end
-				if z1 < Z+(L/2) then z1 = Z+(L/2) end
-				
-			end
-		end
-		
-		-- create bounding box for all objects
-		local width = x1-x0
-		local height = y1-y0
-		local length = z1-z0
-		
-		local offsetX, offsetY, offsetZ = (x0+x1)/2, y0, (z0+z1)/2
-		
-		print(string.format("(W,H,L) = (%f, %f, %f)", width, height, length))
-		print(string.format("(X,Y,Z) = (%f, %f, %f)", offsetX, offsetY, offsetZ))
-		print(string.format("(X0,Y0,Z0) = (%f, %f, %f)", localToWorld(spec.loadVolume.rootNode, 0, 0, 0)))
-
-		spec.boundingBox.rootNode = createTransformGroup("loadVolumeCentre")
-		link(spec.loadVolume.rootNode, spec.boundingBox.rootNode)
-		setTranslation(spec.boundingBox.rootNode, offsetX, offsetY, offsetZ)
-		
-		spec.boundingBox.width = x1-x0
-		spec.boundingBox.height = y1-y0
-		spec.boundingBox.length = z1-z0
-	end
-
+	--print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
 	return not spec.foundObject
 end
 --
@@ -2597,7 +2663,7 @@ end
 
 -- TRIGGER CALLBACK FUNCTIONS
 function UniversalAutoload:playerTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	if otherActorId ~= 0 then
+	if self ~= nil and otherActorId ~= 0 then
 		for _, player in pairs(g_currentMission.players) do
 			if otherActorId == player.rootNode then
 				
@@ -2622,7 +2688,7 @@ function UniversalAutoload:playerTrigger_Callback(triggerId, otherActorId, onEnt
 end
 --
 function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	if otherActorId ~= 0 then
+	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
@@ -2638,7 +2704,7 @@ function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEn
 end
 --
 function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	if otherActorId ~= 0 then
+	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
@@ -2654,7 +2720,7 @@ function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, on
 end
 --
 function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
-	if otherActorId ~= 0 then
+	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
@@ -2671,7 +2737,8 @@ end
 --
 function UniversalAutoload:addLoadedObject(object)
 	local spec = self.spec_universalAutoload
-	if spec.loadedObjects[object] == nil and object.dynamicMountObject == nil then
+	
+	if spec.loadedObjects[object] == nil and not UniversalAutoload.isValidForManualLoading(object) then
 		spec.loadedObjects[object] = object
 		spec.objectToLoadingAreaIndex[object] = spec.currentLoadAreaIndex
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
@@ -2690,6 +2757,10 @@ function UniversalAutoload:removeLoadedObject(object)
 		spec.totalUnloadCount = spec.totalUnloadCount - 1
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "onDeleteLoadedObject_Callback")
+		end
+		if next(spec.loadedObjects) == nil then
+			spec.resetLoadingPattern = true
+			spec.currentLoadAreaIndex = 1
 		end
 		return true
 	end
@@ -2763,15 +2834,22 @@ end
 --
 function UniversalAutoload:addAutoLoadingObject(object)
 	local spec = self.spec_universalAutoload
-	
-	if object.dynamicMountObject ~= nil then
+
+	if UniversalAutoload.isValidForManualLoading(object) then
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "onDeleteAutoLoadingObject_Callback")
 			end
+			local rootNode = UniversalAutoload.getObjectNode(object)
+			if g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
+				g_currentMission.player:pickUpObject(false)
+			end
 			return true
 		end
+	else
+		--print("OBJECT: " .. object:getFullName() )
+		--DebugUtil.printTableRecursively(object, "--", 0, 1)
 	end
 end
 --
@@ -3064,13 +3142,24 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		for i, loadArea in pairs(spec.loadArea) do
 			local W, H, L = loadArea.width, loadArea.height, loadArea.length
 			if not spec.showDebug then H = 0 end
-			UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, WHITE )
-			UniversalAutoload.DrawDebugPallet( loadArea.startNode, W, 0, 0, true, false, GREEN )
-			UniversalAutoload.DrawDebugPallet( loadArea.endNode,   W, 0, 0, true, false, RED )
 			
-			if spec.showDebug and loadArea.height ~= loadArea.baleHeight then
-				H = loadArea.baleHeight
-				UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, YELLOW )
+			local noLoadingFolded = spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())
+			local noLoadingUnfolded = spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())
+			if not (noLoadingFolded or noLoadingUnfolded) then
+				UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, WHITE )
+				UniversalAutoload.DrawDebugPallet( loadArea.startNode, W, 0, 0, true, false, GREEN )
+				UniversalAutoload.DrawDebugPallet( loadArea.endNode,   W, 0, 0, true, false, RED )
+				
+				if spec.showDebug and loadArea.baleHeight ~= nil then
+					H = loadArea.baleHeight
+					UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, YELLOW )
+				end
+			else
+				UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, GRAY )
+				if spec.showDebug and loadArea.baleHeight ~= nil then
+					H = loadArea.baleHeight
+					UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, GRAY )
+				end
 			end
 		end
 

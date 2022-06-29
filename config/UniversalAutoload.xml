@@ -15,7 +15,7 @@
 		
     </vehicleConfigurations>
 	
-    <containerTypeConfigurations>
+    <containerConfigurations>
 		<!-- VALID CONTAINER TYPES: EURO_PALLET, BIGBAG, LIQUID_TANK, BIGBAG_PALLET, BALE, POTATOBOX-->
 		
 		<!-- *** Base Game Example *** -->
@@ -24,5 +24,5 @@
 		<!-- *** Mod Example *** -->		
 		<!-- <containerConfiguration name="FS22_Seedpotato_Farm_Pack:PotatoBox" containerType="POTATOBOX"/> -->
 
-    </containerTypeConfigurations>
+    </containerConfigurations>
 </universalAutoLoad>

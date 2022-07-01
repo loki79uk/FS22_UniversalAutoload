@@ -13,6 +13,7 @@
 		<cz>Univerzální Autoload</cz>
 		<pl>Universalne Autoładowanie</pl>
 		<es>Autoload Universal</es>
+		<br>Carregamento automático Universal</br>
     </title>
 	
     <description>
@@ -354,6 +355,63 @@ v1.1.0.0
 TRANSLATION - ES by Aphroo7
 ]]>
 </es>
+<br><![CDATA[Especialização em carregamento automático para reboques planos. Isso modifica automaticamente os trailers reais do jogo base e será aplicado a quaisquer trailers novos ou existentes em sua fazenda. Consulte o arquivo README para obter instruções sobre como adicionar seus próprios trailers ou paletes de mods.
+
+Características:
+- Carrega qualquer tipo de palete/contêiner compatível (veja a lista abaixo)
+- Instalado automaticamente em qualquer reboque compatível (veja a lista abaixo)
+- Carregar e descarregar por material selecionado ou tipo de contêiner
+- Também pode restringir o carregamento apenas para paletes completos
+- Selecione 'ALL' para carregar tipos mistos em sequência
+- Paletes mistos são carregados em ordem de tamanho para melhor eficiência de embalagem
+- Pode interagir com trailers quando o jogador estiver a pé (mesmo quando não estiver preso a um veículo)
+
+Recursos especiais para 'KRONE Trailer Profi Liner'
+- Carregar/Descarregar disponível apenas no lado em que a cortina está aberta
+- Carga traseira diretamente da empilhadeira
+- Porta traseira e cortina podem ser abertas e fechadas pelo jogador a pé
+
+Configurado para os seguintes tipos de contêiner:
+- Bigbags
+- Paletes BigBag
+- Euro-Paletes
+- Tanques de Líquido IBC
+- Fardos Quadrados
+- Caixa de Batatas (requer mod: Seed Potato Pack)
+
+Configurado para os seguintes trailers:
+- Brantner DD 24073/2 XXL (reboque de fardos)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (padrão)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24 (padrão)
+- LODE KING Renown Drop Deck
+- Welger DK 115 (reboque de fardos)
+- Salek ANS-1900 (reboque de fardos)
+
+Configurado para os seguintes veículos:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
+
+Registro de alterações:
+v1.0.2.0
+ - Atualizado para trabalhar com 1.4.1.0
+v1.1.0.0
+- Adicionadas diferentes alturas de empilhamento para fardos e paletes
+- Os paletes empilham em diferentes alturas com base na massa (para melhorar a distribuição de peso)
+- Carga e descarga manual melhorada com uma empilhadeira
+- Carga lateral manual adicionada aos reboques KRONE e de baixa carga
+- Adicionado tipo de veículo Box Trailer
+
+TRADUÇÃO - BR por Myiamoto86
+]]>
+</br>
     </description>
 	
 	<multiplayer supported="true" />
@@ -435,6 +493,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Univerzální Autoload</cz>
 			<pl>Universalne Autoładowanie</pl>
 			<es>Autoload Universal</es>
+			<br>Autoload Universal</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
 			<en>Toggle loading</en>
@@ -445,6 +504,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Přepnout nakládání</cz>
 			<pl>Przełącz ładowanie</pl>
 			<es>Cambiar carga/descarga</es>
+			<br>Carregar</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -455,6 +515,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vyložit</cz>
 			<pl>Rozładuj</pl>
 			<es>Descargar</es>
+			<br>Descarregar</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
@@ -465,6 +526,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Přepnout stranu vykládky</cz>
 			<pl>Przełącz stronę rozładunku</pl>
 			<es>Cambiar lado de descarga</es>
+			<br>Lado p/ descarregar</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
@@ -475,6 +537,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Přepnout filtr nakládky</cz>
 			<pl>Przełącz filtr ładowania</pl>
 			<es>Cambiar filtro de carga</es>
+			<br>Filtro de carregamento</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -485,6 +548,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Změnit vybraný typ materiálu (další)</cz>
 			<pl>Zmień wybrany typ materiału (następny)</pl>
 			<es>Cambiar material seleccionado (siguiente)</es>
+			<br>Trocar tipo de material selecionado (prox.)</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
@@ -495,6 +559,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Změnit vybraný typ materiálu (předchozí)</cz>
 			<pl>Zmień wybrany typ materiału (poprzedni)</pl>
 			<es>Cambiar material seleccionado (anterior)</es>
+			<br>Trocar tipo de material selecionado (ant.)</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
@@ -505,6 +570,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vyberte všechny typy materiálů</cz>
 			<pl>Wybierz wszystkie typy materiałów</pl>
 			<es>Seleccionar todos los materiales</es>
+			<br>Seleciona todos os tipos de materiais</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -515,6 +581,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Změnit vybraný typ kontejneru (další)</cz>
 			<pl>Zmień wybrany typ kontenera (następny)</pl>
 			<es>Cambiar tipo de contenedor (siguiente)</es>
+			<br>Trocar tipo de contêiner (prox.)</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
@@ -525,6 +592,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Změnit vybraný typ kontejneru (předchozí)</cz>
 			<pl>Zmień wybrany typ kontenera (poprzedni)</pl>
 			<es>Cambiar tipo de contenedor (anterior)</es>
+			<br>Trocar tipo de contêiner (ant.)</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
@@ -535,6 +603,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vyberte všechny typy kontejnerů</cz>
 			<pl>Wybierz wszystkie typy kontenerów</pl>
 			<es>Todos los tipos de contenedor</es>
+			<br>Marca todos os tipos de contêiners</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -545,6 +614,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Zapnout/odepnout upínací pásy</cz>
 			<pl>Zapinanie/Odpinanie pasów napinających</pl>
 			<es>Soltar/Sujetar cintas tensoras </es>
+			<br>Apertar/Soltar cintos de tensão</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
@@ -555,6 +625,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Otevřít/zavřít zadní dveře</cz>
 			<pl>Otwórz/zamknij tylne drzwi</pl>
 			<es>Abrir/Cerrar puerta trasera</es>
+			<br>Abrir/Fechar porta traseira</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
@@ -565,6 +636,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Otevřít/zavřít boční závěs</cz>
 			<pl>Otwórz/zamknij kurtyny</pl>
 			<es>Abrir/Cerrar cortina lateral</es>
+			<br>Abrir/Fechar cortina lateral</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
 			<en>Debug mode</en>
@@ -575,6 +647,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Režim ladění</cz>
 			<pl>Tryb Debugu</pl>
 			<es>Modo debug</es>
+			<br>Modo de Depuração</br>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -586,6 +659,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky.</cz>
 			<pl>Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku.</pl>
 			<es>Area de descarga bloqueada. Por favor despeje la zona.</es>
+			<br>Área de descarregamento bloqueada. Por favor, limpe a área de descarga.</br>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
@@ -596,6 +670,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku.</cz>
 			<pl>Żadne zgodne towary nie są dostępne do załadunku lub rozładunku.</pl>
 			<es>No hay productos compatibles para cargar o descargar.</es>
+			<br>Nenhum item compatível está disponível para cargarregar ou descarregar.</br>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
 			<en>Loading area is full. Unable to load any more items of this size.</en>
@@ -606,6 +681,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Ložná plocha je plná. Nelze načíst další položky této velikosti.</cz>
 			<pl>Jesteś Zapchany. Niemożna więcej załadować.</pl>
 			<es>Area de carga completa. No es posible cargar mas objetos de este tamaño.</es>
+			<br>A área de carregamento está cheia. Não foi possível carregar mais destes itens.</br>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
@@ -616,6 +692,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte.</cz>
 			<pl>Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz.</pl>
 			<es>No es posible cargar en movimiento. Por favor detengase completamente antes de cargar el tráiler.</es>
+			<br>Nenhum carregamento permitido apenas parado. Por favor, pare completamente antes de carregar o trailer.</br>
 		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
@@ -626,6 +703,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vykládací strana</cz>
 			<pl>Strona rozładunku</pl>
 			<es>Lado de descarga</es>
+			<br>Lado de descarregamento</br>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
@@ -636,6 +714,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vlevo</cz>
 			<pl>Lewa</pl>
 			<es>Izquierda</es>
+			<br>Esquerda</br>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
@@ -646,6 +725,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vpravo</cz>
 			<pl>Prawa</pl>
 			<es>Derecha</es>
+			<br>Direita</br>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
@@ -656,6 +736,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Nic</cz>
 			<pl>Żadna</pl>
 			<es>Ninguno</es>
+			<br>Nenhum</br>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
@@ -666,6 +747,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Filtr nakládky</cz>
 			<pl>Filtr ładowania</pl>
 			<es>Filtro de carga</es>
+			<br>Filtro de carregamento</br>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Full only</en>
@@ -676,6 +758,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Pouze plné</cz>
 			<pl>Tylko pełne</pl>
 			<es>Solo completo</es>
+			<br>Completo apenas</br>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Any</en>
@@ -686,6 +769,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vše</cz>
 			<pl>Każde</pl>
 			<es>Cualquiera</es>
+			<br>Qualquer</br>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -696,6 +780,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Začít nakládku</cz>
 			<pl>Rozpocznij ładowanie</pl>
 			<es>Empezar carga</es>
+			<br>Iniciar carregamento</br>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
@@ -706,6 +791,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Zastavit nakládku</cz>
 			<pl>Zatrzymaj ładowanie</pl>
 			<es>Detener carga</es>
+			<br>Parar carregamento</br>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
@@ -716,6 +802,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vyložit</cz>
 			<pl>Rozładuj</pl>
 			<es>Descargar</es>
+			<br>Descarregar</br>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
@@ -726,6 +813,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Typ materiálu</cz>
 			<pl>Typ materiału</pl>
 			<es>Tipo de material</es>
+			<br>Tipo de material</br>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
@@ -736,6 +824,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Typ kontejneru</cz>
 			<pl>Typ kontenera</pl>
 			<es>Tipo de contenedor</es>
+			<br>Tipo de contêiner</br>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
@@ -746,6 +835,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Vše</cz>
 			<pl>Wszystko</pl>
 			<es>Cualquiera</es>
+			<br>Todos</br>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
@@ -756,6 +846,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>IBC nádrž</cz>
 			<pl>Zbiornik Płynów</pl>
 			<es>Palé de líquido</es>
+			<br>Tanque líquido IBC</br>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
@@ -766,6 +857,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Europaleta</cz>
 			<pl>Euro Paleta</pl>
 			<es>Palé</es>
+			<br>Euro Pallet</br>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
@@ -776,6 +868,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Pioneer paleta</cz>
 			<pl>Pioneer Paleta</pl>
 			<es>Palé Pioneer</es>
+			<br>Pioneer Pallet</br>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
@@ -786,6 +879,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Bigbag paleta</cz>
 			<pl>Bigbag Paleta</pl>
 			<es>Palé de sacos grandes</es>
+			<br>Bigbag Pallet</br>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
@@ -796,6 +890,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Bigbag</cz>
 			<pl>Torba</pl>
 			<es>Saco grande</es>
+			<br>Bigbag</br>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
@@ -806,6 +901,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Krabice brambor</cz>
 			<pl>Ziemnioki</pl>
 			<es>Caja de patatas</es>
+			<br>Caixa de batatas</br>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
@@ -816,6 +912,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Balík</cz>
 			<pl>Bele</pl>
 			<es>Paca</es>
+			<br>Fardo</br>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
@@ -826,6 +923,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Kulatý balík</cz>
 			<pl>Okrągłe bele</pl>
 			<es>Paca redonda</es>
+			<br>Fardo redondo</br>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
@@ -836,6 +934,7 @@ TRANSLATION - ES by Aphroo7
 			<cz>Hranatý balík</cz>
 			<pl>Kańciaste bele</pl>
 			<es>Paca rectangular</es>
+			<br>fardo quadrado</br>
 		</text>
 	</l10n>
 

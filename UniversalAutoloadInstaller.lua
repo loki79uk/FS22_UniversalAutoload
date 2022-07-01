@@ -439,18 +439,16 @@ function UniversalAutoload:consoleImportUserConfigurations(forceResetAll)
 			
 			forceResetAll = Utils.stringToBoolean(forceResetAll)
 			if forceResetAll then
-				UniversalAutoload.forceResetAll = true
+				resetList = {}
 				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 					if vehicle ~= nil then
-						print("RESETTING: " .. vehicle:getFullName())
-						g_client:getServerConnection():sendEvent(ResetVehicleEvent.new(vehicle))
+						table.insert(resetList, vehicle)
 					end
 				end
-			-- else
-				-- if g_currentMission.controlledVehicle then
-					-- g_currentMission:consoleCommandReloadVehicle()
-				-- end
-				-- print("RESETTING: " .. g_currentMission.controlledVehicle:getFullName())
+				for _, vehicle in pairs(resetList)  do
+					print("RESETTING: " .. vehicle:getFullName())
+					g_client:getServerConnection():sendEvent(ResetVehicleEvent.new(vehicle))
+				end
 			end
 		end
 	else

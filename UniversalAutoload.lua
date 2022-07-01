@@ -3159,10 +3159,10 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 					UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, YELLOW )
 				end
 			else
-				UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, GRAY )
+				UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, GREY )
 				if spec.showDebug and loadArea.baleHeight ~= nil then
 					H = loadArea.baleHeight
-					UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, GRAY )
+					UniversalAutoload.DrawDebugPallet( loadArea.rootNode, W, H, L, true, false, GREY )
 				end
 			end
 		end

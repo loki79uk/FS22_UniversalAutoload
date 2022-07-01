@@ -13,6 +13,7 @@ for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
     -- Anything with tension belts could potentially require autoload
     if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
         g_vehicleTypeManager:addSpecialization(vehicleName, g_currentModName .. '.universalAutoload')
+		-- print("  UAL INSTALLED: "..vehicleName)
     end
 end
 
@@ -74,27 +75,30 @@ function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteE
 		return
 	end
 	
+	local N,M = 0,0
 	if fileExists(userSettingsFile) then
 		print("IMPORT user vehicle configurations")
-		UniversalAutoload.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
+		N = N + UniversalAutoload.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
 		print("IMPORT user container configurations")
-		UniversalAutoload.ImportContainerTypeConfigurations(userSettingsFile, overwriteExisting)
+		M = M + UniversalAutoload.ImportContainerTypeConfigurations(userSettingsFile, overwriteExisting)
 	else
 		print("CREATING user settings file")
 		local defaultSettingsFile = Utils.getFilename("config/UniversalAutoload.xml", UniversalAutoload.path)
 		copyFile(defaultSettingsFile, userSettingsFile, false)
 	end
+	
+	return N,M
 end
 
 function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
 
+	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 	
 		local globalConfigKey = "universalAutoload.vehicleConfigurations"
 		local debugAll = xmlFile:getValue(globalConfigKey.."#showDebug", false)
 		
-		local i = 0
 		while true do
 			local configKey = string.format("universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
 
@@ -155,16 +159,17 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 
 		xmlFile:delete()
 	end
+	return i
 end
 
 -- IMPORT CONTAINER TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
 function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
 
+	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 
-		local i = 0
 		while true do
 			local configKey = string.format("universalAutoload.containerConfigurations.containerConfiguration(%d)", i)
 			
@@ -205,6 +210,7 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwr
 
 		xmlFile:delete()
 	end
+	return i
 
 end
 --
@@ -338,6 +344,25 @@ function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
 	end
 end
 --
+function UniversalAutoload.detectOldConfigVersion()
+	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
+
+	if fileExists(userSettingsFile) then
+
+		local xmlFile = XMLFile.load("configXml", userSettingsFile, UniversalAutoload.xmlSchema)
+		if xmlFile ~= 0 then
+			local oldConfigKey = "universalAutoload.containerTypeConfigurations"
+			if xmlFile:hasProperty(oldConfigKey) then
+				print("========================================================================")
+				print("** UNIVERSAL AUTOLOAD - LOCAL MOD SETTINGS FILE IS OUT OF DATE        **")
+				print("** Please update container config key to:  <containerConfigurations>  **")
+				print("========================================================================")
+			end
+			xmlFile:delete()
+		end
+	end
+end
+--
 function UniversalAutoload.detectKeybindingConflicts()
 	--DETECT 'T' KEYS CONFLICT
 	if g_currentMission.missionDynamicInfo.isMultiplayer and not g_dedicatedServer then
@@ -396,6 +421,52 @@ function UniversalAutoload.detectKeybindingConflicts()
 			UniversalAutoload.chatKeyConflict = true
 		end
 		
+	end
+end
+
+function UniversalAutoload:consoleImportUserConfigurations(forceResetAll)
+	local usage = "Usage: ualImportUserConfig [forceResetAll]"
+	
+	if g_currentMission:getIsServer() and not g_currentMission.missionDynamicInfo.isMultiplayer then
+
+		local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
+		local N, M = UniversalAutoload.ImportUserConfigurations(userSettingsFile, true)
+		
+		if N > 0 then
+			if g_gui.currentGuiName == "ShopMenu" or g_gui.currentGuiName == "ShopConfigScreen" then
+				return "Reload not supported while in shop!"
+			end
+			
+			forceResetAll = Utils.stringToBoolean(forceResetAll)
+			if forceResetAll then
+				UniversalAutoload.forceResetAll = true
+				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+					if vehicle ~= nil then
+						print("RESETTING: " .. vehicle:getFullName())
+						g_client:getServerConnection():sendEvent(ResetVehicleEvent.new(vehicle))
+					end
+				end
+			-- else
+				-- if g_currentMission.controlledVehicle then
+					-- g_currentMission:consoleCommandReloadVehicle()
+				-- end
+				-- print("RESETTING: " .. g_currentMission.controlledVehicle:getFullName())
+			end
+		end
+	else
+		print("***Reload only supported for single player games***")
+	end
+	return "UAL loacal settings were reloaded"
+end
+
+function UniversalAutoload:consoleCreateBoundingBox()
+	local usage = "Usage: ualCreateBoundingBox"
+
+	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+		if vehicle ~= nil then
+			print("CREATING BOUNDING BOX: " .. vehicle:getFullName())
+			UniversalAutoload.createBoundingBox(vehicle)
+		end
 	end
 end
 
@@ -467,7 +538,11 @@ function UniversalAutoloadManager:loadMap(name)
 		end	
 	end
 	
+	UniversalAutoload.detectOldConfigVersion()
 	UniversalAutoload.detectKeybindingConflicts()
+	
+	addConsoleCommand("ualImportUserConfig", "Force a reload of configurations from local user settings file", "consoleImportUserConfigurations", UniversalAutoload)
+	addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets (experimental)", "consoleCreateBoundingBox", UniversalAutoload)
 
 end
 

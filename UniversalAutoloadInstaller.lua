@@ -241,7 +241,7 @@ end
 function UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("vehicle.base.filename")
-	local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	
 	if i3d_name ~= nil then
 		local name
@@ -296,7 +296,7 @@ end
 function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("bale.filename")
-	local i3d_name = UniversalAutoload.getObjectNameFromPath(i3d_path)
+	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	
 	if i3d_name ~= nil then
 		local name
@@ -424,7 +424,7 @@ function UniversalAutoload.detectKeybindingConflicts()
 	end
 end
 
-function UniversalAutoload:consoleImportUserConfigurations(forceResetAll)
+function UniversalAutoload:consoleImportUserConfig(forceResetAll)
 	local usage = "Usage: ualImportUserConfig [forceResetAll]"
 	
 	if g_currentMission:getIsServer() and not g_currentMission.missionDynamicInfo.isMultiplayer then
@@ -445,9 +445,37 @@ function UniversalAutoload:consoleImportUserConfigurations(forceResetAll)
 						table.insert(resetList, vehicle)
 					end
 				end
+				UniversalAutoload.VEHICLES = {}
 				for _, vehicle in pairs(resetList)  do
 					print("RESETTING: " .. vehicle:getFullName())
-					g_client:getServerConnection():sendEvent(ResetVehicleEvent.new(vehicle))
+					
+					local xmlFile = Vehicle.getReloadXML(vehicle)
+					local key = "vehicles.vehicle(0)"
+
+					local function asyncCallbackFunction(_, newVehicle, vehicleLoadState, arguments)
+						if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
+							g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
+							g_currentMission:removeVehicle(vehicle)
+						else
+							print("ERROR RESETTING: " .. vehicle:getFullName())
+							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
+								print(" >> VEHICLE_LOAD_ERROR")
+							end
+							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_DELAYED then
+								print(" >> VEHICLE_LOAD_DELAYED")
+							end
+							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_NO_SPACE then
+								print(" >> There was no space available at the shop")
+							end
+							g_currentMission:removeVehicle(vehicle)
+							g_currentMission:removeVehicle(newVehicle)
+						end
+
+						xmlFile:delete()
+					end
+
+					VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, nil, asyncCallbackFunction, nil, {})
+					--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
 				end
 			end
 		end
@@ -455,6 +483,55 @@ function UniversalAutoload:consoleImportUserConfigurations(forceResetAll)
 		print("***Reload only supported for single player games***")
 	end
 	return "UAL loacal settings were reloaded"
+end
+
+function UniversalAutoload:consoleAddPallets(palletType)
+	local usage = "Usage: ualAddPallets [palletType]"
+	
+	local pallets = {}
+	for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
+		if fillType.palletFilename ~= nil then
+			pallets[fillType.name] = fillType.palletFilename
+		end
+	end
+		
+	if palletType then
+		palletType = string.upper(palletType or "")
+		local xmlFilename = pallets[palletType]
+		if xmlFilename == nil then
+			return "Error: Invalid pallet type. Valid types are " .. table.concatKeys(pallets, " ")
+		end
+		
+		pallets = {}
+		pallets[palletType] = xmlFilename
+	end
+	
+	if g_currentMission.controlledVehicle ~= nil then
+	
+		local vehicles = {}
+		if g_currentMission.controlledVehicle.spec_universalAutoload ~= nil then
+			table.insert(vehicles, g_currentMission.controlledVehicle.spec_universalAutoload)
+		else
+			if g_currentMission.controlledVehicle.getAttachedImplements ~= nil then
+				local attachedImplements = g_currentMission.controlledVehicle:getAttachedImplements()
+				for _, implement in pairs(attachedImplements) do
+					if implement.object.spec_universalAutoload ~= nil then
+						table.insert(vehicles, implement.object)
+						break
+					end
+				end
+			end
+		end
+		
+		if next(vehicles) ~= nil then
+			for _, vehicle in pairs(vehicles) do
+				UniversalAutoload.setContainerTypeIndex(vehicle, 2)
+				UniversalAutoload.createPallets(vehicle, pallets)
+			end
+		end
+	
+	end
+	return "Begin adding pallets now.."
 end
 
 function UniversalAutoload:consoleCreateBoundingBox()
@@ -539,7 +616,8 @@ function UniversalAutoloadManager:loadMap(name)
 	UniversalAutoload.detectOldConfigVersion()
 	UniversalAutoload.detectKeybindingConflicts()
 	
-	addConsoleCommand("ualImportUserConfig", "Force a reload of configurations from local user settings file", "consoleImportUserConfigurations", UniversalAutoload)
+	addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets (experimental)", "consoleAddPallets", UniversalAutoload)
+	addConsoleCommand("ualImportUserConfig", "Force a reload of configurations from local user settings file", "consoleImportUserConfig", UniversalAutoload)
 	addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets (experimental)", "consoleCreateBoundingBox", UniversalAutoload)
 
 end

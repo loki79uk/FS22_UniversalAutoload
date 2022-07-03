@@ -1683,6 +1683,13 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 			end
 		end
+		
+		-- CREATE AND LOAD PALLETS (IF REQUESTED)
+		if spec.spawnPallets and not spec.spawningPallet then
+			local i = math.random(1, #spec.palletsToSpawn)
+			pallet = spec.palletsToSpawn[i]
+			UniversalAutoload.createPallet(self, pallet)
+		end
 	
 		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
 		local playerTriggerActive = false
@@ -1974,7 +1981,7 @@ function UniversalAutoload:loadObject(object)
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 			
-				-- print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+				if spec.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
 				--g_currentMission:addMoney(-100, self:getOwnerFarmId(), MoneyType.AI)
 				return true
 			end
@@ -2170,11 +2177,6 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		end
 	end
 	
-	-- if not useRoundbalePacking and (lastLoadPlace~=nil and lastLoadPlace.useRoundbalePacking) then
-		-- print("ROUNDBALE OFFSET")
-		-- spec.currentLoadLength = spec.currentLoadLength + lastLoadPlace.roundbaleOffset + 0.01
-	-- end
-
 	--UPDATE NEW PACKING DIMENSIONS
 	spec.currentLoadHeight = 0
 	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + sizeX > spec.loadArea[i].width then
@@ -2209,7 +2211,6 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	if spec.currentLoadLength<spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
 		-- print("CREATE NEW LOADING PLACE")
 		loadPlace = {}
-		--loadPlace.index = #spec.currentLoadingPattern + 1
 		loadPlace.node = createTransformGroup("loadPlace")
 		loadPlace.sizeX = containerType.sizeX
 		loadPlace.sizeY = containerType.sizeY
@@ -2242,7 +2243,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		spec.currentLoadingPlace = loadPlace
 
 	else
-		-- print("FULL - NO MORE ROOM")
+		if spec.showDebug then print("FULL - NO MORE ROOM") end
 		spec.trailerIsFull = true
 	end
 end
@@ -2287,15 +2288,12 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						local mass = UniversalAutoload.getContainerMass(object)
 						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 						local density = mass/volume
-						-- print(containerType.name .. " - " .. UniversalAutoload.getMaterialTypeName(object))
-						-- print("  mass: " .. mass) print("  volume: " .. volume) print("  density: " .. density)
 						if density > 0.5 then
 							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
 						end
 						if maxLoadAreaHeight > 5*containerType.sizeY then
 							maxLoadAreaHeight = 5*containerType.sizeY
 						end
-						-- print("  height scale: " .. maxLoadAreaHeight/spec.loadArea[i].height)
 					end
 
 					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
@@ -2308,7 +2306,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					end
 				
 					if not spec.currentLoadingPlace then
-						-- print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+						if spec.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
 						UniversalAutoload.createLoadingPlace(self, containerType)
 					end
 
@@ -2328,13 +2326,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							local useThisLoadSpace = false
 							if self.lastSpeedReal < 0.0005 then
 								spec.trailerIsMoving = false
-								-- while thisLoadHeight >= 0 do
-									-- if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) and (thisLoadHeight==0 or containerType.isBale or
-									-- UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)) then
-										-- useThisLoadSpace = true
-										-- break
-									-- end
-							
 								local increment = 0.1
 								while thisLoadHeight >= -increment do
 								
@@ -2794,7 +2785,6 @@ function UniversalAutoload:addAvailableObject(object)
 		
 		return true
 	end
-
 end
 --
 function UniversalAutoload:removeAvailableObject(object)
@@ -2875,11 +2865,66 @@ end
 function UniversalAutoload:onDeleteAutoLoadingObject_Callback(object)
 	UniversalAutoload.removeAutoLoadingObject(self, object)
 end
+--
+function UniversalAutoload:createPallet(xmlFilename)
+	local spec = self.spec_universalAutoload
+	spec.spawningPallet = true
+
+	local x, y, z = getWorldTranslation(spec.loadVolume.rootNode)
+	local location = { x=x, y=y+10, z=z }
+
+	local function asyncCallbackFunction(vehicle, pallet, palletLoadState, arguments)
+		if palletLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
+			local fillTypeIndex = pallet:getFillUnitFirstSupportedFillType(1)
+			pallet:addFillUnitFillLevel(1, 1, math.huge, fillTypeIndex, ToolType.UNDEFINED, nil)
+			
+			if not UniversalAutoload.loadObject(vehicle, pallet) then
+				g_currentMission:removeVehicle(pallet, true)
+			end
+			
+			vehicle.spec_universalAutoload.spawningPallet = nil
+			if vehicle.spec_universalAutoload.currentLoadingPlace == nil then
+				vehicle.spec_universalAutoload.spawnPallets = false
+				print("..adding pallets complete!")
+			end
+			return
+		end
+	end
+
+	local farmId = g_currentMission:getFarmId()
+	farmId = farmId ~= FarmManager.SPECTATOR_FARM_ID and farmId or 1
+	VehicleLoadingUtil.loadVehicle(xmlFilename, location, true, 0, Vehicle.PROPERTY_STATE_OWNED, farmId, nil, nil, asyncCallbackFunction, self)
+end
+--
+function UniversalAutoload:createPallets(pallets)
+	local spec = self.spec_universalAutoload
+	
+	print("ADD PALLETS: " .. self:getFullName())
+	spec.spawnPallets = true
+	spec.palletsToSpawn = {}
+	
+	if spec.currentMaterialIndex ~= 1 then
+		UniversalAutoload.setMaterialTypeIndex(self, 1)
+	end
+	if spec.currentContainerIndex ~= 2 then
+		UniversalAutoload.setContainerTypeIndex(self, 2)
+	end
+	
+	for _, pallet in pairs(pallets) do
+		table.insert(spec.palletsToSpawn, pallet)
+	end
+end
+--
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
-function UniversalAutoload.getObjectNameFromPath(i3d_path)
+function UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
 	return i3d_name:sub(0, #i3d_name - 4)
+end
+--
+function UniversalAutoload.getObjectNameFromXml(xml_path)
+	local xml_name = xml_path:match("[^/]*.xml$")
+	return xml_name:sub(0, #xml_name - 4)
 end
 --
 function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
@@ -2897,7 +2942,7 @@ function UniversalAutoload.getContainerTypeName(object)
 end
 --
 function UniversalAutoload.getContainerType(object)
-	local name = UniversalAutoload.getObjectNameFromPath(object.i3dFilename)
+	local name = UniversalAutoload.getObjectNameFromI3d(object.i3dFilename)
 	if object.customEnvironment ~= nil then
 		name = object.customEnvironment..":"..name
 	end
@@ -2915,24 +2960,28 @@ end
 --
 function UniversalAutoload.getContainerMass(object)
 	local mass = 1
-	if object.getTotalMass == nil then
-		if object.getMass ~= nil then
-			-- print("GET BALE MASS")
-			mass = object:getMass()
+	if object ~= nil then
+		if object.getTotalMass == nil then
+			if object.getMass ~= nil then
+				-- print("GET BALE MASS")
+				mass = object:getMass()
+			end
+		else
+			-- print("GET OBJECT MASS")
+			mass = object:getTotalMass()
 		end
-	else
-		-- print("GET OBJECT MASS")
-		mass = object:getTotalMass()
 	end
 	return mass
 end
 --
 function UniversalAutoload.getMaterialType(object)
-	if object.fillType ~= nil then
-		return object.fillType
-	elseif object.spec_fillUnit ~= nil then
-		local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
-		return fillUnitIndex
+	if object ~= nil then
+		if object.fillType ~= nil then
+			return object.fillType
+		elseif object.spec_fillUnit ~= nil then
+			local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
+			return fillUnitIndex
+		end
 	end
 end
 --
@@ -2967,6 +3016,10 @@ function UniversalAutoload:getPalletIsSelectedLoadside(object)
 	local spec = self.spec_universalAutoload
 	
 	if spec.currentLoadside == "both" then
+		return true
+	end
+	
+	if spec.availableObjects[object] == nil then
 		return true
 	end
 

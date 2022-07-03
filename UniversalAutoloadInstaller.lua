@@ -489,9 +489,11 @@ function UniversalAutoload:consoleAddPallets(palletType)
 	local usage = "Usage: ualAddPallets [palletType]"
 	
 	local pallets = {}
+	local palletsOnly = true
 	for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
-		if fillType.palletFilename ~= nil then
-			pallets[fillType.name] = fillType.palletFilename
+		local xmlName = fillType.palletFilename
+		if xmlName ~= nil and not xmlName:find("fillablePallet") then
+			pallets[fillType.name] = xmlName
 		end
 	end
 		
@@ -499,10 +501,11 @@ function UniversalAutoload:consoleAddPallets(palletType)
 		palletType = string.upper(palletType or "")
 		local xmlFilename = pallets[palletType]
 		if xmlFilename == nil then
-			return "Error: Invalid pallet type. Valid types are " .. table.concatKeys(pallets, " ")
+			return "Error: Invalid pallet type. Valid types are " .. table.concatKeys(pallets, ", ")
 		end
 		
 		pallets = {}
+		palletsOnly = false
 		pallets[palletType] = xmlFilename
 	end
 	
@@ -525,7 +528,12 @@ function UniversalAutoload:consoleAddPallets(palletType)
 		
 		if next(vehicles) ~= nil then
 			for _, vehicle in pairs(vehicles) do
-				UniversalAutoload.setContainerTypeIndex(vehicle, 2)
+				UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
+				if palletsOnly then
+					UniversalAutoload.setContainerTypeIndex(vehicle, 2)
+				else
+					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+				end
 				UniversalAutoload.createPallets(vehicle, pallets)
 			end
 		end

@@ -2903,13 +2903,6 @@ function UniversalAutoload:createPallets(pallets)
 	spec.spawnPallets = true
 	spec.palletsToSpawn = {}
 	
-	if spec.currentMaterialIndex ~= 1 then
-		UniversalAutoload.setMaterialTypeIndex(self, 1)
-	end
-	if spec.currentContainerIndex ~= 2 then
-		UniversalAutoload.setContainerTypeIndex(self, 2)
-	end
-	
 	for _, pallet in pairs(pallets) do
 		table.insert(spec.palletsToSpawn, pallet)
 	end

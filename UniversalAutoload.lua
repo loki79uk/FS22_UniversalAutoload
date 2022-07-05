@@ -126,7 +126,7 @@ function UniversalAutoload.registerEventListeners(vehicleType)
 end
 --
 function UniversalAutoload.removeEventListeners(vehicleType)
-
+	-- print("REMOVE EVENT LISTENERS")
 	local function removeUnusedEventListener(vehicle, name, specClass)
 		local eventListeners = vehicle.eventListeners[name]
 
@@ -1256,11 +1256,10 @@ function UniversalAutoload:onLoad(savegame)
 	end
 	
 	if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
-	and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
-		-- print("UNIVERSAL AUTOLOAD - SETTINGS FOUND FOR '"..self:getFullName().."'")
+	and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil
+	and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 		spec.isAutoloadEnabled = true
 	else
-		-- print("UNIVERSAL AUTOLOAD - SETTINGS NOT FOUND FOR '"..self:getFullName().."'")
 		spec.isAutoloadEnabled = false
 		UniversalAutoload.removeEventListeners(self)
 		return

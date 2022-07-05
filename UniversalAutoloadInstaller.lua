@@ -521,6 +521,7 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 					else
 						UniversalAutoload.setContainerTypeIndex(vehicle, 1)
 					end
+					UniversalAutoload.clearLoadedObjects(vehicle)
 					UniversalAutoload.createPallets(vehicle, pallets)
 				end
 			end
@@ -532,7 +533,7 @@ end
 --
 function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, width, height, length, wrapState, modName)
 	local usage = "ualAddBales fillTypeName isRoundBale [width] [height/diameter] [length] [wrapState] [modName]"
-	
+
 	fillTypeName = Utils.getNoNil(fillTypeName, "STRAW")
 	isRoundbale = Utils.stringToBoolean(isRoundbale)
 	width = width ~= nil and tonumber(width) or nil
@@ -573,6 +574,7 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
 				if hasAutoload then
+					UniversalAutoload.clearLoadedObjects(vehicle)
 					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
 					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
 					UniversalAutoload.createBales(vehicle, bales)
@@ -584,7 +586,31 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 	return "Begin adding bales now.."
 end
 --
-function UniversalAutoloadManager:consoleRemoveContainers()
+function UniversalAutoloadManager:consoleAddRoundBales_125()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.25")
+end
+--
+function UniversalAutoloadManager:consoleAddRoundBales_150()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.5")
+end
+--
+function UniversalAutoloadManager:consoleAddRoundBales_180()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.8")
+end
+--
+function UniversalAutoloadManager:consoleAddSquareBales_180()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "1.8")
+end
+--
+function UniversalAutoloadManager:consoleAddSquareBales_220()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "2.2")
+end
+--
+function UniversalAutoloadManager:consoleAddSquareBales_240()
+	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "2.4")
+end
+--
+function UniversalAutoloadManager:consoleClearLoadedObjects()
 	
 	local palletCount, balesCount = 0, 0
 	if g_currentMission.controlledVehicle ~= nil then
@@ -767,14 +793,19 @@ function UniversalAutoloadManager:loadMap(name)
 	
 	if g_currentMission:getIsServer() and not g_currentMission.missionDynamicInfo.isMultiplayer then
 		addConsoleCommand("ualAddBales", "Fill current vehicle with specified bales", "consoleAddBales", UniversalAutoloadManager)
-		addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets", "consoleAddPallets", UniversalAutoloadManager)
-		addConsoleCommand("ualRemoveContainers", "Remove loaded containers from current vehicle", "consoleRemoveContainers", UniversalAutoloadManager)
-		addConsoleCommand("ualResetVehicles", "Force reload configurations from mod settings", "consoleResetVehicles", UniversalAutoloadManager)
+		addConsoleCommand("ualAddRoundBales_125", "Fill current vehicle with small round bales", "consoleAddRoundBales_125", UniversalAutoloadManager)
+		addConsoleCommand("ualAddRoundBales_150", "Fill current vehicle with medium round bales", "consoleAddRoundBales_150", UniversalAutoloadManager)
+		addConsoleCommand("ualAddRoundBales_180", "Fill current vehicle with large round bales", "consoleAddRoundBales_180", UniversalAutoloadManager)
+		addConsoleCommand("ualAddSquareBales_180", "Fill current vehicle with small square bales", "consoleAddSquareBales_180", UniversalAutoloadManager)
+		addConsoleCommand("ualAddSquareBales_220", "Fill current vehicle with medium square bales", "consoleAddSquareBales_220", UniversalAutoloadManager)
+		addConsoleCommand("ualAddSquareBales_240", "Fill current vehicle with large square bales", "consoleAddSquareBales_240", UniversalAutoloadManager)
+		addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets (fill type)", "consoleAddPallets", UniversalAutoloadManager)
+		addConsoleCommand("ualClearLoadedObjects", "Remove all loaded objects from current vehicle", "consoleClearLoadedObjects", UniversalAutoloadManager)
+		addConsoleCommand("ualResetVehicles", "Reset all vehicles with autoload (and any attached) to the shop", "consoleResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
-		addConsoleCommand("ualImportUserConfigsAndResetVehicles", "Force reload configurations from mod settings", "consoleImportUserConfigsAndResetVehicles", UniversalAutoloadManager)
+		addConsoleCommand("ualImportUserConfigsAndResetVehicles", "Force reload configurations from mod settings and reset", "consoleImportUserConfigsAndResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
 	end
-
 end
 
 function UniversalAutoloadManager:deleteMap()

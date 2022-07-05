@@ -93,6 +93,8 @@ function UniversalAutoload.initSpecialization()
 end
 --
 function UniversalAutoload.registerFunctions(vehicleType)
+    SpecializationUtil.registerFunction(vehicleType, "getIsFilled", UniversalAutoload.getIsFilled)
+    SpecializationUtil.registerFunction(vehicleType, "getIsCovered", UniversalAutoload.getIsCovered)
     SpecializationUtil.registerFunction(vehicleType, "getIsFolding", UniversalAutoload.getIsFolding)
     SpecializationUtil.registerFunction(vehicleType, "onDeleteLoadedObject_Callback", UniversalAutoload.onDeleteLoadedObject_Callback)
     SpecializationUtil.registerFunction(vehicleType, "onDeleteAvailableObject_Callback", UniversalAutoload.onDeleteAvailableObject_Callback)
@@ -455,36 +457,29 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 			local stopLoadingText = g_i18n:getText("universalAutoload_stopLoading")
 			g_inputBinding:setActionEventText(spec.toggleLoadingActionEventId, stopLoadingText)
 		else
-			if spec.doPostLoadDelay or spec.validLoadCount == 0 or spec.currentLoadside == "none" or
-			  (spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())) or
-			  (spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()))
-			then
-				g_inputBinding:setActionEventActive(spec.toggleLoadingActionEventId, false)
-			else
+			if UniversalAutoload.getIsLoadingKeyAllowed(self) then
 				local startLoadingText = g_i18n:getText("universalAutoload_startLoading")
 				if UniversalAutoload.debugEnabled then startLoadingText = startLoadingText.." ("..tostring(spec.validLoadCount)..")" end
 				g_inputBinding:setActionEventText(spec.toggleLoadingActionEventId, startLoadingText)
 				g_inputBinding:setActionEventActive(spec.toggleLoadingActionEventId, true)
 				g_inputBinding:setActionEventTextVisibility(spec.toggleLoadingActionEventId, true)
+			else
+				g_inputBinding:setActionEventActive(spec.toggleLoadingActionEventId, false)
 			end
 		end
 	end
 
 	if spec.isAutoloadEnabled and spec.unloadAllActionEventId ~= nil then
 		-- Activate/Deactivate the UNLOAD key binding
-		if spec.doPostLoadDelay or spec.isLoading or spec.isUnloading or
-		   spec.validUnloadCount == 0 or spec.currentTipside == "none" or
-		  (spec.isBoxTrailer and spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())) or
-		  (spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()))
-		then
-			g_inputBinding:setActionEventActive(spec.unloadAllActionEventId, false)
-		else
+		if UniversalAutoload.getIsUnloadingKeyAllowed(self) then
 			local unloadText = g_i18n:getText("universalAutoload_unloadAll")
 			if UniversalAutoload.debugEnabled then unloadText = unloadText.." ("..tostring(spec.validUnloadCount)..")" end
 			-- print("unloadText: "..unloadText)
 			g_inputBinding:setActionEventText(spec.unloadAllActionEventId, unloadText)
 			g_inputBinding:setActionEventActive(spec.unloadAllActionEventId, true)
 			g_inputBinding:setActionEventTextVisibility(spec.unloadAllActionEventId, true)
+		else
+			g_inputBinding:setActionEventActive(spec.unloadAllActionEventId, false)
 		end
 		
 	end
@@ -772,7 +767,7 @@ end
 function UniversalAutoload:startLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 
-	if not spec.isLoading and UniversalAutoload.getIsAutoloadingAllowed(self) then
+	if not spec.isLoading and UniversalAutoload.getIsLoadingVehicleAllowed(self) then
 		-- print("Start Loading: "..self:getFullName() )
 
 		spec.isLoading = true
@@ -1582,7 +1577,6 @@ end
 --
 function UniversalAutoload:getIsFolding()
 
-    local spec = self.spec_universalAutoload
 	for _, foldingPart in pairs(self.spec_foldable.foldingParts) do
 		if self:getIsAnimationPlaying(foldingPart.animationName) then
 			return true
@@ -1591,6 +1585,31 @@ function UniversalAutoload:getIsFolding()
 	
 	return false
 end
+--
+function UniversalAutoload:getIsCovered()
+
+	if self.spec_cover ~= nil then
+		return self.spec_cover.state == #self.spec_cover.covers
+	else
+		return false
+	end
+end
+--
+function UniversalAutoload:getIsFilled()
+
+	local isFilled = false
+	if self.spec_fillVolume ~= nil then
+		for _, fillVolume in ipairs(self.spec_fillVolume.volumes) do
+			local capacity = self:getFillUnitCapacity(fillVolume.fillUnitIndex)
+			local fillLevel = self:getFillUnitFillLevel(fillVolume.fillUnitIndex)
+			if fillLevel > 0 then
+				isFilled = true
+			end
+		end
+	end
+	return isFilled
+end
+
 
 -- NETWORKING FUNCTIONS
 function UniversalAutoload:onReadStream(streamId, connection)
@@ -1681,6 +1700,21 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					--UNABLE_TO_LOAD_OBJECT
 					UniversalAutoload.showWarningMessage(self, 3)
 				end
+			end
+		end
+		
+		-- CREATE AND LOAD BALES (IF REQUESTED)
+		if spec.spawnBales then
+			local i = math.random(1, #spec.balesToSpawn)
+			bale = spec.balesToSpawn[i]
+			local baleObject = UniversalAutoload.createBale(self, bale)
+			if not UniversalAutoload.loadObject(self, baleObject) then
+				baleObject:delete()
+			end
+			if spec.currentLoadingPlace == nil then
+				spec.spawnBales = false
+				self:setAllTensionBeltsActive(true)
+				print("..adding bales complete!")
 			end
 		end
 		
@@ -1826,8 +1860,7 @@ function UniversalAutoload:isValidForLoading(object)
 	
 	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and 
 	(spec.autoLoadingObjects[object] ~= nil or ( spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object) )) and
-	(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) ) and
-	(not spec.noLoadingIfFolded or self:getIsUnfolded()) and (not spec.noLoadingIfUnfolded or not self:getIsUnfolded())
+	(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )
 end
 --
 function UniversalAutoload:isValidForUnloading(object)
@@ -1914,7 +1947,7 @@ function UniversalAutoload:createBoundingBox()
 		local x0, y0, z0 = math.huge, math.huge, math.huge
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
 		for _, object in pairs(spec.loadedObjects) do
-			print("  loaded object: " .. tostring(object.id).." ("..tostring(object.currentSavegameId or "BALE")..")")
+			-- print("  loaded object: " .. tostring(object.id).." ("..tostring(object.currentSavegameId or "BALE")..")")
 			
 			local node = UniversalAutoload.getObjectNode(object)
 			if node ~= nil then
@@ -1970,7 +2003,7 @@ end
 -- LOADING AND UNLOADING FUNCTIONS
 function UniversalAutoload:loadObject(object)
 	-- print("UniversalAutoload - loadObject")
-	if object ~= nil and UniversalAutoload.getIsAutoloadingAllowed(self) and UniversalAutoload.isValidForLoading(self, object) then
+	if object ~= nil and UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.isValidForLoading(self, object) then
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
@@ -2271,9 +2304,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				spec.resetLoadingPattern = false
 			end
 		
-			local noLoadingFolded = spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())
-			local noLoadingUnfolded = spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())
-			if not (noLoadingFolded or noLoadingUnfolded) then
+			if UniversalAutoload.getIsLoadingAreaAllowed(self, i) then
 			
 				while spec.currentLoadLength < spec.loadArea[i].length do
 				
@@ -2401,15 +2432,47 @@ function UniversalAutoload:getIsValidObject(object)
     return false
 end
 --
-function UniversalAutoload:getIsAutoloadingAllowed(triggerId)
-
+function UniversalAutoload:getIsLoadingKeyAllowed()
 	local spec = self.spec_universalAutoload
-	local AutoLoadingAllowed = true
+	
+	if spec.doPostLoadDelay or spec.validLoadCount == 0 or spec.currentLoadside == "none" then
+		return false
+	end
+	return UniversalAutoload.getIsLoadingVehicleAllowed(self)
+end
+--
+function UniversalAutoload:getIsUnloadingKeyAllowed()
+	local spec = self.spec_universalAutoload
 
+	if spec.doPostLoadDelay or spec.isLoading or spec.isUnloading
+	or spec.validUnloadCount == 0 or spec.currentTipside == "none" then
+		return false
+	end
+	if spec.isBoxTrailer and spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+		return false
+	end
+	if spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+		return false
+	end
+    return true
+end
+--
+function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
+	local spec = self.spec_universalAutoload
+	
+	if self:getIsFilled() then
+		return false
+	end
+	if spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+		return false
+	end
+	if spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+		return false
+	end
+	
 	-- check that curtain trailers have an open curtain
 	if spec.isCurtainTrailer and triggerId then
 		-- print("CURTAIN TRAILER")
-		
 		local tipState = self:getTipState()
 		local doorOpen = self:getIsUnfolded()
 		local rearTrigger = triggerId == spec.rearTriggerId
@@ -2418,46 +2481,48 @@ function UniversalAutoload:getIsAutoloadingAllowed(triggerId)
 		if spec.enableRearLoading and rearTrigger then
 			if not doorOpen then
 				-- print("NO LOADING IF DOOR CLOSED")
-				AutoLoadingAllowed = false
+				return false
 			end
 		end
 		
 		if spec.enableSideLoading and not rearTrigger then
 			if not curtainsOpen then
 				-- print("NO LOADING IF CURTAIN CLOSED")
-				AutoLoadingAllowed = false
+				return false
 			end
 		end
-		
 	end
 
-	-- check that folding state is okay
-	if spec.noLoadingIfFolded then
-		if (self:getIsFolding() or not self:getIsUnfolded()) then
-			-- print("NO LOADING IF FOLDED")
-			AutoLoadingAllowed = false
-		end
-	end
-	if spec.noLoadingIfUnfolded then
-		if (self:getIsFolding() or self:getIsUnfolded()) then
-			-- print("NO LOADING IF UNFOLDED")
-			AutoLoadingAllowed = false
-		end
-	end
-	
     -- check that the vehicle has not fallen on its side
     local _, y1, _ = getWorldTranslation(self.components[1].node)
     local _, y2, _ = localToWorld(self.components[1].node, 0, 1, 0)
     if y2 - y1 < 0.5 then
 		-- print("NO LOADING IF FALLEN OVER")
-        AutoLoadingAllowed = false
+        return false
     end
-
-    return AutoLoadingAllowed
+	return true
+end
+--
+function UniversalAutoload:getIsLoadingAreaAllowed(i)
+	local spec = self.spec_universalAutoload
+	
+	if spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+		return false
+	end
+	if spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+		return false
+	end
+	return true
+end
+--
+function UniversalAutoload:getIsUnloadingAreaAllowed(i)
+	local spec = self.spec_universalAutoload
+	
+    return true
 end
 --
 function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
-	return UniversalAutoload.getIsAutoloadingAllowed(self) and -1 or math.huge
+	return UniversalAutoload.getIsLoadingVehicleAllowed(self) and -1 or math.huge
 end
 --
 function UniversalAutoload:testLocationIsFull(loadPlace, offset)
@@ -2690,7 +2755,7 @@ function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEn
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsAutoloadingAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAvailableObject(self, object)
 				elseif onLeave then
@@ -2706,7 +2771,7 @@ function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, on
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsAutoloadingAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addLoadedObject(self, object)
 				elseif onLeave then
@@ -2722,7 +2787,7 @@ function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, 
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsAutoloadingAllowed(self, triggerId) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsLoadingVehicleAllowed(self, triggerId) and UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAutoLoadingObject(self, object)
 				elseif onLeave then
@@ -2885,6 +2950,7 @@ function UniversalAutoload:createPallet(xmlFilename)
 			vehicle.spec_universalAutoload.spawningPallet = nil
 			if vehicle.spec_universalAutoload.currentLoadingPlace == nil then
 				vehicle.spec_universalAutoload.spawnPallets = false
+				vehicle:setAllTensionBeltsActive(true)
 				print("..adding pallets complete!")
 			end
 			return
@@ -2899,13 +2965,74 @@ end
 function UniversalAutoload:createPallets(pallets)
 	local spec = self.spec_universalAutoload
 	
-	print("ADD PALLETS: " .. self:getFullName())
-	spec.spawnPallets = true
-	spec.palletsToSpawn = {}
-	
-	for _, pallet in pairs(pallets) do
-		table.insert(spec.palletsToSpawn, pallet)
+	if spec ~= nil then
+		print("ADD PALLETS: " .. self:getFullName())
+		self:setAllTensionBeltsActive(false)
+		spec.spawnPallets = true
+		spec.palletsToSpawn = {}
+		
+		for _, pallet in pairs(pallets) do
+			table.insert(spec.palletsToSpawn, pallet)
+		end
 	end
+end
+--
+function UniversalAutoload:createBale(xmlFilename)
+	local spec = self.spec_universalAutoload
+
+	local x, y, z = getWorldTranslation(spec.loadVolume.rootNode)
+	y = y + 10
+
+	local farmId = g_currentMission:getFarmId()
+	farmId = farmId ~= FarmManager.SPECTATOR_FARM_ID and farmId or 1
+	local baleObject = Bale.new(g_currentMission:getIsServer(), g_currentMission:getIsClient())
+	
+	if baleObject:loadFromConfigXML(xmlFilename, x, y, z, 0, 0, 0) then
+		-- baleObject:setFillType(fillTypeIndex, true)
+		-- baleObject:setWrappingState(wrapState)
+		baleObject:setOwnerFarmId(farmId, true)
+		baleObject:register()
+	end
+	
+	return baleObject
+end
+--
+function UniversalAutoload:createBales(bales)
+	local spec = self.spec_universalAutoload
+	
+	if spec ~= nil then
+		print("ADD BALES: " .. self:getFullName())
+		self:setAllTensionBeltsActive(false)
+		spec.spawnBales = true
+		spec.balesToSpawn = {}
+		
+		for _, bale in pairs(bales) do
+			table.insert(spec.balesToSpawn, bale)
+		end
+	end
+end
+--
+function UniversalAutoload:clearLoadedObjects()
+	local spec = self.spec_universalAutoload
+	local palletCount, balesCount = 0, 0
+	
+	if spec ~= nil then
+		print("CLEAR OBJECTS: " .. self:getFullName())
+		self:setAllTensionBeltsActive(false)
+		for _, object in pairs(spec.loadedObjects) do
+			if object.isRoundbale == nil then
+				g_currentMission:removeVehicle(object, true)
+				palletCount = palletCount + 1
+			else
+				object:delete()
+				balesCount = balesCount + 1
+			end
+		end
+		spec.loadedObjects = {}
+		spec.currentLoadingPlace = nil
+		spec.resetLoadingPattern = true
+	end
+	return palletCount, balesCount
 end
 --
 
@@ -3193,9 +3320,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			local W, H, L = loadArea.width, loadArea.height, loadArea.length
 			if not spec.showDebug then H = 0 end
 			
-			local noLoadingFolded = spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded())
-			local noLoadingUnfolded = spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded())
-			if not (noLoadingFolded or noLoadingUnfolded) then
+			if UniversalAutoload.getIsLoadingAreaAllowed(self, i) then
 				UniversalAutoload.DrawDebugPallet( loadArea.rootNode,  W, H, L, true, false, WHITE )
 				UniversalAutoload.DrawDebugPallet( loadArea.startNode, W, 0, 0, true, false, GREEN )
 				UniversalAutoload.DrawDebugPallet( loadArea.endNode,   W, 0, 0, true, false, RED )

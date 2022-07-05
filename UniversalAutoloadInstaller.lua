@@ -68,7 +68,7 @@ UniversalAutoload.UNKNOWN_TYPES = {}
 -- IMPORT VEHICLE CONFIGURATIONS
 UniversalAutoload.VEHICLE_CONFIGURATIONS = {}
 
-function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteExisting)
+function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, overwriteExisting)
 
 	if g_currentMission.isMultiplayer then
 		print("Custom configurations are not supported in multiplayer")
@@ -78,9 +78,9 @@ function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteE
 	local N,M = 0,0
 	if fileExists(userSettingsFile) then
 		print("IMPORT user vehicle configurations")
-		N = N + UniversalAutoload.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
+		N = N + UniversalAutoloadManager.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
 		print("IMPORT user container configurations")
-		M = M + UniversalAutoload.ImportContainerTypeConfigurations(userSettingsFile, overwriteExisting)
+		M = M + UniversalAutoloadManager.ImportContainerTypeConfigurations(userSettingsFile, overwriteExisting)
 	else
 		print("CREATING user settings file")
 		local defaultSettingsFile = Utils.getFilename("config/UniversalAutoload.xml", UniversalAutoload.path)
@@ -89,8 +89,13 @@ function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteE
 	
 	return N,M
 end
-
-function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
+--
+function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteExisting)
+	print("*** OLD VERSION OF UNIVERSAL AUTOLOAD MODHUB ADD-ON DETECTED - please update to latest version ***")
+	return UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, overwriteExisting)
+end
+--
+function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
 
 	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
@@ -161,10 +166,15 @@ function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExi
 	end
 	return i
 end
+--
+function UniversalAutoload.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
+	print("*** OLD VERSION OF UNIVERSAL AUTOLOAD MODHUB ADD-ON DETECTED - please update to latest version ***")
+	return UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
+end
 
 -- IMPORT CONTAINER TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
-function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
+function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
 
 	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
@@ -214,7 +224,12 @@ function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwr
 
 end
 --
-function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnvironment)
+function UniversalAutoload.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
+	print("*** OLD VERSION OF UNIVERSAL AUTOLOAD MODHUB ADD-ON DETECTED - please update to latest version ***")
+	return UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
+end
+--
+function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, customEnvironment)
 
 	if xmlFilename ~= nil and not string.find(xmlFilename, "multiPurchase") then	
 		--print( "  >> " .. xmlFilename )
@@ -223,14 +238,14 @@ function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnviron
 
 		if xmlFile~=nil and xmlFile:hasProperty("vehicle.base") then
 			loadedVehicleXML = true
-			UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
+			UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnvironment)
 		end
 		xmlFile:delete()
 		
 		if not loadedVehicleXML then
 			xmlFile = XMLFile.load("baleConfigXml", xmlFilename, BaleManager.baleXMLSchema)
 			if xmlFile~=nil and xmlFile:hasProperty("bale") then
-				UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
+				UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironment)
 			end
 			xmlFile:delete()
 		end
@@ -238,7 +253,7 @@ function UniversalAutoload.importContainerTypeFromXml(xmlFilename, customEnviron
 	end
 end
 --
-function UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
+function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("vehicle.base.filename")
 	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
@@ -293,7 +308,7 @@ function UniversalAutoload.importPalletTypeFromXml(xmlFile, customEnvironment)
 	end
 end
 --
-function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
+function UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("bale.filename")
 	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
@@ -343,8 +358,9 @@ function UniversalAutoload.importBaleTypeFromXml(xmlFile, customEnvironment)
 		end
 	end
 end
---
-function UniversalAutoload.detectOldConfigVersion()
+
+-- DETECT CONFLICTS/ISSUES
+function UniversalAutoloadManager.detectOldConfigVersion()
 	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
 
 	if fileExists(userSettingsFile) then
@@ -363,7 +379,7 @@ function UniversalAutoload.detectOldConfigVersion()
 	end
 end
 --
-function UniversalAutoload.detectKeybindingConflicts()
+function UniversalAutoloadManager.detectKeybindingConflicts()
 	--DETECT 'T' KEYS CONFLICT
 	if g_currentMission.missionDynamicInfo.isMultiplayer and not g_dedicatedServer then
 
@@ -424,70 +440,53 @@ function UniversalAutoload.detectKeybindingConflicts()
 	end
 end
 
-function UniversalAutoload:consoleImportUserConfig(forceResetAll)
-	local usage = "Usage: ualImportUserConfig [forceResetAll]"
+-- CONSOLE FUNCTIONS
+function UniversalAutoloadManager:consoleResetVehicles()
+
+	if g_gui.currentGuiName == "ShopMenu" or g_gui.currentGuiName == "ShopConfigScreen" then
+		return "Reset vehicles is not supported while in shop!"
+	end
 	
-	if g_currentMission:getIsServer() and not g_currentMission.missionDynamicInfo.isMultiplayer then
-
-		local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
-		local N, M = UniversalAutoload.ImportUserConfigurations(userSettingsFile, true)
-		
-		if N > 0 then
-			if g_gui.currentGuiName == "ShopMenu" or g_gui.currentGuiName == "ShopConfigScreen" then
-				return "Reload not supported while in shop!"
-			end
-			
-			forceResetAll = Utils.stringToBoolean(forceResetAll)
-			if forceResetAll then
-				resetList = {}
-				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-					if vehicle ~= nil then
-						table.insert(resetList, vehicle)
-					end
-				end
-				UniversalAutoload.VEHICLES = {}
-				for _, vehicle in pairs(resetList)  do
-					print("RESETTING: " .. vehicle:getFullName())
-					
-					local xmlFile = Vehicle.getReloadXML(vehicle)
-					local key = "vehicles.vehicle(0)"
-
-					local function asyncCallbackFunction(_, newVehicle, vehicleLoadState, arguments)
-						if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
-							g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
-							g_currentMission:removeVehicle(vehicle)
-						else
-							print("ERROR RESETTING: " .. vehicle:getFullName())
-							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
-								print(" >> VEHICLE_LOAD_ERROR")
-							end
-							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_DELAYED then
-								print(" >> VEHICLE_LOAD_DELAYED")
-							end
-							if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_NO_SPACE then
-								print(" >> There was no space available at the shop")
-							end
-							g_currentMission:removeVehicle(vehicle)
-							g_currentMission:removeVehicle(newVehicle)
-						end
-
-						xmlFile:delete()
-					end
-
-					VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, nil, asyncCallbackFunction, nil, {})
-					--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
+	UniversalAutoloadManager.resetList = {}
+	UniversalAutoloadManager.resetCount = 1
+	
+	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+		if vehicle ~= nil then
+			local vehicles = UniversalAutoloadManager.getAttachedVehicles(vehicle)
+			if next(vehicles) ~= nil then
+				for v, _ in pairs(vehicles) do
+					table.insert(UniversalAutoloadManager.resetList, v)
 				end
 			end
 		end
-	else
-		print("***Reload only supported for single player games***")
 	end
-	return "UAL loacal settings were reloaded"
-end
-
-function UniversalAutoload:consoleAddPallets(palletType)
-	local usage = "Usage: ualAddPallets [palletType]"
+	UniversalAutoload.VEHICLES = {}
+	print(string.format("Resetting %d vehicles now..", #UniversalAutoloadManager.resetList))
 	
+	UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+end
+--
+function UniversalAutoloadManager:consoleImportUserConfigurations()
+
+	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
+	local vehicleCount, objectCount = UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, true)
+	
+	if vehicleCount > 0 and objectCount == 0 then
+		return string.format("IMPORTED: %d vehicle settings", vehicleCount)
+	end
+	if objectCount > 0 and vehicleCount == 0 then
+		return string.format("IMPORTED: %d object settings", objectCount)
+	end
+	return string.format("IMPORTED: %d vehicle settings, %d object settings", vehicleCount, objectCount)
+end
+--
+function UniversalAutoloadManager:consoleImportUserConfigsAndResetVehicles()
+	print( UniversalAutoloadManager:consoleImportUserConfigurations() )
+	print( UniversalAutoloadManager:consoleResetVehicles() )
+end
+--
+function UniversalAutoloadManager:consoleAddPallets(palletType)
+
 	local pallets = {}
 	local palletsOnly = true
 	for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
@@ -510,39 +509,107 @@ function UniversalAutoload:consoleAddPallets(palletType)
 	end
 	
 	if g_currentMission.controlledVehicle ~= nil then
-	
-		local vehicles = {}
-		if g_currentMission.controlledVehicle.spec_universalAutoload ~= nil then
-			table.insert(vehicles, g_currentMission.controlledVehicle.spec_universalAutoload)
-		else
-			if g_currentMission.controlledVehicle.getAttachedImplements ~= nil then
-				local attachedImplements = g_currentMission.controlledVehicle:getAttachedImplements()
-				for _, implement in pairs(attachedImplements) do
-					if implement.object.spec_universalAutoload ~= nil then
-						table.insert(vehicles, implement.object)
-						break
-					end
-				end
-			end
-		end
+
+		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
 		
 		if next(vehicles) ~= nil then
-			for _, vehicle in pairs(vehicles) do
-				UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
-				if palletsOnly then
-					UniversalAutoload.setContainerTypeIndex(vehicle, 2)
-				else
-					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+			for vehicle, hasAutoload in pairs(vehicles) do
+				if hasAutoload then
+					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
+					if palletsOnly then
+						UniversalAutoload.setContainerTypeIndex(vehicle, 2)
+					else
+						UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+					end
+					UniversalAutoload.createPallets(vehicle, pallets)
 				end
-				UniversalAutoload.createPallets(vehicle, pallets)
 			end
 		end
 	
 	end
 	return "Begin adding pallets now.."
 end
+--
+function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, width, height, length, wrapState, modName)
+	local usage = "ualAddBales fillTypeName isRoundBale [width] [height/diameter] [length] [wrapState] [modName]"
+	
+	fillTypeName = Utils.getNoNil(fillTypeName, "STRAW")
+	isRoundbale = Utils.stringToBoolean(isRoundbale)
+	width = width ~= nil and tonumber(width) or nil
+	height = height ~= nil and tonumber(height) or nil
+	length = length ~= nil and tonumber(length) or nil
 
-function UniversalAutoload:consoleCreateBoundingBox()
+	if wrapState ~= nil and tonumber(wrapState) == nil then
+		Logging.error("Invalid wrapState '%s'. Number expected", wrapState, usage)
+
+		return
+	end
+
+	wrapState = tonumber(wrapState or 0)
+	local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
+
+	if fillTypeIndex == nil then
+		Logging.error("Invalid fillTypeName '%s' (e.g. STRAW). Use %s", fillTypeName, usage)
+
+		return
+	end
+
+	local xmlFilename, _ = g_baleManager:getBaleXMLFilename(fillTypeIndex, isRoundbale, width, height, length, height, modName)
+
+	if xmlFilename == nil then
+		Logging.error("Could not find bale for given size attributes! (%s)", usage)
+		g_baleManager:consoleCommandListBales()
+
+		return
+	end
+	
+	bales = {}
+	bales["default"] = xmlFilename
+	
+	if g_currentMission.controlledVehicle ~= nil then
+
+		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		
+		if next(vehicles) ~= nil then
+			for vehicle, hasAutoload in pairs(vehicles) do
+				if hasAutoload then
+					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
+					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+					UniversalAutoload.createBales(vehicle, bales)
+				end
+			end
+		end
+
+	end
+	return "Begin adding bales now.."
+end
+--
+function UniversalAutoloadManager:consoleRemoveContainers()
+	
+	local palletCount, balesCount = 0, 0
+	if g_currentMission.controlledVehicle ~= nil then
+		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		if next(vehicles) ~= nil then
+			for vehicle, hasAutoload in pairs(vehicles) do
+				if hasAutoload then
+					N, M = UniversalAutoload.clearLoadedObjects(vehicle)
+					palletCount = palletCount + N
+					balesCount = balesCount + M
+				end
+			end
+		end
+	end
+
+	if palletCount > 0 and balesCount == 0 then
+		return string.format("REMOVED: %d pallets", palletCount)
+	end
+	if balesCount > 0 and palletCount == 0 then
+		return string.format("REMOVED: %d bales", balesCount)
+	end
+	return string.format("REMOVED: %d pallets, %d bales", palletCount, balesCount)
+end
+--
+function UniversalAutoloadManager:consoleCreateBoundingBox()
 	local usage = "Usage: ualCreateBoundingBox"
 
 	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
@@ -551,8 +618,81 @@ function UniversalAutoload:consoleCreateBoundingBox()
 			UniversalAutoload.createBoundingBox(vehicle)
 		end
 	end
+	return "Bounding box created sucessfully"
+end
+--
+function UniversalAutoloadManager.addAttachedVehicles(vehicle, vehicles)
+
+	if vehicle.getAttachedImplements ~= nil then
+		local attachedImplements = vehicle:getAttachedImplements()
+		for _, implement in pairs(attachedImplements) do
+			vehicles[implement.object] = implement.object.spec_universalAutoload ~= nil
+			UniversalAutoloadManager.addAttachedVehicles(implement.object, vehicles)
+		end
+	end
+	return vehicles
+end
+--
+function UniversalAutoloadManager.getAttachedVehicles(vehicle)
+	local vehicles = {}
+	local rootVehicle = vehicle:getRootVehicle()
+	vehicles[rootVehicle] = rootVehicle.spec_universalAutoload ~= nil
+	UniversalAutoloadManager.addAttachedVehicles(rootVehicle, vehicles)
+	return vehicles
 end
 
+-- 
+function UniversalAutoloadManager.resetNextVehicle(resetList)
+
+	if resetList ~= nil and next(resetList) ~= nil then
+		local vehicle = resetList[#resetList]
+		UniversalAutoload.clearLoadedObjects(vehicle)
+		UniversalAutoloadManager.resetVehicleAtShop(vehicle)
+		table.remove(resetList, #resetList)
+	end
+end
+--
+function UniversalAutoloadManager.resetVehicleAtShop(vehicle)
+	print(string.format("RESETTING #%d: %s", UniversalAutoloadManager.resetCount, vehicle:getFullName()))
+	
+	local xmlFile = Vehicle.getReloadXML(vehicle)
+	local key = "vehicles.vehicle(0)"
+
+	local function asyncCallbackFunction(_, newVehicle, vehicleLoadState, arguments)
+		if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
+			g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
+			g_currentMission:removeVehicle(vehicle)
+			UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
+		else
+			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
+				print(" >> VEHICLE_LOAD_ERROR")
+			end
+			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_DELAYED then
+				print(" >> VEHICLE_LOAD_DELAYED")
+			end
+			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_NO_SPACE then
+				print(" >> There was no space available at the shop")
+			end
+			if vehicle ~= nil then
+				print("ERROR RESETTING OLD VEHICLE: " .. vehicle:getFullName())
+				g_currentMission:removeVehicle(vehicle)
+			end
+			if newVehicle ~= nil then
+				print("ERROR RESETTING NEW VEHICLE: " .. newVehicle:getFullName())
+				g_currentMission:removeVehicle(newVehicle)
+			end
+		end
+
+		xmlFile:delete()
+		UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+	end
+	
+	VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, nil, asyncCallbackFunction, nil, {})
+	--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
+end
+--
+
+-- MAIN LOAD MAP FUNCTION
 function UniversalAutoloadManager:loadMap(name)
 
 	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] or g_modIsLoaded["FS22_SeedPotatoFarmBuildings"] then
@@ -586,28 +726,28 @@ function UniversalAutoloadManager:loadMap(name)
 	
 	-- USER SETTINGS FIRST
 	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
-	UniversalAutoload.ImportUserConfigurations(userSettingsFile)
+	UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile)
 	
 	-- DEFAULT SETTINGS SECOND
 	print("IMPORT supported vehicle configurations")
 	local vehicleSettingsFile = Utils.getFilename("config/SupportedVehicles.xml", UniversalAutoload.path)
-	UniversalAutoload.ImportVehicleConfigurations(vehicleSettingsFile)
+	UniversalAutoloadManager.ImportVehicleConfigurations(vehicleSettingsFile)
 	print("IMPORT supported container configurations")
 	local ContainerTypeSettingsFile = Utils.getFilename("config/ContainerTypes.xml", UniversalAutoload.path)
-	UniversalAutoload.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
+	UniversalAutoloadManager.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
 	
 	-- ADDITIONAL SETTINGS THIRD
 	print("ADDITIONAL fill type containers")
     for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
 		if fillType.palletFilename then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
-			UniversalAutoload.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
+			UniversalAutoloadManager.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
 		end
     end
 	for index, baleType in ipairs(g_baleManager.bales) do
 		if baleType.isAvailable then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
-			UniversalAutoload.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
+			UniversalAutoloadManager.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
 		end
 	end
 	for _, storeItem in pairs(g_storeManager:getItems()) do
@@ -617,16 +757,23 @@ function UniversalAutoloadManager:loadMap(name)
 		   storeItem.categoryName == "PALLETS" or
 		   storeItem.categoryName == "BIGBAGPALLETS"
 		then
-			UniversalAutoload.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
+			UniversalAutoloadManager.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
 		end	
 	end
 	
-	UniversalAutoload.detectOldConfigVersion()
-	UniversalAutoload.detectKeybindingConflicts()
+	UniversalAutoloadManager.detectOldConfigVersion()
+	UniversalAutoloadManager.detectKeybindingConflicts()
 	
-	addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets (experimental)", "consoleAddPallets", UniversalAutoload)
-	addConsoleCommand("ualImportUserConfig", "Force a reload of configurations from local user settings file", "consoleImportUserConfig", UniversalAutoload)
-	addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets (experimental)", "consoleCreateBoundingBox", UniversalAutoload)
+	
+	if g_currentMission:getIsServer() and not g_currentMission.missionDynamicInfo.isMultiplayer then
+		addConsoleCommand("ualAddBales", "Fill current vehicle with specified bales", "consoleAddBales", UniversalAutoloadManager)
+		addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets", "consoleAddPallets", UniversalAutoloadManager)
+		addConsoleCommand("ualRemoveContainers", "Remove loaded containers from current vehicle", "consoleRemoveContainers", UniversalAutoloadManager)
+		addConsoleCommand("ualResetVehicles", "Force reload configurations from mod settings", "consoleResetVehicles", UniversalAutoloadManager)
+		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
+		addConsoleCommand("ualImportUserConfigsAndResetVehicles", "Force reload configurations from mod settings", "consoleImportUserConfigsAndResetVehicles", UniversalAutoloadManager)
+		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
+	end
 
 end
 

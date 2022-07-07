@@ -19,6 +19,7 @@ end
 
 -- variables
 UniversalAutoload.userSettingsFile = "modSettings/UniversalAutoload.xml"
+UniversalAutoload.SHOP_ICON = UniversalAutoload.path .. "icons/shop_icon.dds"
 
 -- tables
 UniversalAutoload.ACTIONS = {
@@ -564,8 +565,10 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 		return
 	end
 	
-	bales = {}
-	bales["default"] = xmlFilename
+	bale = {}
+	bale.xmlFile = xmlFilename
+	bale.fillTypeIndex = fillTypeIndex
+	bale.wrapState = wrapState
 	
 	if g_currentMission.controlledVehicle ~= nil then
 
@@ -577,7 +580,7 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 					UniversalAutoload.clearLoadedObjects(vehicle)
 					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
 					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
-					UniversalAutoload.createBales(vehicle, bales)
+					UniversalAutoload.createBales(vehicle, bale)
 				end
 			end
 		end
@@ -586,28 +589,28 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 	return "Begin adding bales now.."
 end
 --
-function UniversalAutoloadManager:consoleAddRoundBales_125()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.25")
+function UniversalAutoloadManager:consoleAddRoundBales_125(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "DRYGRASS_WINDROW", "true", "1.2", "1.25")
 end
 --
-function UniversalAutoloadManager:consoleAddRoundBales_150()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.5")
+function UniversalAutoloadManager:consoleAddRoundBales_150(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "DRYGRASS_WINDROW", "true", "1.2", "1.5")
 end
 --
-function UniversalAutoloadManager:consoleAddRoundBales_180()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "true", "1.2", "1.8")
+function UniversalAutoloadManager:consoleAddRoundBales_180(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "DRYGRASS_WINDROW", "true", "1.2", "1.8")
 end
 --
-function UniversalAutoloadManager:consoleAddSquareBales_180()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "1.8")
+function UniversalAutoloadManager:consoleAddSquareBales_180(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "STRAW", "false", "1.2", "0.9", "1.8")
 end
 --
-function UniversalAutoloadManager:consoleAddSquareBales_220()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "2.2")
+function UniversalAutoloadManager:consoleAddSquareBales_220(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "STRAW", "false", "1.2", "0.9", "2.2")
 end
 --
-function UniversalAutoloadManager:consoleAddSquareBales_240()
-	return UniversalAutoloadManager:consoleAddBales("STRAW", "false", "1.2", "0.9", "2.4")
+function UniversalAutoloadManager:consoleAddSquareBales_240(fillTypeName)
+	return UniversalAutoloadManager:consoleAddBales(fillTypeName or "STRAW", "false", "1.2", "0.9", "2.4")
 end
 --
 function UniversalAutoloadManager:consoleClearLoadedObjects()
@@ -819,3 +822,26 @@ function tableContainsValue(container, value)
 	end
 	return false
 end
+
+ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScreen.processAttributeData,
+	function(self, superFunc, storeItem, vehicle, saleItem)
+
+		superFunc(self, storeItem, vehicle, saleItem)
+		
+		if vehicle.spec_universalAutoload ~= nil and vehicle.spec_universalAutoload.isAutoloadEnabled then
+		
+			local itemElement = self.attributeItem:clone(self.attributesLayout)
+			local iconElement = itemElement:getDescendantByName("icon")
+			local textElement = itemElement:getDescendantByName("text")
+
+			itemElement:reloadFocusHandling(true)
+			iconElement:applyProfile(ShopConfigScreen.GUI_PROFILE.CAPACITY)
+			iconElement:setImageFilename(UniversalAutoload.SHOP_ICON)
+			iconElement:setImageUVs(nil, 0, 0, 0, 1, 1, 0, 1, 1)
+			iconElement:setVisible(true)
+			textElement:setText(g_i18n:getText("configuration_universalAutoload"))
+			self.attributesLayout:invalidateLayout()
+		end
+
+	end
+)

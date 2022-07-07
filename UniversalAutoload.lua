@@ -1256,8 +1256,7 @@ function UniversalAutoload:onLoad(savegame)
 	end
 	
 	if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
-	and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil
-	and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
+	and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
 		spec.isAutoloadEnabled = true
 	else
 		spec.isAutoloadEnabled = false
@@ -1265,7 +1264,7 @@ function UniversalAutoload:onLoad(savegame)
 		return
 	end
 
-    if self.isServer then
+    if self.isServer and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 
 		--initialise server only arrays
 		spec.triggers = {}
@@ -1455,7 +1454,7 @@ function UniversalAutoload:onLoad(savegame)
 
 	end
 
-	table.insert(UniversalAutoload.VEHICLES, self)
+	UniversalAutoload.VEHICLES[self] = self
 	spec.actionEvents = {}
 	spec.playerInTrigger = {}
 	
@@ -1536,6 +1535,7 @@ function UniversalAutoload:onPreDelete()
 	-- print("UniversalAutoload - onPreDelete")
 	local spec = self.spec_universalAutoload
 	if UniversalAutoload.VEHICLES[self] ~= nil then
+		-- print("PRE DELETE: " .. self:getFullName() )
 		UniversalAutoload.VEHICLES[self] = nil
 	end
     if self.isServer then
@@ -1551,6 +1551,7 @@ function UniversalAutoload:onDelete()
 	-- print("UniversalAutoload - onDelete")
     local spec = self.spec_universalAutoload
 	if UniversalAutoload.VEHICLES[self] ~= nil then
+		-- print("DELETE: " .. self:getFullName() )
 		UniversalAutoload.VEHICLES[self] = nil
 	end
     if spec.isAutoloadEnabled and self.isServer then
@@ -1704,9 +1705,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		
 		-- CREATE AND LOAD BALES (IF REQUESTED)
 		if spec.spawnBales then
-			local i = math.random(1, #spec.balesToSpawn)
-			bale = spec.balesToSpawn[i]
-			local baleObject = UniversalAutoload.createBale(self, bale)
+			bale = spec.baleToSpawn
+			local baleObject = UniversalAutoload.createBale(self, bale.xmlFile, bale.fillTypeIndex, bale.wrapState)
 			if not UniversalAutoload.loadObject(self, baleObject) then
 				baleObject:delete()
 			end
@@ -2976,7 +2976,7 @@ function UniversalAutoload:createPallets(pallets)
 	end
 end
 --
-function UniversalAutoload:createBale(xmlFilename)
+function UniversalAutoload:createBale(xmlFilename, fillTypeIndex, wrapState)
 	local spec = self.spec_universalAutoload
 
 	local x, y, z = getWorldTranslation(spec.loadVolume.rootNode)
@@ -2987,8 +2987,8 @@ function UniversalAutoload:createBale(xmlFilename)
 	local baleObject = Bale.new(g_currentMission:getIsServer(), g_currentMission:getIsClient())
 	
 	if baleObject:loadFromConfigXML(xmlFilename, x, y, z, 0, 0, 0) then
-		-- baleObject:setFillType(fillTypeIndex, true)
-		-- baleObject:setWrappingState(wrapState)
+		baleObject:setFillType(fillTypeIndex, true)
+		baleObject:setWrappingState(wrapState)
 		baleObject:setOwnerFarmId(farmId, true)
 		baleObject:register()
 	end
@@ -2996,18 +2996,14 @@ function UniversalAutoload:createBale(xmlFilename)
 	return baleObject
 end
 --
-function UniversalAutoload:createBales(bales)
+function UniversalAutoload:createBales(bale)
 	local spec = self.spec_universalAutoload
 	
 	if spec ~= nil then
 		print("ADD BALES: " .. self:getFullName())
 		self:setAllTensionBeltsActive(false)
 		spec.spawnBales = true
-		spec.balesToSpawn = {}
-		
-		for _, bale in pairs(bales) do
-			table.insert(spec.balesToSpawn, bale)
-		end
+		spec.baleToSpawn = bale
 	end
 end
 --

@@ -127,6 +127,7 @@ end
 --
 function UniversalAutoload.removeEventListeners(vehicleType)
 	-- print("REMOVE EVENT LISTENERS")
+	-- *** full credit to GtX for this function ***
 	local function removeUnusedEventListener(vehicle, name, specClass)
 		local eventListeners = vehicle.eventListeners[name]
 
@@ -138,19 +139,18 @@ function UniversalAutoload.removeEventListeners(vehicleType)
 			end
 		end
 	end
-
-    -- removeUnusedEventListener(vehicleType, "onLoad", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onPostLoad", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onReadStream", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onWriteStream", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onDelete", UniversalAutoload)
-    -- removeUnusedEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	
-	-- removeUnusedEventListener(vehicleType, "onUpdate", UniversalAutoload)
-	-- removeUnusedEventListener(vehicleType, "onActivate", UniversalAutoload)
-	-- removeUnusedEventListener(vehicleType, "onDeactivate", UniversalAutoload)
-	-- removeUnusedEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
+	-- (called during 'onLoad' so do not unregister that)
+    removeUnusedEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
+    removeUnusedEventListener(vehicleType, "onReadStream", UniversalAutoload)
+    removeUnusedEventListener(vehicleType, "onWriteStream", UniversalAutoload)
+    removeUnusedEventListener(vehicleType, "onDelete", UniversalAutoload)
+    removeUnusedEventListener(vehicleType, "onPreDelete", UniversalAutoload)
+	
+	removeUnusedEventListener(vehicleType, "onUpdate", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onActivate", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onDeactivate", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
 end
 
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS
@@ -1454,7 +1454,9 @@ function UniversalAutoload:onLoad(savegame)
 
 	end
 
-	UniversalAutoload.VEHICLES[self] = self
+	if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
+		UniversalAutoload.VEHICLES[self] = self
+	end
 	spec.actionEvents = {}
 	spec.playerInTrigger = {}
 	

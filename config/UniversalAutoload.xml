@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<universalAutoLoad>
+
+<!-- GLOBAL SETTINGS - OVERRIDE ALL OTHERS -->
+<universalAutoLoad showDebug="false" manualLoadingOnly="false" disableAutoStrap="false">
+
+	<!-- APPLIES TO ALL IN THIS SECTION -->
     <vehicleConfigurations showDebug="false">
 	
         <!-- *** Base Game Example *** -->
@@ -10,7 +14,7 @@
         <!-- *** Mod Example *** -->
         <!-- <vehicleConfiguration configFileName="FS22_20ftGooseneck/lizardgooseneck.xml">  
             <loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
-            <options enableRearLoading="true" enableSideLoading="true"/>
+            <options enableRearLoading="true" enableSideLoading="true" showDebug="true"/>
         </vehicleConfiguration> -->
 		
     </vehicleConfigurations>

@@ -36,13 +36,20 @@ function UniversalAutoload.initSpecialization()
 	g_configurationManager:addConfigurationType("universalAutoload", g_i18n:getText("configuration_universalAutoload"), "universalAutoload", nil, nil, nil, ConfigurationUtil.SELECTOR_MULTIOPTION)
 	
 	UniversalAutoload.xmlSchema = XMLSchema.new("universalAutoload")
-	UniversalAutoload.vehicleKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
-	local schemas = {
-		[1] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = UniversalAutoload.vehicleKey },
-		[2] = { ["schema"] = Vehicle.xmlSchema, ["key"] = "vehicle."..UniversalAutoload.vehicleKey }
-	}
+
+	local globalKey = "universalAutoload"
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
+	
 	local allVehiclesKey = "universalAutoload.vehicleConfigurations"
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, allVehiclesKey.."#showDebug", "Show the full graphical debugging display for all vehicles", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, allVehiclesKey.."#showDebug", "Show the full graphical debugging display for all vehicles in config", false)
+	
+	local vehicleKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
+	local schemas = {
+		[1] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = vehicleKey },
+		[2] = { ["schema"] = Vehicle.xmlSchema, ["key"] = "vehicle."..vehicleKey }
+	}
 	for _, s in ipairs(schemas) do
 		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vechicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
@@ -76,7 +83,6 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
 
 	local schemaSavegame = Vehicle.xmlSchemaSavegame
-	--local specKey = "vehicles.vehicle(?)." .. UniversalAutoload.specName
 	local specKey = "vehicles.vehicle(?).universalAutoload"
     schemaSavegame:register(XMLValueType.STRING, specKey.."#tipside", "Last used tip side", "none")
     schemaSavegame:register(XMLValueType.STRING, specKey.."#loadside", "Last used load side", "both")
@@ -230,20 +236,22 @@ function UniversalAutoload:updateActionEventKeys()
 			local actions = UniversalAutoload.ACTIONS
 			local ignoreCollisions = true
 
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
-			spec.toggleLoadingActionEventId = actionEventId
-			-- print("TOGGLE_LOADING: "..tostring(valid))
-
+			if not UniversalAutoload.manualLoadingOnly then
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+				spec.toggleLoadingActionEventId = actionEventId
+				-- print("TOGGLE_LOADING: "..tostring(valid))
+				
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				spec.toggleLoadingFilterActionEventId = actionEventId
+				-- print("TOGGLE_FILTER: "..tostring(valid))
+			end
+			
 			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.unloadAllActionEventId = actionEventId
 			-- print("UNLOAD_ALL: "..tostring(valid))
-
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			spec.toggleLoadingFilterActionEventId = actionEventId
-			-- print("TOGGLE_FILTER: "..tostring(valid))
 			
 			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
@@ -907,7 +915,7 @@ function UniversalAutoload:resetLoadingState(noEventSend)
 	local spec = self.spec_universalAutoload
 	
 	if self.isServer then
-		if spec.doSetTensionBelts then
+		if spec.doSetTensionBelts and not spec.disableAutoStrap and not UniversalAutoload.disableAutoStrap then
 			self:setAllTensionBeltsActive(true)
 		end
 		spec.postLoadDelayTime = 0
@@ -1199,7 +1207,7 @@ function UniversalAutoload:onLoad(savegame)
 					spec.enableSideLoading = config.enableSideLoading
 					spec.noLoadingIfFolded = config.noLoadingIfFolded
 					spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
-					--spec.disableAutoStrap = config.disableAutoStrap
+					spec.disableAutoStrap = config.disableAutoStrap
 					spec.showDebug = config.showDebug
 					break
 				end
@@ -1243,8 +1251,9 @@ function UniversalAutoload:onLoad(savegame)
 					spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)
 					spec.noLoadingIfFolded = xmlFile:getValue(key..".options#noLoadingIfFolded", false)
 					spec.noLoadingIfUnfolded = xmlFile:getValue(key..".options#noLoadingIfUnfolded", false)
-					--spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
-					spec.showDebug = xmlFile:getValue(key..".options#showDebug", false)
+					spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
+					spec.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(key..".options#showDebug", false)
+					
 					-- print("  >> "..configFileName)
 					break
 				end
@@ -1352,39 +1361,41 @@ function UniversalAutoload:onLoad(savegame)
             addTrigger(playerTrigger.node, "playerTrigger_Callback", self)
 		end
 
-        local leftPickupTrigger = {}
-		leftPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "pickupTrigger1")
-		if leftPickupTrigger.node ~= nil then
-			leftPickupTrigger.name = "leftPickupTrigger"
-			link(spec.loadVolume.rootNode, leftPickupTrigger.node)
+		if not UniversalAutoload.manualLoadingOnly then
+			local leftPickupTrigger = {}
+			leftPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "pickupTrigger1")
+			if leftPickupTrigger.node ~= nil then
+				leftPickupTrigger.name = "leftPickupTrigger"
+				link(spec.loadVolume.rootNode, leftPickupTrigger.node)
+				
+				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+
+				setRotation(leftPickupTrigger.node, 0, 0, 0)
+				setTranslation(leftPickupTrigger.node, 1.1*(width+spec.loadVolume.width)/2, 0, 0)
+				setScale(leftPickupTrigger.node, width, height, length)
+
+				table.insert(spec.triggers, leftPickupTrigger)
+				addTrigger(leftPickupTrigger.node, "loadingTrigger_Callback", self)
+			end
 			
-			local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+			local rightPickupTrigger = {}
+			rightPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "pickupTrigger2")
+			if rightPickupTrigger.node ~= nil then
+				rightPickupTrigger.name = "rightPickupTrigger"
+				link(spec.loadVolume.rootNode, rightPickupTrigger.node)
+				
+				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
 
-			setRotation(leftPickupTrigger.node, 0, 0, 0)
-			setTranslation(leftPickupTrigger.node, 1.1*(width+spec.loadVolume.width)/2, 0, 0)
-			setScale(leftPickupTrigger.node, width, height, length)
+				setRotation(rightPickupTrigger.node, 0, 0, 0)
+				setTranslation(rightPickupTrigger.node, -1.1*(width+spec.loadVolume.width)/2, 0, 0)
+				setScale(rightPickupTrigger.node, width, height, length)
 
-			table.insert(spec.triggers, leftPickupTrigger)
-			addTrigger(leftPickupTrigger.node, "loadingTrigger_Callback", self)
+				table.insert(spec.triggers, rightPickupTrigger)
+				addTrigger(rightPickupTrigger.node, "loadingTrigger_Callback", self)
+			end
 		end
 		
-		local rightPickupTrigger = {}
-		rightPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "pickupTrigger2")
-		if rightPickupTrigger.node ~= nil then
-			rightPickupTrigger.name = "rightPickupTrigger"
-			link(spec.loadVolume.rootNode, rightPickupTrigger.node)
-			
-			local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
-
-			setRotation(rightPickupTrigger.node, 0, 0, 0)
-			setTranslation(rightPickupTrigger.node, -1.1*(width+spec.loadVolume.width)/2, 0, 0)
-			setScale(rightPickupTrigger.node, width, height, length)
-
-			table.insert(spec.triggers, rightPickupTrigger)
-			addTrigger(rightPickupTrigger.node, "loadingTrigger_Callback", self)
-		end
-		
-		if spec.enableRearLoading then
+		if UniversalAutoload.manualLoadingOnly or spec.enableRearLoading then
 			local rearAutoTrigger = {}
 			rearAutoTrigger.node = I3DUtil.getChildByName(triggersRootNode, "autoTrigger1")
 			if rearAutoTrigger.node ~= nil then
@@ -1406,7 +1417,7 @@ function UniversalAutoload:onLoad(savegame)
 			end
 		end
 		
-		if spec.enableSideLoading then
+		if UniversalAutoload.manualLoadingOnly or spec.enableSideLoading then
 			local depth = 0.05
 			local recess = spec.loadVolume.width/7
 			local boundary = 2*spec.loadVolume.width/3
@@ -1629,6 +1640,9 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.isUnloading = streamReadBool(streamId)
 		spec.validLoadCount = streamReadInt32(streamId)
 		spec.validUnloadCount = streamReadInt32(streamId)
+		
+		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
+		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
 	else
 		spec.isAutoloadEnabled = false
 	end
@@ -1659,6 +1673,9 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteBool(streamId, spec.isUnloading)
 		streamWriteInt32(streamId, spec.validLoadCount)
 		streamWriteInt32(streamId, spec.validUnloadCount)
+		
+		streamWriteBool(streamId, UniversalAutoload.disableAutoStrap)
+		streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly)
 	end
 end
 
@@ -2556,14 +2573,16 @@ function UniversalAutoload:testLocationIsEmpty(loadPlace, object, offset)
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
-	
-	-- if spec.testLocation == nil then
-		-- spec.testLocation = {}
-	-- end
-	-- spec.testLocation.node = loadPlace.node
-	-- spec.testLocation.sizeX = 2*sizeX
-	-- spec.testLocation.sizeY = 2*sizeY
-	-- spec.testLocation.sizeZ = 2*sizeZ
+
+	if UniversalAutoload.showDebug then
+		if spec.testLocation == nil then
+			spec.testLocation = {}
+		end
+		spec.testLocation.node = loadPlace.node
+		spec.testLocation.sizeX = 2*sizeX
+		spec.testLocation.sizeY = 2*sizeY
+		spec.testLocation.sizeZ = 2*sizeZ
+	end
 
 	return not spec.foundObject
 end
@@ -3236,9 +3255,9 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			local place = spec.currentLoadingPlace
 			UniversalAutoload.DrawDebugPallet( place.node, place.sizeX, place.sizeY, place.sizeZ, true, false, GREY)
 		end
-		-- if spec.testLocation ~= nil then
-			-- UniversalAutoload.DrawDebugPallet( spec.testLocation.node, spec.testLocation.sizeX, spec.testLocation.sizeY, spec.testLocation.sizeZ, true, false, WHITE)
-		-- end
+		if UniversalAutoload.showDebug and spec.testLocation ~= nil then
+			UniversalAutoload.DrawDebugPallet( spec.testLocation.node, spec.testLocation.sizeX, spec.testLocation.sizeY, spec.testLocation.sizeZ, true, false, WHITE)
+		end
 
 		if spec.showDebug then
 			for _, trigger in pairs(spec.triggers) do
@@ -3342,7 +3361,8 @@ function UniversalAutoload.DrawDebugPallet( node, w, h, l, showCube, showAxis, c
 
 	if node ~= nil and node ~= 0 then
 		-- colour for square
-		local r, g, b = unpack(colour) --(r or 1), (g or 1), (b or 1)
+		colour = colour or WHITE
+		local r, g, b = unpack(colour)
 		local w, h, l = (w or 1), (h or 1), (l or 1)
 		local offset = offset or 0
 

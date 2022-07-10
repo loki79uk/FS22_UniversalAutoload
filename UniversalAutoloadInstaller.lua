@@ -78,6 +78,7 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 	
 	local N,M = 0,0
 	if fileExists(userSettingsFile) then
+		UniversalAutoloadManager.ImportGlobalSettings(userSettingsFile, overwriteExisting)
 		print("IMPORT user vehicle configurations")
 		N = N + UniversalAutoloadManager.ImportVehicleConfigurations(userSettingsFile, overwriteExisting)
 		print("IMPORT user container configurations")
@@ -96,14 +97,34 @@ function UniversalAutoload.ImportUserConfigurations(userSettingsFile, overwriteE
 	return UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, overwriteExisting)
 end
 --
+function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExisting)
+
+	if g_currentMission:getIsServer() and not UniversalAutoload.globalSettingsLoaded then
+	
+		local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
+		if xmlFile ~= 0 then
+			print("IMPORT Universal Autoload global settings")
+			UniversalAutoload.globalSettingsLoaded = true
+			UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
+			UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
+			UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
+			print("Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
+			print("Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
+			print("Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
+			xmlFile:delete()
+		end
+	else
+		print("Universal Autoload - global settings are only loaded for the server")
+	end
+end
+--
 function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overwriteExisting)
 
 	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
 	
-		local globalConfigKey = "universalAutoload.vehicleConfigurations"
-		local debugAll = xmlFile:getValue(globalConfigKey.."#showDebug", false)
+		local debugAll = xmlFile:getValue("universalAutoload.vehicleConfigurations#showDebug", false)
 		
 		while true do
 			local configKey = string.format("universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
@@ -148,8 +169,8 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 				config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
 				config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
 				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
-				--config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
-				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
+				config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
+				config.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
 				if not config.showDebug then
 					print("  >> "..configFileName.." ("..selectedConfigs..")")
@@ -213,7 +234,7 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 				end
 
 			else
-				print("  UNKNOWN CONTAINER TYPE: "..tostring(containerType))
+				if UniversalAutoload.showDebug then print("  UNKNOWN CONTAINER TYPE: "..tostring(containerType)) end
 			end
 
 			i = i + 1
@@ -452,25 +473,35 @@ function UniversalAutoloadManager:consoleResetVehicles()
 	UniversalAutoloadManager.resetCount = 1
 	
 	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-		if vehicle ~= nil then
-			local vehicles = UniversalAutoloadManager.getAttachedVehicles(vehicle)
-			if next(vehicles) ~= nil then
-				for v, _ in pairs(vehicles) do
-					table.insert(UniversalAutoloadManager.resetList, v)
-				end
-			end
-		end
+		table.insert(UniversalAutoloadManager.resetList, vehicle)
 	end
 	UniversalAutoload.VEHICLES = {}
 	print(string.format("Resetting %d vehicles now..", #UniversalAutoloadManager.resetList))
 	
 	UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+	
 end
 --
 function UniversalAutoloadManager:consoleImportUserConfigurations()
 
+	local oldConfigurations = deepCopy(UniversalAutoload.VEHICLE_CONFIGURATIONS)
 	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
 	local vehicleCount, objectCount = UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, true)
+	
+	if vehicleCount > 0 then
+		for key, value in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
+			if not deepCompare(oldConfigurations[key], value) then
+				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+					if string.find(vehicle.configFileName, key) then
+						print("DETECTED SETTINGS CHANGE: " .. vehicle:getFullName())
+						if not UniversalAutoloadManager.resetVehicle(vehicle) then
+							g_currentMission:consoleCommandReloadVehicle()
+						end
+					end
+				end
+			end
+		end
+	end
 	
 	if vehicleCount > 0 and objectCount == 0 then
 		return string.format("IMPORTED: %d vehicle settings", vehicleCount)
@@ -479,11 +510,6 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		return string.format("IMPORTED: %d object settings", objectCount)
 	end
 	return string.format("IMPORTED: %d vehicle settings, %d object settings", vehicleCount, objectCount)
-end
---
-function UniversalAutoloadManager:consoleImportUserConfigsAndResetVehicles()
-	print( UniversalAutoloadManager:consoleImportUserConfigurations() )
-	print( UniversalAutoloadManager:consoleResetVehicles() )
 end
 --
 function UniversalAutoloadManager:consoleAddPallets(palletType)
@@ -675,15 +701,32 @@ function UniversalAutoloadManager.resetNextVehicle(resetList)
 
 	if resetList ~= nil and next(resetList) ~= nil then
 		local vehicle = resetList[#resetList]
-		UniversalAutoload.clearLoadedObjects(vehicle)
-		UniversalAutoloadManager.resetVehicleAtShop(vehicle)
+		if not UniversalAutoloadManager.resetVehicle(vehicle) then
+			g_currentMission:consoleCommandReloadVehicle()
+		end
 		table.remove(resetList, #resetList)
+	else
+		UniversalAutoloadManager.resetCount = nil
 	end
 end
 --
-function UniversalAutoloadManager.resetVehicleAtShop(vehicle)
-	print(string.format("RESETTING #%d: %s", UniversalAutoloadManager.resetCount, vehicle:getFullName()))
+function UniversalAutoloadManager.resetVehicle(vehicle)
+	if UniversalAutoloadManager.resetCount then
+		print(string.format("RESETTING #%d: %s", UniversalAutoloadManager.resetCount, vehicle:getFullName()))
+	else
+		print(string.format("RESETTING: %s", vehicle:getFullName()))
+	end
 	
+	UniversalAutoload.clearLoadedObjects(vehicle)
+	
+	local rootVehicle = vehicle:getRootVehicle()
+	if rootVehicle ~= nil and rootVehicle ~= vehicle then
+		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
+		if rootVehicle == g_currentMission.controlledVehicle then
+			return false
+		end
+	end
+
 	local xmlFile = Vehicle.getReloadXML(vehicle)
 	local key = "vehicles.vehicle(0)"
 
@@ -691,7 +734,9 @@ function UniversalAutoloadManager.resetVehicleAtShop(vehicle)
 		if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
 			g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
 			g_currentMission:removeVehicle(vehicle)
-			UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
+			if UniversalAutoloadManager.resetCount then
+				UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
+			end
 		else
 			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
 				print(" >> VEHICLE_LOAD_ERROR")
@@ -711,13 +756,14 @@ function UniversalAutoloadManager.resetVehicleAtShop(vehicle)
 				g_currentMission:removeVehicle(newVehicle)
 			end
 		end
-
+		
 		xmlFile:delete()
 		UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
 	end
 	
-	VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, nil, asyncCallbackFunction, nil, {})
+	VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, true, asyncCallbackFunction, nil, {})
 	--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
+	return true
 end
 --
 
@@ -806,7 +852,6 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualClearLoadedObjects", "Remove all loaded objects from current vehicle", "consoleClearLoadedObjects", UniversalAutoloadManager)
 		addConsoleCommand("ualResetVehicles", "Reset all vehicles with autoload (and any attached) to the shop", "consoleResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
-		addConsoleCommand("ualImportUserConfigsAndResetVehicles", "Force reload configurations from mod settings and reset", "consoleImportUserConfigsAndResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
 	end
 end
@@ -819,6 +864,45 @@ function tableContainsValue(container, value)
 		if v == value then
 			return true
 		end
+	end
+	return false
+end
+
+function deepCopy(original)
+	local copy = {}
+	for k, v in pairs(original) do
+		if type(v) == "table" then
+			v = deepCopy(v)
+		end
+		copy[k] = v
+	end
+	return copy
+end
+
+function deepCompare(tbl1, tbl2)
+	if tbl1 == tbl2 then
+		return true
+	elseif type(tbl1) == "table" and type(tbl2) == "table" then
+		for key1, value1 in pairs(tbl1) do
+			local value2 = tbl2[key1]
+			if value2 == nil then
+				return false
+			elseif value1 ~= value2 then
+				if type(value1) == "table" and type(value2) == "table" then
+					if not deepCompare(value1, value2) then
+						return false
+					end
+				else
+					return false
+				end
+			end
+		end
+		for key2, _ in pairs(tbl2) do
+			if tbl1[key2] == nil then
+				return false
+			end
+		end
+		return true
 	end
 	return false
 end

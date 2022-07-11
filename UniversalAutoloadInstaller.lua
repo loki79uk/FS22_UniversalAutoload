@@ -10,11 +10,11 @@ addModEventListener(UniversalAutoloadManager)
 g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), "")
 
 for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
-    -- Anything with tension belts could potentially require autoload
-    if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
-        g_vehicleTypeManager:addSpecialization(vehicleName, g_currentModName .. '.universalAutoload')
+	-- Anything with tension belts could potentially require autoload
+	if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
+		g_vehicleTypeManager:addSpecialization(vehicleName, UniversalAutoload.name .. '.universalAutoload')
 		-- print("  UAL INSTALLED: "..vehicleName)
-    end
+	end
 end
 
 -- variables
@@ -99,7 +99,7 @@ end
 --
 function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExisting)
 
-	if g_currentMission:getIsServer() and not UniversalAutoload.globalSettingsLoaded then
+	if g_currentMission:getIsServer() and (overwriteExisting or not UniversalAutoload.globalSettingsLoaded) then
 	
 		local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 		if xmlFile ~= 0 then
@@ -108,9 +108,11 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 			UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
 			UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
 			UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
-			print("Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
-			print("Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
-			print("Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
+			UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
+			print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
+			print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
+			print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
+			print("  >> Price Per Pallet: " .. tostring(not UniversalAutoload.pricePerPallet))
 			xmlFile:delete()
 		end
 	else
@@ -160,6 +162,8 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
 						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
+						config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
+						config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
 						j = j + 1
 					end
 					
@@ -169,6 +173,8 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 				config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
 				config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
 				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+				config.noLoadingIfCovered = xmlFile:getValue(configKey..".options#noLoadingIfCovered", false)
+				config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
 				config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 				config.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
@@ -471,6 +477,7 @@ function UniversalAutoloadManager:consoleResetVehicles()
 	
 	UniversalAutoloadManager.resetList = {}
 	UniversalAutoloadManager.resetCount = 1
+	g_currentMission.isReloadingVehicles = true
 	
 	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 		table.insert(UniversalAutoloadManager.resetList, vehicle)
@@ -484,16 +491,19 @@ end
 --
 function UniversalAutoloadManager:consoleImportUserConfigurations()
 
-	local oldConfigurations = deepCopy(UniversalAutoload.VEHICLE_CONFIGURATIONS)
+	local oldVehicleConfigurations = deepCopy(UniversalAutoload.VEHICLE_CONFIGURATIONS)
+	local oldContainerConfigurations = deepCopy(UniversalAutoload.LOADING_TYPE_CONFIGURATIONS)
 	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
 	local vehicleCount, objectCount = UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, true)
 	
 	if vehicleCount > 0 then
+		vehicleCount = 0
 		for key, value in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
-			if not deepCompare(oldConfigurations[key], value) then
+			if not deepCompare(oldVehicleConfigurations[key], value) then
 				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 					if string.find(vehicle.configFileName, key) then
-						print("DETECTED SETTINGS CHANGE: " .. vehicle:getFullName())
+						vehicleCount = vehicleCount + 1
+						print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
 						if not UniversalAutoloadManager.resetVehicle(vehicle) then
 							g_currentMission:consoleCommandReloadVehicle()
 						end
@@ -503,13 +513,22 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		end
 	end
 	
+	if objectCount > 0 then
+		objectCount = 0
+		for key, value in pairs(UniversalAutoload.LOADING_TYPE_CONFIGURATIONS) do
+			if not deepCompare(oldContainerConfigurations[key], value) then
+				objectCount = objectCount + 1
+			end
+		end
+	end
+	
 	if vehicleCount > 0 and objectCount == 0 then
-		return string.format("IMPORTED: %d vehicle settings", vehicleCount)
+		return string.format("UPDATED: %d vehicle configurations", vehicleCount)
 	end
 	if objectCount > 0 and vehicleCount == 0 then
-		return string.format("IMPORTED: %d object settings", objectCount)
+		return string.format("UPDATED: %d container configurations", objectCount)
 	end
-	return string.format("IMPORTED: %d vehicle settings, %d object settings", vehicleCount, objectCount)
+	return string.format("UPDATED: %d vehicle configurations, %d container configurations", vehicleCount, objectCount)
 end
 --
 function UniversalAutoloadManager:consoleAddPallets(palletType)
@@ -538,10 +557,12 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 	if g_currentMission.controlledVehicle ~= nil then
 
 		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		local count = 0
 		
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
 				if hasAutoload then
+					count = count + 1
 					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
 					if palletsOnly then
 						UniversalAutoload.setContainerTypeIndex(vehicle, 2)
@@ -554,8 +575,9 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 			end
 		end
 	
+		if count>0 then return "Begin adding pallets now.." end
 	end
-	return "Begin adding pallets now.."
+	return "Please enter a vehicle with a UAL trailer attached to use this command"
 end
 --
 function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, width, height, length, wrapState, modName)
@@ -599,10 +621,12 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 	if g_currentMission.controlledVehicle ~= nil then
 
 		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		local count = 0
 		
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
 				if hasAutoload then
+					count = count + 1
 					UniversalAutoload.clearLoadedObjects(vehicle)
 					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
 					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
@@ -611,8 +635,9 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 			end
 		end
 
+		if count>0 then return "Begin adding bales now.." end
 	end
-	return "Begin adding bales now.."
+	return "Please enter a vehicle with a UAL trailer attached to use this command"
 end
 --
 function UniversalAutoloadManager:consoleAddRoundBales_125(fillTypeName)
@@ -701,12 +726,15 @@ function UniversalAutoloadManager.resetNextVehicle(resetList)
 
 	if resetList ~= nil and next(resetList) ~= nil then
 		local vehicle = resetList[#resetList]
+		table.remove(resetList, #resetList)
 		if not UniversalAutoloadManager.resetVehicle(vehicle) then
 			g_currentMission:consoleCommandReloadVehicle()
+			g_currentMission.isReloadingVehicles = true
+			UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
 		end
-		table.remove(resetList, #resetList)
 	else
 		UniversalAutoloadManager.resetCount = nil
+		g_currentMission.isReloadingVehicles = false
 	end
 end
 --
@@ -720,7 +748,7 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 	UniversalAutoload.clearLoadedObjects(vehicle)
 	
 	local rootVehicle = vehicle:getRootVehicle()
-	if rootVehicle ~= nil and rootVehicle ~= vehicle then
+	if rootVehicle ~= nil then
 		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
 		if rootVehicle == g_currentMission.controlledVehicle then
 			return false
@@ -769,6 +797,15 @@ end
 
 -- MAIN LOAD MAP FUNCTION
 function UniversalAutoloadManager:loadMap(name)
+
+	for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
+		-- Anything with tension belts could potentially require autoload
+		if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) 
+		and not SpecializationUtil.hasSpecialization(UniversalAutoload, vehicleType.specializations) then
+			g_vehicleTypeManager:addSpecialization(vehicleName, UniversalAutoload.name .. '.universalAutoload')
+			print("  UAL INSTALLED: "..vehicleName)
+		end
+	end
 
 	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] or g_modIsLoaded["FS22_SeedPotatoFarmBuildings"] then
 		print("** Seedpotato Farm Pack is loaded **")
@@ -853,6 +890,25 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualResetVehicles", "Reset all vehicles with autoload (and any attached) to the shop", "consoleResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
+		
+		
+		local oldCleanUp = getmetatable(_G).__index.cleanUp
+		getmetatable(_G).__index.cleanUp = function()
+			print("UNIVERSAL AUTOLOAD: CLEAN UP")
+			removeConsoleCommand("ualAddBales")
+			removeConsoleCommand("ualAddRoundBales_125")
+			removeConsoleCommand("ualAddRoundBales_150")
+			removeConsoleCommand("ualAddRoundBales_180")
+			removeConsoleCommand("ualAddSquareBales_180")
+			removeConsoleCommand("ualAddSquareBales_220")
+			removeConsoleCommand("ualAddSquareBales_240")
+			removeConsoleCommand("ualAddPallets")
+			removeConsoleCommand("ualClearLoadedObjects")
+			removeConsoleCommand("ualResetVehicles")
+			removeConsoleCommand("ualImportUserConfigurations")
+			removeConsoleCommand("ualCreateBoundingBox")
+			oldCleanUp()
+		end
 	end
 end
 

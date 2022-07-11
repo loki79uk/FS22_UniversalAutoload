@@ -41,6 +41,7 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerPallet", "The price charged for each auto-loaded pallet (default is zero)", 0)
 	
 	local allVehiclesKey = "universalAutoload.vehicleConfigurations"
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, allVehiclesKey.."#showDebug", "Show the full graphical debugging display for all vehicles in config", false)
@@ -60,12 +61,16 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#baleHeight", "Height of the loading area for BALES only", nil)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfFolded", "Prevent loading when folded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUnfolded", "Prevent loading when unfolded (for this area only)", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfCovered", "Prevent loading when covered (for this area only)", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUncovered", "Prevent loading when uncovered (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isBoxTrailer", "If trailer is enclosed with a rear door", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableSideLoading", "Use the automatic side loading triggers", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfFolded", "Prevent loading when folded", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUnfolded", "Prevent loading when unfolded", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfCovered", "Prevent loading when covered", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUncovered", "Prevent loading when uncovered", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full graphical debugging display for this vehicle", false)
 	end
@@ -148,8 +153,6 @@ function UniversalAutoload.removeEventListeners(vehicleType)
 	
 	-- (called during 'onLoad' so do not unregister that)
     removeUnusedEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    removeUnusedEventListener(vehicleType, "onReadStream", UniversalAutoload)
-    removeUnusedEventListener(vehicleType, "onWriteStream", UniversalAutoload)
     removeUnusedEventListener(vehicleType, "onDelete", UniversalAutoload)
     removeUnusedEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	
@@ -1014,7 +1017,7 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 				if v == closestSet then
 					for _, n in ipairs(selectedConfigs) do
 						if tonumber(n) == tonumber(k) then
-							-- print("valid config: "..n)
+							if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID CONFIG: "..n) end
 							validConfig = closestSet.name
 						end
 					end
@@ -1171,106 +1174,118 @@ function UniversalAutoload:onLoad(savegame)
 	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
 	spec.isAutoloadEnabled = false
-
-	local configFileName = self.configFileName
-	local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
-
-	if self.customEnvironment ~= nil then
-		configFileName = configFileName:gsub(g_modsDirectory, "")
-		-- print("configFileName:  " .. configFileName)
-	end
 	
-	if xmlFile ~= 0 then
-		if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
-			-- print("EXISTS: " .. configFileName)
-			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
-			for selectedConfigs, config in pairs(configGroup) do
-				-- DebugUtil.printTableRecursively(config, "--", 0, 1)
-				local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
-				if validConfig ~= nil then
-					print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig)
-					-- define the loading area parameters from supported vehicles settings file
-					spec.loadArea = {}
-					for i, loadArea in pairs(config.loadingArea) do
-						spec.loadArea[i] = {}
-						spec.loadArea[i].width      = loadArea.width
-						spec.loadArea[i].length     = loadArea.length
-						spec.loadArea[i].height     = loadArea.height
-						spec.loadArea[i].baleHeight = loadArea.baleHeight
-						spec.loadArea[i].offset     = loadArea.offset
-						spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
-						spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
-					end
-					spec.isBoxTrailer = config.isBoxTrailer
-					spec.isCurtainTrailer = config.isCurtainTrailer
-					spec.enableRearLoading = config.enableRearLoading
-					spec.enableSideLoading = config.enableSideLoading
-					spec.noLoadingIfFolded = config.noLoadingIfFolded
-					spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
-					spec.disableAutoStrap = config.disableAutoStrap
-					spec.showDebug = config.showDebug
-					break
-				end
-			end
-			
-		else
-			-- print("LOOK IN XML: " .. configFileName)
-			local i = 0
-			while true do
-				local key = string.format("vehicle.universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
+	if self.isServer then
 
-				if not xmlFile:hasProperty(key) then
-					break
-				end
-				local selectedConfigs = xmlFile:getValue(key.."#selectedConfigs")
-				local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
-				if validConfig ~= nil then
-					validVehicleName = self:getFullName().." - "..validConfig
-					print("UniversalAutoload - vaild vehicle: "..validVehicleName)
-					-- define the loading area parameters from vechicle.xml file
-					spec.loadArea = {}
-					local j = 0
-					while true do
-						local loadAreaKey = string.format("%s.loadingArea(%d)", key, j)
-						if not xmlFile:hasProperty(loadAreaKey) then
-							break
-						end
-						spec.loadArea[j+1] = {}
-						spec.loadArea[j+1].width      = xmlFile:getValue(loadAreaKey.."#width")
-						spec.loadArea[j+1].length     = xmlFile:getValue(loadAreaKey.."#length")
-						spec.loadArea[j+1].height     = xmlFile:getValue(loadAreaKey.."#height")
-						spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
-						spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
-						spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
-						spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
-						j = j + 1
-					end
-					spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
-					spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
-					spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
-					spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)
-					spec.noLoadingIfFolded = xmlFile:getValue(key..".options#noLoadingIfFolded", false)
-					spec.noLoadingIfUnfolded = xmlFile:getValue(key..".options#noLoadingIfUnfolded", false)
-					spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
-					spec.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(key..".options#showDebug", false)
-					
-					-- print("  >> "..configFileName)
-					break
-				end
+		local configFileName = self.configFileName
+		local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
 
-				i = i + 1
-			end
+		if self.customEnvironment ~= nil then
+			configFileName = Utils.removeModDirectory(configFileName)
+			if UniversalAutoload.showDebug then print("configFileName:  " .. configFileName) end
 		end
-		xmlFile:delete()
-	end
-	
-	if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
-	and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
-		spec.isAutoloadEnabled = true
-	else
-		spec.isAutoloadEnabled = false
-		UniversalAutoload.removeEventListeners(self)
-		return
+		
+		if xmlFile ~= 0 then
+			if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
+				local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
+				for selectedConfigs, config in pairs(configGroup) do
+					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
+					if validConfig ~= nil then
+						print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig)
+						-- define the loading area parameters from supported vehicles settings file
+						spec.loadArea = {}
+						for i, loadArea in pairs(config.loadingArea) do
+							spec.loadArea[i] = {}
+							spec.loadArea[i].width      = loadArea.width
+							spec.loadArea[i].length     = loadArea.length
+							spec.loadArea[i].height     = loadArea.height
+							spec.loadArea[i].baleHeight = loadArea.baleHeight
+							spec.loadArea[i].offset     = loadArea.offset
+							spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
+							spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
+							spec.loadArea[i].noLoadingIfCovered  = loadArea.noLoadingIfCovered
+							spec.loadArea[i].noLoadingIfUncovered  = loadArea.noLoadingIfUncovered
+						end
+						spec.isBoxTrailer = config.isBoxTrailer
+						spec.isCurtainTrailer = config.isCurtainTrailer
+						spec.enableRearLoading = config.enableRearLoading
+						spec.enableSideLoading = config.enableSideLoading
+						spec.noLoadingIfFolded = config.noLoadingIfFolded
+						spec.noLoadingIfUnfolded = config.noLoadingIfUnfolded
+						spec.noLoadingIfCovered  = config.noLoadingIfCovered
+						spec.noLoadingIfUncovered  = config.noLoadingIfUncovered
+						spec.disableAutoStrap = config.disableAutoStrap
+						spec.showDebug = config.showDebug
+						break
+					end
+				end
+				
+			else
+				-- print("LOOK IN XML: " .. configFileName)
+				local i = 0
+				while true do
+					local key = string.format("vehicle.universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
+
+					if not xmlFile:hasProperty(key) then
+						break
+					end
+					local selectedConfigs = xmlFile:getValue(key.."#selectedConfigs")
+					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
+					if validConfig ~= nil then
+						validVehicleName = self:getFullName().." - "..validConfig
+						print("UniversalAutoload - vaild vehicle: "..validVehicleName)
+						-- define the loading area parameters from vechicle.xml file
+						spec.loadArea = {}
+						local j = 0
+						while true do
+							local loadAreaKey = string.format("%s.loadingArea(%d)", key, j)
+							if not xmlFile:hasProperty(loadAreaKey) then
+								break
+							end
+							spec.loadArea[j+1] = {}
+							spec.loadArea[j+1].width      = xmlFile:getValue(loadAreaKey.."#width")
+							spec.loadArea[j+1].length     = xmlFile:getValue(loadAreaKey.."#length")
+							spec.loadArea[j+1].height     = xmlFile:getValue(loadAreaKey.."#height")
+							spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
+							spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+							spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
+							spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
+							spec.loadArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
+							spec.loadArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
+							j = j + 1
+						end
+						spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
+						spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
+						spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
+						spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)
+						spec.noLoadingIfFolded = xmlFile:getValue(key..".options#noLoadingIfFolded", false)
+						spec.noLoadingIfUnfolded = xmlFile:getValue(key..".options#noLoadingIfUnfolded", false)
+						spec.noLoadingIfCovered = xmlFile:getValue(key..".options#noLoadingIfCovered", false)
+						spec.noLoadingIfUncovered = xmlFile:getValue(key..".options#noLoadingIfUncovered", false)
+						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
+						spec.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(key..".options#showDebug", false)
+						break
+					end
+
+					i = i + 1
+				end
+			end
+			xmlFile:delete()
+		end
+		
+		if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
+		and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
+			if UniversalAutoload.showDebug then print("Universal Autoload Enabled: " .. self:getFullName()) end
+			spec.isAutoloadEnabled = true
+			if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
+				UniversalAutoload.VEHICLES[self] = self
+			end
+		else
+			if UniversalAutoload.showDebug then print("Universal Autoload DISABLED: " .. self:getFullName()) end
+			spec.isAutoloadEnabled = false
+			UniversalAutoload.removeEventListeners(self)
+			return
+		end
 	end
 
     if self.isServer and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
@@ -1465,13 +1480,9 @@ function UniversalAutoload:onLoad(savegame)
 
 	end
 
-	if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
-		UniversalAutoload.VEHICLES[self] = self
-	end
+	--client+server
 	spec.actionEvents = {}
 	spec.playerInTrigger = {}
-	
-	--client+server
 	spec.currentTipside = "left"
 	spec.currentLoadside = "both"
 	spec.currentMaterialIndex = 1
@@ -1601,8 +1612,8 @@ end
 --
 function UniversalAutoload:getIsCovered()
 
-	if self.spec_cover ~= nil then
-		return self.spec_cover.state == #self.spec_cover.covers
+	if self.spec_cover ~= nil and self.spec_cover.hasCovers then
+		return self.spec_cover.state == 0
 	else
 		return false
 	end
@@ -1630,6 +1641,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
     local spec = self.spec_universalAutoload
 	
 	if streamReadBool(streamId) then
+		print("Universal Autoload Enabled: " .. self:getFullName())
 		spec.isAutoloadEnabled = true
 		spec.currentTipside = streamReadString(streamId)
 		spec.currentLoadside = streamReadString(streamId)
@@ -1643,8 +1655,14 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		
 		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
 		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+		
+		if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
+			UniversalAutoload.VEHICLES[self] = self
+		end
 	else
+		print("Universal Autoload Disabled: " .. self:getFullName())
 		spec.isAutoloadEnabled = false
+		UniversalAutoload.removeEventListeners(self)
 	end
 end
 --
@@ -1663,6 +1681,8 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.isUnloading = spec.isUnloading or false
 		spec.validLoadCount = spec.validLoadCount or 0
 		spec.validUnloadCount = spec.validUnloadCount or 0
+		UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
+		UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false
 		
 		streamWriteString(streamId, spec.currentTipside)
 		streamWriteString(streamId, spec.currentLoadside)
@@ -1689,7 +1709,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	end
 	
 	if spec.isAutoloadEnabled and self.isServer then
-
+	
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
 			if not self:getIsFolding() then
@@ -1699,6 +1719,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 		end
 		
+		-- DETECT WHEN COVER STATE CHANGES
+		if self.spec_cover ~= nil and self.spec_cover.hasCovers then
+			if spec.lastCoverState ~= self.spec_cover.state then
+				-- print("*** COVERS CHANGED STATE ***")
+				spec.lastCoverState = self.spec_cover.state
+				UniversalAutoload.updateActionEventText(self)
+			end
+		end
+
+
 		-- ALWAYS LOAD THE AUTO LOADING PALLETS
 		if spec.autoLoadingObjects ~= nil then
 			for _, object in pairs(spec.autoLoadingObjects) do
@@ -1946,14 +1976,16 @@ function UniversalAutoload:countActivePallets()
 		UniversalAutoload.updateActionEventText(self)
 	end
 
-	-- if spec.totalAvailableCount ~= totalAvailableCount then
-		-- --spec.totalAvailableCount = totalAvailableCount
-		-- print("TOTAL AVAILABLE COUNT ERROR: "..tostring(spec.totalAvailableCount).." vs "..tostring(totalAvailableCount))
-	-- end
-	-- if spec.totalUnloadCount ~= totalUnloadCount then
-		-- --spec.totalUnloadCount = totalUnloadCount
-		-- print("TOTAL UNLOAD COUNT ERROR: "..tostring(spec.totalUnloadCount).." vs "..tostring(totalUnloadCount))
-	-- end
+	if UniversalAutoload.showDebug then
+		if spec.totalAvailableCount ~= totalAvailableCount then
+			--spec.totalAvailableCount = totalAvailableCount
+			print("TOTAL AVAILABLE COUNT ERROR: "..tostring(spec.totalAvailableCount).." vs "..tostring(totalAvailableCount))
+		end
+		if spec.totalUnloadCount ~= totalUnloadCount then
+			--spec.totalUnloadCount = totalUnloadCount
+			print("TOTAL UNLOAD COUNT ERROR: "..tostring(spec.totalUnloadCount).." vs "..tostring(totalUnloadCount))
+		end
+	end
 end
 --
 function UniversalAutoload:createBoundingBox()
@@ -2002,9 +2034,11 @@ function UniversalAutoload:createBoundingBox()
 		
 		local offsetX, offsetY, offsetZ = (x0+x1)/2, y0, (z0+z1)/2
 		
-		print(string.format("(W,H,L) = (%f, %f, %f)", width, height, length))
-		print(string.format("(X,Y,Z) = (%f, %f, %f)", offsetX, offsetY, offsetZ))
-		print(string.format("(X0,Y0,Z0) = (%f, %f, %f)", localToWorld(spec.loadVolume.rootNode, 0, 0, 0)))
+		if UniversalAutoload.showDebug then
+			print(string.format("(W,H,L) = (%f, %f, %f)", width, height, length))
+			print(string.format("(X,Y,Z) = (%f, %f, %f)", offsetX, offsetY, offsetZ))
+			print(string.format("(X0,Y0,Z0) = (%f, %f, %f)", localToWorld(spec.loadVolume.rootNode, 0, 0, 0)))
+		end
 
 		spec.boundingBox.rootNode = createTransformGroup("loadVolumeCentre")
 		link(spec.loadVolume.rootNode, spec.boundingBox.rootNode)
@@ -2031,9 +2065,12 @@ function UniversalAutoload:loadObject(object)
 			if UniversalAutoload.moveObjectNodes(self, object, loadPlace) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
+				
+				if UniversalAutoload.pricePerPallet > 0 then
+					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI)
+				end
 			
 				if spec.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]", containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
-				--g_currentMission:addMoney(-100, self:getOwnerFarmId(), MoneyType.AI)
 				return true
 			end
 		end
@@ -2472,6 +2509,12 @@ function UniversalAutoload:getIsUnloadingKeyAllowed()
 	if spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
 		return false
 	end
+	if spec.noLoadingIfCovered and self:getIsCovered() then
+		return false
+	end
+	if spec.noLoadingIfUncovered and not self:getIsCovered() then
+		return false
+	end
     return true
 end
 --
@@ -2485,6 +2528,12 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 		return false
 	end
 	if spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+		return false
+	end
+	if spec.noLoadingIfCovered and self:getIsCovered() then
+		return false
+	end
+	if spec.noLoadingIfUncovered and not self:getIsCovered() then
 		return false
 	end
 	
@@ -2511,13 +2560,21 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 		end
 	end
 
-    -- check that the vehicle has not fallen on its side
-    local _, y1, _ = getWorldTranslation(self.components[1].node)
-    local _, y2, _ = localToWorld(self.components[1].node, 0, 1, 0)
-    if y2 - y1 < 0.5 then
-		-- print("NO LOADING IF FALLEN OVER")
-        return false
-    end
+	local node = UniversalAutoload.getObjectNode( self )
+	if node == nil then
+		return false
+	end
+	
+	if node then
+		-- check that the vehicle has not fallen on its side
+		local _, y1, _ = getWorldTranslation(node)
+		local _, y2, _ = localToWorld(node, 0, 1, 0)
+		if y2 - y1 < 0.5 then
+			-- print("NO LOADING IF FALLEN OVER")
+			return false
+		end
+	end
+	
 	return true
 end
 --
@@ -2528,6 +2585,12 @@ function UniversalAutoload:getIsLoadingAreaAllowed(i)
 		return false
 	end
 	if spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+		return false
+	end
+	if spec.loadArea[i].noLoadingIfCovered and self:getIsCovered() then
+		return false
+	end
+	if spec.loadArea[i].noLoadingIfUncovered and not self:getIsCovered() then
 		return false
 	end
 	return true
@@ -2929,7 +2992,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 			end
 			return true
 		end
-	else
+	--else
 		--print("OBJECT: " .. object:getFullName() )
 		--DebugUtil.printTableRecursively(object, "--", 0, 1)
 	end
@@ -3087,7 +3150,7 @@ function UniversalAutoload.getContainerType(object)
 	if objectType == nil then
 		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
 			UniversalAutoload.UNKNOWN_TYPES[name] = true
-			print("UNKNOWN OBJECT TYPE: ".. name )
+			print("*** UNIVERSAL AUTOLOAD - UNKNOWN OBJECT TYPE: ".. name.." ***")
 		end
 	end
 	

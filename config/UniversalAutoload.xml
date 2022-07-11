@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 
 <!-- GLOBAL SETTINGS - OVERRIDE ALL OTHERS -->
-<universalAutoLoad showDebug="false" manualLoadingOnly="false" disableAutoStrap="false">
+<universalAutoLoad showDebug="false" manualLoadingOnly="false" disableAutoStrap="false" pricePerPallet="0">
 
 	<!-- APPLIES TO ALL IN THIS SECTION -->
     <vehicleConfigurations showDebug="false">
 	
-        <!-- *** Base Game Example *** -->
-        <!-- <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
-            <loadingArea offset="0 1.339 -0.165" width="1.95" height="2.00" length="4.525"/>
-        </vehicleConfiguration> -->
-		
-        <!-- *** Mod Example *** -->
-        <!-- <vehicleConfiguration configFileName="FS22_20ftGooseneck/lizardgooseneck.xml">  
-            <loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
-            <options enableRearLoading="true" enableSideLoading="true" showDebug="true"/>
-        </vehicleConfiguration> -->
+	<!-- *** Base Game Example *** -->
+	<!-- <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
+		<loadingArea offset="0 1.339 -0.165" width="1.95" height="2.00" length="4.525"/>
+	</vehicleConfiguration> -->
+
+	<!-- *** Mod Example *** -->
+	<!-- <vehicleConfiguration configFileName="FS22_20ftGooseneck/lizardgooseneck.xml">  
+		<loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
+		<options enableRearLoading="true" enableSideLoading="true" showDebug="true"/>
+	</vehicleConfiguration> -->
 		
     </vehicleConfigurations>
 	
@@ -25,8 +25,20 @@
 		<!-- *** Base Game Example *** -->
 		<!-- <containerConfiguration name="treeSaplingPallet" sizeY="2.500" neverStack="true" containerType="ALL"/> -->
 
-		<!-- *** Mod Example *** -->		
+		<!-- *** Mod Examples *** -->		
 		<!-- <containerConfiguration name="FS22_Seedpotato_Farm_Pack:PotatoBox" containerType="POTATOBOX"/> -->
+		<!-- <containerConfiguration name="FS22_JohnDeere_560m:roundbale180" sizeX="11.80" sizeY="12.70" sizeZ="11.85" containerType="BALE" isRoundbale="true" flipYZ="true"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:whiskeyPallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:soymilkPallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:oatmealPallet" sizeY="1.075" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:pastaPallet" sizeY="1.125" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:chipsPallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:beerPallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:winePallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:ethanolPallet" sizeY="0.765" containerType="EURO_PALLET"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:anhydrousTank" containerType="LIQUID_TANK"/> -->
+		<!-- <containerConfiguration name="FS22_Green_Valley_Nebraska_4X:propaneTank" containerType="LIQUID_TANK"/> -->
 
     </containerConfigurations>
+	
 </universalAutoLoad>

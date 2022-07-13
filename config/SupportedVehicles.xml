@@ -40,7 +40,7 @@
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/kk301827H/kk301827H.xml">
             <loadingArea offset="0 0.612 -0.87" width="1.80" height="1.95" length="2.55"/>
-            <!-- <loadingArea offset="0 0.612 -0.62" width="1.80" height="1.50" length="2.95"/> -->
+            <loadingArea offset="0 0.612 -0.62" width="1.80" height="1.50" length="2.95"/>
 			<options isBoxTrailer="true" noLoadingIfFolded="true" enableRearLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/salek/ans1900/ans1900.xml" selectedConfigs="1">
@@ -79,7 +79,6 @@
 		<vehicleConfiguration configFileName="kubotaPack/vehicles/kubota/rtvx1140/rtvx1140.xml" selectedConfigs="2">
             <loadingArea offset="0 0.900 -1.15" width="1.40" height="1.00" length="1.15"/>
         </vehicleConfiguration>
-		
 		
 		<!-- SUPPORTED MODS -->
         <!-- <vehicleConfiguration configFileName="FS22_lizardCarTrailer/lizardCarTrailer.xml"> -->

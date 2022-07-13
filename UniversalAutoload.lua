@@ -47,11 +47,11 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, allVehiclesKey.."#showDebug", "Show the full graphical debugging display for all vehicles in config", false)
 	
 	local vehicleKey = "universalAutoload.vehicleConfigurations.vehicleConfiguration(?)"
-	local schemas = {
+	local vehicleSchemas = {
 		[1] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = vehicleKey },
 		[2] = { ["schema"] = Vehicle.xmlSchema, ["key"] = "vehicle."..vehicleKey }
 	}
-	for _, s in ipairs(schemas) do
+	for _, s in ipairs(vehicleSchemas) do
 		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vechicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
 		s.schema:register(XMLValueType.VECTOR_TRANS, s.key..".loadingArea(?)#offset", "Offset to the centre of the loading area", "0 0 0")
@@ -76,16 +76,23 @@ function UniversalAutoload.initSpecialization()
 	end
 
 	local containerKey = "universalAutoload.containerConfigurations.containerConfiguration(?)"
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerKey.."#containerType", "The loading type category to group under in the menu)", "ANY")
-	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, containerKey.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeX", "Width of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeY", "Height of the pallet", 2.0)
-    UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, containerKey.."#sizeZ", "Length of the pallet", 1.5)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#isBale", "If the object is either a round bale or square bale", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#flipYZ", "Should always rotate 90 degrees to stack on end - e.g. for round bales", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#neverStack", "Should never load another pallet on top of this one when loading", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#neverRotate", "Should never rotate object when loading", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, containerKey.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+	local legacyContainerKey = "universalAutoload.containerTypeConfigurations.containerConfiguration(?)"
+	local containerSchemas = {
+		[1] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = containerKey },
+		[2] = { ["schema"] = UniversalAutoload.xmlSchema, ["key"] = legacyContainerKey }
+	}
+	for _, s in ipairs(containerSchemas) do
+		s.schema:register(XMLValueType.STRING, s.key.."#containerType", "The loading type category to group under in the menu)", "ANY")
+		s.schema:register(XMLValueType.STRING, s.key.."#name", "Simplified Pallet Configuration Filename", "UNKNOWN")
+		s.schema:register(XMLValueType.FLOAT, s.key.."#sizeX", "Width of the pallet", 1.5)
+		s.schema:register(XMLValueType.FLOAT, s.key.."#sizeY", "Height of the pallet", 2.0)
+		s.schema:register(XMLValueType.FLOAT, s.key.."#sizeZ", "Length of the pallet", 1.5)
+		s.schema:register(XMLValueType.BOOL, s.key.."#isBale", "If the object is either a round bale or square bale", false)
+		s.schema:register(XMLValueType.BOOL, s.key.."#flipYZ", "Should always rotate 90 degrees to stack on end - e.g. for round bales", false)
+		s.schema:register(XMLValueType.BOOL, s.key.."#neverStack", "Should never load another pallet on top of this one when loading", false)
+		s.schema:register(XMLValueType.BOOL, s.key.."#neverRotate", "Should never rotate object when loading", false)
+		s.schema:register(XMLValueType.BOOL, s.key.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+	end
 
 	local schemaSavegame = Vehicle.xmlSchemaSavegame
 	local specKey = "vehicles.vehicle(?).universalAutoload"

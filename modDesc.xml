@@ -64,6 +64,16 @@ Configured for the following vehicles:
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Added an icon in the shop configuration page to show when autoload is active
+- Added global option "manualLoadingOnly" for a less cheaty "autoload light" option
+- Added global option to charge per pallet loaded, e.g.: pricePerPallet="10"
+- Added disableAutoStrap option (global or per vehicle)
+- Added no loading if covered/uncovered options (for trailers with covers)
+- Added multiple loading zones (step decks can now load to both areas)
+- Added loading of objects by hand (small objects or super-stength)
+- Added new console commands (see readme file for more details)
+- Implemented function to correctly remove event listeners (credit to GtX)
 v1.1.0.0
 - Added different stacking heights for bales and pallets
 - Pallets stack to different heights based on mass (to improve weight distribution)
@@ -122,6 +132,16 @@ Liste der kompatiblen Fahrzeuge:
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Auf der Shop-Konfigurationsseite wurde ein Symbol hinzugefügt, das anzeigt, wenn das automatische Laden aktiviert ist
+- Globale Option "manualLoadingOnly" für eine weniger betrügerische "autoload light" Option hinzugefügt
+- Globale Option hinzugefügt, um pro geladene Palette zu berechnen, z.B.: pricePerPallet="10"
+- Option disableAutoStrap hinzugefügt (global oder pro Fahrzeug)
+- Option "Keine Beladung, wenn abgedeckt/unabgedeckt" hinzugefügt (für Anhänger mit Abdeckungen)
+- Mehrere Ladezonen hinzugefügt (Step Decks können nun in beide Bereiche geladen werden)
+- Laden von Objekten von Hand hinzugefügt (kleine Objekte oder Superlängen)
+- Neue Konsolenbefehle hinzugefügt (siehe Readme-Datei für weitere Details)
+- Funktion zum korrekten Entfernen von Ereignis-Listenern implementiert (Dank an GtX)
 v1.1.0.0
 - Unterschiedliche Stapelhöhen für Ballen und Paletten hinzugefügt
 - Paletten lassen sich je nach Masse unterschiedlich hoch stapeln (um die Gewichtsverteilung zu verbessern)
@@ -180,6 +200,16 @@ Liste des véhicules compatibles :
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Ajout d'une icône dans la page de configuration de la boutique pour indiquer quand le chargement automatique est actif.
+- Ajout d'une option globale "manualLoadingOnly" pour une option "autoload light" moins tricheuse.
+- Ajout d'une option globale pour facturer par palette chargée, par exemple : pricePerPallet="10".
+- Ajout de l'option disableAutoStrap (global ou par véhicule)
+- Ajout de l'option "Pas de chargement si le véhicule est couvert/découvert" (pour les remorques couvertes).
+- Ajout de zones de chargement multiples (les step decks peuvent maintenant être chargés dans les deux zones)
+- Ajout du chargement d'objets à la main (petits objets ou super-longueurs)
+- Ajout de nouvelles commandes de console (voir le fichier readme pour plus de détails)
+- Implémentation d'une fonction pour supprimer correctement les écouteurs d'événements (crédit à GtX)
 v1.1.0.0
 - Ajout de différentes hauteurs d'empilage pour les balles et les palettes
 - Les palettes s'empilent à des hauteurs différentes en fonction de leur masse (pour améliorer la répartition du poids)
@@ -238,6 +268,16 @@ Nakonfigurováno pro následující vozidla:
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Na stránku konfigurace obchodu byla přidána ikona, která zobrazuje, kdy je aktivní automatické načítání.
+- Přidána globální volba "manualLoadingOnly" pro méně podvodnou volbu "autoload light".
+- Přidána globální možnost účtování za každou naloženou paletu, např.: pricePerPallet="10"
+- Přidána možnost disableAutoStrap (globální nebo pro každé vozidlo)
+- Přidány možnosti nenakládat, pokud je zakrytý/nezakrytý (pro návěsy s kryty)
+- Přidáno více nakládacích zón (stupňovité paluby lze nyní nakládat do obou oblastí)
+- Přidáno ruční nakládání předmětů (malé předměty nebo superdlouhé předměty)
+- Přidány nové konzolové příkazy (více informací naleznete v souboru readme)
+- Implementována funkce pro správné odstranění posluchačů událostí (zásluha GtX)
 v1.1.0.0
 - Přidány různé výšky stohování balíků a palet
 - Palety se stohují do různých výšek v závislosti na hmotnosti (pro lepší rozložení hmotnosti)
@@ -296,6 +336,16 @@ Skonfigurowany dla następujących pojazdów:
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Dodano ikonę na stronie konfiguracji sklepu, aby pokazać, kiedy autoload jest aktywny
+- Dodano globalną opcję "manualLoadingOnly" dla mniej oszukańczej opcji "autoload light".
+- Dodano globalną opcję naliczania opłaty za załadowaną paletę, np.: pricePerPallet="10"
+- Dodano opcję disableAutoStrap (globalną lub dla każdego pojazdu)
+- Dodano opcje "nie ładować, jeśli przykryte/niepokryte" (dla przyczep z pokrywami)
+- Dodano wiele stref załadunku (pokłady schodkowe mogą teraz ładować się do obu stref)
+- Dodano ładowanie obiektów ręcznie (małe obiekty lub superdługości)
+- Dodano nowe komendy konsoli (więcej szczegółów w pliku readme)
+- Zaimplementowana funkcja do prawidłowego usuwania słuchaczy zdarzeń (zasługa GtX)
 v1.1.0.0
 - Dodano różne wysokości układania w stos dla bel i palet
 - Palety układane są na różnych wysokościach w zależności od masy (aby poprawić rozkład ciężaru)
@@ -355,6 +405,16 @@ Configurado para los siguientes vehículos:
 - Kubota RTV-X1140
 
 Changelog:
+v1.2.0.0
+- Añadido un icono en la página de configuración de la tienda para mostrar cuando la carga automática está activa
+- Añadida la opción global "manualLoadingOnly" para una opción menos tramposa de "autoload light".
+- Añadida la opción global de cobrar por palet cargado, por ejemplo: pricePerPallet="10"
+- Añadida la opción disableAutoStrap (global o por vehículo)
+- Añadida la opción de no cargar si está cubierto/descubierto (para remolques con cubierta)
+- Añadida la opción de múltiples zonas de carga (las cubiertas escalonadas ahora pueden cargar en ambas zonas)
+- Añadida la carga de objetos a mano (objetos pequeños o superlongitud)
+- Añadidos nuevos comandos de consola (ver archivo readme para más detalles)
+- Implementada función para eliminar correctamente los escuchadores de eventos (crédito a GtX)
 v1.1.0.0
 - Añadidas diferentes alturas de apilamiento para balas y palets
 - Los palés se apilan a diferentes alturas en función de la masa (para mejorar la distribución del peso)
@@ -414,6 +474,16 @@ Configurado para os seguintes veículos:
 - Kubota RTV-X1140
 
 Registro de alterações:
+v1.2.0.0
+- Adicionado um ícone na página de configuração da loja para mostrar quando a carga automática está ativa
+- Adicionada a opção global "manualLoadingOnly" para uma opção menos trapaceira de "autoload light".
+- Adicionada opção global para cobrar por palete carregado, por exemplo: pricePerPallet="10".
+- Adicionada a opção desabilitarAutoStrap (global ou por veículo)
+- Adicionado nenhum carregamento se coberto/descoberto opções (para reboques com coberturas)
+- Acrescentadas múltiplas zonas de carga (os degraus podem agora ser carregados em ambas as áreas)
+- Carga adicional de objetos à mão (objetos pequenos ou super-esforço)
+- Adicionados novos comandos de console (veja o arquivo readme para mais detalhes)
+- Função implementada para remover corretamente os ouvintes do evento (crédito para GtX)
 v1.1.0.0
 - Adicionadas diferentes alturas de empilhamento para fardos e paletes
 - Os paletes empilham em diferentes alturas com base na massa (para melhorar a distribuição de peso)

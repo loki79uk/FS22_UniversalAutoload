@@ -112,7 +112,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 			print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
 			print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
 			print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
-			print("  >> Price Per Pallet: " .. tostring(not UniversalAutoload.pricePerPallet))
+			print("  >> Price Per Pallet: " .. tostring(UniversalAutoload.pricePerPallet))
 			xmlFile:delete()
 		end
 	else
@@ -184,7 +184,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					print("  >> "..configFileName.." ("..selectedConfigs..") DEBUG")
 				end
 			else
-				print("  CONFIG ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")")
+				if UniversalAutoload.debugEnabled then print("  CONFIG ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")") end
 			end
 			
 			i = i + 1
@@ -207,9 +207,16 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 	local i = 0
 	local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 	if xmlFile ~= 0 then
+	
+		local containerRootKey = "universalAutoload.containerConfigurations"
+		local legacyContainerRootKey = "universalAutoload.containerTypeConfigurations"
+		if not xmlFile:hasProperty(containerRootKey) and xmlFile:hasProperty(legacyContainerRootKey) then
+			print("*** OLD VERSION OF CONFIG FILE DETECTED - please use <containerConfigurations> ***")
+			containerRootKey = legacyContainerRootKey
+		end
 
 		while true do
-			local configKey = string.format("universalAutoload.containerConfigurations.containerConfiguration(%d)", i)
+			local configKey = string.format(containerRootKey..".containerConfiguration(%d)", i)
 			
 			if not xmlFile:hasProperty(configKey) then
 				break
@@ -310,7 +317,7 @@ function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnviron
 			elseif category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
 			else
 				containerType = "ALL"
-				print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category)
+				if UniversalAutoload.debugEnabled then print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category) end
 			end
 
 			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}

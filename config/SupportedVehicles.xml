@@ -41,7 +41,7 @@
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/kk301827H/kk301827H.xml">
             <loadingArea offset="0 0.612 -0.87" width="1.80" height="1.95" length="2.55"/>
             <loadingArea offset="0 0.612 -0.62" width="1.80" height="1.50" length="2.95"/>
-			<options isBoxTrailer="true" noLoadingIfFolded="true" enableRearLoading="true"/>
+			<options isBoxTrailer="true" noLoadingIfFolded="true" enableRearLoading="true" zonesOverlap="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/salek/ans1900/ans1900.xml" selectedConfigs="1">
             <loadingArea offset="0 0.589 -0.48" width="1.50" height="1.85" length="2.45"/>
@@ -49,6 +49,7 @@
 		
 		<!-- SUPPORTED VEHICLES -->
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
+            <options zonesOverlap="true"/>
             <loadingArea offset="0 0.810 -0.450" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.225" width="1.00" height="1.60" length="2.35" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.650" width="1.00" height="1.60" length="1.50" baleHeight="1.85"/>
@@ -56,6 +57,7 @@
             <loadingArea offset="0 0.810 -1.262" width="1.00" height="1.60" length="0.774" baleHeight="1.85"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
+            <options zonesOverlap="true"/>
             <loadingArea offset="0 0.763 -0.625" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.370" width="1.10" height="1.60" length="2.25" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.775" width="1.10" height="1.60" length="1.45" baleHeight="1.85"/>

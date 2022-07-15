@@ -176,6 +176,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 				config.noLoadingIfCovered = xmlFile:getValue(configKey..".options#noLoadingIfCovered", false)
 				config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
 				config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
+				config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
 				config.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
 				if not config.showDebug then

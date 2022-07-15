@@ -72,6 +72,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfCovered", "Prevent loading when covered", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUncovered", "Prevent loading when uncovered", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#zonesOverlap", "Flag to identify when the loading areas overlap each other", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full graphical debugging display for this vehicle", false)
 	end
 
@@ -1222,6 +1223,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.noLoadingIfCovered  = config.noLoadingIfCovered
 						spec.noLoadingIfUncovered  = config.noLoadingIfUncovered
 						spec.disableAutoStrap = config.disableAutoStrap
+						spec.zonesOverlap = config.zonesOverlap
 						spec.showDebug = config.showDebug
 						break
 					end
@@ -1270,6 +1272,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.noLoadingIfCovered = xmlFile:getValue(key..".options#noLoadingIfCovered", false)
 						spec.noLoadingIfUncovered = xmlFile:getValue(key..".options#noLoadingIfUncovered", false)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
+						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
 						spec.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(key..".options#showDebug", false)
 						break
 					end
@@ -2390,7 +2393,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					end
 
 					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
-						if containerType.isBale or (spec.currentLoadingPlace and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
+						if (containerType.isBale and not spec.zonesOverlap) or (spec.currentLoadingPlace and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
 							if spec.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
 							spec.currentLoadingPlace = nil
 						else
@@ -2425,7 +2428,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 								
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-									and (thisLoadHeight<=0 or containerType.isBale
+									and (thisLoadHeight<=0 or (containerType.isBale and not spec.zonesOverlap)
 										or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
 									then
 										spec.currentLoadHeight = math.max(0,thisLoadHeight)
@@ -2437,7 +2440,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								end
 							else
 								spec.trailerIsMoving = true
-								if containerType.isBale and not spec.partiallyUnloaded and not spec.trailerIsFull then
+								if containerType.isBale and not spec.zonesOverlap and not spec.partiallyUnloaded and not spec.trailerIsFull then
 									useThisLoadSpace = true
 								else
 									if not spec.trailerIsFull then
@@ -2845,11 +2848,20 @@ function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEn
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAvailableObject(self, object)
 				elseif onLeave then
 					UniversalAutoload.removeAvailableObject(self, object)
+				end
+			end
+		else
+			local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(otherActorId))
+			if splitType ~= nil then
+				if onEnter then
+					-- print("WOOD")
+				elseif onLeave then
+					-- print("NO WOOD")
 				end
 			end
 		end
@@ -2861,7 +2873,7 @@ function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, on
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addLoadedObject(self, object)
 				elseif onLeave then
@@ -2877,7 +2889,7 @@ function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, 
 		local spec = self.spec_universalAutoload
 		local object = g_currentMission:getNodeObject(otherActorId)
 		if object ~= nil then
-			if UniversalAutoload.getIsLoadingVehicleAllowed(self, triggerId) and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAutoLoadingObject(self, object)
 				elseif onLeave then

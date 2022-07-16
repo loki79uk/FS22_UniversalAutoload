@@ -904,7 +904,7 @@ function UniversalAutoloadManager:loadMap(name)
 		
 		local oldCleanUp = getmetatable(_G).__index.cleanUp
 		getmetatable(_G).__index.cleanUp = function()
-			print("UNIVERSAL AUTOLOAD: CLEAN UP")
+			-- print("UNIVERSAL AUTOLOAD: CLEAN UP")
 			removeConsoleCommand("ualAddBales")
 			removeConsoleCommand("ualAddRoundBales_125")
 			removeConsoleCommand("ualAddRoundBales_150")

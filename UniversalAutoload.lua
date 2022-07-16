@@ -2233,8 +2233,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	local shouldRotate = ((N2*M2) > (N1*M1)) or (N1 > N2)
 
 	if spec.showDebug then
-		print("===============================")
-		print(containerType.name)
+		print("-------------------------------")
 		print("width: " .. tostring(width) )
 		print("length: " .. tostring(length) )
 		print(" N1: "..N1.. " ,  M1: "..M1)
@@ -2303,7 +2302,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("currentLoadLength: " .. tostring(spec.currentLoadLength) )
 		print("currentActualWidth: " .. tostring(spec.currentActualWidth) )
 		print("currentActualLength: " .. tostring(spec.currentActualLength) )
-		print("===============================")
+		print("-------------------------------")
 	end
 	
 	if spec.currentLoadLength<spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
@@ -2361,6 +2360,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
     local spec = self.spec_universalAutoload
 	
 	if containerType ~= nil then
+		if spec.showDebug then
+			print("===============================")
+			print("FIND LOADING PLACE FOR "..containerType.name)
+		end
 
 		local i = spec.currentLoadAreaIndex or 1
 		while i <= #spec.loadArea do
@@ -2415,8 +2418,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
 
 						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
-						-- print("(x0,y0,z0) = " .. x0 .. ",".. y0 .. "," .. z0)
-						-- setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+						setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
@@ -2428,10 +2430,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 								
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-									and (thisLoadHeight<=0 or (containerType.isBale and not spec.zonesOverlap)
-										or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
+									and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
 									then
-										spec.currentLoadHeight = math.max(0,thisLoadHeight)
+										spec.currentLoadHeight = math.max(0, thisLoadHeight)
 										useThisLoadSpace = true
 										break
 									end
@@ -2452,11 +2453,11 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							end
 							
 							if useThisLoadSpace then
-								if spec.showDebug then print("USING LOAD PLACE") end
 								if containerType.neverStack then
 									spec.currentLoadingPlace = nil
 								end
 								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+								if spec.showDebug then print("USING LOAD PLACE - height: " .. tostring(spec.currentLoadHeight)) end
 								return thisLoadPlace
 							end
 						end
@@ -2476,6 +2477,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			end
 		end
 		spec.currentLoadAreaIndex = 1
+		if spec.showDebug then print("===============================") end
 	end
 end
 

@@ -630,7 +630,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<en>Automatic Bale Collection Mode</en>
 			<de>Automatischer Ballensammel-Modus</de>
 			<fr>Mode de collecte automatique des balles</fr>
-			<ru>Автоматический режим сбора тюков</ru>
+			<ru>Автоматический сбор тюков</ru>
 			<nl>Automatische balenophaalmodus</nl>
 			<cz>Režim automatického sběru balíků</cz>
 			<pl>Tryb automatycznego zbierania beli</pl>
@@ -950,7 +950,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<en>Auto-Bale Mode</en>
 			<de>Auto-Ballen-Modus</de>
 			<fr>Mode Auto-Balles</fr>
-			<ru>Автоматический режим кипы</ru>
+			<ru>Автосбор тюков</ru>
 			<nl>Auto-Bale Mode</nl>
 			<cz>Sbírka Auto-Bale Režim</cz>
 			<pl>Tryb Auto-Bale</pl>
@@ -1115,7 +1115,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<en>Round bale</en>
 			<de>Rundballen</de>
 			<fr>Balle Ronde</fr>
-			<ru>Круглый рулон</ru>
+			<ru>Круглый тюк</ru>
 			<nl>Ronde balen</nl>
 			<cz>Kulatý balík</cz>
 			<pl>Okrągłe bele</pl>

@@ -2017,9 +2017,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime or 0
 			if spec.spawnPalletsDelayTime > UniversalAutoload.delayTime/4 then
 				spec.spawnPalletsDelayTime = 0
+
 				local i = math.random(1, #spec.palletsToSpawn)
 				pallet = spec.palletsToSpawn[i]
+				if spec.lastSpawnedPallet then
+					if math.random(1, 100) > 50 then
+						pallet = spec.lastSpawnedPallet
+					end
+				end
 				UniversalAutoload.createPallet(self, pallet)
+				spec.lastSpawnedPallet = pallet
 			else
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + dt
 			end
@@ -2503,7 +2510,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea[i].width
-	local length = spec.loadArea[i].length -- spec.currentActualLength
+	local length = spec.loadArea[i].length
 	local N1 = math.floor(width / containerType.sizeX)
 	local M1 = math.floor(length / containerType.sizeZ)
 	local N2 = math.floor(width / containerType.sizeZ)
@@ -2511,7 +2518,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	local shouldRotate = ((N2*M2) > (N1*M1)) or (N1 > N2)
+	local shouldRotate = ((N2*M2) > (N1*M1)) or ((N1>N2) and (N2*M2)>0)
 
 	if UniversalAutoload.showDebug then
 		print("-------------------------------")
@@ -3342,7 +3349,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 			return true
 		end
 	else
-		if UniversalAutoload.showDebug then 
+		if UniversalAutoload.showDebug and object.isRoundbale==nil then 
 			print("OBJECT: " .. object:getFullName() )
 			--DebugUtil.printTableRecursively(object, "--", 0, 1)
 		end
@@ -3471,8 +3478,9 @@ function UniversalAutoload:clearLoadedObjects()
 		end
 		spec.loadedObjects = {}
 		spec.totalUnloadCount = 0
-		spec.currentLoadingPlace = nil
-		spec.resetLoadingPattern = true
+		UniversalAutoload.resetLoadingPattern(self)
+		spec.trailerIsFull = false
+		spec.partiallyUnloaded = false
 	end
 	return palletCount, balesCount
 end

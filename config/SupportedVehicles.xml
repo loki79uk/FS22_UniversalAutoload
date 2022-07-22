@@ -3,9 +3,11 @@
     <vehicleConfigurations showDebug="false">
         <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
             <loadingArea offset="0 1.339 -0.165" width="1.95" height="1.75" length="4.525" baleHeight="2.5"/>
+			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/brantner/dd24073/dd24073.xml" selectedConfigs="1">
             <loadingArea offset="0 1.419 -0.75" width="2.41" height="2.25" length="7.25" baleHeight="2.8"/>
+			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/fliegl/dts59/dts59.xml">
             <loadingArea offset="0 1.205 -1.5" width="2.30" height="2.10" length="5.0" baleHeight="2.8"/>
@@ -30,10 +32,22 @@
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/farmtech/dpw1800/dpw1800.xml">
             <loadingArea offset="0 1.130 -0.82" width="2.42" height="2.20" length="9.3" baleHeight="2.8"/>
+			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/kroeger/pwo24/pwo24.xml" selectedConfigs="1">
             <loadingArea offset="0 1.275 -0.20" width="2.42" height="2.20" length="9.75" baleHeight="2.8"/>
+			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
+        <vehicleConfiguration configFileName="data/vehicles/kroeger/pwo24/pwo24.xml" selectedConfigs="2">
+            <loadingArea offset="0 1.275 -0.20" width="2.42" height="2.20" length="9.75" baleHeight="2.8"/>
+			<options isBaleTrailer="true" noLoadingIfFolded="true"/>
+        </vehicleConfiguration>
+        <vehicleConfiguration configFileName="data/vehicles/kroeger/pwo24/pwo24.xml" selectedConfigs="3">
+            <loadingArea offset="0 1.275 -0.20" width="2.00" height="2.20" length="9.75" baleHeight="2.8"/>
+			<options isBaleTrailer="true" noLoadingIfFolded="true"/>
+        </vehicleConfiguration>
+		
+		
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/mhal4320/mhal4320.xml">
             <loadingArea offset="0 0.650 -0.895" width="2.00" height="2.20" length="4.25"/>
 			<options noLoadingIfUnfolded="true"/>
@@ -41,7 +55,7 @@
         <vehicleConfiguration configFileName="data/vehicles/boeckmann/kk301827H/kk301827H.xml">
             <loadingArea offset="0 0.612 -0.87" width="1.80" height="1.95" length="2.55"/>
             <loadingArea offset="0 0.612 -0.62" width="1.80" height="1.50" length="2.95"/>
-			<options isBoxTrailer="true" noLoadingIfFolded="true" enableRearLoading="true" zonesOverlap="true"/>
+			<options isBoxTrailer="true" noLoadingIfFolded="true" enableRearLoading="true" rearUnloadingOnly="true" zonesOverlap="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/salek/ans1900/ans1900.xml" selectedConfigs="1">
             <loadingArea offset="0 0.589 -0.48" width="1.50" height="1.85" length="2.45"/>
@@ -49,7 +63,7 @@
 		
 		<!-- SUPPORTED VEHICLES -->
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
-            <options zonesOverlap="true"/>
+            <options zonesOverlap="true" rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.810 -0.450" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.225" width="1.00" height="1.60" length="2.35" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.650" width="1.00" height="1.60" length="1.50" baleHeight="1.85"/>
@@ -57,7 +71,7 @@
             <loadingArea offset="0 0.810 -1.262" width="1.00" height="1.60" length="0.774" baleHeight="1.85"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
-            <options zonesOverlap="true"/>
+            <options zonesOverlap="true" rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.763 -0.625" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.370" width="1.10" height="1.60" length="2.25" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.775" width="1.10" height="1.60" length="1.45" baleHeight="1.85"/>
@@ -65,32 +79,45 @@
             <loadingArea offset="0 0.763 -1.450" width="1.10" height="1.60" length="0.770" baleHeight="1.85"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/johnDeere/xuv865M/xuv865M.xml">
+			<options rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.741 -0.99" width="1.30" height="1.00" length="1.05"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/mahindra/retriever/retriever.xml">
+			<options rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.777 -1.04" width="1.30" height="1.40" length="0.88"/>
+        </vehicleConfiguration>
+		
+		<!-- SUPPORTED TRAIN CARRIAGES -->
+		<vehicleConfiguration configFileName="data/vehicles/train/wagonVehicles/wagonVehicles.xml">
+            <loadingArea offset="0 1.328 -10.625" width="2.85" height="3.00" length="24.9" baleHeight="4.00"/>
         </vehicleConfiguration>
 		
 		<!-- SUPPORTED DLCs -->
 		<vehicleConfiguration configFileName="kubotaPack/vehicles/kubota/rtvxG850/rtvxg850.xml">
+			<options rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.920 -0.70" width="1.40" height="1.20" length="1.00"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="kubotaPack/vehicles/kubota/rtvx1140/rtvx1140.xml" selectedConfigs="1,3">
+			<options rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.900 -1.42" width="1.40" height="1.20" length="0.60"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="kubotaPack/vehicles/kubota/rtvx1140/rtvx1140.xml" selectedConfigs="2">
+			<options rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.900 -1.15" width="1.40" height="1.00" length="1.15"/>
         </vehicleConfiguration>
 		
 		<!-- SUPPORTED MODS -->
         <!-- <vehicleConfiguration configFileName="FS22_lizardCarTrailer/lizardCarTrailer.xml"> -->
+			<!-- <options noLoadingIfCovered="true" rearUnloadingOnly="true"/> -->
             <!-- <loadingArea offset="0 0.60 -0.05" width="1.25" height="2.00" length="2.35"/> -->
         <!-- </vehicleConfiguration> -->
         <!-- <vehicleConfiguration configFileName="FS22_strautmannSEK802/sek802.xml" selectedConfigs="1"> -->
             <!-- <loadingArea offset="0 1.30 -0.95" width="2.10" height="1.85" length="4.55" baleHeight="2.5"/>/> -->
+			<!-- <options isBaleTrailer="true"/> -->
         <!-- </vehicleConfiguration> -->
         <!-- <vehicleConfiguration configFileName="FS22_strautmannSZK802/szk802.xml" selectedConfigs="1"> -->
             <!-- <loadingArea offset="0 1.30 -0.25" width="2.10" height="1.85" length="4.55" baleHeight="2.5"/>/> -->
+			<!-- <options isBaleTrailer="true"/> -->
         <!-- </vehicleConfiguration> -->
 
     </vehicleConfigurations>

@@ -23,20 +23,22 @@ UniversalAutoload.SHOP_ICON = UniversalAutoload.path .. "icons/shop_icon.dds"
 
 -- tables
 UniversalAutoload.ACTIONS = {
-	["TOGGLE_LOADING"]        = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
-	["UNLOAD_ALL"]            = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
-	["TOGGLE_TIPSIDE"]        = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
-	["TOGGLE_FILTER"]         = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
-	["CYCLE_MATERIAL_FW"]     = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
-	["CYCLE_MATERIAL_BW"]     = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
-	["SELECT_ALL_MATERIALS"]  = "UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS",
-	["CYCLE_CONTAINER_FW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
-	["CYCLE_CONTAINER_BW"]    = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
-	["SELECT_ALL_CONTAINERS"] = "UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS",
-	["TOGGLE_BELTS"]	      = "UNIVERSALAUTOLOAD_TOGGLE_BELTS",
-	["TOGGLE_DOOR"]           = "UNIVERSALAUTOLOAD_TOGGLE_DOOR",
-	["TOGGLE_CURTAIN"]	      = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN",
-	["TOGGLE_DEBUG"]	      = "UNIVERSALAUTOLOAD_TOGGLE_DEBUG"
+	["TOGGLE_LOADING"]         = "UNIVERSALAUTOLOAD_TOGGLE_LOADING",
+	["UNLOAD_ALL"]             = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
+	["TOGGLE_TIPSIDE"]         = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
+	["TOGGLE_FILTER"]          = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
+	["CYCLE_MATERIAL_FW"]      = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
+	["CYCLE_MATERIAL_BW"]      = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
+	["SELECT_ALL_MATERIALS"]   = "UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS",
+	["CYCLE_CONTAINER_FW"]     = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW",
+	["CYCLE_CONTAINER_BW"]     = "UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW",
+	["SELECT_ALL_CONTAINERS"]  = "UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS",
+	["TOGGLE_BELTS"]	       = "UNIVERSALAUTOLOAD_TOGGLE_BELTS",
+	["TOGGLE_DOOR"]            = "UNIVERSALAUTOLOAD_TOGGLE_DOOR",
+	["TOGGLE_CURTAIN"]	       = "UNIVERSALAUTOLOAD_TOGGLE_CURTAIN",
+	["TOGGLE_SHOW_DEBUG"]	   = "UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG",
+	["TOGGLE_SHOW_LOADING"]	   = "UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING",
+	["TOGGLE_BALE_COLLECTION"] = "UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION"
 }
 
 UniversalAutoload.WARNINGS = {
@@ -168,6 +170,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					end
 					
 				config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
+				config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", false)
 				config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 				config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 				config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
@@ -175,9 +178,11 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
 				config.noLoadingIfCovered = xmlFile:getValue(configKey..".options#noLoadingIfCovered", false)
 				config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
+				config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
+				config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
 				config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 				config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
-				config.showDebug = UniversalAutoload.showDebug or xmlFile:getValue(configKey..".options#showDebug", debugAll)
+				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
 				if not config.showDebug then
 					print("  >> "..configFileName.." ("..selectedConfigs..")")
@@ -244,7 +249,7 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 					newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
 					newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
 					newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
-					print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", containerType, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
+					print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", newType.type, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
 				end
 
 			else
@@ -268,7 +273,45 @@ end
 function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, customEnvironment)
 
 	if xmlFilename ~= nil and not string.find(xmlFilename, "multiPurchase") then	
-		--print( "  >> " .. xmlFilename )
+		-- print( "  >> " .. xmlFilename )
+		
+		if customEnvironment ~= nil then
+			local objectName = UniversalAutoload.getObjectNameFromXml(xmlFilename)
+			local customName = customEnvironment..":"..objectName
+
+			if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] ~= nil then
+				-- print("FOUND CUSTOM CONFIG FOR " .. xmlFilename)
+				return
+			end
+			
+			if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName] ~= nil then
+				-- print("USING BASE CONFIG FOR " .. xmlFilename)
+				
+				UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] = {}
+				newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName]
+				oldType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName]
+
+				newType.name = customName
+				newType.type = oldType.type
+				newType.containerIndex = oldType.containerIndex
+				newType.sizeX = oldType.sizeX
+				newType.sizeY = oldType.sizeY
+				newType.sizeZ = oldType.sizeZ
+				newType.isBale = oldType.isBale
+				newType.flipYZ = oldType.flipYZ
+				newType.neverStack = oldType.neverStack
+				newType.neverRotate = oldType.neverRotate
+				newType.alwaysRotate = oldType.alwaysRotate
+
+				if oldType.isBale then
+					newType.width = oldType.width
+					newType.length = oldType.length
+				end
+				print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ, newType.type ))
+				return
+			end
+		end
+		
 		local loadedVehicleXML = false
 		local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
 
@@ -285,7 +328,7 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 			end
 			xmlFile:delete()
 		end
-		
+
 	end
 end
 --
@@ -508,14 +551,16 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 	
 	if vehicleCount > 0 then
 		vehicleCount = 0
-		for key, value in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
-			if not deepCompare(oldVehicleConfigurations[key], value) then
-				for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-					if string.find(vehicle.configFileName, key) then
-						vehicleCount = vehicleCount + 1
-						print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
-						if not UniversalAutoloadManager.resetVehicle(vehicle) then
-							g_currentMission:consoleCommandReloadVehicle()
+		for key, configGroup in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
+			for index, config in pairs(configGroup) do
+				if not deepCompare(oldVehicleConfigurations[key][index], config) then
+					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+						if string.find(vehicle.configFileName, key) and vehicle.spec_universalAutoload.boughtConfig == index then
+							vehicleCount = vehicleCount + 1
+							print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
+							if not UniversalAutoloadManager.resetVehicle(vehicle) then
+								g_currentMission:consoleCommandReloadVehicle()
+							end
 						end
 					end
 				end
@@ -716,7 +761,8 @@ function UniversalAutoloadManager.addAttachedVehicles(vehicle, vehicles)
 	if vehicle.getAttachedImplements ~= nil then
 		local attachedImplements = vehicle:getAttachedImplements()
 		for _, implement in pairs(attachedImplements) do
-			vehicles[implement.object] = implement.object.spec_universalAutoload ~= nil
+			local spec = implement.object.spec_universalAutoload
+			vehicles[implement.object] = spec ~= nil and spec.isAutoloadEnabled
 			UniversalAutoloadManager.addAttachedVehicles(implement.object, vehicles)
 		end
 	end
@@ -726,7 +772,8 @@ end
 function UniversalAutoloadManager.getAttachedVehicles(vehicle)
 	local vehicles = {}
 	local rootVehicle = vehicle:getRootVehicle()
-	vehicles[rootVehicle] = rootVehicle.spec_universalAutoload ~= nil
+	local spec = rootVehicle.spec_universalAutoload
+	vehicles[rootVehicle] = spec ~= nil and spec.isAutoloadEnabled
 	UniversalAutoloadManager.addAttachedVehicles(rootVehicle, vehicles)
 	return vehicles
 end
@@ -754,53 +801,63 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 	else
 		print(string.format("RESETTING: %s", vehicle:getFullName()))
 	end
-	
-	UniversalAutoload.clearLoadedObjects(vehicle)
-	
+
 	local rootVehicle = vehicle:getRootVehicle()
 	if rootVehicle ~= nil then
 		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
 		if rootVehicle == g_currentMission.controlledVehicle then
-			return false
+			if rootVehicle:getFullName() == "Diesel Locomotive" then
+				print("*** CANNOT RESET TRAIN - terrible things will happen ***")
+				return true
+			else
+				print("*** Resetting with standard console command ***")
+				UniversalAutoload.clearLoadedObjects(vehicle)
+				return false
+			end
 		end
 	end
+	
+	UniversalAutoload.clearLoadedObjects(vehicle)
 
 	local xmlFile = Vehicle.getReloadXML(vehicle)
 	local key = "vehicles.vehicle(0)"
 
-	local function asyncCallbackFunction(_, newVehicle, vehicleLoadState, arguments)
-		if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
-			g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
-			g_currentMission:removeVehicle(vehicle)
-			if UniversalAutoloadManager.resetCount then
-				UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
-			end
-		else
-			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
-				print(" >> VEHICLE_LOAD_ERROR")
-			end
-			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_DELAYED then
-				print(" >> VEHICLE_LOAD_DELAYED")
-			end
-			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_NO_SPACE then
-				print(" >> There was no space available at the shop")
-			end
-			if vehicle ~= nil then
-				print("ERROR RESETTING OLD VEHICLE: " .. vehicle:getFullName())
+	if xmlFile ~= nil and xmlFile ~= 0 then
+		local function asyncCallbackFunction(_, newVehicle, vehicleLoadState, arguments)
+			if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
+				g_messageCenter:publish(MessageType.VEHICLE_RESET, vehicle, newVehicle)
 				g_currentMission:removeVehicle(vehicle)
+				if UniversalAutoloadManager.resetCount then
+					UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
+				end
+			else
+				if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_ERROR then
+					print(" >> VEHICLE_LOAD_ERROR")
+				end
+				if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_DELAYED then
+					print(" >> VEHICLE_LOAD_DELAYED")
+				end
+				if vehicleLoadState == VehicleLoadingUtil.VEHICLE_LOAD_NO_SPACE then
+					print(" >> There was no space available at the shop")
+				end
+				if vehicle ~= nil then
+					print("ERROR RESETTING OLD VEHICLE: " .. vehicle:getFullName())
+					--g_currentMission:removeVehicle(vehicle)
+				end
+				if newVehicle ~= nil then
+					print("ERROR RESETTING NEW VEHICLE: " .. newVehicle:getFullName())
+					--g_currentMission:removeVehicle(newVehicle)
+				end
 			end
-			if newVehicle ~= nil then
-				print("ERROR RESETTING NEW VEHICLE: " .. newVehicle:getFullName())
-				g_currentMission:removeVehicle(newVehicle)
-			end
+			
+			xmlFile:delete()
+			UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
 		end
 		
-		xmlFile:delete()
-		UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+		VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, true, asyncCallbackFunction, nil, {})
+		--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
+
 	end
-	
-	VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, true, asyncCallbackFunction, nil, {})
-	--(xmlFile, key, resetVehicle, allowDelayed, xmlFilename, keepPosition, asyncCallbackFunction, asyncCallbackObject, asyncCallbackArguments)
 	return true
 end
 --

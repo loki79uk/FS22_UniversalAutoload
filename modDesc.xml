@@ -50,7 +50,7 @@ Configured for the following trailers:
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (standard)
+- Kröger PWO 24
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
 - Salek ANS-1900 (bale trailer)
@@ -62,9 +62,13 @@ Configured for the following vehicles:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Train (vehicle carriage)
 
 Changelog:
 v1.2.0.0
+- Added a bale collection mode
+- Added an option for rear loading/unloading only
+- Added support for autoloading pallets onto the train (vehicle carriage only)
 - Added an icon in the shop configuration page to show when autoload is active
 - Added global option "manualLoadingOnly" for a less cheaty "autoload light" option
 - Added global option to charge per pallet loaded, e.g.: pricePerPallet="10"
@@ -118,7 +122,7 @@ Liste der kompatiblen Anhänger und Pritschen:
 - Farmtech DPW 1800 (Standard)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (Standard)
+- Kröger PWO 24
 - LODE KING Renown Drop Deck
 - Welger DK 115 (Ballenpritsche)
 - Salek ANS-1900 (Ballenpritsche)
@@ -130,9 +134,13 @@ Liste der kompatiblen Fahrzeuge:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Zug (Fahrzeugwagen)
 
 Changelog:
 v1.2.0.0
+- Modus zum Sammeln von Ballen hinzugefügt
+- Option zum Be- und Entladen nur von hinten hinzugefügt
+- Unterstützung für das automatische Aufladen von Paletten auf den Zug wurde hinzugefügt (nur Fahrzeugwagen)
 - Auf der Shop-Konfigurationsseite wurde ein Symbol hinzugefügt, das anzeigt, wenn das automatische Laden aktiviert ist
 - Globale Option "manualLoadingOnly" für eine weniger betrügerische "autoload light" Option hinzugefügt
 - Globale Option hinzugefügt, um pro geladene Palette zu berechnen, z.B.: pricePerPallet="10"
@@ -186,7 +194,7 @@ Liste des remorques et plateaux compatibles :
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (standard)
+- Kröger PWO 24
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
 - Salek ANS-1900 (bale trailer)
@@ -198,9 +206,13 @@ Liste des véhicules compatibles :
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Train (transport de véhicules)
 
 Changelog:
 v1.2.0.0
+- Ajout d'un mode de collecte des balles
+- Ajout d'une option pour le chargement/déchargement par l'arrière uniquement
+- Ajout de la prise en charge du chargement automatique des palettes dans le train (uniquement pour les véhicules)
 - Ajout d'une icône dans la page de configuration de la boutique pour indiquer quand le chargement automatique est actif.
 - Ajout d'une option globale "manualLoadingOnly" pour une option "autoload light" moins tricheuse.
 - Ajout d'une option globale pour facturer par palette chargée, par exemple : pricePerPallet="10".
@@ -254,7 +266,7 @@ Nakonfigurováno pro následující přívěsy:
 - Farmtech DPW 1800 (standardní)
 - Fliegl DTS 5.9
 - Přívěs KRONE Profi Liner
-- Kröger PWO 24 (standardní)
+- Kröger PWO 24
 - LODE KING Renomovaný Drop Deck
 - Welger DK 115 (přívěs na balíky)
 - Salek ANS-1900 (přívěs na balíky)
@@ -266,9 +278,13 @@ Nakonfigurováno pro následující vozidla:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Vlak (vagon vozidla)
 
 Changelog:
 v1.2.0.0
+- Přidán režim sběru balíků
+- Přidána možnost pouze zadní nakládky/vykládky
+- Přidána podpora pro automatické nakládání palet do vlaku (pouze u vozů)
 - Na stránku konfigurace obchodu byla přidána ikona, která zobrazuje, kdy je aktivní automatické načítání.
 - Přidána globální volba "manualLoadingOnly" pro méně podvodnou volbu "autoload light".
 - Přidána globální možnost účtování za každou naloženou paletu, např.: pricePerPallet="10"
@@ -322,7 +338,7 @@ Skonfigurowany dla następujących przyczep:
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (standard)
+- Kröger PWO 24
 - Zrzut talii LODE KING Renown
 - Welger DK 115 (przyczepa do bel)
 - Salek ANS-1900 (przyczepa do bel)
@@ -334,9 +350,13 @@ Skonfigurowany dla następujących pojazdów:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Pociąg (przewóz pojazdów)
 
 Changelog:
 v1.2.0.0
+- Dodano tryb zbierania beli
+- Dodano opcję tylko dla tylnego załadunku/rozładunku
+- Dodano obsługę automatycznego załadunku palet na pociąg (tylko przewóz pojazdów)
 - Dodano ikonę na stronie konfiguracji sklepu, aby pokazać, kiedy autoload jest aktywny
 - Dodano globalną opcję "manualLoadingOnly" dla mniej oszukańczej opcji "autoload light".
 - Dodano globalną opcję naliczania opłaty za załadowaną paletę, np.: pricePerPallet="10"
@@ -391,7 +411,7 @@ Configurado para los siguientes tráilers:
 - Farmtech DPW 1800 (standard)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (standard)
+- Kröger PWO 24
 - LODE KING Renown Drop Deck
 - Welger DK 115 (carga de pacas)
 - Salek ANS-1900 (carga de pacas)
@@ -403,9 +423,13 @@ Configurado para los siguientes vehículos:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Tren (vagón de vehículos)
 
 Changelog:
 v1.2.0.0
+- Se ha añadido un modo de recogida de balas
+- Se ha añadido una opción para la carga/descarga trasera solamente
+- Se ha añadido la posibilidad de cargar automáticamente los palés en el tren (sólo en el vagón de vehículos)
 - Añadido un icono en la página de configuración de la tienda para mostrar cuando la carga automática está activa
 - Añadida la opción global "manualLoadingOnly" para una opción menos tramposa de "autoload light".
 - Añadida la opción global de cobrar por palet cargado, por ejemplo: pricePerPallet="10"
@@ -460,7 +484,7 @@ Configurado para os seguintes trailers:
 - Farmtech DPW 1800 (padrão)
 - Fliegl DTS 5.9
 - KRONE Trailer Profi Liner
-- Kröger PWO 24 (padrão)
+- Kröger PWO 24
 - LODE KING Renown Drop Deck
 - Welger DK 115 (reboque de fardos)
 - Salek ANS-1900 (reboque de fardos)
@@ -472,9 +496,13 @@ Configurado para os seguintes veículos:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Trem (vagão de veículo)
 
 Registro de alterações:
 v1.2.0.0
+- Adicionado um modo de coleta de fardos
+- Adicionada uma opção apenas para carga/descarga traseira
+- Suporte adicional para a auto-carga de paletes no trem (somente transporte de veículos)
 - Adicionado um ícone na página de configuração da loja para mostrar quando a carga automática está ativa
 - Adicionada a opção global "manualLoadingOnly" para uma opção menos trapaceira de "autoload light".
 - Adicionada opção global para cobrar por palete carregado, por exemplo: pricePerPallet="10".
@@ -519,7 +547,9 @@ TRADUÇÃO - BR por Myiamoto86
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_DEBUG" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 	</actions>
 	
 	<inputBinding>
@@ -562,8 +592,14 @@ TRADUÇÃO - BR por Myiamoto86
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
 		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DEBUG" >
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_f12" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f12" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" >
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_r" />
 		</actionBinding>
 	</inputBinding>
 	
@@ -589,6 +625,17 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Przełącz ładowanie</pl>
 			<es>Cambiar carga/descarga</es>
 			<br>Carregar</br>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION">
+			<en>Automatic Bale Collection Mode</en>
+			<de>Automatischer Ballensammel-Modus</de>
+			<fr>Mode de collecte automatique des balles</fr>
+			<ru>Автоматический режим сбора тюков</ru>
+			<nl>Automatische balenophaalmodus</nl>
+			<cz>Režim automatického sběru balíků</cz>
+			<pl>Tryb automatycznego zbierania beli</pl>
+			<es>Modo de recogida automática de balas</es>
+			<br>Modo de coleta automática de fardos</br>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -722,16 +769,27 @@ TRADUÇÃO - BR por Myiamoto86
 			<es>Abrir/Cerrar cortina lateral</es>
 			<br>Abrir/Fechar cortina lateral</br>
 		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DEBUG">
-			<en>Debug mode</en>
-			<de>Debug-Modus</de>
-			<fr>Mode débogage</fr>
-			<ru>Режим отладки</ru>
-			<nl>Debug-modus</nl>
-			<cz>Režim ladění</cz>
-			<pl>Tryb Debugu</pl>
-			<es>Modo debug</es>
-			<br>Modo de Depuração</br>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG">
+			<en>Full debug mode</en>
+			<de>Vollständiger Debug-Modus</de>
+			<fr>Mode débogage complet</fr>
+			<ru>Режим полной отладки</ru>
+			<nl>Volledige debug-modus</nl>
+			<cz>Úplný režim ladění</cz>
+			<pl>Pełny Tryb Debugu</pl>
+			<es>Modo debug completa</es>
+			<br>Modo de depuração total</br>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING">
+			<en>Simple debug mode</en>
+			<de>Einfacher Debug-Modus</de>
+			<fr>Mode débogage simple</fr>
+			<ru>Режим простой отладки</ru>
+			<nl>Eenvoudige debug-modus</nl>
+			<cz>Jednoduchý režim ladění</cz>
+			<pl>Prosty Tryb Debugu</pl>
+			<es>Modo debug simple</es>
+			<br>Modo de depuração simples</br>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -833,7 +891,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<es>Filtro de carga</es>
 			<br>Filtro de carregamento</br>
 		</text>
-		<text name="universalAutoload_enabled">
+		<text name="universalAutoload_fullOnly">
 			<en>Full only</en>
 			<de>Nur volle</de>
 			<fr>Complet uniquement</fr>
@@ -844,7 +902,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<es>Solo completo</es>
 			<br>Completo apenas</br>
 		</text>
-		<text name="universalAutoload_disabled">
+		<text name="universalAutoload_loadAny">
 			<en>Any</en>
 			<de>Jede</de>
 			<fr>Tout</fr>
@@ -887,6 +945,61 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Rozładuj</pl>
 			<es>Descargar</es>
 			<br>Descarregar</br>
+		</text>
+		<text name="universalAutoload_baleMode">
+			<en>Auto-Bale Mode</en>
+			<de>Auto-Ballen-Modus</de>
+			<fr>Mode Auto-Balles</fr>
+			<ru>Автоматический режим кипы</ru>
+			<nl>Auto-Bale Mode</nl>
+			<cz>Sbírka Auto-Bale Režim</cz>
+			<pl>Tryb Auto-Bale</pl>
+			<es>Modo Auto-Paca</es>
+			<br>Modo Auto Fardo</br>
+		</text>
+		<text name="universalAutoload_enabled">
+			<en>Enabled</en>
+			<de>Aktiviert</de>
+			<fr>Activé</fr>
+			<ru>Включено</ru>
+			<nl>Ingeschakeld</nl>
+			<cz>Povoleno</cz>
+			<pl>Włączone</pl>
+			<es>Activado</es>
+			<br>Habilitado</br>
+		</text>
+		<text name="universalAutoload_disabled">
+			<en>Disabled</en>
+			<de>Deaktiviert</de>
+			<fr>Désactivé</fr>
+			<ru>Отключено</ru>
+			<nl>Uitgeschakeld</nl>
+			<cz>Zakázáno</cz>
+			<pl>Wyłączone</pl>
+			<es>Desactivado</es>
+			<br>Deficiente</br>
+		</text>
+		<text name="universalAutoload_activate">
+			<en>Activate</en>
+			<de>Aktivieren</de>
+			<fr>Activer</fr>
+			<ru>Активировать</ru>
+			<nl>Activeer</nl>
+			<cz>Aktivace</cz>
+			<pl>Aktywuj</pl>
+			<es>Activar</es>
+			<br>Ativar</br>
+		</text>
+		<text name="universalAutoload_deactivate">
+			<en>Deactivate</en>
+			<de>Deaktivieren</de>
+			<fr>Désactiver</fr>
+			<ru>Деактивировать</ru>
+			<nl>Deactiveren</nl>
+			<cz>Deaktivace</cz>
+			<pl>Dezaktywuj</pl>
+			<es>Desactivar</es>
+			<br>Desativar</br>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>

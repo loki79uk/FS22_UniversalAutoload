@@ -89,6 +89,11 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 		print("CREATING user settings file")
 		local defaultSettingsFile = Utils.getFilename("config/UniversalAutoload.xml", UniversalAutoload.path)
 		copyFile(defaultSettingsFile, userSettingsFile, false)
+
+		UniversalAutoload.showDebug = false
+		UniversalAutoload.disableAutoStrap = false
+		UniversalAutoload.manualLoadingOnly = false
+		UniversalAutoload.pricePerPallet = 0
 	end
 	
 	return N,M

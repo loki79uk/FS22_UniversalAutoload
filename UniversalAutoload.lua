@@ -146,15 +146,15 @@ end
 function UniversalAutoload:getCanStartFieldWork(superFunc)
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled and spec.baleCollectionMode then
-		if UniversalAutoload.showDebug then print("getCanStartFieldWork...") end
-		return true
+		--if UniversalAutoload.showDebug then print("getCanStartFieldWork...") end
+		--return true
 	end
 	return superFunc(self)
 end
 function UniversalAutoload:getCanImplementBeUsedForAI(superFunc)
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
-		if UniversalAutoload.showDebug then print("*** getCanImplementBeUsedForAI ***") end
+		--if UniversalAutoload.showDebug then print("*** getCanImplementBeUsedForAI ***") end
 		--DebugUtil.printTableRecursively(self.spec_aiImplement, "--", 0, 1)
 		--return true
 	end
@@ -3350,7 +3350,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 		end
 	else
 		if UniversalAutoload.showDebug and object.isRoundbale==nil then 
-			print("OBJECT: " .. object:getFullName() )
+			--print("OBJECT: " .. object:getFullName() )
 			--DebugUtil.printTableRecursively(object, "--", 0, 1)
 		end
 	end

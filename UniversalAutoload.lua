@@ -12,6 +12,11 @@ UniversalAutoload.showLoading = false
 
 UniversalAutoload.delayTime = 200
 
+UniversalAutoload.globalSettingsLoaded = false
+UniversalAutoload.disableAutoStrap = false
+UniversalAutoload.manualLoadingOnly = false
+UniversalAutoload.pricePerPallet = 0
+
 local debugKeys = false
 local debugConsole = false
 

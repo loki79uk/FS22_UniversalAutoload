@@ -559,12 +559,32 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		for key, configGroup in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
 			for index, config in pairs(configGroup) do
 				if not deepCompare(oldVehicleConfigurations[key][index], config) then
+					local foundFirstMatch = false
+					-- FIRST LOOK IF THIS IS THE CURRENT CONTROLLED VECHILE
 					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 						if string.find(vehicle.configFileName, key) and vehicle.spec_universalAutoload.boughtConfig == index then
-							vehicleCount = vehicleCount + 1
-							print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
-							if not UniversalAutoloadManager.resetVehicle(vehicle) then
-								g_currentMission:consoleCommandReloadVehicle()
+							local rootVehicle = vehicle:getRootVehicle()
+							if rootVehicle == g_currentMission.controlledVehicle then
+								foundFirstMatch = true
+								print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
+								if not UniversalAutoloadManager.resetVehicle(vehicle) then
+									g_currentMission:consoleCommandReloadVehicle()
+								end
+							end
+						end
+					end
+					-- THEN CHECK ALL THE OTHERS - but we can only reset one at a time
+					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+						if string.find(vehicle.configFileName, key) and vehicle.spec_universalAutoload.boughtConfig == index then
+							if not foundFirstMatch then
+								foundFirstMatch = true
+								vehicleCount = vehicleCount + 1
+								print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
+								if not UniversalAutoloadManager.resetVehicle(vehicle) then
+									g_currentMission:consoleCommandReloadVehicle()
+								end
+							else
+								print("ONLY ONE OF EACH VEHICLE CONFIGURATION CAN BE RESET USING THIS COMMAND")
 							end
 						end
 					end

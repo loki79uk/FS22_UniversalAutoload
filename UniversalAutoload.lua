@@ -2193,7 +2193,10 @@ function UniversalAutoload:isValidForLoading(object)
 	if spec.baleCollectionMode and object.isRoundbale==nil then
 		return false
 	end
-	
+	if object.isRoundbale ~= nil and object.mountObject then
+		return false
+	end
+
 	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and 
 	(spec.autoLoadingObjects[object] ~= nil or ( spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object) )) and
 	(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )

@@ -978,7 +978,7 @@ function UniversalAutoload:stopLoading(noEventSend)
 		if self.isServer then
 			spec.loadDelayTime = 0
 
-			if not spec.trailerIsFull and not self.spec_tensionBelts.areBeltsFasten then
+			if not self.spec_tensionBelts.areBeltsFasten then
 				spec.doSetTensionBelts = true
 			end
 		end
@@ -2101,7 +2101,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						end
 						if #spec.sortedObjectsToLoad > 0 then
 							if spec.trailerIsFull or (UniversalAutoload.testLoadAreaIsEmpty(self) and not spec.baleCollectionMode) then
-								-- print("RESET PATTERN to fill in any gaps")
+								if UniversalAutoload.showDebug then print("RESET PATTERN to fill in any gaps") end
 								spec.partiallyUnloaded = true
 								spec.resetLoadingPattern = true
 							end
@@ -2112,7 +2112,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								spec.partiallyUnloaded = true
 								spec.resetLoadingPattern = true
 							end
-							-- print("STOP LOADING")
+							if UniversalAutoload.showDebug then print("STOP LOADING") end
 							UniversalAutoload.stopLoading(self)
 						end
 					end
@@ -2650,7 +2650,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 	if containerType ~= nil then
 		if UniversalAutoload.showDebug then
 			print("===============================")
-			print("FIND LOADING PLACE FOR "..containerType.name)
+			-- print("FIND LOADING PLACE FOR "..containerType.name)
 		end
 
 		local i = spec.currentLoadAreaIndex or 1
@@ -2688,7 +2688,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							if UniversalAutoload.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
 							spec.currentLoadingPlace = nil
 						else
-							if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM THIS PLACE - TRY AGAIN") end
+							if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM PREVIOUS PLACE - TRY AGAIN") end
 						end
 					end
 				
@@ -2758,7 +2758,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			i = i + 1
 			spec.resetLoadingPattern = true
 			if #spec.loadArea > 1 and i <= #spec.loadArea then
-				if UniversalAutoload.showDebug then print("TRY NEXT LOADING AREA...") end
+				if UniversalAutoload.showDebug then print("TRY NEXT LOADING AREA ("..tostring(i)..")...") end
 				spec.currentLoadAreaIndex = i
 			end
 		end
@@ -3350,11 +3350,6 @@ function UniversalAutoload:addAutoLoadingObject(object)
 				g_currentMission.player:pickUpObject(false)
 			end
 			return true
-		end
-	else
-		if UniversalAutoload.showDebug and object.isRoundbale==nil then 
-			--print("OBJECT: " .. object:getFullName() )
-			--DebugUtil.printTableRecursively(object, "--", 0, 1)
 		end
 	end
 end

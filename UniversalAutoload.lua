@@ -594,10 +594,11 @@ end
 --
 function UniversalAutoload.actionEventToggleDoor(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleDoor: "..self:getFullName())
-	local spec = self.spec_foldable
-	if #spec.foldingParts > 0 then
+	local spec = self.spec_universalAutoload
+	local foldable = self.spec_foldable
+	if #foldable.foldingParts > 0 then
 		local toggleDirection = self:getToggledFoldDirection()
-		if toggleDirection == spec.turnOnFoldDirection then
+		if toggleDirection == foldable.turnOnFoldDirection then
 			self:setFoldState(toggleDirection, true)
 		else
 			self:setFoldState(toggleDirection, false)
@@ -608,6 +609,7 @@ end
 --
 function UniversalAutoload.actionEventToggleCurtain(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleCurtain: "..self:getFullName())
+	local spec = self.spec_universalAutoload
 	local tipState = self:getTipState()
 	if tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING then
 		self:startTipping(nil, false)
@@ -621,6 +623,7 @@ end
 --
 function UniversalAutoload.actionEventToggleShowDebug(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleShowDebug: "..self:getFullName())
+	local spec = self.spec_universalAutoload
 	if self.isServer then
 		UniversalAutoload.showDebug = not UniversalAutoload.showDebug
 	end
@@ -628,6 +631,7 @@ end
 --
 function UniversalAutoload.actionEventToggleShowLoading(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleShowLoading: "..self:getFullName())
+	local spec = self.spec_universalAutoload
 	if self.isServer then
 		UniversalAutoload.showLoading = not UniversalAutoload.showLoading
 	end

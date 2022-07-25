@@ -1099,8 +1099,7 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	if spec.updateKeys then
 		--print("UPDATE KEYS: "..self:getFullName())
 		spec.updateKeys = false
-		if debugKeys then print("*** updateActionEventKeys ***") end
-		UniversalAutoload.updateActionEventKeys(self)
+		spec.updateToggleLoading = true
 	end
 	
 	if self.isServer then
@@ -1118,8 +1117,6 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	end
 	
 	UniversalAutoloadRaiseActiveEvent.sendEvent(self, state, noEventSend)
-	
-	spec.updateToggleLoading = true
 end
 --
 function UniversalAutoload:updatePlayerTriggerState(playerId, inTrigger, noEventSend)
@@ -1899,7 +1896,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		return
 	end
 
-	if self.isClient and isActiveForInputIgnoreSelection then
+	-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
+	local playerTriggerActive = false
+	if not isActiveForInputIgnoreSelection then
+		for k, v in pairs (spec.playerInTrigger) do
+			playerTriggerActive = true
+		end
+	end
+	
+	--local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
+	if self.isClient and isActiveForInputIgnoreSelection or playerTriggerActive then
 		spec.menuDelayTime = spec.menuDelayTime or 0
 		if spec.menuDelayTime > UniversalAutoload.delayTime/2 then
 			spec.menuDelayTime = 0
@@ -2033,14 +2039,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				spec.lastSpawnedPallet = pallet
 			else
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + dt
-			end
-		end
-	
-		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
-		local playerTriggerActive = false
-		if not isActiveForInputIgnoreSelection then
-			for k, v in pairs (spec.playerInTrigger) do
-				playerTriggerActive = true
 			end
 		end
 

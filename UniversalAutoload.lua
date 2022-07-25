@@ -1896,16 +1896,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		return
 	end
 
-	-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
-	local playerTriggerActive = false
-	if not isActiveForInputIgnoreSelection then
-		for k, v in pairs (spec.playerInTrigger) do
-			playerTriggerActive = true
-		end
-	end
-	
-	--local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
-	if self.isClient and isActiveForInputIgnoreSelection or playerTriggerActive then
+	local playerActive = spec.playerInTrigger[g_currentMission.player.userId] == true
+	if self.isClient and isActiveForInputIgnoreSelection or playerActive then
 		spec.menuDelayTime = spec.menuDelayTime or 0
 		if spec.menuDelayTime > UniversalAutoload.delayTime/2 then
 			spec.menuDelayTime = 0
@@ -2039,6 +2031,14 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				spec.lastSpawnedPallet = pallet
 			else
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + dt
+			end
+		end
+		
+		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
+		local playerTriggerActive = false
+		if not isActiveForInputIgnoreSelection then
+			for k, v in pairs (spec.playerInTrigger) do
+				playerTriggerActive = true
 			end
 		end
 

@@ -1,4 +1,4 @@
-To add the ford truck that FSG was using on Middleburgh:
+To add the Ford truck that FSG was using on Middleburgh:
 
 First download the mod if you don't already have it, but you MUST rename it from `OKUM_GMYK_FS22_64Ford_T850_Flatbed.zip` to `FS22_64Ford_T850_Flatbed_OKUM_GMYK.zip` so that it is loaded before UAL.
 

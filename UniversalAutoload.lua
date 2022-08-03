@@ -2444,7 +2444,7 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 		local x, y, z = getTranslation(unloadPlace.node)
 		
 		if #spec.loadArea > 1 then
-			local i = spec.objectToLoadingAreaIndex[object]
+			local i = spec.objectToLoadingAreaIndex[object] or 1
 			local _, offsetY, _ = localToLocal(spec.loadArea[i].rootNode, spec.loadVolume.rootNode, 0, 0, 0)
 			y = y - offsetY
 		end

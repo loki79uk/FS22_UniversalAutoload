@@ -2,7 +2,7 @@
 <modDesc descVersion="67">
 
     <author>loki_79</author>
-    <version>1.2.0.0</version>
+    <version>1.2.1.0</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -65,6 +65,8 @@ Configured for the following vehicles:
 - Train (vehicle carriage)
 
 Changelog:
+v1.2.1.0
+- Hotfix for a LUA error that would sometimes occur for vehicles with multiple loading zones
 v1.2.0.0
 - Added a bale collection mode
 - Added an option for rear loading/unloading only
@@ -75,7 +77,7 @@ v1.2.0.0
 - Added disableAutoStrap option (global or per vehicle)
 - Added no loading if covered/uncovered options (for trailers with covers)
 - Added multiple loading zones (step decks can now load to both areas)
-- Added loading of objects by hand (small objects or super-stength)
+- Added loading of objects by hand (small objects or super-strength)
 - Added new console commands (see readme file for more details)
 - Implemented function to correctly remove event listeners (credit to GtX)
 v1.1.0.0
@@ -137,6 +139,8 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.2.1.0
+- Hotfix für einen LUA-Fehler, der manchmal bei Fahrzeugen mit mehreren Ladezonen auftrat
 v1.2.0.0
 - Modus zum Sammeln von Ballen hinzugefügt
 - Option zum Be- und Entladen nur von hinten hinzugefügt
@@ -209,15 +213,17 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.2.1.0
+- Correction d'une erreur LUA qui se produisait parfois pour les véhicules ayant plusieurs zones de chargement
 v1.2.0.0
 - Ajout d'un mode de collecte des balles
 - Ajout d'une option pour le chargement/déchargement par l'arrière uniquement
 - Ajout de la prise en charge du chargement automatique des palettes dans le train (uniquement pour les véhicules)
-- Ajout d'une icône dans la page de configuration de la boutique pour indiquer quand le chargement automatique est actif.
-- Ajout d'une option globale "manualLoadingOnly" pour une option "autoload light" moins tricheuse.
-- Ajout d'une option globale pour facturer par palette chargée, par exemple : pricePerPallet="10".
+- Ajout d'une icône dans la page de configuration de la boutique pour indiquer quand le chargement automatique est actif
+- Ajout d'une option globale "manualLoadingOnly" pour une option "autoload light" moins tricheuse
+- Ajout d'une option globale pour facturer par palette chargée, par exemple : pricePerPallet="10"
 - Ajout de l'option disableAutoStrap (global ou par véhicule)
-- Ajout de l'option "Pas de chargement si le véhicule est couvert/découvert" (pour les remorques couvertes).
+- Ajout de l'option "Pas de chargement si le véhicule est couvert/découvert" (pour les remorques couvertes)
 - Ajout de zones de chargement multiples (les step decks peuvent maintenant être chargés dans les deux zones)
 - Ajout du chargement d'objets à la main (petits objets ou super-longueurs)
 - Ajout de nouvelles commandes de console (voir le fichier readme pour plus de détails)
@@ -281,6 +287,8 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.2.1.0
+- Oprava chyby LUA, která se někdy vyskytovala u vozidel s více nakládacími zónami
 v1.2.0.0
 - Přidán režim sběru balíků
 - Přidána možnost pouze zadní nakládky/vykládky
@@ -353,6 +361,8 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.2.1.0
+- Poprawka do błędu LUA, który czasami występował w przypadku pojazdów z wieloma strefami załadunku
 v1.2.0.0
 - Dodano tryb zbierania beli
 - Dodano opcję tylko dla tylnego załadunku/rozładunku
@@ -426,6 +436,8 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.2.1.0
+- Corrección de un error de LUA que a veces se producía en vehículos con múltiples zonas de carga
 v1.2.0.0
 - Se ha añadido un modo de recogida de balas
 - Se ha añadido una opción para la carga/descarga trasera solamente
@@ -499,6 +511,8 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.2.1.0
+- Correção a quente para um erro de LUA que às vezes ocorreria para veículos com múltiplas zonas de carga
 v1.2.0.0
 - Adicionado um modo de coleta de fardos
 - Adicionada uma opção apenas para carga/descarga traseira

@@ -457,7 +457,7 @@ function UniversalAutoloadManager.detectOldConfigVersion()
 				print("**  UNIVERSAL AUTOLOAD - LOCAL MOD SETTINGS FILE IS OUT OF DATE    **")
 				print("*********************************************************************")
 				print("**  Please delete old 'UniversalAutoload.xml' file in modSettings  **")
-				print("**  OR update container config key to: <containerConfigurations>   **")
+				print("**  OR update container config key to: 'containerConfigurations'   **")
 				print("*********************************************************************")
 			end
 			xmlFile:delete()

@@ -190,7 +190,7 @@
 	
 	width  - The width (X dimension) of the loading area
 	height - The height (Y dimension) of the loading area
-    length - The length (Z dimension) of the loading area
+	length - The length (Z dimension) of the loading area
 	offset - The offset to the defined loading area from the vehicle root node
 
    TIP: To measure the loading area parameters in the GIANTS Editor

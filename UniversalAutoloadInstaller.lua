@@ -277,7 +277,7 @@ end
 --
 function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, customEnvironment)
 
-	if xmlFilename ~= nil and not string.find(xmlFilename, "multiPurchase") then	
+	if xmlFilename ~= nil and not (string.find(xmlFilename, "multiPurchase") or string.find(xmlFilename, "multipleItemPurchase") ) then	
 		-- print( "  >> " .. xmlFilename )
 		
 		if customEnvironment ~= nil then
@@ -340,6 +340,13 @@ end
 function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("vehicle.base.filename")
+	
+	if i3d_path == nil then
+		print("importPalletTypeFromXml: i3d_path == NIL")
+		print(tostring(xmlFile.filename))
+		return
+	end
+	
 	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	
 	if i3d_name ~= nil then
@@ -395,6 +402,13 @@ end
 function UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironment)
 	
 	local i3d_path = xmlFile:getValue("bale.filename")
+	
+	if i3d_path == nil then
+		print("importBaleTypeFromXml: i3d_path == NIL")
+		print(tostring(xmlFile.filename))
+		return
+	end
+	
 	local i3d_name = UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	
 	if i3d_name ~= nil then

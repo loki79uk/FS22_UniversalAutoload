@@ -3488,16 +3488,34 @@ end
 
 -- PALLET IDENTIFICATION AND SELECTION FUNCTIONS
 function UniversalAutoload.getObjectNameFromI3d(i3d_path)
+
+	if i3d_path == nil then
+		--print("getObjectNameFromI3d: i3d_path == NIL")
+		return
+	end
+	
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
 	return i3d_name:sub(0, #i3d_name - 4)
 end
 --
 function UniversalAutoload.getObjectNameFromXml(xml_path)
+
+	if xml_path == nil then
+		--print("getObjectNameFromXml: xml_path == NIL")
+		return
+	end
+	
 	local xml_name = xml_path:match("[^/]*.xml$")
 	return xml_name:sub(0, #xml_name - 4)
 end
 --
 function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
+
+	if i3d_path == nil then
+		--print("getEnvironmentNameFromPath: i3d_path == NIL")
+		return
+	end
+	
 	local customEnvironment = nil
 	if i3d_path:find(g_modsDirectory) then
 		local temp = i3d_path:gsub(g_modsDirectory, "")
@@ -3512,6 +3530,12 @@ function UniversalAutoload.getContainerTypeName(object)
 end
 --
 function UniversalAutoload.getContainerType(object)
+
+	if object.i3dFilename == nil then
+		--print("getContainerType: i3dFilename == NIL")
+		return
+	end
+	
 	local name = UniversalAutoload.getObjectNameFromI3d(object.i3dFilename)
 	if object.customEnvironment ~= nil then
 		name = object.customEnvironment..":"..name
@@ -3548,7 +3572,7 @@ function UniversalAutoload.getMaterialType(object)
 	if object ~= nil then
 		if object.fillType ~= nil then
 			return object.fillType
-		elseif object.spec_fillUnit ~= nil then
+		elseif object.spec_fillUnit ~= nil and next(object.spec_fillUnit.fillUnits) ~= nil then
 			local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
 			return fillUnitIndex
 		end

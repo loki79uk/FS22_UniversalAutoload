@@ -54,7 +54,14 @@ UniversalAutoload.CONTAINERS = {
 	[3] = "BIGBAG_PALLET",
 	[4] = "LIQUID_TANK",
 	[5] = "BIGBAG",
-	[6] = "BALE"
+	[6] = "BALE",
+	[6] = "LOGS"
+}
+
+UniversalAutoload.VALID_OBJECTS = {
+	[1] = "pallet",
+	[2] = "bigBag",
+	[3] = "treeSaplingPallet"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES
@@ -106,20 +113,40 @@ end
 --
 function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExisting)
 
-	if g_currentMission:getIsServer() and (overwriteExisting or not UniversalAutoload.globalSettingsLoaded) then
-	
+	if g_currentMission:getIsServer() then
+
 		local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
 		if xmlFile ~= 0 then
-			print("IMPORT Universal Autoload global settings")
-			UniversalAutoload.globalSettingsLoaded = true
-			UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
-			UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
-			UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
-			UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
-			print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
-			print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
-			print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
-			print("  >> Price Per Pallet: " .. tostring(UniversalAutoload.pricePerPallet))
+		
+			if overwriteExisting or not UniversalAutoload.globalSettingsLoaded then
+				print("IMPORT Universal Autoload global settings")
+				UniversalAutoload.globalSettingsLoaded = true
+				UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
+				UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
+				UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
+				UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
+				print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
+				print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
+				print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
+				print("  >> Price Per Pallet: " .. tostring(UniversalAutoload.pricePerPallet))
+			end
+			
+			local objectTypesKey = "universalAutoload.objectTypes"
+			if xmlFile:hasProperty(objectTypesKey) then
+				print("  >> Adding EXTRA object types:")
+				local i = 0
+				while true do
+					local objectTypeKey = string.format(objectTypesKey .. ".objectType(%d)", i)
+					if not xmlFile:hasProperty(objectTypeKey) then
+						break
+					end
+					local objectType = xmlFile:getValue(objectTypeKey.."#name")
+					objectType = objectType:gsub(":", ".")
+					table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
+					print("   - " .. tostring(objectType))
+					i = i + 1
+				end
+			end
 			xmlFile:delete()
 		end
 	else
@@ -342,8 +369,7 @@ function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnviron
 	local i3d_path = xmlFile:getValue("vehicle.base.filename")
 	
 	if i3d_path == nil then
-		print("importPalletTypeFromXml: i3d_path == NIL")
-		print(tostring(xmlFile.filename))
+		print("  MISSING 'vehicle.base.filename' in " .. tostring(xmlFile.filename))
 		return
 	end
 	

@@ -1147,6 +1147,17 @@ TRADUÇÃO - BR por Myiamoto86
 			<es>Paca rectangular</es>
 			<br>fardo quadrado</br>
 		</text>
+		<text name="universalAutoload_LOGS">
+			<en>Logs</en>
+			<de>Stämme</de>
+			<fr>Grumes</fr>
+			<ru>брёвна</ru>
+			<nl>Stammen</nl>
+			<cz>Polena</cz>
+			<pl>Kłody</pl>
+			<es>Troncos</es>
+			<br>Toros</br>
+		</text>
 	</l10n>
 
 </modDesc>

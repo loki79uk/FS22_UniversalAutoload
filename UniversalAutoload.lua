@@ -50,6 +50,9 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerPallet", "The price charged for each auto-loaded pallet (default is zero)", 0)
 	
+	local objectTypesKey = "universalAutoload.objectTypes.objectType(?)"
+	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, objectTypesKey.."#name", "Custom vehicle types for objects to be loaded by UAL", nil)
+	
 	local allVehiclesKey = "universalAutoload.vehicleConfigurations"
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, allVehiclesKey.."#showDebug", "Show the full graphical debugging display for all vehicles in config", false)
 	
@@ -59,7 +62,7 @@ function UniversalAutoload.initSpecialization()
 		[2] = { ["schema"] = Vehicle.xmlSchema, ["key"] = "vehicle."..vehicleKey }
 	}
 	for _, s in ipairs(vehicleSchemas) do
-		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vechicles", nil)
+		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vehicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
 		s.schema:register(XMLValueType.VECTOR_TRANS, s.key..".loadingArea(?)#offset", "Offset to the centre of the loading area", "0 0 0")
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#width", "Width of the loading area", 0)
@@ -934,7 +937,7 @@ function UniversalAutoload:createSortedObjectsToLoad(availableObjects)
 	sortedObjectsToLoad = {}
 	for _, object in pairs(availableObjects) do
 	
-		local node = UniversalAutoload.getObjectNode(object)
+		local node = UniversalAutoload.getObjectPositionNode(object)
 		if UniversalAutoload.isValidForLoading(self, object) and node~=nil then
 		
 			local containerType = UniversalAutoload.getContainerType(object)
@@ -944,7 +947,6 @@ function UniversalAutoload:createSortedObjectsToLoad(availableObjects)
 			object.sort.distance = math.abs(x) + math.abs(z)
 			object.sort.area = (containerType.sizeX * containerType.sizeZ) or 1
 			object.sort.material = UniversalAutoload.getMaterialType(object) or 1
-			
 			table.insert(sortedObjectsToLoad, object)
 		end
 	end
@@ -2198,7 +2200,7 @@ function UniversalAutoload:isValidForLoading(object)
 	if object.isRoundbale ~= nil and object.mountObject then
 		return false
 	end
-
+	
 	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and 
 	(spec.autoLoadingObjects[object] ~= nil or ( spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object) )) and
 	(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )
@@ -2215,7 +2217,7 @@ function UniversalAutoload.isValidForManualLoading(object)
 		return true
 	end
 	if g_currentMission.player ~= nil then
-		local rootNode = UniversalAutoload.getObjectNode(object)
+		local rootNode = UniversalAutoload.getObjectRootNode(object)
 		if g_currentMission.player.pickedUpObject == rootNode then
 			return true
 		end
@@ -2292,7 +2294,7 @@ function UniversalAutoload:createBoundingBox()
 		for _, object in pairs(spec.loadedObjects) do
 			-- print("  loaded object: " .. tostring(object.id).." ("..tostring(object.currentSavegameId or "BALE")..")")
 			
-			local node = UniversalAutoload.getObjectNode(object)
+			local node = UniversalAutoload.getObjectPositionNode(object)
 			if node ~= nil then
 			
 				local containerType = UniversalAutoload.getContainerType(object)
@@ -2397,7 +2399,7 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 	for _, object in pairs(spec.loadedObjects) do
 		if UniversalAutoload.isValidForUnloading(vehicle, object) then
 		
-			local node = UniversalAutoload.getObjectNode(object)
+			local node = UniversalAutoload.getObjectPositionNode(object)
 			if node ~= nil then
 				x, y, z = localToLocal(node, spec.loadVolume.rootNode, 0, 0, 0)
 				rx, ry, rz = localRotationToLocal(node, spec.loadVolume.rootNode, 0, 0, 0)
@@ -2685,7 +2687,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					end
 
 					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
-						if (containerType.isBale and not spec.zonesOverlap) or (spec.currentLoadingPlace
+						if object.isSplitShape or (containerType.isBale and not spec.zonesOverlap) or (spec.currentLoadingPlace
 						and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
 							if UniversalAutoload.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
 							spec.currentLoadingPlace = nil
@@ -2693,7 +2695,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM PREVIOUS PLACE - TRY AGAIN") end
 						end
 					end
-				
+					
 					if not spec.currentLoadingPlace then
 						if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
 						containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
@@ -2779,14 +2781,23 @@ end
 function UniversalAutoload:getIsValidObject(object)
     local spec = self.spec_universalAutoload
 	
-	if object.i3dFilename ~= nil and (
-		object.typeName=="pallet" or
-		object.typeName=="bigBag" or
-		object.typeName=="treeSaplingPallet" or
-		object.isRoundbale~=nil
-	) then
-		if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
-			return UniversalAutoload.getContainerType(object) ~= nil
+	if object.isSplitShape then
+		return true
+	end
+	
+	if object.i3dFilename ~= nil then
+		local validObject = false
+		for _, name in pairs(UniversalAutoload.VALID_OBJECTS) do
+			if object.typeName == name then
+				validObject = true
+				break
+			end
+		end
+		
+		if validObject or object.isRoundbale~=nil then
+			if g_currentMission.accessHandler:canFarmAccess(self:getActiveFarm(), object) then
+				return UniversalAutoload.getContainerType(object) ~= nil
+			end
 		end
 	end
 	
@@ -2872,7 +2883,7 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 		end
 	end
 
-	local node = UniversalAutoload.getObjectNode( self )
+	local node = UniversalAutoload.getObjectPositionNode( self )
 	if node == nil then
 		return false
 	end
@@ -2966,7 +2977,7 @@ function UniversalAutoload:testLocationOverlap_Callback(hitObjectId, x, y, z, di
 	
     if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
         local spec = self.spec_universalAutoload
-        local object = g_currentMission:getNodeObject(hitObjectId)
+        local object = UniversalAutoload.getNodeObject(hitObjectId)
 
         if object ~= nil and object ~= self and object ~= spec.currentObject then
 			-- print(object.i3dFilename)
@@ -2978,7 +2989,7 @@ end
 function UniversalAutoload:testLoadAreaIsEmpty()
 	local spec = self.spec_universalAutoload
 	local i = spec.currentLoadAreaIndex or 1
-	--print(self:getFullName() .. " IS EMPTY: " .. tostring(next(spec.loadedObjects) == nil))
+	-- print(self:getFullName() .. " IS EMPTY: " .. tostring(next(spec.loadedObjects) == nil))
 	
 	local sizeX, sizeY, sizeZ = spec.loadArea[i].width/2, spec.loadArea[i].height/2, spec.loadArea[i].length/2
 	local x, y, z = localToWorld(spec.loadArea[i].rootNode, 0, 0, 0)
@@ -2991,7 +3002,7 @@ function UniversalAutoload:testLoadAreaIsEmpty()
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
 
-	--print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
+	-- print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
 	return not spec.foundObject
 end
 --
@@ -3027,20 +3038,90 @@ function UniversalAutoload:testUnloadLocation_Callback(hitObjectId, x, y, z, dis
 end
 
 -- OBJECT MOVEMENT FUNCTIONS
-function UniversalAutoload.getObjectNode( object )
+function UniversalAutoload.getNodeObject( objectId )
+
+	return g_currentMission:getNodeObject(objectId) or UniversalAutoload.getSplitShapeObject(objectId)
+end
+--
+function UniversalAutoload.getSplitShapeObject( objectId )
+	
+	if getRigidBodyType(objectId) == RigidBodyType.DYNAMIC then
+	
+		local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(objectId))
+		if splitType ~= nil then
+
+			if UniversalAutoload.SPLITSHAPES_LOOKUP == nil then
+				UniversalAutoload.SPLITSHAPES_LOOKUP = {}
+			end
+			
+			if UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] == nil then
+			
+				local sizeX, sizeY, sizeZ, numConvexes, numAttachments = getSplitShapeStats(objectId)
+				local xx,xy,xz = localDirectionToWorld(objectId, 1, 0, 0)
+				local yx,yy,yz = localDirectionToWorld(objectId, 0, 1, 0)
+				local zx,zy,zz = localDirectionToWorld(objectId, 0, 0, 1)
+				
+				if getChild(objectId, 'positionNode') == 0 then
+					local x, y, z = getWorldTranslation(objectId)
+					local rx, ry, rz = getWorldRotation(objectId)
+					local xBelow, xAbove = getSplitShapePlaneExtents(objectId, x,y,z, xx,xy,xz)
+					local yBelow, yAbove = getSplitShapePlaneExtents(objectId, x,y,z, yx,yy,yz)
+					local zBelow, zAbove = getSplitShapePlaneExtents(objectId, x,y,z, zx,zy,zz)
+					
+					local positionNode = createTransformGroup("positionNode")
+					link(objectId, positionNode)
+					setTranslation(positionNode, (xAbove-xBelow)/2, -yBelow, (zAbove-zBelow)/2)
+				end
+				
+				logObject = {}
+				logObject.nodeId = objectId
+				logObject.positionNodeId = getChild(objectId, 'positionNode')
+
+				local x, y, z  = getWorldTranslation(logObject.positionNodeId)
+				local xBelow, xAbove = getSplitShapePlaneExtents(objectId, x,y,z, xx,xy,xz)
+				local yBelow, yAbove = getSplitShapePlaneExtents(objectId, x,y,z, yx,yy,yz)
+				local zBelow, zAbove = getSplitShapePlaneExtents(objectId, x,y,z, zx,zy,zz)
+				
+				logObject.isSplitShape = true
+				logObject.sizeX = xBelow + xAbove
+				logObject.sizeY = yBelow + yAbove
+				logObject.sizeZ = zBelow + zAbove
+				logObject.fillType = FillType.WOOD
+				
+				UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] = logObject
+				
+				print("CREATED OBJECT "..tostring(logObject))
+			end
+			
+			return UniversalAutoload.SPLITSHAPES_LOOKUP[objectId]
+
+		end
+	end
+end
+--
+--
+function UniversalAutoload.getObjectPositionNode( object )
+	if object.isSplitShape and object.positionNodeId then
+		return object.positionNodeId
+	else
+		return UniversalAutoload.getObjectRootNode( object )
+	end
+end
+--
+function UniversalAutoload.getObjectRootNode( object )
 	local node = nil
 	if object.components ~= nil then
 		node = object.components[1].node
 	else
 		node = object.nodeId
 	end
-	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
+	if node ~= nil and node ~= 0 and (g_currentMission.nodeToObject[node]~=nil or object.isSplitShape) then
 		return node
 	end
 end
 --
 function UniversalAutoload.unlinkObject( object )
-	local node = UniversalAutoload.getObjectNode(object)
+	local node = UniversalAutoload.getObjectRootNode(object)
 	local x, y, z = localToWorld(node, 0, 0, 0)
 	local rx, ry, rz = getWorldRotation(node, 0, 0, 0)
 	link(getRootNode(), node)
@@ -3057,7 +3138,17 @@ function UniversalAutoload.moveObjectNode( node, p )
 	end
 end
 --
-function UniversalAutoload.getNodes( object )
+function UniversalAutoload.getPositionNodes( object )
+	local nodes = {}
+	if object.isSplitShape and object.positionNodeId then
+		table.insert(nodes, object.positionNodeId)
+	else
+		nodes = UniversalAutoload.getRootNodes( object )
+	end
+	return nodes
+end
+--
+function UniversalAutoload.getRootNodes( object )
 	local nodes = {}
 	if object.components ~= nil then
 		for i = 1, #object.components do
@@ -3092,8 +3183,9 @@ function UniversalAutoload.getTransformation( position, nodes )
 end
 --
 function UniversalAutoload.removeFromPhysics(object)
-	if object.isRoundbale~=nil then
-		local node = UniversalAutoload.getObjectNode(object)
+
+	if object.isRoundbale~=nil or object.isSplitShape then
+		local node = UniversalAutoload.getObjectRootNode(object)
 		removeFromPhysics(node)
 	elseif object.isAddedToPhysics then
 		object:removeFromPhysics()
@@ -3101,22 +3193,25 @@ function UniversalAutoload.removeFromPhysics(object)
 end
 --
 function UniversalAutoload:addToPhysics(object)
-	if object.isRoundbale~=nil then
-		local node = UniversalAutoload.getObjectNode(object)
+
+	if object.isRoundbale~=nil or object.isSplitShape then
+		local node = UniversalAutoload.getObjectRootNode(object)
 		addToPhysics(node)
 	else
 		object:addToPhysics()
 	end
 	
-	local nodes = UniversalAutoload.getNodes(object)
+	local nodes = UniversalAutoload.getRootNodes(object)
 	local rootNode = self:getParentComponent(self.rootNode)
 	local vx, vy, vz = getLinearVelocity(rootNode)
 	for i = 1, #nodes do
 		setLinearVelocity(nodes[i], vx or 0, vy or 0, vz or 0)
 	end
-	object:raiseActive()
-	object.networkTimeInterpolator:reset()
-	UniversalAutoload.raiseObjectDirtyFlags(object)
+	if object.raiseActive~=nil then
+		object:raiseActive()
+		object.networkTimeInterpolator:reset()
+		UniversalAutoload.raiseObjectDirtyFlags(object)
+	end
 end
 --
 function UniversalAutoload:addBaleModeBale(node)
@@ -3131,16 +3226,28 @@ end
 --
 function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 
-	local nodes = UniversalAutoload.getNodes(object)
-	local node = nodes[1]
-	if node ~= nil and node ~= 0 and g_currentMission.nodeToObject[node]~=nil then
+	local rootNodes = UniversalAutoload.getRootNodes(object)
+	local node = rootNodes[1]
+	if node ~= nil and node ~= 0 and (g_currentMission.nodeToObject[node]~=nil or object.isSplitShape) then
 	
 		UniversalAutoload.unmountDynamicMount(object)
 		UniversalAutoload.removeFromPhysics(object)
 
-		local n = UniversalAutoload.getTransformation( position, nodes )
-		for i = 1, #nodes do
-			UniversalAutoload.moveObjectNode(nodes[i], n[i])
+		local n = UniversalAutoload.getTransformation( position, rootNodes )
+		for i = 1, #rootNodes do
+			UniversalAutoload.moveObjectNode(rootNodes[i], n[i])
+		end
+		
+		if object.isSplitShape then
+
+			local x0, y0, z0 = getWorldTranslation(node)
+			local x1, y1, z1 = getWorldTranslation(object.positionNodeId)
+			local offset = {}
+			offset['x'] = x0 - (x1-x0)
+			offset['y'] = y0 - (y1-y0)
+			offset['z'] = z0 - (z1-z0)
+			UniversalAutoload.moveObjectNode(node, offset)
+
 		end
 
 		if baleMode==true and object.isRoundbale~=nil then
@@ -3182,22 +3289,13 @@ end
 function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
-		local object = g_currentMission:getNodeObject(otherActorId)
+		local object = UniversalAutoload.getNodeObject(otherActorId)
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					UniversalAutoload.addAvailableObject(self, object)
 				elseif onLeave then
 					UniversalAutoload.removeAvailableObject(self, object)
-				end
-			end
-		else
-			local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(otherActorId))
-			if splitType ~= nil then
-				if onEnter then
-					-- print("WOOD")
-				elseif onLeave then
-					-- print("NO WOOD")
 				end
 			end
 		end
@@ -3207,7 +3305,7 @@ end
 function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
-		local object = g_currentMission:getNodeObject(otherActorId)
+		local object = UniversalAutoload.getNodeObject(otherActorId)
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
@@ -3223,7 +3321,7 @@ end
 function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
-		local object = g_currentMission:getNodeObject(otherActorId)
+		local object = UniversalAutoload.getNodeObject(otherActorId)
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
@@ -3285,7 +3383,7 @@ function UniversalAutoload:addAvailableObject(object)
 		end
 		
 		if spec.isLoading and UniversalAutoload.isValidForLoading(self, object) then
-			-- print("ADDING OBJECT")
+			print("ADDING OBJECT")
 			table.insert(spec.sortedObjectsToLoad, object)
 		end
 		
@@ -3347,7 +3445,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "onDeleteAutoLoadingObject_Callback")
 			end
-			local rootNode = UniversalAutoload.getObjectNode(object)
+			local rootNode = UniversalAutoload.getObjectRootNode(object)
 			if g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
 				g_currentMission.player:pickUpObject(false)
 			end
@@ -3533,7 +3631,17 @@ function UniversalAutoload.getContainerType(object)
 
 	if object.i3dFilename == nil then
 		--print("getContainerType: i3dFilename == NIL")
-		return
+		if object.isSplitShape then
+		
+			local splitShape = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS["splitShape"]
+			splitShape.sizeX = object.sizeX
+			splitShape.sizeY = object.sizeY
+			splitShape.sizeZ = object.sizeZ
+
+			return splitShape
+		else
+			return nil
+		end
 	end
 	
 	local name = UniversalAutoload.getObjectNameFromI3d(object.i3dFilename)
@@ -3550,6 +3658,17 @@ function UniversalAutoload.getContainerType(object)
 	end
 	
 	return objectType
+end
+--
+function UniversalAutoload.getContainerSize(object)
+	if object ~= nil then
+		if object.isSplitShape then
+			return object.sizeX, object.sizeY, object.sizeZ
+		else
+			local containerType = UniversalAutoload.getContainerType(object)
+			return containerType.sizeX, containerType.sizeY, containerType.sizeZ
+		end
+	end
 end
 --
 function UniversalAutoload.getContainerMass(object)
@@ -3617,7 +3736,7 @@ function UniversalAutoload:getPalletIsSelectedLoadside(object)
 		return true
 	end
 
-	local node = UniversalAutoload.getObjectNode(object)
+	local node = UniversalAutoload.getObjectPositionNode(object)
 	if node == nil then
 		return false
 	end
@@ -3679,10 +3798,12 @@ function UniversalAutoload.getPalletIsFull(object)
 end
 --
 function UniversalAutoload.raiseObjectDirtyFlags(object)
-	if object.isRoundbale ~= nil then
-		object:raiseDirtyFlags(object.physicsObjectDirtyFlag)
-	else
-		object:raiseDirtyFlags(object.vehicleDirtyFlag)
+	if object.raiseDirtyFlags ~= nil then
+		if object.isRoundbale ~= nil then
+			object:raiseDirtyFlags(object.physicsObjectDirtyFlag)
+		else
+			object:raiseDirtyFlags(object.vehicleDirtyFlag)
+		end
 	end
 end
 
@@ -3730,7 +3851,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 	
 		for _,object in pairs(spec.availableObjects) do
 			if object ~= nil then
-				local node = UniversalAutoload.getObjectNode(object)
+				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
 					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
@@ -3749,7 +3870,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		
 		for _,object in pairs(spec.loadedObjects) do
 			if object ~= nil then
-				local node = UniversalAutoload.getObjectNode(object)
+				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
 					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
@@ -3818,7 +3939,7 @@ end
 --
 function UniversalAutoload.DrawDebugPallet( node, w, h, l, showCube, showAxis, colour, offset )
 
-	if node ~= nil and node ~= 0 then
+	if node ~= nil and node ~= 0 and entityExists(node) then
 		-- colour for square
 		colour = colour or WHITE
 		local r, g, b = unpack(colour)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 
 <!-- GLOBAL SETTINGS - OVERRIDE ALL OTHERS -->
-<universalAutoLoad showDebug="false" manualLoadingOnly="false" disableAutoStrap="false" pricePerPallet="0">
+<universalAutoload showDebug="false" manualLoadingOnly="false" disableAutoStrap="false" pricePerPallet="0">
 
 	<!-- APPLIES TO ALL IN THIS SECTION -->
     <vehicleConfigurations showDebug="false">
@@ -41,4 +41,11 @@
 
     </containerConfigurations>
 	
-</universalAutoLoad>
+	<!-- ADD CUSTOM OBJECT TYPES HERE IF REQUIRED -->
+	<!-- <objectTypes> -->
+		<!-- *** Mod Examples *** -->	
+		<!-- <objectType name="FS22_GlobalTransportPallet:globalpallet"/> -->
+		<!-- <objectType name="FS22_GameplayExtension:PlaceableElements"/> -->
+	<!-- </objectTypes> -->
+	
+</universalAutoload>

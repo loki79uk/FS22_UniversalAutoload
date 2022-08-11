@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<universalAutoLoad>
+<universalAutoload>
     <containerConfigurations>
 	
 		<containerConfiguration containerType="ALL" name="treeSaplingPallet" sizeY="2.500" neverStack="true"/>
+		
+		<containerConfiguration containerType="LOGS" name="splitShape" sizeX="1" sizeY="1" sizeZ="1"/>
 
 		<containerConfiguration containerType="LIQUID_TANK" name="liquidTank"/>
 		<containerConfiguration containerType="BIGBAG_PALLET" name="bigBagPallet"/>
@@ -58,7 +60,7 @@
 		<containerConfiguration containerType="POTATOBOX" name="FS22_Seedpotato_Farm_Pack:Potatoboxpremium"/>
 
     </containerConfigurations>
-</universalAutoLoad>
+</universalAutoload>
 
 <!--
 	local i3d_path = object.i3dFilename

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<universalAutoLoad>
+<universalAutoload>
     <vehicleConfigurations showDebug="false">
         <vehicleConfiguration configFileName="data/vehicles/welger/dk115/dk115.xml" selectedConfigs="2">
             <loadingArea offset="0 1.339 -0.165" width="1.95" height="1.75" length="4.525" baleHeight="2.5"/>
@@ -121,4 +121,4 @@
         <!-- </vehicleConfiguration> -->
 
     </vehicleConfigurations>
-</universalAutoLoad>
+</universalAutoload>

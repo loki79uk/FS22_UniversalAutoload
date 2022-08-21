@@ -1140,7 +1140,7 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 	if selectedConfigs == nil or selectedConfigs == "ALL" then
 		validConfig = "ALL CONFIGURATIONS"
 	else
-		local selectedConfigs = selectedConfigs:split(",")
+		local selectedConfigsList = selectedConfigs:split(",")
 
 		local item = {}
 		item.configurations, _ = UniversalAutoload.getConfigurationsFromXML(xmlFile, "vehicle", self.customEnvironment, item)
@@ -1150,9 +1150,9 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 			local closestSet, _ = UniversalAutoload.getClosestConfigurationSet(self.configurations, item.configurationSets)
 			for k, v in pairs(item.configurationSets) do
 				if v == closestSet then
-					for _, n in ipairs(selectedConfigs) do
+					for _, n in ipairs(selectedConfigsList) do
 						if tonumber(n) == tonumber(k) then
-							if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID CONFIG: "..n) end
+							if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID CONFIG: "..n.." / "..selectedConfigs) end
 							validConfig = closestSet.name
 						end
 					end
@@ -1161,14 +1161,14 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 		else
 			if self.configurations ~= nil and self.configurations.design ~= nil then
 				local selectedDesign = self.configurations.design
-				for _, n in ipairs(selectedConfigs) do
+				for _, n in ipairs(selectedConfigsList) do
 					if tonumber(n) == tonumber(selectedDesign) then
 						for k, design in pairs(item.configurations.design) do
 							if tonumber(n) == tonumber(k) then
-								if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID DESIGN: "..n.." ("..design.name..")") end
+								if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID DESIGN: "..n.." / "..selectedConfigs.." ("..design.name..")") end
 								validConfig = design.name
 							end
-						end						
+						end
 					end
 				end
 			end
@@ -1340,7 +1340,7 @@ function UniversalAutoload:onLoad(savegame)
 				for selectedConfigs, config in pairs(configGroup) do
 					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
 					if validConfig ~= nil then
-						print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig)
+						print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig.." ("..selectedConfigs..")" )
 						-- define the loading area parameters from supported vehicles settings file
 						spec.boughtConfig = selectedConfigs
 						spec.loadArea = {}
@@ -1375,7 +1375,7 @@ function UniversalAutoload:onLoad(savegame)
 				end
 				
 			else
-				-- print("LOOK IN XML: " .. configFileName)
+				if UniversalAutoload.showDebug then print("READ SETTINGS FROM XML: " .. configFileName) end
 				local i = 0
 				while true do
 					local key = string.format("vehicle.universalAutoload.vehicleConfigurations.vehicleConfiguration(%d)", i)
@@ -1383,12 +1383,12 @@ function UniversalAutoload:onLoad(savegame)
 					if not xmlFile:hasProperty(key) then
 						break
 					end
-					local selectedConfigs = xmlFile:getValue(key.."#selectedConfigs")
+					local selectedConfigs = xmlFile:getValue(key.."#selectedConfigs", "ALL")
 					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
 					if validConfig ~= nil then
-						validVehicleName = self:getFullName().." - "..validConfig
-						print("UniversalAutoload - valid vehicle: "..validVehicleName)
+						print("UniversalAutoload - valid vehicle: "..self:getFullName().." - "..validConfig.." ("..selectedConfigs..")" )
 						-- define the loading area parameters from vehicle.xml file
+						spec.boughtConfig = selectedConfigs
 						spec.loadArea = {}
 						local j = 0
 						while true do

@@ -598,10 +598,12 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		vehicleCount = 0
 		for key, configGroup in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
 			for index, config in pairs(configGroup) do
-				if not deepCompare(oldVehicleConfigurations[key][index], config) then
+				if oldVehicleConfigurations[key] and oldVehicleConfigurations[key][index]
+				and not deepCompare(oldVehicleConfigurations[key][index], config) then
 					local foundFirstMatch = false
 					-- FIRST LOOK IF THIS IS THE CURRENT CONTROLLED VECHILE
 					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+						print(vehicle.configFileName .. " - " .. tostring(vehicle.spec_universalAutoload.boughtConfig) .. " / " .. index)
 						if string.find(vehicle.configFileName, key) and vehicle.spec_universalAutoload.boughtConfig == index then
 							local rootVehicle = vehicle:getRootVehicle()
 							if rootVehicle == g_currentMission.controlledVehicle then
@@ -684,6 +686,7 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 				if hasAutoload then
 					count = count + 1
 					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
+					UniversalAutoload.setBaleCollectionMode(vehicle, false)
 					if palletsOnly then
 						UniversalAutoload.setContainerTypeIndex(vehicle, 2)
 					else
@@ -1068,6 +1071,9 @@ function deepCopy(original)
 end
 
 function deepCompare(tbl1, tbl2)
+	if tbl1==nil or tbl2==nil then
+		return false
+	end
 	if tbl1 == tbl2 then
 		return true
 	elseif type(tbl1) == "table" and type(tbl2) == "table" then

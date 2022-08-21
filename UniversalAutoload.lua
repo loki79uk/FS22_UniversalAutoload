@@ -390,6 +390,7 @@ function UniversalAutoload:updateActionEventKeys()
 			spec.updateToggleBelts = true
 			spec.updateToggleFilter = true
 			spec.updateToggleLoading = true
+			if debugKeys then print("*** updateActionEventKeys ***") end
 		end
 	end
 end
@@ -555,7 +556,7 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 		else
 			if UniversalAutoload.getIsLoadingKeyAllowed(self) then
 				local startLoadingText = g_i18n:getText("universalAutoload_startLoading")
-				if UniversalAutoload.showLoading then startLoadingText = startLoadingText.." ("..tostring(spec.validLoadCount)..")" end
+				-- if UniversalAutoload.showLoading then startLoadingText = startLoadingText.." ("..tostring(spec.validLoadCount)..")" end
 				g_inputBinding:setActionEventText(spec.toggleLoadingActionEventId, startLoadingText)
 				g_inputBinding:setActionEventActive(spec.toggleLoadingActionEventId, true)
 				g_inputBinding:setActionEventTextVisibility(spec.toggleLoadingActionEventId, true)
@@ -570,7 +571,7 @@ function UniversalAutoload:updateToggleLoadingActionEvent()
 		-- Activate/Deactivate the UNLOAD key binding
 		if UniversalAutoload.getIsUnloadingKeyAllowed(self) then
 			local unloadText = g_i18n:getText("universalAutoload_unloadAll")
-			if UniversalAutoload.showLoading then unloadText = unloadText.." ("..tostring(spec.validUnloadCount)..")" end
+			-- if UniversalAutoload.showLoading then unloadText = unloadText.." ("..tostring(spec.validUnloadCount)..")" end
 			g_inputBinding:setActionEventText(spec.unloadAllActionEventId, unloadText)
 			g_inputBinding:setActionEventActive(spec.unloadAllActionEventId, true)
 			g_inputBinding:setActionEventTextVisibility(spec.unloadAllActionEventId, true)
@@ -1099,7 +1100,7 @@ function UniversalAutoload:forceRaiseActive(state, noEventSend)
 	local spec = self.spec_universalAutoload
 	
 	if spec.updateKeys then
-		--print("UPDATE KEYS: "..self:getFullName())
+		-- print("UPDATE KEYS: "..self:getFullName())
 		spec.updateKeys = false
 		spec.updateToggleLoading = true
 	end
@@ -1140,14 +1141,13 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 		validConfig = "ALL CONFIGURATIONS"
 	else
 		local selectedConfigs = selectedConfigs:split(",")
-		
+
 		local item = {}
 		item.configurations, _ = UniversalAutoload.getConfigurationsFromXML(xmlFile, "vehicle", self.customEnvironment, item)
 		item.configurationSets = UniversalAutoload.getConfigurationSetsFromXML(item, xmlFile, "vehicle", self.customEnvironment)
 
 		if item.configurationSets ~= nil and #item.configurationSets > 0  then
 			local closestSet, _ = UniversalAutoload.getClosestConfigurationSet(self.configurations, item.configurationSets)
-			
 			for k, v in pairs(item.configurationSets) do
 				if v == closestSet then
 					for _, n in ipairs(selectedConfigs) do
@@ -1155,6 +1155,20 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 							if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID CONFIG: "..n) end
 							validConfig = closestSet.name
 						end
+					end
+				end
+			end
+		else
+			if self.configurations ~= nil and self.configurations.design ~= nil then
+				local selectedDesign = self.configurations.design
+				for _, n in ipairs(selectedConfigs) do
+					if tonumber(n) == tonumber(selectedDesign) then
+						for k, design in pairs(item.configurations.design) do
+							if tonumber(n) == tonumber(k) then
+								if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID DESIGN: "..n.." ("..design.name..")") end
+								validConfig = design.name
+							end
+						end						
 					end
 				end
 			end
@@ -1373,8 +1387,8 @@ function UniversalAutoload:onLoad(savegame)
 					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
 					if validConfig ~= nil then
 						validVehicleName = self:getFullName().." - "..validConfig
-						print("UniversalAutoload - vaild vehicle: "..validVehicleName)
-						-- define the loading area parameters from vechicle.xml file
+						print("UniversalAutoload - valid vehicle: "..validVehicleName)
+						-- define the loading area parameters from vehicle.xml file
 						spec.loadArea = {}
 						local j = 0
 						while true do
@@ -1905,9 +1919,21 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			spec.menuDelayTime = 0
 
 			if spec.updateToggleLoading then
+				if UniversalAutoload.showDebug then
+					if not spec.counter then spec.counter = 0 end
+					spec.counter = spec.counter + 1
+					print( self:getFullName() .. " - RefreshActionEvents " .. spec.counter)
+				end
+
 				if debugKeys then print("*** clearActionEvents ***") end
 				UniversalAutoload.clearActionEvents(self)
 				UniversalAutoload.updateActionEventKeys(self)
+				
+				-- for i, helpElement in ipairs(g_currentMission.hud.inputHelp.visibleHelpElements) do
+					-- print("[" .. i .. "] " .. helpElement.actionName)
+					-- --DebugUtil.printTableRecursively(helpElement, "--", 0, 2)
+				-- end
+				
 				if debugKeys then print("  UPDATE Toggle Loading") end
 				spec.updateToggleLoading=false
 				UniversalAutoload.updateToggleLoadingActionEvent(self)
@@ -2262,13 +2288,24 @@ function UniversalAutoload:countActivePallets()
 	end
 
 	if (spec.validLoadCount ~= validLoadCount) or (spec.validUnloadCount ~= validUnloadCount) then
+		local refreshMenuText = false
 		if spec.validLoadCount ~= validLoadCount then
+			if debugKeys then print("validLoadCount: "..spec.validLoadCount.."/"..validLoadCount) end
+			if spec.validLoadCount==0 or validLoadCount==0 then
+				refreshMenuText = true
+			end
 			spec.validLoadCount = validLoadCount
 		end
 		if spec.validUnloadCount ~= validUnloadCount then
+			if debugKeys then print("validUnloadCount: "..spec.validUnloadCount.."/"..validUnloadCount) end
+			if spec.validUnloadCount==0 or validUnloadCount==0 then
+				refreshMenuText = true
+			end
 			spec.validUnloadCount = validUnloadCount
 		end
-		UniversalAutoload.updateActionEventText(self)
+		if refreshMenuText then
+			UniversalAutoload.updateActionEventText(self)
+		end
 	end
 
 	if UniversalAutoload.showDebug then
@@ -3063,7 +3100,6 @@ function UniversalAutoload.getSplitShapeObject( objectId )
 				
 				if getChild(objectId, 'positionNode') == 0 then
 					local x, y, z = getWorldTranslation(objectId)
-					local rx, ry, rz = getWorldRotation(objectId)
 					local xBelow, xAbove = getSplitShapePlaneExtents(objectId, x,y,z, xx,xy,xz)
 					local yBelow, yAbove = getSplitShapePlaneExtents(objectId, x,y,z, yx,yy,yz)
 					local zBelow, zAbove = getSplitShapePlaneExtents(objectId, x,y,z, zx,zy,zz)
@@ -3234,6 +3270,17 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 		UniversalAutoload.removeFromPhysics(object)
 
 		local n = UniversalAutoload.getTransformation( position, rootNodes )
+		
+		-- if object.isSplitShape then
+			-- local rx, ry, rz = localRotationToWorld(position.node, 0, 0, -math.pi/2)
+			-- n[1].rx = rx
+			-- n[1].ry = ry
+			-- n[1].rz = rz
+			-- --n[1].x = n[1].x + object.sizeX/2
+			-- n[1].y = n[1].y + object.sizeX/2
+			-- --n[1].z = n[1].z + object.sizeX/2
+		-- end
+		
 		for i = 1, #rootNodes do
 			UniversalAutoload.moveObjectNode(rootNodes[i], n[i])
 		end
@@ -3242,6 +3289,7 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 
 			local x0, y0, z0 = getWorldTranslation(node)
 			local x1, y1, z1 = getWorldTranslation(object.positionNodeId)
+			
 			local offset = {}
 			offset['x'] = x0 - (x1-x0)
 			offset['y'] = y0 - (y1-y0)

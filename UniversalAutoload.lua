@@ -2034,8 +2034,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 				if spec.currentLoadingPlace == nil then
 					spec.spawnBales = false
-					self:setAllTensionBeltsActive(true)
-					if debugConsole then print("..adding bales complete!") end
+					spec.doPostLoadDelay = true
+					spec.doSetTensionBelts = true
+					print("..adding bales complete!")
 				end
 			else
 				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + dt
@@ -2562,7 +2563,8 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	--CHOOSE BEST PACKING ORIENTATION
 	local N, M, sizeX, sizeY, sizeZ, rotation
-	local shouldRotate = ((N2*M2) > (N1*M1)) or ((N1>N2) and (N2*M2)>0)
+	local shouldRotate = ((N2*M2) > (N1*M1)) or (((N2*M2)==(N1*M1)) and (N1>N2) and (N2*M2)>0)
+	local doRotate = (containerType.alwaysRotate or shouldRotate) and not containerType.neverRotate
 
 	if UniversalAutoload.showDebug then
 		print("-------------------------------")
@@ -2571,9 +2573,9 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print(" N1: "..N1.. " ,  M1: "..M1)
 		print(" N2: "..N2.. " ,  M2: "..M2)
 		print("shouldRotate: " .. tostring(shouldRotate) )
+		print("doRotate: " .. tostring(doRotate) )
 	end
 	
-	local doRotate = (containerType.alwaysRotate or shouldRotate) and not containerType.neverRotate
 	if doRotate then
 		N, M = N2, M2
 		rotation = math.pi/2
@@ -3548,7 +3550,8 @@ function UniversalAutoload:createPallet(xmlFilename)
 			vehicle.spec_universalAutoload.spawningPallet = nil
 			if vehicle.spec_universalAutoload.trailerIsFull == true then
 				vehicle.spec_universalAutoload.spawnPallets = false
-				vehicle:setAllTensionBeltsActive(true)
+				vehicle.spec_universalAutoload.doPostLoadDelay = true
+				vehicle.spec_universalAutoload.doSetTensionBelts = true
 				print(vehicle:getFullName() .. " ..adding pallets complete!")
 			end
 			return

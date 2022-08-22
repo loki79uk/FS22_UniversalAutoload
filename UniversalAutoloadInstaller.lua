@@ -55,7 +55,7 @@ UniversalAutoload.CONTAINERS = {
 	[4] = "LIQUID_TANK",
 	[5] = "BIGBAG",
 	[6] = "BALE",
-	[6] = "LOGS"
+	[7] = "LOGS"
 }
 
 UniversalAutoload.VALID_OBJECTS = {

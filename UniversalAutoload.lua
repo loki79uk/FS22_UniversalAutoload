@@ -138,6 +138,10 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "loadingTrigger_Callback", UniversalAutoload.loadingTrigger_Callback)
     SpecializationUtil.registerFunction(vehicleType, "unloadingTrigger_Callback", UniversalAutoload.unloadingTrigger_Callback)
     SpecializationUtil.registerFunction(vehicleType, "autoLoadingTrigger_Callback", UniversalAutoload.autoLoadingTrigger_Callback)
+	--- Courseplay functions
+	SpecializationUtil.registerFunction(vehicleType, "ualHasLoadedBales", UniversalAutoload.ualHasLoadedBales)
+    SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
@@ -176,8 +180,13 @@ function UniversalAutoload.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onActivate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onDeactivate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
+	--- Courseplay event listeners.
+	SpecializationUtil.registerEventListener(vehicleType, "onAIImplementStart", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onAIImplementEnd", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onAIFieldWorkerStart", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onAIFieldWorkerEnd", UniversalAutoload)
 end
---
+
 function UniversalAutoload.removeEventListeners(vehicleType)
 	-- print("REMOVE EVENT LISTENERS")
 	-- *** full credit to GtX for this function ***
@@ -2072,9 +2081,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		end
 
 		local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
-		if isActiveForInputIgnoreSelection or isActiveForLoading or playerTriggerActive or spec.baleCollectionModeDeactivated then
+		if isActiveForInputIgnoreSelection or isActiveForLoading or playerTriggerActive or spec.baleCollectionModeDeactivated or spec.aiLoadingActive then
 		
-			if spec.baleCollectionMode and not isActiveForLoading then
+			if spec.baleCollectionMode and not isActiveForLoading or spec.aiLoadingActive then
 				if spec.availableBaleCount > 0 and not spec.trailerIsFull then
 					UniversalAutoload.startLoading(self)
 				end
@@ -4061,3 +4070,44 @@ function UniversalAutoload.AddCustomStrings()
 	end
 end
 UniversalAutoload.AddCustomStrings()
+
+-- Courseplay event listeneres.
+function UniversalAutoload:onAIImplementStart()
+	--- TODO: Unfolding or opening cover, if needed!
+	local spec = self.spec_universalAutoload
+	spec.aiLoadingActive = true
+end
+
+function UniversalAutoload:onAIImplementEnd()
+    --- TODO: Folding or closing cover, if needed!
+	local spec = self.spec_universalAutoload
+	spec.aiLoadingActive = false
+end
+
+function UniversalAutoload:onAIFieldWorkerStart()
+	--- TODO: Unfolding or opening cover, if needed!
+    local spec = self.spec_universalAutoload
+	spec.aiLoadingActive = true
+end
+
+function UniversalAutoload:onAIFieldWorkerEnd()
+	--- TODO: Folding or closing cover, if needed!
+	local spec = self.spec_universalAutoload
+	spec.aiLoadingActive = false
+end  
+
+--- Courseplay interface functions.
+function UniversalAutoload:ualHasLoadedBales()
+	local spec = self.spec_universalAutoload
+	return spec.totalUnloadCount > 0
+end
+
+function UniversalAutoload:ualIsFull()
+	local spec = self.spec_universalAutoload
+	return spec.trailerIsFull
+end
+
+function UniversalAutoload:ualGetLoadedBales()
+	local spec = self.spec_universalAutoload
+	return spec.loadedObjects
+end

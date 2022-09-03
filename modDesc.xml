@@ -14,6 +14,7 @@
 		<pl>Universalne Autoładowanie</pl>
 		<es>Autoload Universal</es>
 		<br>Carregamento Automático Universal</br>
+		<cs>通用自动装载</cs>
     </title>
 	
     <description>
@@ -538,6 +539,79 @@ v1.0.2.0
 TRADUÇÃO - BR por Myiamoto86
 ]]>
 </br>
+<cs><![CDATA[平板拖车的自动装载专业化。 这将自动修改游戏拖车，并将应用于你的农场上任何新的或现有的拖车。 关于如何添加到你自己的mod拖车或货盘上，请看附带的readme文件的说明。
+
+特点。
+- 加载任何兼容的托盘/容器类型（见下面的列表）。
+- 自动安装在任何兼容的拖车上（见下面的列表）。
+- 按选定的材料或容器类型装载和卸载
+- 也可以限制只装满货盘
+- 选择 "所有 "来依次装载混合类型的货物 
+- 混合货盘按大小顺序装载，以获得最佳的包装效率
+- 当玩家步行时，可以与拖车互动（即使没有连接到车辆上）。
+
+"KRONE Trailer Profi Liner"的特殊功能
+- 只有在侧面打开的那一面才可以装/卸货
+- 直接从叉车上进行后部装载
+- 后门和侧面可以由步行的玩家打开和关闭
+
+为以下集装箱类型进行配置。
+- 大包
+- 大包货盘
+- 欧式托盘
+- IBC液体罐
+- 方形包
+- 马铃薯箱（需要mod：Seed Potato Pack）。
+
+为以下拖车配置。
+- 布兰特纳DD 24073/2 XXL (捆包拖车)
+- Bremer Transportwagen TP 500 S
+- Böckmann MH-AL 4320/35
+- Böckmann KK 3018/27 H
+- Demco钢制落地车
+- Farmtech DPW 1800 (标准)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24
+- LODE KING Renown Drop Deck
+- Welger DK 115 (草包拖车)
+- 萨利克 ANS-1900 (捆绑式拖车)
+
+为以下车辆配置。
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- 马恒达 Retriever
+- 约翰迪尔XUV865M
+- 久保田RTV-XG850
+- 久保田RTV-X1140
+- 火车(汽车车厢)
+
+更改日志。
+v1.2.1.0
+- 热修复了一个LUA错误，该错误有时会发生在有多个装载区的车辆上
+v1.2.0.0
+- 增加了包收集模式
+- 增加了只在后部装货/卸货的选项
+- 增加了对自动装载托盘到火车上的支持（仅限车辆车厢）。
+- 在商店配置页面中增加了一个图标，以显示自动装载的激活情况。
+- 增加了全局选项 "仅手动装载"，以减少欺骗性的 "自动装载"选项。
+- 增加了全局选项，按装载的货盘收费，例如：pricePerPallet="10"
+- 增加了disableAutoStrap选项（全局或每辆车）。
+- 增加了有盖/无盖的不装货选项（对于有盖的拖车）。
+- 增加了多个装载区（阶梯甲板现在可以装载到两个区域）。
+- 增加了手动装载物体的功能（小物体或超强度）。
+- 增加了新的控制台命令（详情见readme文件）。
+- 实现了正确删除事件监听器的功能（归功于GtX）。
+v1.1.0.0
+- 增加了包和托盘的不同堆放高度
+- 托盘根据质量堆叠到不同的高度（以改善重量分配）。
+- 改进了用叉车进行手动装卸的方法
+- 为KRONE和低位装载机拖车增加了手动侧面装载功能
+- 增加了箱式拖车车辆类型
+v1.0.2.0
+ - 已更新以适用于1.4.1.0版本
+ ]]>
+ </cs>
     </description>
 	
 	<multiplayer supported="true" />
@@ -628,6 +702,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Universalne Autoładowanie</pl>
 			<es>Autoload Universal</es>
 			<br>Autoload Universal</br>
+			<cs>通用自动装载</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
 			<en>Toggle loading</en>
@@ -639,6 +714,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Przełącz ładowanie</pl>
 			<es>Cambiar carga/descarga</es>
 			<br>Carregar</br>
+			<cs>切换装载</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION">
 			<en>Automatic Bale Collection Mode</en>
@@ -650,6 +726,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Tryb automatycznego zbierania beli</pl>
 			<es>Modo de recogida automática de balas</es>
 			<br>Modo de coleta automática de fardos</br>
+			<cs>自动捡包模式</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
 			<en>Unload</en>
@@ -661,6 +738,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Rozładuj</pl>
 			<es>Descargar</es>
 			<br>Descarregar</br>
+			<cs>卸载</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
 			<en>Toggle unloading side</en>
@@ -672,6 +750,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Przełącz stronę rozładunku</pl>
 			<es>Cambiar lado de descarga</es>
 			<br>Lado p/ descarregar</br>
+			<cs>切换卸载端</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
 			<en>Toggle loading filter</en>
@@ -683,6 +762,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Przełącz filtr ładowania</pl>
 			<es>Cambiar filtro de carga</es>
 			<br>Filtro de carregamento</br>
+			<cs>切换装载过滤器</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -694,6 +774,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zmień wybrany typ materiału (następny)</pl>
 			<es>Cambiar material seleccionado (siguiente)</es>
 			<br>Trocar tipo de material selecionado (prox.)</br>
+			<cs>改变选定的材料类型（下一个）</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
 			<en>Change selected material type (previous)</en>
@@ -705,6 +786,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zmień wybrany typ materiału (poprzedni)</pl>
 			<es>Cambiar material seleccionado (anterior)</es>
 			<br>Trocar tipo de material selecionado (ant.)</br>
+			<cs>改变选定的材料类型（上一个）</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
 			<en>Select all material types</en>
@@ -716,6 +798,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Wybierz wszystkie typy materiałów</pl>
 			<es>Seleccionar todos los materiales</es>
 			<br>Seleciona todos os tipos de materiais</br>
+			<cs>选择所有材料类型</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
 			<en>Change selected container type (next)</en>
@@ -727,6 +810,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zmień wybrany typ kontenera (następny)</pl>
 			<es>Cambiar tipo de contenedor (siguiente)</es>
 			<br>Trocar tipo de contêiner (prox.)</br>
+			<cs>改变选定的容器类型（下一个）</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
 			<en>Change selected container type (previous)</en>
@@ -738,6 +822,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zmień wybrany typ kontenera (poprzedni)</pl>
 			<es>Cambiar tipo de contenedor (anterior)</es>
 			<br>Trocar tipo de contêiner (ant.)</br>
+			<cs>改变选定的容器类型（上一个）</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
 			<en>Select all container types</en>
@@ -749,6 +834,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Wybierz wszystkie typy kontenerów</pl>
 			<es>Todos los tipos de contenedor</es>
 			<br>Marca todos os tipos de contêiners</br>
+			<cs>选择所有容器类型</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
 			<en>Fasten/Unfasten tension belts</en>
@@ -760,6 +846,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zapinanie/Odpinanie pasów napinających</pl>
 			<es>Soltar/Sujetar cintas tensoras </es>
 			<br>Apertar/Soltar cintos de tensão</br>
+			<cs>拉紧/松开张力带</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
 			<en>Open/Close rear door</en>
@@ -771,6 +858,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Otwórz/zamknij tylne drzwi</pl>
 			<es>Abrir/Cerrar puerta trasera</es>
 			<br>Abrir/Fechar porta traseira</br>
+			<cs>打开/关闭后门</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
 			<en>Open/Close curtain side</en>
@@ -782,6 +870,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Otwórz/zamknij kurtyny</pl>
 			<es>Abrir/Cerrar cortina lateral</es>
 			<br>Abrir/Fechar cortina lateral</br>
+			<cs>打开/关闭侧门</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG">
 			<en>Full debug mode</en>
@@ -793,6 +882,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Pełny Tryb Debugu</pl>
 			<es>Modo debug completa</es>
 			<br>Modo de depuração total</br>
+			<cs>完全调试模式</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING">
 			<en>Simple debug mode</en>
@@ -804,6 +894,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Prosty Tryb Debugu</pl>
 			<es>Modo debug simple</es>
 			<br>Modo de depuração simples</br>
+			<cs>简单调试模式</cs>
 		</text>
 
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
@@ -816,6 +907,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku.</pl>
 			<es>Area de descarga bloqueada. Por favor despeje la zona.</es>
 			<br>Área de descarregamento bloqueada. Por favor, limpe a área de descarga.</br>
+			<cs>卸货区被占用。请清理卸货区。</cs>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
 			<en>No compatible goods are available for loading or unloading.</en>
@@ -827,6 +919,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Żadne zgodne towary nie są dostępne do załadunku lub rozładunku.</pl>
 			<es>No hay productos compatibles para cargar o descargar.</es>
 			<br>Nenhum item compatível está disponível para cargarregar ou descarregar.</br>
+			<cs>没有相应的货物可供装货或卸货。</cs>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
 			<en>Loading area is full. Unable to load any more items of this size.</en>
@@ -838,6 +931,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Jesteś Zapchany. Niemożna więcej załadować.</pl>
 			<es>Area de carga completa. No es posible cargar mas objetos de este tamaño.</es>
 			<br>A área de carregamento está cheia. Não foi possível carregar mais destes itens.</br>
+			<cs>已装满。无法再装载任何此尺寸的物品。</cs>
 		</text>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
 			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
@@ -849,6 +943,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz.</pl>
 			<es>No es posible cargar en movimiento. Por favor detengase completamente antes de cargar el tráiler.</es>
 			<br>Nenhum carregamento permitido apenas parado. Por favor, pare completamente antes de carregar o trailer.</br>
+			<cs>运动中不允许装载。在装载拖车之前，请停车。</cs>
 		</text>
 		<text name="universalAutoload_tipside">
 			<en>Unloading side</en>
@@ -860,6 +955,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Strona rozładunku</pl>
 			<es>Lado de descarga</es>
 			<br>Lado de descarregamento</br>
+			<cs>卸货端</cs>
 		</text>
 		<text name="universalAutoload_left">
 			<en>Left</en>
@@ -871,6 +967,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Lewa</pl>
 			<es>Izquierda</es>
 			<br>Esquerda</br>
+			<cs>左</cs>
 		</text>
 		<text name="universalAutoload_right">
 			<en>Right</en>
@@ -882,6 +979,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Prawa</pl>
 			<es>Derecha</es>
 			<br>Direita</br>
+			<cs>右</cs>
 		</text>
 		<text name="universalAutoload_none">
 			<en>None</en>
@@ -893,6 +991,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Żadna</pl>
 			<es>Ninguno</es>
 			<br>Nenhum</br>
+			<cs>空</cs>
 		</text>
 		<text name="universalAutoload_loadingFilter">
 			<en>Loading filter</en>
@@ -904,6 +1003,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Filtr ładowania</pl>
 			<es>Filtro de carga</es>
 			<br>Filtro de carregamento</br>
+			<cs>装载过滤器</cs>
 		</text>
 		<text name="universalAutoload_fullOnly">
 			<en>Full only</en>
@@ -915,6 +1015,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Tylko pełne</pl>
 			<es>Solo completo</es>
 			<br>Completo apenas</br>
+			<cs>仅装满</cs>
 		</text>
 		<text name="universalAutoload_loadAny">
 			<en>Any</en>
@@ -926,6 +1027,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Każde</pl>
 			<es>Cualquiera</es>
 			<br>Qualquer</br>
+			<cs>任何类型</cs>
 		</text>
 		<text name="universalAutoload_startLoading">
 			<en>Start loading</en>
@@ -937,6 +1039,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Rozpocznij ładowanie</pl>
 			<es>Empezar carga</es>
 			<br>Iniciar carregamento</br>
+			<cs>开始装载</cs>
 		</text>
 		<text name="universalAutoload_stopLoading">
 			<en>Stop loading</en>
@@ -948,6 +1051,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zatrzymaj ładowanie</pl>
 			<es>Detener carga</es>
 			<br>Parar carregamento</br>
+			<cs>停止装载</cs>
 		</text>
 		<text name="universalAutoload_unloadAll">
 			<en>Unload</en>
@@ -959,6 +1063,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Rozładuj</pl>
 			<es>Descargar</es>
 			<br>Descarregar</br>
+			<cs>卸载</cs>
 		</text>
 		<text name="universalAutoload_baleMode">
 			<en>Auto-Bale Mode</en>
@@ -970,6 +1075,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Tryb Auto-Bale</pl>
 			<es>Modo Auto-Paca</es>
 			<br>Modo Auto Fardo</br>
+			<cs>自动打包模式</cs>
 		</text>
 		<text name="universalAutoload_enabled">
 			<en>Enabled</en>
@@ -981,6 +1087,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Włączone</pl>
 			<es>Activado</es>
 			<br>Habilitado</br>
+			<cs>已启用</cs>
 		</text>
 		<text name="universalAutoload_disabled">
 			<en>Disabled</en>
@@ -992,6 +1099,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Wyłączone</pl>
 			<es>Desactivado</es>
 			<br>Deficiente</br>
+			<cs>已停用</cs>
 		</text>
 		<text name="universalAutoload_activate">
 			<en>Activate</en>
@@ -1003,6 +1111,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Aktywuj</pl>
 			<es>Activar</es>
 			<br>Ativar</br>
+			<cs>激活</cs>
 		</text>
 		<text name="universalAutoload_deactivate">
 			<en>Deactivate</en>
@@ -1014,6 +1123,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Dezaktywuj</pl>
 			<es>Desactivar</es>
 			<br>Desativar</br>
+			<cs>停用</cs>
 		</text>
 		<text name="universalAutoload_materialType">
 			<en>Material type</en>
@@ -1025,6 +1135,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Typ materiału</pl>
 			<es>Tipo de material</es>
 			<br>Tipo de material</br>
+			<cs>材料类型</cs>
 		</text>
 		<text name="universalAutoload_containerType">
 			<en>Container type</en>
@@ -1036,6 +1147,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Typ kontenera</pl>
 			<es>Tipo de contenedor</es>
 			<br>Tipo de contêiner</br>
+			<cs>容器类型</cs>
 		</text>
 		<text name="universalAutoload_ALL">
 			<en>All</en>
@@ -1047,6 +1159,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Wszystko</pl>
 			<es>Cualquiera</es>
 			<br>Todos</br>
+			<cs>全部</cs>
 		</text>
 		<text name="universalAutoload_LIQUID_TANK">
 			<en>IBC Tank</en>
@@ -1058,6 +1171,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Zbiornik Płynów</pl>
 			<es>Palé de líquido</es>
 			<br>Tanque líquido IBC</br>
+			<cs>IBC罐</cs>
 		</text>
 		<text name="universalAutoload_EURO_PALLET">
 			<en>Euro Pallet</en>
@@ -1069,6 +1183,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Euro Paleta</pl>
 			<es>Palé</es>
 			<br>Euro Pallet</br>
+			<cs>欧式托盘</cs>
 		</text>
 		<text name="universalAutoload_PIONEER_PALLET">
 			<en>Pioneer Pallet</en>
@@ -1080,6 +1195,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Pioneer Paleta</pl>
 			<es>Palé Pioneer</es>
 			<br>Pioneer Pallet</br>
+			<cs>Pioneer Pallet</cs>
 		</text>
 		<text name="universalAutoload_BIGBAG_PALLET">
 			<en>Bigbag Pallet</en>
@@ -1091,6 +1207,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Bigbag Paleta</pl>
 			<es>Palé de sacos grandes</es>
 			<br>Bigbag Pallet</br>
+			<cs>大袋托盘</cs>
 		</text>
 		<text name="universalAutoload_BIGBAG">
 			<en>Bigbag</en>
@@ -1102,6 +1219,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Torba</pl>
 			<es>Saco grande</es>
 			<br>Bigbag</br>
+			<cs>大袋</cs>
 		</text>
 		<text name="universalAutoload_POTATOBOX">
 			<en>Potato Box</en>
@@ -1113,6 +1231,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Ziemnioki</pl>
 			<es>Caja de patatas</es>
 			<br>Caixa de batatas</br>
+			<cs>马铃薯箱</cs>
 		</text>
 		<text name="universalAutoload_BALE">
 			<en>Bale</en>
@@ -1124,6 +1243,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Bele</pl>
 			<es>Paca</es>
 			<br>Fardo</br>
+			<cs>捆包</cs>
 		</text>
 		<text name="universalAutoload_ROUND_BALE">
 			<en>Round bale</en>
@@ -1135,6 +1255,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Okrągłe bele</pl>
 			<es>Paca redonda</es>
 			<br>Fardo redondo</br>
+			<cs>圆包</cs>
 		</text>
 		<text name="universalAutoload_SQUARE_BALE">
 			<en>Square bale</en>
@@ -1146,6 +1267,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Kańciaste bele</pl>
 			<es>Paca rectangular</es>
 			<br>fardo quadrado</br>
+			<cs>方包</cs>
 		</text>
 		<text name="universalAutoload_LOGS">
 			<en>Logs</en>
@@ -1157,6 +1279,7 @@ TRADUÇÃO - BR por Myiamoto86
 			<pl>Kłody</pl>
 			<es>Troncos</es>
 			<br>Toros</br>
+			<cs>日志</cs>
 		</text>
 	</l10n>
 

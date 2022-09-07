@@ -125,19 +125,19 @@ function UniversalAutoload.initSpecialization()
 end
 --
 function UniversalAutoload.registerFunctions(vehicleType)
-    SpecializationUtil.registerFunction(vehicleType, "getIsMoving", UniversalAutoload.getIsMoving)
-    SpecializationUtil.registerFunction(vehicleType, "getIsFilled", UniversalAutoload.getIsFilled)
-    SpecializationUtil.registerFunction(vehicleType, "getIsCovered", UniversalAutoload.getIsCovered)
-    SpecializationUtil.registerFunction(vehicleType, "getIsFolding", UniversalAutoload.getIsFolding)
-    SpecializationUtil.registerFunction(vehicleType, "onDeleteLoadedObject_Callback", UniversalAutoload.onDeleteLoadedObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "onDeleteAvailableObject_Callback", UniversalAutoload.onDeleteAvailableObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "onDeleteAutoLoadingObject_Callback", UniversalAutoload.onDeleteAutoLoadingObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "testUnloadLocation_Callback", UniversalAutoload.testUnloadLocation_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "testLocationOverlap_Callback", UniversalAutoload.testLocationOverlap_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "playerTrigger_Callback", UniversalAutoload.playerTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "loadingTrigger_Callback", UniversalAutoload.loadingTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "unloadingTrigger_Callback", UniversalAutoload.unloadingTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "autoLoadingTrigger_Callback", UniversalAutoload.autoLoadingTrigger_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualGetIsMoving", UniversalAutoload.ualGetIsMoving)
+    SpecializationUtil.registerFunction(vehicleType, "ualGetIsFilled", UniversalAutoload.ualGetIsFilled)
+    SpecializationUtil.registerFunction(vehicleType, "ualGetIsCovered", UniversalAutoload.ualGetIsCovered)
+    SpecializationUtil.registerFunction(vehicleType, "ualGetIsFolding", UniversalAutoload.ualGetIsFolding)
+    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteLoadedObject_Callback", UniversalAutoload.ualOnDeleteLoadedObject_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAvailableObject_Callback", UniversalAutoload.ualOnDeleteAvailableObject_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAutoLoadingObject_Callback", UniversalAutoload.ualOnDeleteAutoLoadingObject_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualTestUnloadLocation_Callback", UniversalAutoload.ualTestUnloadLocation_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualTestLocationOverlap_Callback", UniversalAutoload.ualTestLocationOverlap_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualPlayerTrigger_Callback", UniversalAutoload.ualPlayerTrigger_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualLoadingTrigger_Callback", UniversalAutoload.ualLoadingTrigger_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualUnloadingTrigger_Callback", UniversalAutoload.ualUnloadingTrigger_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualAutoLoadingTrigger_Callback", UniversalAutoload.ualAutoLoadingTrigger_Callback)
 	--- Courseplay functions
 	SpecializationUtil.registerFunction(vehicleType, "ualHasLoadedBales", UniversalAutoload.ualHasLoadedBales)
     SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
@@ -1527,7 +1527,7 @@ function UniversalAutoload:onLoad(savegame)
 			setScale(unloadingTrigger.node, spec.loadVolume.width-boundary, spec.loadVolume.height, spec.loadVolume.length-boundary)
 			
 			table.insert(spec.triggers, unloadingTrigger)
-            addTrigger(unloadingTrigger.node, "unloadingTrigger_Callback", self)
+            addTrigger(unloadingTrigger.node, "ualUnloadingTrigger_Callback", self)
 		end
 		
 		local playerTrigger = {}
@@ -1540,7 +1540,7 @@ function UniversalAutoload:onLoad(savegame)
 			setScale(playerTrigger.node, 5*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+2*spec.loadVolume.width)
 			
 			table.insert(spec.triggers, playerTrigger)
-            addTrigger(playerTrigger.node, "playerTrigger_Callback", self)
+            addTrigger(playerTrigger.node, "ualPlayerTrigger_Callback", self)
 		end
 
 		if not UniversalAutoload.manualLoadingOnly then
@@ -1559,7 +1559,7 @@ function UniversalAutoload:onLoad(savegame)
 					setScale(leftPickupTrigger.node, width, height, length)
 
 					table.insert(spec.triggers, leftPickupTrigger)
-					addTrigger(leftPickupTrigger.node, "loadingTrigger_Callback", self)
+					addTrigger(leftPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 				end
 				
 				local rightPickupTrigger = {}
@@ -1575,7 +1575,7 @@ function UniversalAutoload:onLoad(savegame)
 					setScale(rightPickupTrigger.node, width, height, length)
 
 					table.insert(spec.triggers, rightPickupTrigger)
-					addTrigger(rightPickupTrigger.node, "loadingTrigger_Callback", self)
+					addTrigger(rightPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 				end
 			end
 			
@@ -1594,7 +1594,7 @@ function UniversalAutoload:onLoad(savegame)
 					setScale(rearPickupTrigger.node, width, height, length)
 
 					table.insert(spec.triggers, rearPickupTrigger)
-					addTrigger(rearPickupTrigger.node, "loadingTrigger_Callback", self)
+					addTrigger(rearPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 				end
 			end
 			
@@ -1613,7 +1613,7 @@ function UniversalAutoload:onLoad(savegame)
 					setScale(frontPickupTrigger.node, width, height, length)
 
 					table.insert(spec.triggers, frontPickupTrigger)
-					addTrigger(frontPickupTrigger.node, "loadingTrigger_Callback", self)
+					addTrigger(frontPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 				end
 			end
 		end
@@ -1635,7 +1635,7 @@ function UniversalAutoload:onLoad(savegame)
 				setScale(rearAutoTrigger.node, width, height, length)
 
 				table.insert(spec.triggers, rearAutoTrigger)
-				addTrigger(rearAutoTrigger.node, "autoLoadingTrigger_Callback", self)
+				addTrigger(rearAutoTrigger.node, "ualAutoLoadingTrigger_Callback", self)
 				spec.rearTriggerId = rearAutoTrigger.node
 			end
 		end
@@ -1657,7 +1657,7 @@ function UniversalAutoload:onLoad(savegame)
 				setScale(leftAutoTrigger.node, width, height, length)
 
 				table.insert(spec.triggers, leftAutoTrigger)
-				addTrigger(leftAutoTrigger.node, "autoLoadingTrigger_Callback", self)
+				addTrigger(leftAutoTrigger.node, "ualAutoLoadingTrigger_Callback", self)
 			end
 			local rightAutoTrigger = {}
 			rightAutoTrigger.node = I3DUtil.getChildByName(triggersRootNode, "rightAutoTrigger")
@@ -1670,7 +1670,7 @@ function UniversalAutoload:onLoad(savegame)
 				setScale(rightAutoTrigger.node, width, height, length)
 
 				table.insert(spec.triggers, rightAutoTrigger)
-				addTrigger(rightAutoTrigger.node, "autoLoadingTrigger_Callback", self)
+				addTrigger(rightAutoTrigger.node, "ualAutoLoadingTrigger_Callback", self)
 			end
 		end
 		
@@ -1808,7 +1808,7 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	end
 end
 --
-function UniversalAutoload:getIsFolding()
+function UniversalAutoload:ualGetIsFolding()
 
 	for _, foldingPart in pairs(self.spec_foldable.foldingParts) do
 		if self:getIsAnimationPlaying(foldingPart.animationName) then
@@ -1819,7 +1819,7 @@ function UniversalAutoload:getIsFolding()
 	return false
 end
 --
-function UniversalAutoload:getIsCovered()
+function UniversalAutoload:ualGetIsCovered()
 
 	if self.spec_cover ~= nil and self.spec_cover.hasCovers then
 		return self.spec_cover.state == 0
@@ -1828,7 +1828,7 @@ function UniversalAutoload:getIsCovered()
 	end
 end
 --
-function UniversalAutoload:getIsFilled()
+function UniversalAutoload:ualGetIsFilled()
 
 	local isFilled = false
 	if self.spec_fillVolume ~= nil then
@@ -1843,7 +1843,7 @@ function UniversalAutoload:getIsFilled()
 	return isFilled
 end
 --
-function UniversalAutoload:getIsMoving()
+function UniversalAutoload:ualGetIsMoving()
 	return self.lastSpeedReal > 0.0005
 end
 
@@ -1991,7 +1991,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	
 		-- DETECT WHEN FOLDING STOPS IF IT WAS STARTED
 		if spec.foldAnimationStarted then
-			if not self:getIsFolding() then
+			if not self:ualGetIsFolding() then
 				-- print("*** FOLDING COMPLETE ***")
 				spec.foldAnimationStarted = false
 				UniversalAutoload.updateActionEventText(self)
@@ -2090,7 +2090,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 			
 			-- RETURN BALES TO PHYSICS WHEN NOT MOVING
-			if spec.baleCollectionModeDeactivated and not self:getIsMoving() then
+			if spec.baleCollectionModeDeactivated and not self:ualGetIsMoving() then
 				-- print("ADDING BALES BACK TO PHYSICS")
 				spec.baleCollectionModeDeactivated = false
 				for object,_ in pairs(spec.loadedObjects) do
@@ -2146,7 +2146,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								spec.resetLoadingPattern = true
 							end
 						else
-							if spec.firstAttemptToLoad and not spec.baleCollectionMode and not self:getIsMoving() then
+							if spec.firstAttemptToLoad and not spec.baleCollectionMode and not self:ualGetIsMoving() then
 								--UNABLE_TO_LOAD_OBJECT
 								UniversalAutoload.showWarningMessage(self, 3)
 								spec.partiallyUnloaded = true
@@ -2763,7 +2763,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
-							if not self:getIsMoving() and not spec.baleCollectionMode then
+							if not self:ualGetIsMoving() and not spec.baleCollectionMode then
 								local increment = 0.1
 								while thisLoadHeight >= -increment do
 								
@@ -2871,16 +2871,16 @@ function UniversalAutoload:getIsUnloadingKeyAllowed()
 	or spec.validUnloadCount == 0 or spec.currentTipside == "none" then
 		return false
 	end
-	if spec.isBoxTrailer and spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+	if spec.isBoxTrailer and spec.noLoadingIfFolded and (self:ualGetIsFolding() or not self:getIsUnfolded()) then
 		return false
 	end
-	if spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+	if spec.isBoxTrailer and spec.noLoadingIfUnfolded and (self:ualGetIsFolding() or self:getIsUnfolded()) then
 		return false
 	end
-	if spec.noLoadingIfCovered and self:getIsCovered() then
+	if spec.noLoadingIfCovered and self:ualGetIsCovered() then
 		return false
 	end
-	if spec.noLoadingIfUncovered and not self:getIsCovered() then
+	if spec.noLoadingIfUncovered and not self:ualGetIsCovered() then
 		return false
 	end
 	if spec.baleCollectionMode then
@@ -2892,19 +2892,19 @@ end
 function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 	local spec = self.spec_universalAutoload
 	
-	if self:getIsFilled() then
+	if self:ualGetIsFilled() then
 		return false
 	end
-	if spec.noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+	if spec.noLoadingIfFolded and (self:ualGetIsFolding() or not self:getIsUnfolded()) then
 		return false
 	end
-	if spec.noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+	if spec.noLoadingIfUnfolded and (self:ualGetIsFolding() or self:getIsUnfolded()) then
 		return false
 	end
-	if spec.noLoadingIfCovered and self:getIsCovered() then
+	if spec.noLoadingIfCovered and self:ualGetIsCovered() then
 		return false
 	end
-	if spec.noLoadingIfUncovered and not self:getIsCovered() then
+	if spec.noLoadingIfUncovered and not self:ualGetIsCovered() then
 		return false
 	end
 	
@@ -2952,16 +2952,16 @@ end
 function UniversalAutoload:getIsLoadingAreaAllowed(i)
 	local spec = self.spec_universalAutoload
 	
-	if spec.loadArea[i].noLoadingIfFolded and (self:getIsFolding() or not self:getIsUnfolded()) then
+	if spec.loadArea[i].noLoadingIfFolded and (self:ualGetIsFolding() or not self:getIsUnfolded()) then
 		return false
 	end
-	if spec.loadArea[i].noLoadingIfUnfolded and (self:getIsFolding() or self:getIsUnfolded()) then
+	if spec.loadArea[i].noLoadingIfUnfolded and (self:ualGetIsFolding() or self:getIsUnfolded()) then
 		return false
 	end
-	if spec.loadArea[i].noLoadingIfCovered and self:getIsCovered() then
+	if spec.loadArea[i].noLoadingIfCovered and self:ualGetIsCovered() then
 		return false
 	end
-	if spec.loadArea[i].noLoadingIfUncovered and not self:getIsCovered() then
+	if spec.loadArea[i].noLoadingIfUncovered and not self:ualGetIsCovered() then
 		return false
 	end
 	return true
@@ -2989,7 +2989,7 @@ function UniversalAutoload:testLocationIsFull(loadPlace, offset)
 	spec.currentObject = self
 	
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
-	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
+	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	return spec.foundObject
 end
@@ -3006,7 +3006,7 @@ function UniversalAutoload:testLocationIsEmpty(loadPlace, object, offset)
 	spec.currentObject = object
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
-	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
+	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	if UniversalAutoload.showDebug then
 		if spec.testLocation == nil then
@@ -3021,7 +3021,7 @@ function UniversalAutoload:testLocationIsEmpty(loadPlace, object, offset)
 	return not spec.foundObject
 end
 --
-function UniversalAutoload:testLocationOverlap_Callback(hitObjectId, x, y, z, distance)
+function UniversalAutoload:ualTestLocationOverlap_Callback(hitObjectId, x, y, z, distance)
 	
     if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
         local spec = self.spec_universalAutoload
@@ -3048,7 +3048,7 @@ function UniversalAutoload:testLoadAreaIsEmpty()
 	spec.currentObject = nil
 
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
-	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testLocationOverlap_Callback", self, collisionMask, true, false, true)
+	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	-- print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
 	return not spec.foundObject
@@ -3071,12 +3071,12 @@ function UniversalAutoload:testUnloadLocationIsEmpty(unloadPlace)
 
 	-- local collisionMask = CollisionMask.ALL - CollisionMask.TRIGGERS - CollisionFlag.FILLABLE
 	local collisionMask = CollisionFlag.STATIC_WORLD + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
-	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "testUnloadLocation_Callback", self, collisionMask, true, true, true)
+	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestUnloadLocation_Callback", self, collisionMask, true, true, true)
 
 	return not spec.hasOverlap
 end
 --
-function UniversalAutoload:testUnloadLocation_Callback(hitObjectId, x, y, z, distance)
+function UniversalAutoload:ualTestUnloadLocation_Callback(hitObjectId, x, y, z, distance)
 	if hitObjectId ~= 0 and hitObjectId ~= g_currentMission.terrainRootNode then
 		local spec = self.spec_universalAutoload
 		spec.hasOverlap = true
@@ -3320,7 +3320,7 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 end
 
 -- TRIGGER CALLBACK FUNCTIONS
-function UniversalAutoload:playerTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
+function UniversalAutoload:ualPlayerTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		for _, player in pairs(g_currentMission.players) do
 			if otherActorId == player.rootNode then
@@ -3345,7 +3345,7 @@ function UniversalAutoload:playerTrigger_Callback(triggerId, otherActorId, onEnt
 	end
 end
 --
-function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
+function UniversalAutoload:ualLoadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = UniversalAutoload.getNodeObject(otherActorId)
@@ -3361,7 +3361,7 @@ function UniversalAutoload:loadingTrigger_Callback(triggerId, otherActorId, onEn
     end
 end
 --
-function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
+function UniversalAutoload:ualUnloadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = UniversalAutoload.getNodeObject(otherActorId)
@@ -3377,7 +3377,7 @@ function UniversalAutoload:unloadingTrigger_Callback(triggerId, otherActorId, on
 	end
 end
 --
-function UniversalAutoload:autoLoadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
+function UniversalAutoload:ualAutoLoadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
 	if self ~= nil and otherActorId ~= 0 then
 		local spec = self.spec_universalAutoload
 		local object = UniversalAutoload.getNodeObject(otherActorId)
@@ -3401,7 +3401,7 @@ function UniversalAutoload:addLoadedObject(object)
 		spec.objectToLoadingAreaIndex[object] = spec.currentLoadAreaIndex
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
 		if object.addDeleteListener ~= nil then
-			object:addDeleteListener(self, "onDeleteLoadedObject_Callback")
+			object:addDeleteListener(self, "ualOnDeleteLoadedObject_Callback")
 		end
 		return true
 	end
@@ -3414,7 +3414,7 @@ function UniversalAutoload:removeLoadedObject(object)
 		spec.objectToLoadingAreaIndex[object] = nil
 		spec.totalUnloadCount = spec.totalUnloadCount - 1
 		if object.removeDeleteListener ~= nil then
-			object:removeDeleteListener(self, "onDeleteLoadedObject_Callback")
+			object:removeDeleteListener(self, "ualOnDeleteLoadedObject_Callback")
 		end
 		if next(spec.loadedObjects) == nil then
 			spec.resetLoadingPattern = true
@@ -3424,7 +3424,7 @@ function UniversalAutoload:removeLoadedObject(object)
 	end
 end
 --
-function UniversalAutoload:onDeleteLoadedObject_Callback(object)
+function UniversalAutoload:ualOnDeleteLoadedObject_Callback(object)
 	UniversalAutoload.removeLoadedObject(self, object)
 end
 --
@@ -3438,7 +3438,7 @@ function UniversalAutoload:addAvailableObject(object)
 			spec.availableBaleCount = spec.availableBaleCount + 1
 		end
 		if object.addDeleteListener ~= nil then
-			object:addDeleteListener(self, "onDeleteAvailableObject_Callback")
+			object:addDeleteListener(self, "ualOnDeleteAvailableObject_Callback")
 		end
 		
 		if spec.isLoading and UniversalAutoload.isValidForLoading(self, object) then
@@ -3461,7 +3461,7 @@ function UniversalAutoload:removeAvailableObject(object)
 			spec.availableBaleCount = spec.availableBaleCount - 1
 		end
 		if object.removeDeleteListener ~= nil then
-			object:removeDeleteListener(self, "onDeleteAvailableObject_Callback")
+			object:removeDeleteListener(self, "ualOnDeleteAvailableObject_Callback")
 		end
 		
 		if spec.totalAvailableCount == 0 and not isActiveForLoading then
@@ -3490,7 +3490,7 @@ function UniversalAutoload:removeFromSortedObjectsToLoad(object)
 	end
 end
 --
-function UniversalAutoload:onDeleteAvailableObject_Callback(object)
+function UniversalAutoload:ualOnDeleteAvailableObject_Callback(object)
 	UniversalAutoload.removeAvailableObject(self, object)
 	UniversalAutoload.removeFromSortedObjectsToLoad(self, object)
 end
@@ -3502,7 +3502,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
 			if object.addDeleteListener ~= nil then
-				object:addDeleteListener(self, "onDeleteAutoLoadingObject_Callback")
+				object:addDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 			end
 			local rootNode = UniversalAutoload.getObjectRootNode(object)
 			if g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
@@ -3519,13 +3519,13 @@ function UniversalAutoload:removeAutoLoadingObject(object)
 	if spec.autoLoadingObjects[object] ~= nil then
 		spec.autoLoadingObjects[object] = nil
 		if object.removeDeleteListener ~= nil then
-			object:removeDeleteListener(self, "onDeleteAutoLoadingObject_Callback")
+			object:removeDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 		end
 		return true
 	end
 end
 --
-function UniversalAutoload:onDeleteAutoLoadingObject_Callback(object)
+function UniversalAutoload:ualOnDeleteAutoLoadingObject_Callback(object)
 	UniversalAutoload.removeAutoLoadingObject(self, object)
 end
 --

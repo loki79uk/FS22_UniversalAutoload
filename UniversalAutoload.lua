@@ -2239,7 +2239,7 @@ function UniversalAutoload:isValidForLoading(object)
 	
 	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and 
 	(spec.autoLoadingObjects[object] ~= nil or ( spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object) )) and
-	(not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) )
+	(UniversalAutoload.manualLoadingOnly or (not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object))) )
 end
 --
 function UniversalAutoload:isValidForUnloading(object)

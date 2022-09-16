@@ -142,6 +142,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualHasLoadedBales", UniversalAutoload.ualHasLoadedBales)
     SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
+	SpecializationUtil.registerFunction(vehicleType, "ualIsObjectLoadable", UniversalAutoload.ualIsObjectLoadable)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
@@ -4110,4 +4111,10 @@ end
 function UniversalAutoload:ualGetLoadedBales()
 	local spec = self.spec_universalAutoload
 	return spec.loadedObjects
+end
+
+function UniversalAutoload:ualIsObjectLoadable(object)
+	--- TODO: Returns true, if the given object is loadable.
+	--- For CP, the given object is of the class Bale.
+	return true
 end

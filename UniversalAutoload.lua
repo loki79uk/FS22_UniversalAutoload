@@ -106,6 +106,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key.."#neverStack", "Should never load another pallet on top of this one when loading", false)
 		s.schema:register(XMLValueType.BOOL, s.key.."#neverRotate", "Should never rotate object when loading", false)
 		s.schema:register(XMLValueType.BOOL, s.key.."#alwaysRotate", "Should always rotate to face outwards for manual unloading", false)
+		s.schema:register(XMLValueType.INT, s.key.."#stackLimit", "Overrides the maximum number of layers to stack without regards to density", 0)
 	end
 
 	local schemaSavegame = Vehicle.xmlSchemaSavegame
@@ -2722,7 +2723,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
 					
-					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
+					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY and containerType.stackLimit == 0 then
 						local mass = UniversalAutoload.getContainerMass(object)
 						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 						local density = mass/volume
@@ -2732,6 +2733,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						if maxLoadAreaHeight > 5*containerType.sizeY then
 							maxLoadAreaHeight = 5*containerType.sizeY
 						end
+					elseif containerType.stackLimit > 0 then
+						maxLoadAreaHeight = math.min(maxLoadAreaHeight, containerType.stackLimit * containerType.sizeY)
 					end
 
 					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then

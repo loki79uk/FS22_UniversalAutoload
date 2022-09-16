@@ -281,6 +281,7 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 					newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
 					newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
 					newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
+					newType.stackLimit = xmlFile:getValue(configKey.."#stackLimit", default.stackLimit or 0)
 					print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", newType.type, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
 				end
 
@@ -334,6 +335,7 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 				newType.neverStack = oldType.neverStack
 				newType.neverRotate = oldType.neverRotate
 				newType.alwaysRotate = oldType.alwaysRotate
+				newType.stackLimit = oldType.stackLimit
 
 				if oldType.isBale then
 					newType.width = oldType.width

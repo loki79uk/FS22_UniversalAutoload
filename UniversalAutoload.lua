@@ -2582,6 +2582,8 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("length: " .. tostring(length) )
 		print(" N1: "..N1.. " ,  M1: "..M1)
 		print(" N2: "..N2.. " ,  M2: "..M2)
+		print("neverRotate: " .. tostring(containerType.neverRotate) )
+		print("alwaysRotate: " .. tostring(containerType.alwaysRotate) )
 		print("shouldRotate: " .. tostring(shouldRotate) )
 		print("doRotate: " .. tostring(doRotate) )
 	end
@@ -3283,20 +3285,44 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 
 		local n = UniversalAutoload.getTransformation( position, rootNodes )
 		
-		-- if object.isSplitShape then
-			-- local rx, ry, rz = localRotationToWorld(position.node, 0, 0, -math.pi/2)
-			-- n[1].rx = rx
-			-- n[1].ry = ry
-			-- n[1].rz = rz
-			-- --n[1].x = n[1].x + object.sizeX/2
-			-- n[1].y = n[1].y + object.sizeX/2
-			-- --n[1].z = n[1].z + object.sizeX/2
-		-- end
+		-- SPLITSHAPE ROTATION
+		if object.isSplitShape then
+		
+			local s = math.floor(math.random(0,1)+0.5) * 2 - 1;
+			local xx,xy,xz = localDirectionToWorld(position.node, s, 0, 0) --length
+			local yx,yy,yz = localDirectionToWorld(position.node, 0, 1, 0) --height
+			local zx,zy,zz = localDirectionToWorld(position.node, 0, 0, 0) --width
+			print(string.format("X %f, %f, %f",xx,xy,xz))
+			print(string.format("Y %f, %f, %f",yx,yy,yz))
+			print(string.format("Z %f, %f, %f",zx,zy,zz))
+			
+			if not object.isLoaded then
+				object.isLoaded = true
+				local rx,ry,rz = localRotationToWorld(position.node, 0, 0, s*math.pi/2)
+				print(string.format("R %f, %f, %f",rx,ry,rz))
+				
+				n[1].rx = rx
+				n[1].ry = ry
+				n[1].rz = rz
+				
+				local X = object.sizeY/2
+				local Y = object.sizeX/2
+				local Z = object.sizeZ/2
+				print(string.format("D %f, %f, %f", X, Y, Z))
+				n[1].x = n[1].x + xx*X + yx*Y + zx*Z
+				n[1].y = n[1].y + xy*X + yy*Y + zy*Z
+				n[1].z = n[1].z + xz*X + yz*Y + zz*Z
+			else
+				object.isLoaded = false
+			end
+
+		end
 		
 		for i = 1, #rootNodes do
 			UniversalAutoload.moveObjectNode(rootNodes[i], n[i])
 		end
 		
+		-- SPLITSHAPE TRANSLATION
 		if object.isSplitShape then
 
 			local x0, y0, z0 = getWorldTranslation(node)
@@ -3694,12 +3720,15 @@ function UniversalAutoload.getContainerType(object)
 		--print("getContainerType: i3dFilename == NIL")
 		if object.isSplitShape then
 		
+			-- SPLITSHAPE ROTATION
 			local splitShape = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS["splitShape"]
-			splitShape.sizeX = object.sizeX
-			splitShape.sizeY = object.sizeY
+			splitShape.sizeX = object.sizeY
+			splitShape.sizeY = object.sizeX
 			splitShape.sizeZ = object.sizeZ
-
+			splitShape.flipXY = true
+			splitShape.alwaysRotate = true
 			return splitShape
+			
 		else
 			return nil
 		end
@@ -3721,14 +3750,16 @@ function UniversalAutoload.getContainerType(object)
 	return objectType
 end
 --
-function UniversalAutoload.getContainerSize(object)
-	if object ~= nil then
-		if object.isSplitShape then
-			return object.sizeX, object.sizeY, object.sizeZ
-		else
-			local containerType = UniversalAutoload.getContainerType(object)
-			return containerType.sizeX, containerType.sizeY, containerType.sizeZ
+function UniversalAutoload.getContainerDimensions(containerType)
+	if containerType ~= nil then
+		local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+		if containerType.flipXY then
+			w, h = containerType.sizeY, containerType.sizeX
 		end
+		if containerType.flipYZ then
+			l, h = containerType.sizeY, containerType.sizeZ
+		end
+		return w, h, l
 	end
 end
 --
@@ -3915,10 +3946,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
-					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
-					if containerType.flipYZ then
-						l, h = containerType.sizeY, containerType.sizeZ
-					end
+					local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
 					local offset = 0 if containerType.isBale then offset = h/2 end
 					if UniversalAutoload.isValidForLoading(self, object) then
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREEN, offset )
@@ -3934,10 +3962,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
-					local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
-					if containerType.flipYZ then
-						l, h = containerType.sizeY, containerType.sizeZ
-					end
+					local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
 					local offset = 0 if containerType.isBale then offset = h/2 end
 					if UniversalAutoload.isValidForUnloading(self, object) then 
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREEN, offset )
@@ -3951,10 +3976,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		UniversalAutoload.buildObjectsToUnloadTable(self)
 		for object, unloadPlace in pairs(spec.objectsToUnload) do
 			local containerType = UniversalAutoload.getContainerType(object)
-			local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
-			if containerType.flipYZ then
-				l, h = containerType.sizeY, containerType.sizeZ
-			end
+			local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
 			local offset = 0 if containerType.isBale then offset = h/2 end
 			if spec.unloadingAreaClear then
 				UniversalAutoload.DrawDebugPallet( unloadPlace.node, w, h, l, true, false, CYAN, offset )

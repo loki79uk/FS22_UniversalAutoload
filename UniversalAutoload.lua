@@ -4194,5 +4194,6 @@ function UniversalAutoload:ualIsObjectLoadable(object)
 	--- TODO: Returns true, if the given object is loadable.
 	--- For CP, the given object is of the class Bale.
 	print("UAL/CP - IS BALE = ".. tostring(UniversalAutoload.getContainerTypeName(object) == "BALE"))
-	return UniversalAutoload.getContainerTypeName(object) == "BALE"
+	print("UAL/CP - IS VALID = ".. tostring(UniversalAutoload.isValidForLoading(self, object))
+	return UniversalAutoload.getContainerTypeName(object) == "BALE") and UniversalAutoload.isValidForLoading(self, object)
 end

@@ -1069,7 +1069,7 @@ function UniversalAutoload:resetLoadingState(noEventSend)
 	local spec = self.spec_universalAutoload
 	
 	if self.isServer then
-		if spec.doSetTensionBelts and not spec.disableAutoStrap and not UniversalAutoload.disableAutoStrap then
+		if spec.doSetTensionBelts and not spec.disableAutoStrap and not spec.baleCollectionMode and not UniversalAutoload.disableAutoStrap then
 			self:setAllTensionBeltsActive(true)
 		end
 		spec.postLoadDelayTime = 0
@@ -4131,49 +4131,68 @@ function UniversalAutoload.AddCustomStrings()
 end
 UniversalAutoload.AddCustomStrings()
 
--- Courseplay event listeneres.
+-- Courseplay event listeners.
 function UniversalAutoload:onAIImplementStart()
 	--- TODO: Unfolding or opening cover, if needed!
 	local spec = self.spec_universalAutoload
+	if not spec.baleCollectionMode then
+		print("UAL/CP - ACTIVATE BALE COLLECTION MODE (onAIImplementStart)")
+		UniversalAutoload.setBaleCollectionMode(self, true)
+	end
 	spec.aiLoadingActive = true
 end
-
+--
 function UniversalAutoload:onAIImplementEnd()
     --- TODO: Folding or closing cover, if needed!
 	local spec = self.spec_universalAutoload
+	if not spec.baleCollectionMode then
+		print("UAL/CP - DEACTIVATE BALE COLLECTION MODE (onAIImplementEnd)")
+		UniversalAutoload.setBaleCollectionMode(self, false)
+	end
 	spec.aiLoadingActive = false
 end
-
+--
 function UniversalAutoload:onAIFieldWorkerStart()
 	--- TODO: Unfolding or opening cover, if needed!
     local spec = self.spec_universalAutoload
+	if not spec.baleCollectionMode then
+		print("UAL/CP - ACTIVATE BALE COLLECTION MODE (onAIFieldWorkerStart)")
+		UniversalAutoload.setBaleCollectionMode(self, true)
+	end
 	spec.aiLoadingActive = true
 end
-
+--
 function UniversalAutoload:onAIFieldWorkerEnd()
 	--- TODO: Folding or closing cover, if needed!
 	local spec = self.spec_universalAutoload
+	if not spec.baleCollectionMode then
+		print("UAL/CP - DEACTIVATE BALE COLLECTION MODE (onAIFieldWorkerEnd)")
+		UniversalAutoload.setBaleCollectionMode(self, false)
+	end
 	spec.aiLoadingActive = false
 end  
 
---- Courseplay interface functions.
-function UniversalAutoload:ualHasLoadedBales()
-	local spec = self.spec_universalAutoload
-	return spec.totalUnloadCount > 0
-end
-
+-- Courseplay interface functions.
 function UniversalAutoload:ualIsFull()
 	local spec = self.spec_universalAutoload
 	return spec.trailerIsFull
 end
-
+--
 function UniversalAutoload:ualGetLoadedBales()
 	local spec = self.spec_universalAutoload
 	return spec.loadedObjects
 end
-
+--
+function UniversalAutoload:ualHasLoadedBales()
+	print("UAL/CP - ualHasLoadedBales")
+	local spec = self.spec_universalAutoload
+	return spec.totalUnloadCount > 0
+end
+--
 function UniversalAutoload:ualIsObjectLoadable(object)
+	print("UAL/CP - ualIsObjectLoadable")
 	--- TODO: Returns true, if the given object is loadable.
 	--- For CP, the given object is of the class Bale.
-	return true
+	print("UAL/CP - IS BALE = ".. tostring(UniversalAutoload.getContainerTypeName(object) == "BALE"))
+	return UniversalAutoload.getContainerTypeName(object) == "BALE"
 end

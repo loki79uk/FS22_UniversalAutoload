@@ -2073,6 +2073,39 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 		end
 		
+		-- -- PRINT ALL THE TEST PALLETS INFORMATION
+		-- if not UniversalAutoload.runOnce then
+			-- UniversalAutoload.runOnce = true
+			-- UniversalAutoload.testPallets = {}
+			-- UniversalAutoload.testPalletsCount = 0;
+			-- local pallets = {}
+			-- for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
+				-- local xmlName = fillType.palletFilename
+				-- if xmlName ~= nil and not xmlName:find("fillablePallet") then
+					-- pallets[fillType.name] = xmlName
+				-- end
+			-- end
+			-- for fillType, xmlName in pairs(pallets) do
+				-- print(string.format("%s - %s", fillType, xmlName))
+				-- UniversalAutoload.createPallet(self, xmlName)
+				-- UniversalAutoload.testPalletsCount = UniversalAutoload.testPalletsCount + 1
+			-- end
+		-- end
+		-- if next(UniversalAutoload.testPallets) and isActiveForInputIgnoreSelection then
+			-- if #UniversalAutoload.testPallets == UniversalAutoload.testPalletsCount then
+				-- print("TEST PALLETS SPAWNED")
+				-- print(string.format("%s, %s, %s, %s", "name", "volume", "mass", "density"))
+				-- for _, pallet in pairs(UniversalAutoload.testPallets) do
+					-- local config = UniversalAutoload.getContainerType(pallet)
+					-- local mass = UniversalAutoload.getContainerMass(pallet)
+					-- local volume = config.sizeX * config.sizeY * config.sizeZ
+					-- print(string.format("%s, %f, %f, %f", config.name, volume, mass, mass/volume))
+					-- g_currentMission:removeVehicle(pallet, true)
+				-- end
+				-- UniversalAutoload.testPallets = {}
+			-- end
+		-- end
+		
 		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
 		local playerTriggerActive = false
 		if not isActiveForInputIgnoreSelection then
@@ -2728,7 +2761,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
 						local mass = UniversalAutoload.getContainerMass(object)
 						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
-						local density = mass/volume
+						local density = math.min(mass/volume, 1.5)
 						if density > 0.5 then
 							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
 						end
@@ -3567,6 +3600,10 @@ function UniversalAutoload:createPallet(xmlFilename)
 		if palletLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
 			local fillTypeIndex = pallet:getFillUnitFirstSupportedFillType(1)
 			pallet:addFillUnitFillLevel(1, 1, math.huge, fillTypeIndex, ToolType.UNDEFINED, nil)
+			
+			-- if next(UniversalAutoload.testPallets)
+				-- table.insert(UniversalAutoload.testPallets, pallet)
+			-- end
 			
 			if not UniversalAutoload.loadObject(vehicle, pallet) then
 				g_currentMission:removeVehicle(pallet, true)

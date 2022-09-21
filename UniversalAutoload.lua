@@ -64,6 +64,7 @@ function UniversalAutoload.initSpecialization()
 	for _, s in ipairs(vehicleSchemas) do
 		s.schema:register(XMLValueType.STRING, s.key.."#configFileName", "Vehicle config file xml full path - used to identify supported vehicles", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
+		s.schema:register(XMLValueType.STRING, s.key.."#useConfigName", "Specific configuration to be used for selected configs", nil)
 		s.schema:register(XMLValueType.VECTOR_TRANS, s.key..".loadingArea(?)#offset", "Offset to the centre of the loading area", "0 0 0")
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#width", "Width of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#length", "Length of the loading area", 0)
@@ -1143,8 +1144,7 @@ function UniversalAutoload:updatePlayerTriggerState(playerId, inTrigger, noEvent
 	UniversalAutoloadPlayerTriggerEvent.sendEvent(self, playerId, inTrigger, noEventSend)
 end
 --
-function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key)
-
+function UniversalAutoload:getIsValidConfiguration(selectedConfigs, useConfigName, xmlFile)
 	local validConfig = nil
 	
 	if selectedConfigs == nil or selectedConfigs == "ALL" then
@@ -1156,7 +1156,7 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 		item.configurations, _ = UniversalAutoload.getConfigurationsFromXML(xmlFile, "vehicle", self.customEnvironment, item)
 		item.configurationSets = UniversalAutoload.getConfigurationSetsFromXML(item, xmlFile, "vehicle", self.customEnvironment)
 
-		if item.configurationSets ~= nil and #item.configurationSets > 0  then
+		if item.configurationSets ~= nil and #item.configurationSets > 0 and useConfigName == nil then
 			local closestSet, _ = UniversalAutoload.getClosestConfigurationSet(self.configurations, item.configurationSets)
 			for k, v in pairs(item.configurationSets) do
 				if v == closestSet then
@@ -1169,13 +1169,14 @@ function UniversalAutoload:getIsValidConfiguration(selectedConfigs, xmlFile, key
 				end
 			end
 		else
-			if self.configurations ~= nil and self.configurations.design ~= nil then
-				local selectedDesign = self.configurations.design
+			local configName = useConfigName or "design"
+			if self.configurations ~= nil and self.configurations[configName] ~= nil then
+				local selectedDesign = self.configurations[configName]
 				for _, n in ipairs(selectedConfigsList) do
 					if tonumber(n) == tonumber(selectedDesign) then
-						for k, design in pairs(item.configurations.design) do
+						for k, design in pairs(item.configurations[configName]) do
 							if tonumber(n) == tonumber(k) then
-								if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID DESIGN: "..n.." / "..selectedConfigs.." ("..design.name..")") end
+								if UniversalAutoload.showDebug then print("UNIVERSAL AUTOLOAD VALID DESIGN: "..configName.." "..n.." / "..selectedConfigs) end
 								validConfig = design.name
 							end
 						end
@@ -1348,7 +1349,8 @@ function UniversalAutoload:onLoad(savegame)
 			if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] ~= nil then
 				local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
 				for selectedConfigs, config in pairs(configGroup) do
-					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
+					local configName = config.useConfigName
+					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, configName, xmlFile)
 					if validConfig ~= nil then
 						print("UniversalAutoload - supported vehicle: "..self:getFullName().." - "..validConfig.." ("..selectedConfigs..")" )
 						-- define the loading area parameters from supported vehicles settings file
@@ -1394,7 +1396,8 @@ function UniversalAutoload:onLoad(savegame)
 						break
 					end
 					local selectedConfigs = xmlFile:getValue(key.."#selectedConfigs", "ALL")
-					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, xmlFile, key)
+					local useConfigName = xmlFile:getValue(key.."#useConfigName", nil)
+					local validConfig = UniversalAutoload.getIsValidConfiguration(self, selectedConfigs, useConfigName, xmlFile)
 					if validConfig ~= nil then
 						print("UniversalAutoload - valid vehicle: "..self:getFullName().." - "..validConfig.." ("..selectedConfigs..")" )
 						-- define the loading area parameters from vehicle.xml file

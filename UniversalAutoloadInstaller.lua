@@ -175,31 +175,33 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 			end
 				
 			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
-			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs") or "ALL"
+			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs", "ALL")
+			local useConfigName = xmlFile:getValue(configKey.."#useConfigName", nil)
 			if configGroup[selectedConfigs] == nil or overwriteExisting then
 				configGroup[selectedConfigs] = {}
 				configGroup[selectedConfigs].loadingArea = {}
 				
 				local config = configGroup[selectedConfigs]
+				config.useConfigName = useConfigName
 				
-					local j = 0
-					while true do
-						local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
-						if not xmlFile:hasProperty(loadAreaKey) then
-							break
-						end
-						config.loadingArea[j+1] = {}
-						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
-						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
-						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
-						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
-						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
-						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
-						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
-						config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
-						config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
-						j = j + 1
+				local j = 0
+				while true do
+					local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
+					if not xmlFile:hasProperty(loadAreaKey) then
+						break
 					end
+					config.loadingArea[j+1] = {}
+					config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
+					config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
+					config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
+					config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
+					config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+					config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
+					config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
+					config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
+					config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
+					j = j + 1
+				end
 					
 				config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
 				config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", false)

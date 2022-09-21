@@ -900,9 +900,9 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	-- print("setBaleCollectionMode: "..self:getFullName().." - "..tostring(baleCollectionMode))
 	local spec = self.spec_universalAutoload
 		
-	if self.isServer then
+	if self.isServer and spec~=nil and spec.isAutoloadEnabled then
 		if baleCollectionMode then
-			if spec.availableBaleCount > 0 and not spec.trailerIsFull then
+			if spec.availableBaleCount and spec.availableBaleCount > 0 and not spec.trailerIsFull then
 				if UniversalAutoload.showDebug then print("baleCollectionMode: startLoading") end
 				UniversalAutoload.startLoading(self)
 			end
@@ -1701,6 +1701,7 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentMaterialIndex = 1
 	spec.currentContainerIndex = 1
 	spec.currentLoadingFilter = true
+	spec.baleCollectionMode = false
 
 end
 
@@ -1717,6 +1718,7 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentMaterialIndex = 1
 				spec.currentContainerIndex = 1
 				spec.currentLoadingFilter = true
+				spec.baleCollectionMode = false
 			else
 				--client+server
 				spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
@@ -1724,6 +1726,7 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentMaterialIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#materialIndex", 1)
 				spec.currentContainerIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#containerIndex", 1)
 				spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
+				spec.baleCollectionMode = savegame.xmlFile:getValue(savegame.key..".universalAutoload#baleCollectionMode", false)
 				--server only
 				spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
 				spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
@@ -1756,6 +1759,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			xmlFile:setValue(correctedKey.."#materialIndex", spec.currentMaterialIndex or 1)
 			xmlFile:setValue(correctedKey.."#containerIndex", spec.currentContainerIndex or 1)
 			xmlFile:setValue(correctedKey.."#loadingFilter", spec.currentLoadingFilter or true)
+			xmlFile:setValue(correctedKey.."#baleCollectionMode", spec.baleCollectionMode or false)	
 			--server only
 			xmlFile:setValue(correctedKey.."#loadWidth", spec.currentLoadWidth or 0)
 			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight or 0)
@@ -1865,6 +1869,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.currentMaterialIndex = streamReadInt32(streamId)
 		spec.currentContainerIndex = streamReadInt32(streamId)
 		spec.currentLoadingFilter = streamReadBool(streamId)
+		spec.baleCollectionMode = streamReadBool(streamId)
 		spec.isLoading = streamReadBool(streamId)
 		spec.isUnloading = streamReadBool(streamId)
 		spec.validLoadCount = streamReadInt32(streamId)
@@ -1894,6 +1899,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.currentMaterialIndex = spec.currentMaterialIndex or 1
 		spec.currentContainerIndex = spec.currentContainerIndex or 1
 		spec.currentLoadingFilter = spec.currentLoadingFilter or true
+		spec.baleCollectionMode = spec.baleCollectionMode or false
 		spec.isLoading = spec.isLoading or false
 		spec.isUnloading = spec.isUnloading or false
 		spec.validLoadCount = spec.validLoadCount or 0
@@ -1906,6 +1912,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteInt32(streamId, spec.currentMaterialIndex)
 		streamWriteInt32(streamId, spec.currentContainerIndex)
 		streamWriteBool(streamId, spec.currentLoadingFilter)
+		streamWriteBool(streamId, spec.baleCollectionMode)
 		streamWriteBool(streamId, spec.isLoading)
 		streamWriteBool(streamId, spec.isUnloading)
 		streamWriteInt32(streamId, spec.validLoadCount)
@@ -4138,7 +4145,7 @@ UniversalAutoload.AddCustomStrings()
 function UniversalAutoload:onAIImplementStart()
 	--- TODO: Unfolding or opening cover, if needed!
 	local spec = self.spec_universalAutoload
-	if not spec.baleCollectionMode then
+	if spec~=nil and spec.isAutoloadEnabled then
 		print("UAL/CP - ACTIVATE BALE COLLECTION MODE (onAIImplementStart)")
 		UniversalAutoload.setBaleCollectionMode(self, true)
 	end
@@ -4148,7 +4155,7 @@ end
 function UniversalAutoload:onAIImplementEnd()
     --- TODO: Folding or closing cover, if needed!
 	local spec = self.spec_universalAutoload
-	if not spec.baleCollectionMode then
+	if spec~=nil and spec.isAutoloadEnabled and spec.aiLoadingActive then
 		print("UAL/CP - DEACTIVATE BALE COLLECTION MODE (onAIImplementEnd)")
 		UniversalAutoload.setBaleCollectionMode(self, false)
 	end
@@ -4158,7 +4165,7 @@ end
 function UniversalAutoload:onAIFieldWorkerStart()
 	--- TODO: Unfolding or opening cover, if needed!
     local spec = self.spec_universalAutoload
-	if not spec.baleCollectionMode then
+	if spec~=nil and spec.isAutoloadEnabled then
 		print("UAL/CP - ACTIVATE BALE COLLECTION MODE (onAIFieldWorkerStart)")
 		UniversalAutoload.setBaleCollectionMode(self, true)
 	end
@@ -4168,7 +4175,7 @@ end
 function UniversalAutoload:onAIFieldWorkerEnd()
 	--- TODO: Folding or closing cover, if needed!
 	local spec = self.spec_universalAutoload
-	if not spec.baleCollectionMode then
+	if spec~=nil and spec.isAutoloadEnabled and spec.aiLoadingActive then
 		print("UAL/CP - DEACTIVATE BALE COLLECTION MODE (onAIFieldWorkerEnd)")
 		UniversalAutoload.setBaleCollectionMode(self, false)
 	end
@@ -4193,10 +4200,14 @@ function UniversalAutoload:ualHasLoadedBales()
 end
 --
 function UniversalAutoload:ualIsObjectLoadable(object)
+    local spec = self.spec_universalAutoload
 	print("UAL/CP - ualIsObjectLoadable")
 	--- TODO: Returns true, if the given object is loadable.
 	--- For CP, the given object is of the class Bale.
-	print("UAL/CP - IS BALE = ".. tostring(UniversalAutoload.getContainerTypeName(object) == "BALE"))
-	print("UAL/CP - IS VALID = ".. tostring(UniversalAutoload.isValidForLoading(self, object)))
-	return UniversalAutoload.getContainerTypeName(object) == "BALE" and UniversalAutoload.isValidForLoading(self, object)
+	if spec~=nil and spec.isAutoloadEnabled then
+		print("UAL/CP - IS BALE = ".. tostring(UniversalAutoload.getContainerTypeName(object) == "BALE"))
+		print("UAL/CP - IS VALID = ".. tostring(UniversalAutoload.isValidForLoading(self, object)))
+		return UniversalAutoload.getContainerTypeName(object) == "BALE" and UniversalAutoload.isValidForLoading(self, object)
+	end
+	return false
 end

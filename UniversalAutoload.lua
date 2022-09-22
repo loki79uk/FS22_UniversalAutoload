@@ -122,6 +122,7 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
     schemaSavegame:register(XMLValueType.BOOL, specKey.."#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
+    schemaSavegame:register(XMLValueType.BOOL, specKey.."#baleCollectionMode", "Enable manual toggling of the automatic bale collection mode", false)
 
 end
 --

@@ -17,6 +17,10 @@ for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
 	end
 end
 
+-- Create a new store pack to group all UAL supported vehicles
+-- @Loki Cannot do this in the modDesc using 'storePacks.storePack' as Giants forgot to localise l10n
+g_storeManager:addModStorePack("UNIVERSALAUTOLOAD", g_i18n:getText("configuration_universalAutoload", g_currentModName), "icons/storePack_ual.dds", g_currentModDirectory)
+
 -- variables
 UniversalAutoload.userSettingsFile = "modSettings/UniversalAutoload.xml"
 UniversalAutoload.SHOP_ICON = UniversalAutoload.path .. "icons/shop_icon.dds"
@@ -170,61 +174,73 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 			end
 
 			local configFileName = xmlFile:getValue(configKey.."#configFileName")
-			if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] == nil then
-				UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
-			end
-				
-			local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
-			local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs", "ALL")
-			local useConfigName = xmlFile:getValue(configKey.."#useConfigName", nil)
-			if configGroup[selectedConfigs] == nil or overwriteExisting then
-				configGroup[selectedConfigs] = {}
-				configGroup[selectedConfigs].loadingArea = {}
-				
-				local config = configGroup[selectedConfigs]
-				config.useConfigName = useConfigName
-				
-				local j = 0
-				while true do
-					local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
-					if not xmlFile:hasProperty(loadAreaKey) then
-						break
-					end
-					config.loadingArea[j+1] = {}
-					config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
-					config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
-					config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
-					config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
-					config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
-					config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
-					config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
-					config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
-					config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
-					j = j + 1
-				end
-					
-				config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
-				config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", false)
-				config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
-				config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
-				config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
-				config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
-				config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
-				config.noLoadingIfCovered = xmlFile:getValue(configKey..".options#noLoadingIfCovered", false)
-				config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
-				config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
-				config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
-				config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
-				config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
-				config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
+			local validXmlFilename = UniversalAutoload.getValidXmlName(configFileName)
+			
+			if validXmlFilename ~= nil then
 
-				if not config.showDebug then
-					print("  >> "..configFileName.." ("..selectedConfigs..")")
-				else
-					print("  >> "..configFileName.." ("..selectedConfigs..") DEBUG")
+				if UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] == nil then
+					UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName] = {}
+					-- Update the store pack with available vehicle
+					-- StoreManager.addPackItem' allows duplicates when using 'gsStoreItemsReload' so not used
+					table.addElement(g_storeManager:getPackItems("UNIVERSALAUTOLOAD"), validXmlFilename)
 				end
+				
+				local configGroup = UniversalAutoload.VEHICLE_CONFIGURATIONS[configFileName]
+				local selectedConfigs = xmlFile:getValue(configKey.."#selectedConfigs", "ALL")
+				local useConfigName = xmlFile:getValue(configKey.."#useConfigName", nil)
+				if configGroup[selectedConfigs] == nil or overwriteExisting then
+					configGroup[selectedConfigs] = {}
+					configGroup[selectedConfigs].loadingArea = {}
+					
+					local config = configGroup[selectedConfigs]
+					config.useConfigName = useConfigName
+					config.xmlFilename = validXmlFilename
+					
+					local j = 0
+					while true do
+						local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
+						if not xmlFile:hasProperty(loadAreaKey) then
+							break
+						end
+						config.loadingArea[j+1] = {}
+						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
+						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
+						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
+						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
+						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
+						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
+						config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
+						config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
+						j = j + 1
+					end
+						
+					config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
+					config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", false)
+					config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
+					config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
+					config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
+					config.noLoadingIfFolded = xmlFile:getValue(configKey..".options#noLoadingIfFolded", false)
+					config.noLoadingIfUnfolded = xmlFile:getValue(configKey..".options#noLoadingIfUnfolded", false)
+					config.noLoadingIfCovered = xmlFile:getValue(configKey..".options#noLoadingIfCovered", false)
+					config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
+					config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
+					config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
+					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
+					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
+					config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
+
+					if not config.showDebug then
+						print("  >> "..configFileName.." ("..selectedConfigs..")")
+					else
+						print("  >> "..configFileName.." ("..selectedConfigs..") DEBUG")
+					end
+				else
+					if UniversalAutoload.showDebug then print("  ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")") end
+				end
+
 			else
-				if UniversalAutoload.debugEnabled then print("  CONFIG ALREADY EXISTS: "..configFileName.." ("..selectedConfigs..")") end
+				if UniversalAutoload.showDebug then print("  NOT FOUND: " .. configFileName) end			
 			end
 			
 			i = i + 1
@@ -232,6 +248,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 
 		xmlFile:delete()
 	end
+
 	return i
 end
 --
@@ -401,7 +418,7 @@ function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnviron
 			elseif category == "bigbagPallets" then containerType = "BIGBAG_PALLET"
 			else
 				containerType = "ALL"
-				if UniversalAutoload.debugEnabled then print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category) end
+				if UniversalAutoload.showDebug then print("  USING DEFAULT CONTAINER TYPE: "..name.." - "..category) end
 			end
 
 			UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
@@ -823,7 +840,7 @@ function UniversalAutoloadManager:consoleCreateBoundingBox()
 			UniversalAutoload.createBoundingBox(vehicle)
 		end
 	end
-	return "Bounding box created sucessfully"
+	return "Bounding box created successfully"
 end
 --
 function UniversalAutoloadManager.addAttachedVehicles(vehicle, vehicles)
@@ -1125,3 +1142,23 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 
 	end
 )
+
+-- Add valid store items to the 'UNIVERSALAUTOLOAD' store pack if it exists.
+-- Using 'table.addElement' will avoid duplicates and errors if Store Pack does not load or exist for some reason ;-)
+StoreManager.loadItem = Utils.overwrittenFunction(StoreManager.loadItem, function(self, superFunc, ...)
+    local storeItem = superFunc(self, ...)
+
+    if storeItem ~= nil and storeItem.isMod and storeItem.species == "vehicle" then
+        local xmlFile = XMLFile.load("loadItemXml", storeItem.xmlFilename, storeItem.xmlSchema)
+
+        -- @Loki Could do more checks if required but why would a mod have the XML key if not UAL?
+        if xmlFile:hasProperty("vehicle.universalAutoload") then
+            -- StoreManager.addPackItem' allows duplicates when using 'gsStoreItemsReload' so not used
+            table.addElement(g_storeManager:getPackItems("UNIVERSALAUTOLOAD"), storeItem.xmlFilename)
+        end
+
+        xmlFile:delete()
+    end
+
+    return storeItem
+end)

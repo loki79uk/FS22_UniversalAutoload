@@ -7,7 +7,7 @@ UniversalAutoload.name = g_currentModName
 UniversalAutoload.path = g_currentModDirectory
 UniversalAutoload.specName = ("spec_%s.universalAutoload"):format(g_currentModName)
 
-UniversalAutoload.showDebug = true
+UniversalAutoload.showDebug = false
 UniversalAutoload.showLoading = false
 
 UniversalAutoload.delayTime = 200
@@ -3755,6 +3755,28 @@ function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
 		customEnvironment, _ = temp:match( "^(.-)/(.+)$" )
 	end
 	return customEnvironment
+end
+--
+function UniversalAutoload.getValidXmlName(ualConfigName)
+
+	local xmlFilename = ualConfigName
+	if g_storeManager:getItemByXMLFilename(xmlFilename) then
+		return xmlFilename
+	end
+	
+	xmlFilename = g_modsDirectory..ualConfigName
+	if g_storeManager:getItemByXMLFilename(xmlFilename) then
+		return xmlFilename
+	end
+	
+	for i = 1, #g_dlcsDirectories do
+		local dlcsDir = g_dlcsDirectories[i].path
+		xmlFilename = dlcsDir..ualConfigName
+		if g_storeManager:getItemByXMLFilename(xmlFilename) then
+			return xmlFilename
+		end
+	end
+
 end
 --
 function UniversalAutoload.getContainerTypeName(object)

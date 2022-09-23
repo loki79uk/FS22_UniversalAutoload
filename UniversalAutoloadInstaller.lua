@@ -227,6 +227,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
 					config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
 					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
+					config.disableHeightLimit = xmlFile:getValue(configKey..".options#disableHeightLimit", false)
 					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
 					config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
 

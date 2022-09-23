@@ -89,7 +89,8 @@
 		
 		<!-- SUPPORTED TRAIN CARRIAGES -->
 		<vehicleConfiguration configFileName="data/vehicles/train/wagonVehicles/wagonVehicles.xml">
-            <loadingArea offset="0 1.328 -10.625" width="2.85" height="3.00" length="24.9" baleHeight="4.00"/>
+			<options disableHeightLimit="true"/>
+            <loadingArea offset="0 1.328 -10.625" width="2.85" height="3.35" length="24.9" baleHeight="4.00"/>
         </vehicleConfiguration>
 		
 		<!-- SUPPORTED DLCs -->

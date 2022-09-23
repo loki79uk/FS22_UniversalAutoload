@@ -86,6 +86,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#rearUnloadingOnly", "Use rear unloading zone only (not side zones)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#frontUnloadingOnly", "Use front unloading zone only (not side zones)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#disableHeightLimit", "Disable the density based stacking height limit", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#zonesOverlap", "Flag to identify when the loading areas overlap each other", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full graphical debugging display for this vehicle", false)
 	end
@@ -901,7 +902,7 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	-- print("setBaleCollectionMode: "..self:getFullName().." - "..tostring(baleCollectionMode))
 	local spec = self.spec_universalAutoload
 		
-	if self.isServer and spec~=nil and spec.isAutoloadEnabled then
+	if self.isServer and spec~=nil and spec.isAutoloadEnabled and spec.baleCollectionMode ~= baleCollectionMode then
 		if baleCollectionMode then
 			if spec.availableBaleCount and spec.availableBaleCount > 0 and not spec.trailerIsFull then
 				if UniversalAutoload.showDebug then print("baleCollectionMode: startLoading") end
@@ -1381,6 +1382,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.rearUnloadingOnly = config.rearUnloadingOnly
 						spec.frontUnloadingOnly = config.frontUnloadingOnly
 						spec.disableAutoStrap = config.disableAutoStrap
+						spec.disableHeightLimit = config.disableHeightLimit
 						spec.zonesOverlap = config.zonesOverlap
 						spec.showDebug = config.showDebug
 						break
@@ -1434,6 +1436,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.rearUnloadingOnly = xmlFile:getValue(key..".options#rearUnloadingOnly", false)
 						spec.frontUnloadingOnly = xmlFile:getValue(key..".options#frontUnloadingOnly", false)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
+						spec.disableHeightLimit = xmlFile:getValue(key..".options#disableHeightLimit", false)
 						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
 						spec.showDebug = xmlFile:getValue(key..".options#showDebug", UniversalAutoload.showDebug)
 						break
@@ -2769,7 +2772,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
 					
-					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY then
+					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY and not spec.disableHeightLimit then
 						local mass = UniversalAutoload.getContainerMass(object)
 						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 						local density = math.min(mass/volume, 1.5)

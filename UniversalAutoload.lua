@@ -1510,6 +1510,7 @@ function UniversalAutoload:onLoad(savegame)
 		if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
 		and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
 			if UniversalAutoload.showDebug then print("Universal Autoload Enabled: " .. self:getFullName()) end
+			spec.isAutoloadEnabled = true
 			if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 				UniversalAutoload.VEHICLES[self] = self
 			end
@@ -1970,6 +1971,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 			spec = self.spec_universalAutoload
 		end
 		print("Universal Autoload Enabled: " .. self:getFullName())
+		spec.isAutoloadEnabled = isAutoloadEnabled
 		spec.currentTipside = streamReadString(streamId)
 		spec.currentLoadside = streamReadString(streamId)
 		spec.currentMaterialIndex = streamReadInt32(streamId)

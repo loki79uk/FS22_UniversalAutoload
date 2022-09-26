@@ -24,6 +24,7 @@ source(g_currentModDirectory.."events/ResetLoadingEvent.lua")
 source(g_currentModDirectory.."events/SetBaleCollectionModeEvent.lua")
 source(g_currentModDirectory.."events/SetContainerTypeEvent.lua")
 source(g_currentModDirectory.."events/SetFilterEvent.lua")
+source(g_currentModDirectory.."events/SetHorizontalLoadingEvent.lua")
 source(g_currentModDirectory.."events/SetLoadsideEvent.lua")
 source(g_currentModDirectory.."events/SetMaterialTypeEvent.lua")
 source(g_currentModDirectory.."events/SetTipsideEvent.lua")
@@ -85,6 +86,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#noLoadingIfUncovered", "Prevent loading when uncovered", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#rearUnloadingOnly", "Use rear unloading zone only (not side zones)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#frontUnloadingOnly", "Use front unloading zone only (not side zones)", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#horizontalLoading", "Start with horizontal loading enabled (can be toggled if key is bound)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableHeightLimit", "Disable the density based stacking height limit", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#zonesOverlap", "Flag to identify when the loading areas overlap each other", false)
@@ -123,6 +125,7 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
     schemaSavegame:register(XMLValueType.BOOL, specKey.."#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
+    schemaSavegame:register(XMLValueType.BOOL, specKey.."#useHorizontalLoading", "Last used horizontal loading state", false)
     schemaSavegame:register(XMLValueType.BOOL, specKey.."#baleCollectionMode", "Enable manual toggling of the automatic bale collection mode", false)
 
 end
@@ -314,6 +317,11 @@ function UniversalAutoload:updateActionEventKeys()
 				if debugKeys then print("  TOGGLE_FILTER: "..tostring(valid)) end
 			end
 			
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_HORIZONTAL, self, UniversalAutoload.actionEventToggleHorizontalLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
+			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+			spec.toggleHorizontalLoadingActionEventId = actionEventId
+			if debugKeys then print("  TOGGLE_HORIZONTAL: "..tostring(valid)) end
+
 			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
 			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
 			spec.unloadAllActionEventId = actionEventId
@@ -403,6 +411,7 @@ function UniversalAutoload:updateActionEventKeys()
 			spec.updateToggleBelts = true
 			spec.updateToggleFilter = true
 			spec.updateToggleLoading = true
+			spec.updateHorizontalLoading = true
 			if debugKeys then print("*** updateActionEventKeys ***") end
 		end
 	end
@@ -520,6 +529,23 @@ function UniversalAutoload:updateToggleFilterActionEvent()
 		end
 		g_inputBinding:setActionEventText(spec.toggleLoadingFilterActionEventId, loadingFilterText)
 		g_inputBinding:setActionEventTextVisibility(spec.toggleLoadingFilterActionEventId, true)
+	end
+end
+--
+function UniversalAutoload:updateHorizontalLoadingActionEvent()
+	--if debugKeys then print("updateHorizontalLoadingActionEvent") end
+	local spec = self.spec_universalAutoload
+	
+	if spec.isAutoloadEnabled and spec.toggleHorizontalLoadingActionEventId ~= nil then
+		-- Loading Filter: ANY / FULL ONLY
+		local horizontalLoadingText
+		if spec.useHorizontalLoading then
+			horizontalLoadingText = g_i18n:getText("universalAutoload_loadingMethod")..": "..g_i18n:getText("universalAutoload_layer")
+		else
+			horizontalLoadingText = g_i18n:getText("universalAutoload_loadingMethod")..": "..g_i18n:getText("universalAutoload_stack")
+		end
+		g_inputBinding:setActionEventText(spec.toggleHorizontalLoadingActionEventId, horizontalLoadingText)
+		g_inputBinding:setActionEventTextVisibility(spec.toggleHorizontalLoadingActionEventId, true)
 	end
 end
 --
@@ -697,6 +723,13 @@ function UniversalAutoload.actionEventToggleFilter(self, actionName, inputValue,
 	UniversalAutoload.setLoadingFilter(self, state)
 end
 --
+function UniversalAutoload.actionEventToggleHorizontalLoading(self, actionName, inputValue, callbackState, isAnalog)
+	--print("actionEventToggleHorizontalLoading: "..self:getFullName())
+	local spec = self.spec_universalAutoload
+	local state = not spec.useHorizontalLoading
+	UniversalAutoload.setHorizontalLoading(self, state)
+end
+--
 function UniversalAutoload.actionEventToggleTipside(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleTipside: "..self:getFullName())
 	local spec = self.spec_universalAutoload
@@ -872,6 +905,17 @@ function UniversalAutoload:setLoadingFilter(state, noEventSend)
 	if self.isServer then
 		UniversalAutoload.countActivePallets(self)
 	end
+end
+--
+function UniversalAutoload:setHorizontalLoading(state, noEventSend)
+	-- print("setHorizontalLoading: "..self:getFullName().." "..tostring(state))
+	local spec = self.spec_universalAutoload
+
+	spec.useHorizontalLoading = state
+
+	UniversalAutoloadSetHorizontalLoadingEvent.sendEvent(self, state, noEventSend)
+	
+	spec.updateHorizontalLoading = true
 end
 --
 function UniversalAutoload:setCurrentTipside(tipside, noEventSend)
@@ -1381,6 +1425,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.noLoadingIfUncovered = config.noLoadingIfUncovered
 						spec.rearUnloadingOnly = config.rearUnloadingOnly
 						spec.frontUnloadingOnly = config.frontUnloadingOnly
+						spec.horizontalLoading = config.horizontalLoading
 						spec.disableAutoStrap = config.disableAutoStrap
 						spec.disableHeightLimit = config.disableHeightLimit
 						spec.zonesOverlap = config.zonesOverlap
@@ -1435,6 +1480,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.noLoadingIfUncovered = xmlFile:getValue(key..".options#noLoadingIfUncovered", false)
 						spec.rearUnloadingOnly = xmlFile:getValue(key..".options#rearUnloadingOnly", false)
 						spec.frontUnloadingOnly = xmlFile:getValue(key..".options#frontUnloadingOnly", false)
+						spec.horizontalLoading = xmlFile:getValue(key..".options#horizontalLoading", false)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
 						spec.disableHeightLimit = xmlFile:getValue(key..".options#disableHeightLimit", false)
 						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
@@ -1706,6 +1752,7 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentContainerIndex = 1
 	spec.currentLoadingFilter = true
 	spec.baleCollectionMode = false
+	spec.useHorizontalLoading = spec.horizontalLoading or false
 
 end
 
@@ -1723,6 +1770,7 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentContainerIndex = 1
 				spec.currentLoadingFilter = true
 				spec.baleCollectionMode = false
+				spec.useHorizontalLoading = spec.horizontalLoading or false
 			else
 				--client+server
 				spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
@@ -1731,6 +1779,7 @@ function UniversalAutoload:onPostLoad(savegame)
 				spec.currentContainerIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#containerIndex", 1)
 				spec.currentLoadingFilter = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadingFilter", true)
 				spec.baleCollectionMode = savegame.xmlFile:getValue(savegame.key..".universalAutoload#baleCollectionMode", false)
+				spec.useHorizontalLoading = savegame.xmlFile:getValue(savegame.key..".universalAutoload#useHorizontalLoading", spec.horizontalLoading or false)
 				--server only
 				spec.currentLoadWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadWidth", 0)
 				spec.currentLoadLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadLength", 0)
@@ -1763,7 +1812,8 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 			xmlFile:setValue(correctedKey.."#materialIndex", spec.currentMaterialIndex or 1)
 			xmlFile:setValue(correctedKey.."#containerIndex", spec.currentContainerIndex or 1)
 			xmlFile:setValue(correctedKey.."#loadingFilter", spec.currentLoadingFilter or true)
-			xmlFile:setValue(correctedKey.."#baleCollectionMode", spec.baleCollectionMode or false)	
+			xmlFile:setValue(correctedKey.."#baleCollectionMode", spec.baleCollectionMode or false)
+			xmlFile:setValue(correctedKey.."#useHorizontalLoading", spec.useHorizontalLoading or false)
 			--server only
 			xmlFile:setValue(correctedKey.."#loadWidth", spec.currentLoadWidth or 0)
 			xmlFile:setValue(correctedKey.."#loadHeight", spec.currentLoadHeight or 0)
@@ -1873,6 +1923,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.currentMaterialIndex = streamReadInt32(streamId)
 		spec.currentContainerIndex = streamReadInt32(streamId)
 		spec.currentLoadingFilter = streamReadBool(streamId)
+		spec.useHorizontalLoading = streamReadBool(streamId)
 		spec.baleCollectionMode = streamReadBool(streamId)
 		spec.isLoading = streamReadBool(streamId)
 		spec.isUnloading = streamReadBool(streamId)
@@ -1903,6 +1954,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.currentMaterialIndex = spec.currentMaterialIndex or 1
 		spec.currentContainerIndex = spec.currentContainerIndex or 1
 		spec.currentLoadingFilter = spec.currentLoadingFilter or true
+		spec.useHorizontalLoading = spec.useHorizontalLoading or false
 		spec.baleCollectionMode = spec.baleCollectionMode or false
 		spec.isLoading = spec.isLoading or false
 		spec.isUnloading = spec.isUnloading or false
@@ -1916,6 +1968,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteInt32(streamId, spec.currentMaterialIndex)
 		streamWriteInt32(streamId, spec.currentContainerIndex)
 		streamWriteBool(streamId, spec.currentLoadingFilter)
+		streamWriteBool(streamId, spec.useHorizontalLoading)
 		streamWriteBool(streamId, spec.baleCollectionMode)
 		streamWriteBool(streamId, spec.isLoading)
 		streamWriteBool(streamId, spec.isUnloading)
@@ -1996,6 +2049,11 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				if debugKeys then print("  UPDATE Toggle Filter") end
 				spec.updateToggleFilter=false
 				UniversalAutoload.updateToggleFilterActionEvent(self)
+			end
+			if spec.updateHorizontalLoading then
+				if debugKeys then print("  UPDATE Horizontal Loading") end
+				spec.updateHorizontalLoading=false
+				UniversalAutoload.updateHorizontalLoadingActionEvent(self)
 			end
 		else
 			spec.menuDelayTime = spec.menuDelayTime + dt
@@ -2602,6 +2660,8 @@ end
 function UniversalAutoload:createLoadingPlace(containerType)
     local spec = self.spec_universalAutoload
 	
+	spec.currentLoadingPlace = nil
+	
 	spec.currentLoadWidth = spec.currentLoadWidth or 0
 	spec.currentLoadLength = spec.currentLoadLength or 0
 	
@@ -2746,8 +2806,9 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.resetLoadingPattern = false
 end
 --
-function UniversalAutoload:getLoadPlace(containerType, object)
+function UniversalAutoload:getLoadPlace(containerType, object, count)
     local spec = self.spec_universalAutoload
+	count = count or 1
 	
 	if containerType ~= nil then
 		if UniversalAutoload.showDebug then
@@ -2772,7 +2833,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
 					
-					if spec.currentLoadHeight > 0 and maxLoadAreaHeight > containerType.sizeY and not spec.disableHeightLimit then
+					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerType.sizeY and not spec.disableHeightLimit then
 						local mass = UniversalAutoload.getContainerMass(object)
 						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
 						local density = math.min(mass/volume, 1.5)
@@ -2794,13 +2855,12 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						end
 					end
 					
-					if not spec.currentLoadingPlace then
+					if not spec.currentLoadingPlace or spec.useHorizontalLoading then
 						if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
 						containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
 						UniversalAutoload.createLoadingPlace(self, containerType)
 					end
 
-					local thisLoadHeight = spec.currentLoadHeight
 					local thisLoadPlace = spec.currentLoadingPlace
 					if thisLoadPlace ~= nil then
 					
@@ -2809,25 +2869,47 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
 
 						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
-						setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
 							if not self:ualGetIsMoving() and not spec.baleCollectionMode then
 								local increment = 0.1
-								while thisLoadHeight >= -increment do
+								if spec.useHorizontalLoading then
 								
+									local thisLoadHeight = 0
 									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-								
-									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-									and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
-									then
-										spec.currentLoadHeight = math.max(0, thisLoadHeight)
-										useThisLoadSpace = true
-										break
+									while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
+
+										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+									
+										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
+										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
+										then
+											spec.currentLoadHeight = thisLoadHeight
+											useThisLoadSpace = true
+											break
+										end
+										-- print("Not empty OR no pallet found below position")
+										thisLoadHeight = thisLoadHeight + increment
 									end
-									-- print("Not empty OR no pallet found below position")
-									thisLoadHeight = thisLoadHeight - increment
+								else
+								
+									local thisLoadHeight = spec.currentLoadHeight
+									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+									while thisLoadHeight >= -increment do
+									
+										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+									
+										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
+										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
+										then
+											spec.currentLoadHeight = math.max(0, thisLoadHeight)
+											useThisLoadSpace = true
+											break
+										end
+										-- print("Not empty OR no pallet found below position")
+										thisLoadHeight = thisLoadHeight - increment
+									end
 								end
 							else
 								if containerType.isBale and not spec.zonesOverlap
@@ -2864,13 +2946,19 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				spec.currentLoadAreaIndex = i
 			end
 		end
-		spec.currentLoadAreaIndex = 1
-		spec.trailerIsFull = true
-		if spec.baleCollectionMode == true then
-			if UniversalAutoload.showDebug then print("baleCollectionMode: trailerIsFull") end
-			UniversalAutoload.setBaleCollectionMode(self, false)
+		if spec.useHorizontalLoading and count < 4 then
+			if UniversalAutoload.showDebug then print("START NEW LAYER " .. count) end
+			spec.currentLoadingPlace = nil
+			return UniversalAutoload.getLoadPlace(self, containerType, object, count+1)
+		else
+			spec.currentLoadAreaIndex = 1
+			spec.trailerIsFull = true
+			if spec.baleCollectionMode == true then
+				if UniversalAutoload.showDebug then print("baleCollectionMode: trailerIsFull") end
+				UniversalAutoload.setBaleCollectionMode(self, false)
+			end
+			if UniversalAutoload.showDebug then print("FULL - NO MORE ROOM") end
 		end
-		if UniversalAutoload.showDebug then print("FULL - NO MORE ROOM") end
 		if UniversalAutoload.showDebug then print("===============================") end
 	end
 end

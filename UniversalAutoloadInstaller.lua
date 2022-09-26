@@ -31,6 +31,7 @@ UniversalAutoload.ACTIONS = {
 	["UNLOAD_ALL"]             = "UNIVERSALAUTOLOAD_UNLOAD_ALL",
 	["TOGGLE_TIPSIDE"]         = "UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE",
 	["TOGGLE_FILTER"]          = "UNIVERSALAUTOLOAD_TOGGLE_FILTER",
+	["TOGGLE_HORIZONTAL"]      = "UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL",
 	["CYCLE_MATERIAL_FW"]      = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW",
 	["CYCLE_MATERIAL_BW"]      = "UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW",
 	["SELECT_ALL_MATERIALS"]   = "UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS",
@@ -226,6 +227,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
 					config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
 					config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
+					config.horizontalLoading = xmlFile:getValue(configKey..".options#horizontalLoading", false)
 					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 					config.disableHeightLimit = xmlFile:getValue(configKey..".options#disableHeightLimit", false)
 					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)

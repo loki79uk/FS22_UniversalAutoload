@@ -626,6 +626,7 @@ v1.0.2.0
 		<action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+		<action name="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
@@ -652,6 +653,9 @@ v1.0.2.0
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
+		</actionBinding>
+		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" >
+			<binding device="KB_MOUSE_DEFAULT" input="" />
 		</actionBinding>
 		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" >
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
@@ -763,6 +767,18 @@ v1.0.2.0
 			<es>Cambiar filtro de carga</es>
 			<br>Filtro de carregamento</br>
 			<cs>切换装载过滤器</cs>
+		</text>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL">
+			<en>Toggle horizontal loading</en>
+			<de>Horizontales Laden umschalten</de>
+			<fr>Basculement du chargement horizontal</fr>
+			<ru>Переключение горизонтальной загрузки</ru>
+			<nl>Toggle horizontaal laden</nl>
+			<cz>Přepínání horizontálního zatížení</cz>
+			<pl>Przełączanie ładowania poziomego</pl>
+			<es>Alternar carga horizontal</es>
+			<br>Alternar carregamento horizontal</br>
+			<cs>切换水平装载</cs>
 		</text>
 		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
 			<en>Change selected material type (next)</en>
@@ -1004,6 +1020,42 @@ v1.0.2.0
 			<es>Filtro de carga</es>
 			<br>Filtro de carregamento</br>
 			<cs>装载过滤器</cs>
+		</text>
+		<text name="universalAutoload_loadingMethod">
+			<en>Loading Method</en>
+			<de>Ladeverfahren</de>
+			<fr>Méthode de chargement</fr>
+			<ru>Способ загрузки</ru>
+			<nl>Laadmethode</nl>
+			<cz>Způsob nakládky</cz>
+			<pl>Metoda ładowania</pl>
+			<es>Método de carga</es>
+			<br>Método de carregamento</br>
+			<cs>装载方法</cs>
+		</text>
+		<text name="universalAutoload_layer">
+			<en>Layer</en>
+			<de>Ebene</de>
+			<fr>Couche</fr>
+			<ru>Слой</ru>
+			<nl>Laag</nl>
+			<cz>Vrstva</cz>
+			<pl>Warstwa</pl>
+			<es>Capa</es>
+			<br>Camada</br>
+			<cs>层数</cs>
+		</text>
+		<text name="universalAutoload_stack">
+			<en>Stack</en>
+			<de>Stapel</de>
+			<fr>Pile</fr>
+			<ru>Стек</ru>
+			<nl>Stack</nl>
+			<cz>Stoh</cz>
+			<pl>Stos</pl>
+			<es>Pila</es>
+			<br>Pilha</br>
+			<cs>堆栈</cs>
 		</text>
 		<text name="universalAutoload_fullOnly">
 			<en>Full only</en>

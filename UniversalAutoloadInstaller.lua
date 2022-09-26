@@ -852,7 +852,7 @@ function UniversalAutoloadManager.addAttachedVehicles(vehicle, vehicles)
 		local attachedImplements = vehicle:getAttachedImplements()
 		for _, implement in pairs(attachedImplements) do
 			local spec = implement.object.spec_universalAutoload
-			vehicles[implement.object] = spec ~= nil and spec.isAutoloadEnabled
+			vehicles[implement.object] = spec ~= nil
 			UniversalAutoloadManager.addAttachedVehicles(implement.object, vehicles)
 		end
 	end
@@ -863,7 +863,7 @@ function UniversalAutoloadManager.getAttachedVehicles(vehicle)
 	local vehicles = {}
 	local rootVehicle = vehicle:getRootVehicle()
 	local spec = rootVehicle.spec_universalAutoload
-	vehicles[rootVehicle] = spec ~= nil and spec.isAutoloadEnabled
+	vehicles[rootVehicle] = spec ~= nil
 	UniversalAutoloadManager.addAttachedVehicles(rootVehicle, vehicles)
 	return vehicles
 end
@@ -1128,7 +1128,7 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 
 		superFunc(self, storeItem, vehicle, saleItem)
 		
-		if vehicle.spec_universalAutoload ~= nil and vehicle.spec_universalAutoload.isAutoloadEnabled then
+		if vehicle.spec_universalAutoload ~= nil then
 		
 			local itemElement = self.attributeItem:clone(self.attributesLayout)
 			local iconElement = itemElement:getDescendantByName("icon")

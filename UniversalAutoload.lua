@@ -952,7 +952,7 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	-- print("setBaleCollectionMode: "..self:getFullName().." - "..tostring(baleCollectionMode))
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - setBaleCollectionMode")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - setBaleCollectionMode")
 		return
 	end
 		
@@ -978,7 +978,7 @@ end
 function UniversalAutoload:startLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - startLoading")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - startLoading")
 		return
 	end
 
@@ -1092,6 +1092,8 @@ function UniversalAutoload:startUnloading(noEventSend)
 					spec.resetLoadingPattern = true
 					spec.currentLoadAreaIndex = 1
 					spec.currentLoadingPlace = nil
+					spec.nextLayerHeight = 0
+					spec.currentLayerHeight = 0
 				else
 					spec.partiallyUnloaded = true
 				end
@@ -1774,7 +1776,7 @@ function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil then
 		local spec = self.spec_universalAutoload
 		if spec == nil then
-			print("UAL SPEC WAS NIL - onPostLoad")
+			print(self:getFullName() .. ": UAL SPEC WAS NIL - onPostLoad")
 			return
 		end
 
@@ -1814,7 +1816,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - saveToXMLFile")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - saveToXMLFile")
 		return
 	end
 
@@ -1848,7 +1850,7 @@ function UniversalAutoload:onPreDelete()
 	-- print("UniversalAutoload - onPreDelete")
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onPreDelete")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onPreDelete")
 		return
 	end
 	
@@ -1869,7 +1871,7 @@ function UniversalAutoload:onDelete()
 	-- print("UniversalAutoload - onDelete")
     local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onDelete")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onDelete")
 		return
 	end
 	
@@ -1892,7 +1894,7 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	--if self.isClient and g_dedicatedServer==nil then
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onFoldStateChanged")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onFoldStateChanged")
 		return
 	end
 	
@@ -1905,27 +1907,20 @@ end
 --
 function UniversalAutoload:ualGetIsFolding()
 
-	if self.spec_foldable == nil then
-		print("FOLDABLE SPEC WAS NIL - ualGetIsFolding")
-		return false
-	end
-
-	for _, foldingPart in pairs(self.spec_foldable.foldingParts) do
-		if self:getIsAnimationPlaying(foldingPart.animationName) then
-			return true
+	local isFolding = false
+	if self.spec_foldable ~= nil then
+		for _, foldingPart in pairs(self.spec_foldable.foldingParts) do
+			if self:getIsAnimationPlaying(foldingPart.animationName) then
+				isFolding = true
+			end
 		end
 	end
-	
-	return false
+
+	return isFolding
 end
 --
 function UniversalAutoload:ualGetIsCovered()
 
-	if self.spec_cover == nil then
-		print("COVER SPEC WAS NIL - ualGetIsCovered")
-		return false
-	end
-	
 	if self.spec_cover ~= nil and self.spec_cover.hasCovers then
 		return self.spec_cover.state == 0
 	else
@@ -1935,11 +1930,6 @@ end
 --
 function UniversalAutoload:ualGetIsFilled()
 
-	if self.spec_fillVolume == nil then
-		print("FILL VOLUME SPEC WAS NIL - ualGetIsFilled")
-		return false
-	end
-	
 	local isFilled = false
 	if self.spec_fillVolume ~= nil then
 		for _, fillVolume in ipairs(self.spec_fillVolume.volumes) do
@@ -1966,7 +1956,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 	
 	if isAutoloadEnabled then
 		if spec == nil then
-			print("UAL SPEC WAS NIL - onReadStream")
+			print(self:getFullName() .. ": UAL SPEC WAS NIL - onReadStream")
 			self.spec_universalAutoload = {}
 			spec = self.spec_universalAutoload
 		end
@@ -2045,7 +2035,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onUpdate")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onUpdate")
 		return
 	end
 
@@ -2351,7 +2341,7 @@ function UniversalAutoload:onActivate(isControlling)
 	if UniversalAutoload.showDebug then print("*** "..self:getFullName().." ***") end
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onActivate")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onActivate")
 		return
 	end
 	
@@ -2364,7 +2354,7 @@ function UniversalAutoload:onDeactivate()
 	-- print("onDeactivate: "..self:getFullName())
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - onDeactivate")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - onDeactivate")
 		return
 	end
 	
@@ -2378,7 +2368,7 @@ function UniversalAutoload:determineTipside()
 	-- currently only used for the KRONE Profi Liner Curtain Trailer
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - determineTipside")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - determineTipside")
 		return
 	end
 
@@ -2802,7 +2792,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	end
 	
 	--UPDATE NEW PACKING DIMENSIONS
-	spec.currentLoadHeight = 0
+	spec.currentLoadHeight = 0	
 	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + sizeX > spec.loadArea[i].width then
 		spec.currentLoadWidth = sizeX
 		spec.currentActualWidth = N * sizeX
@@ -2898,10 +2888,12 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 		
 			if UniversalAutoload.getIsLoadingAreaAllowed(self, i) then
 			
+				spec.nextLayerHeight = spec.nextLayerHeight or 0
+				spec.currentLoadHeight = spec.currentLoadHeight or 0
+				spec.currentLayerHeight = spec.currentLayerHeight or 0
+			
 				while spec.currentLoadLength < spec.loadArea[i].length do
-				
-					spec.currentLoadHeight = spec.currentLoadHeight or 0
-					
+
 					local maxLoadAreaHeight = spec.loadArea[i].height
 					if containerType.isBale and spec.loadArea[i].baleHeight ~= nil then
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
@@ -2942,7 +2934,9 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 							((containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
 							or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
 
+						local thisLoadHeight = spec.currentLoadHeight
 						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
+						setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
@@ -2950,8 +2944,6 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 								local increment = 0.1
 								if spec.useHorizontalLoading then
 								
-									local thisLoadHeight = 0
-									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 									while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
 
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
@@ -2968,8 +2960,6 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 									end
 								else
 								
-									local thisLoadHeight = spec.currentLoadHeight
-									setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 									while thisLoadHeight >= -increment do
 									
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
@@ -2988,6 +2978,11 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 							else
 								if containerType.isBale and not spec.zonesOverlap
 								and not spec.partiallyUnloaded and not spec.trailerIsFull then
+								
+									if spec.useHorizontalLoading then
+										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
+									end
+									
 									useThisLoadSpace = true
 								else
 									if not spec.trailerIsFull then
@@ -3003,6 +2998,9 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 									spec.currentLoadingPlace = nil
 								end
 								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+								spec.nextLayerHeight = math.max(spec.currentLayerHeight + spec.currentLoadHeight, spec.nextLayerHeight)
+								-- print("nextLayerHeight:" .. spec.nextLayerHeight)
+								
 								if UniversalAutoload.showDebug then print("USING LOAD PLACE - height: " .. tostring(spec.currentLoadHeight)) end
 								return thisLoadPlace
 							end
@@ -3023,8 +3021,12 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 		if spec.useHorizontalLoading and count < 4 then
 			if UniversalAutoload.showDebug then print("START NEW LAYER " .. count) end
 			spec.currentLoadingPlace = nil
+			spec.currentLayerHeight = spec.nextLayerHeight
+			-- print("currentLayerHeight:" .. spec.currentLayerHeight)
 			return UniversalAutoload.getLoadPlace(self, containerType, object, count+1)
 		else
+			spec.nextLayerHeight = 0
+			spec.currentLayerHeight = 0
 			spec.currentLoadAreaIndex = 1
 			spec.trailerIsFull = true
 			if spec.baleCollectionMode == true then
@@ -3067,7 +3069,7 @@ end
 function UniversalAutoload:getIsLoadingKeyAllowed()
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - getIsLoadingKeyAllowed")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - getIsLoadingKeyAllowed")
 		return
 	end
 
@@ -3083,7 +3085,7 @@ end
 function UniversalAutoload:getIsUnloadingKeyAllowed()
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - getIsUnloadingKeyAllowed")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - getIsUnloadingKeyAllowed")
 		return
 	end
 
@@ -3112,7 +3114,7 @@ end
 function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - getIsLoadingVehicleAllowed")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - getIsLoadingVehicleAllowed")
 		return false
 	end
 	
@@ -3176,7 +3178,7 @@ end
 function UniversalAutoload:getIsLoadingAreaAllowed(i)
 	local spec = self.spec_universalAutoload
 	if spec == nil then
-		print("UAL SPEC WAS NIL - getIsLoadingAreaAllowed")
+		print(self:getFullName() .. ": UAL SPEC WAS NIL - getIsLoadingAreaAllowed")
 		return false
 	end
 	

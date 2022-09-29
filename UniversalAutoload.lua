@@ -2406,10 +2406,22 @@ function UniversalAutoload:isValidForLoading(object)
 	if object.isRoundbale ~= nil and object.mountObject then
 		return false
 	end
+	if object.spec_umbilicalReelOverload ~= nil and object.spec_umbilicalReelOverload.isOverloading then
+		return false
+	end
 	
-	return UniversalAutoload.getPalletIsSelectedMaterial(self, object) and UniversalAutoload.getPalletIsSelectedContainer(self, object) and 
-	(spec.autoLoadingObjects[object] ~= nil or ( spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object) )) and
-	(UniversalAutoload.manualLoadingOnly or (not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object))) )
+	local isSelectedMaterial = UniversalAutoload.getPalletIsSelectedMaterial(self, object)
+	local isSelectedContainer = UniversalAutoload.getPalletIsSelectedContainer(self, object)
+	local isBeingManuallyLoaded = spec.autoLoadingObjects[object] ~= nil
+	local isValidLoadSide = spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object)
+	local isValidLoadFilter = not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object))
+	-- print("isSelectedMaterial: " .. tostring( isSelectedMaterial ))
+	-- print("isSelectedContainer: " .. tostring(  isSelectedContainer ))
+	-- print("isBeingManuallyLoaded: " .. tostring(  isBeingManuallyLoaded ))
+	-- print("isValidLoadSide: " .. tostring(  isValidLoadSide ))
+	-- print("isValidLoadFilter: " .. tostring(  isValidLoadFilter ))
+
+	return isSelectedMaterial and isSelectedContainer and (isBeingManuallyLoaded or isValidLoadSide) and (UniversalAutoload.manualLoadingOnly or isValidLoadFilter)
 end
 --
 function UniversalAutoload:isValidForUnloading(object)
@@ -2978,11 +2990,9 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 							else
 								if containerType.isBale and not spec.zonesOverlap
 								and not spec.partiallyUnloaded and not spec.trailerIsFull then
-								
 									if spec.useHorizontalLoading then
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
 									end
-									
 									useThisLoadSpace = true
 								else
 									if not spec.trailerIsFull then
@@ -4040,8 +4050,9 @@ function UniversalAutoload.getMaterialType(object)
 		if object.fillType ~= nil then
 			return object.fillType
 		elseif object.spec_fillUnit ~= nil and next(object.spec_fillUnit.fillUnits) ~= nil then
-			local fillUnitIndex = object.spec_fillUnit.fillUnits[1].fillType
-			return fillUnitIndex
+			return object.spec_fillUnit.fillUnits[1].fillType
+		elseif object.spec_umbilicalReelOverload ~= nil then
+			return g_fillTypeManager:getFillTypeIndexByName("UMBILICAL_HOSE")
 		end
 	end
 end

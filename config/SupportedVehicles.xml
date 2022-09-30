@@ -12,19 +12,21 @@
         <vehicleConfiguration configFileName="data/vehicles/fliegl/dts59/dts59.xml">
             <loadingArea offset="0 1.205 -1.5" width="2.30" height="2.10" length="5.0" baleHeight="2.8"/>
             <loadingArea offset="0 1.392 1.80" width="2.30" height="1.95" length="1.4" baleHeight="2.8"/>
+			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/bremerMaschinenbau/transportwagen/transportwagen.xml">
             <loadingArea offset="0 0.515 -0.265" width="2.30" height="2.10" length="4.75" baleHeight="2.5"/>
+			<options isBaleTrailer="false"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/demco/steelDropDeck/steelDropDeck.xml">
             <loadingArea offset="0 1.010 -0.33" width="2.42" height="2.25" length="11.2" baleHeight="2.8"/>
             <loadingArea offset="0 1.500 6.975" width="2.42" height="2.25" length="3.20" baleHeight="2.8"/>
-			<options enableRearLoading="true" enableSideLoading="true"/>
+			<options isBaleTrailer="false" enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/lodeKing/renownTriAxleBeavertailLowDrop/renownTriAxleBeavertailLowDrop.xml">
             <loadingArea offset="0 1.010 -1.00" width="2.42" height="2.25" length="11.1" baleHeight="2.8"/>
             <loadingArea offset="0 1.620 6.235" width="2.42" height="2.25" length="3.20" baleHeight="2.8"/>
-			<options enableRearLoading="true" enableSideLoading="true"/>
+			<options isBaleTrailer="false" enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/krone/profiLiner/profiLiner.xml">
             <loadingArea offset="0 1.185 -0.1" width="2.40" height="2.50" length="13.2"/>
@@ -63,7 +65,7 @@
 		
 		<!-- SUPPORTED VEHICLES -->
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup1986/pickup1986.xml">
-            <options zonesOverlap="true" rearUnloadingOnly="true"/>
+            <options isBaleTrailer="false" zonesOverlap="true" rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.810 -0.450" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.225" width="1.00" height="1.60" length="2.35" baleHeight="1.85"/>
             <loadingArea offset="0 0.810 -1.650" width="1.00" height="1.60" length="1.50" baleHeight="1.85"/>
@@ -71,7 +73,7 @@
             <loadingArea offset="0 0.810 -1.262" width="1.00" height="1.60" length="0.774" baleHeight="1.85"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/lizard/pickup2017/pickup2017.xml">
-            <options zonesOverlap="true" rearUnloadingOnly="true"/>
+            <options isBaleTrailer="false" zonesOverlap="true" rearUnloadingOnly="true"/>
             <loadingArea offset="0 0.763 -0.625" width="1.45" height="1.60" length="0.85" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.370" width="1.10" height="1.60" length="2.25" baleHeight="1.85"/>
             <loadingArea offset="0 0.763 -1.775" width="1.10" height="1.60" length="1.45" baleHeight="1.85"/>
@@ -89,7 +91,7 @@
 		
 		<!-- SUPPORTED TRAIN CARRIAGES -->
 		<vehicleConfiguration configFileName="data/vehicles/train/wagonVehicles/wagonVehicles.xml">
-			<options disableHeightLimit="true"/>
+			<options isBaleTrailer="false" disableHeightLimit="true"/>
             <loadingArea offset="0 1.328 -10.625" width="2.85" height="3.35" length="24.9" baleHeight="4.00"/>
         </vehicleConfiguration>
 		

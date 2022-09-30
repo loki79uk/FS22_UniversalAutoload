@@ -138,6 +138,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteLoadedObject_Callback", UniversalAutoload.ualOnDeleteLoadedObject_Callback)
     SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAvailableObject_Callback", UniversalAutoload.ualOnDeleteAvailableObject_Callback)
     SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAutoLoadingObject_Callback", UniversalAutoload.ualOnDeleteAutoLoadingObject_Callback)
+    SpecializationUtil.registerFunction(vehicleType, "ualTestLocation_Callback", UniversalAutoload.ualTestLocation_Callback)
     SpecializationUtil.registerFunction(vehicleType, "ualTestUnloadLocation_Callback", UniversalAutoload.ualTestUnloadLocation_Callback)
     SpecializationUtil.registerFunction(vehicleType, "ualTestLocationOverlap_Callback", UniversalAutoload.ualTestLocationOverlap_Callback)
     SpecializationUtil.registerFunction(vehicleType, "ualPlayerTrigger_Callback", UniversalAutoload.ualPlayerTrigger_Callback)
@@ -1467,6 +1468,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.boughtConfig = selectedConfigs
 						spec.loadArea = {}
 						local j = 0
+						local hasBaleHeight = false
 						while true do
 							local loadAreaKey = string.format("%s.loadingArea(%d)", key, j)
 							if not xmlFile:hasProperty(loadAreaKey) then
@@ -1482,10 +1484,11 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 							spec.loadArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
 							spec.loadArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
+							hasBaleHeight = hasBaleHeight or type(spec.loadArea[j+1].baleHeight) == 'number'
 							j = j + 1
 						end
 						spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
-						spec.isBaleTrailer = xmlFile:getValue(key..".options#isBaleTrailer", false)
+						spec.isBaleTrailer = xmlFile:getValue(key..".options#isBaleTrailer", hasBaleHeight)
 						spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
 						spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
 						spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)

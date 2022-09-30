@@ -199,6 +199,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.xmlFilename = validXmlFilename
 					
 					local j = 0
+					local hasBaleHeight = false
 					while true do
 						local loadAreaKey = string.format("%s.loadingArea(%d)", configKey, j)
 						if not xmlFile:hasProperty(loadAreaKey) then
@@ -214,11 +215,12 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 						config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
 						config.loadingArea[j+1].noLoadingIfUncovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfUncovered", false)
+						hasBaleHeight = hasBaleHeight or type(config.loadingArea[j+1].baleHeight) == 'number'
 						j = j + 1
 					end
 						
 					config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
-					config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", false)
+					config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", hasBaleHeight)
 					config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 					config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 					config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)

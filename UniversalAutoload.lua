@@ -2442,6 +2442,10 @@ function UniversalAutoload.isValidForManualLoading(object)
 		if g_currentMission.player.pickedUpObject == rootNode then
 			return true
 		end
+		if object.isSplitShape then
+			print("split shape root node: " .. tostring(rootNode))
+			return true
+		end
 	end
 end
 --
@@ -2592,7 +2596,7 @@ function UniversalAutoload:loadObject(object)
 		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
 
-			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, spec.baleCollectionMode) then
+			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, spec.baleCollectionMode) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 				
@@ -2615,7 +2619,7 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 	-- print("UniversalAutoload - unloadObject")
 	if object ~= nil and UniversalAutoload.isValidForUnloading(self, object) then
 	
-		if UniversalAutoload.moveObjectNodes(self, object, unloadPlace) then
+		if UniversalAutoload.moveObjectNodes(self, object, unloadPlace, false) then
 			UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			UniversalAutoload.addAvailableObject(self, object)
 			return true
@@ -3413,6 +3417,11 @@ function UniversalAutoload.getNodeObject( objectId )
 end
 --
 function UniversalAutoload.getSplitShapeObject( objectId )
+
+	if not entityExists(objectId) then
+		UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] = nil
+		return
+	end
 	
 	if getRigidBodyType(objectId) == RigidBodyType.DYNAMIC then
 	
@@ -3469,10 +3478,10 @@ end
 function UniversalAutoload.getObjectPositionNode( object )
 	local node = UniversalAutoload.getObjectRootNode(object)
 	if node == nil or not entityExists(node) then
-		-- print("************************************")
-		-- print("*** getObjectPositionNode == NIL ***")
-		-- DebugUtil.printTableRecursively(object, "--", 0, 1)
-		-- print("************************************")
+		print("************************************")
+		print("*** getObjectPositionNode == NIL ***")
+		DebugUtil.printTableRecursively(object, "--", 0, 1)
+		print("************************************")
 		return
 	end
 	if object.isSplitShape and object.positionNodeId then
@@ -3602,7 +3611,7 @@ function UniversalAutoload:addBaleModeBale(node)
 	setRotation(node, rx, ry, rz)
 end
 --
-function UniversalAutoload:moveObjectNodes( object, position, baleMode )
+function UniversalAutoload:moveObjectNodes( object, position, isLoading, baleMode )
 
 	local rootNodes = UniversalAutoload.getRootNodes(object)
 	local node = rootNodes[1]
@@ -3624,8 +3633,8 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 			-- print(string.format("Y %f, %f, %f",yx,yy,yz))
 			-- print(string.format("Z %f, %f, %f",zx,zy,zz))
 			
-			if not object.isLoaded then
-				object.isLoaded = true
+			-- IF OBJECT IS NOT ALREADY LOADED
+			if isLoading then
 				local rx,ry,rz = localRotationToWorld(position.node, 0, 0, s*math.pi/2)
 				-- print(string.format("R %f, %f, %f",rx,ry,rz))
 				
@@ -3640,8 +3649,6 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 				n[1].x = n[1].x + xx*X + yx*Y + zx*Z
 				n[1].y = n[1].y + xy*X + yy*Y + zy*Z
 				n[1].z = n[1].z + xz*X + yz*Y + zz*Z
-			else
-				object.isLoaded = false
 			end
 
 		end

@@ -2586,6 +2586,9 @@ function UniversalAutoload:loadObject(object)
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
+		
+		if UniversalAutoload.showDebug then print("") end
+					
 		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
 
@@ -2692,7 +2695,7 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 				break
 			end
 		end
-		if not thisAreaClear then
+		if not thisAreaClear and not object.isSplitShape then
 			spec.unloadingAreaClear = false
 		end
 	end
@@ -2960,9 +2963,7 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 								if spec.useHorizontalLoading then
 								
 									while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
-
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-									
 										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
 										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
 										then
@@ -2970,15 +2971,12 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 											useThisLoadSpace = true
 											break
 										end
-										-- print("Not empty OR no pallet found below position")
 										thisLoadHeight = thisLoadHeight + increment
 									end
 								else
 								
 									while thisLoadHeight >= -increment do
-									
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-									
 										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
 										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
 										then
@@ -2986,15 +2984,16 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 											useThisLoadSpace = true
 											break
 										end
-										-- print("Not empty OR no pallet found below position")
 										thisLoadHeight = thisLoadHeight - increment
 									end
 								end
 							else
 								if containerType.isBale and not spec.zonesOverlap
 								and not spec.partiallyUnloaded and not spec.trailerIsFull then
+								
 									if spec.useHorizontalLoading then
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
+										if UniversalAutoload.showDebug then print("useHorizontalLoading: " .. spec.currentLayerHeight) end
 									end
 									useThisLoadSpace = true
 								else
@@ -3007,12 +3006,13 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 							end
 							
 							if useThisLoadSpace then
+								-- UniversalAutoload.testLocation(self)
 								if containerType.neverStack then
 									spec.currentLoadingPlace = nil
 								end
 								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
 								spec.nextLayerHeight = math.max(spec.currentLayerHeight + spec.currentLoadHeight, spec.nextLayerHeight)
-								-- print("nextLayerHeight:" .. spec.nextLayerHeight)
+								if UniversalAutoload.showDebug then print("nextLayerHeight: " .. spec.nextLayerHeight) end
 								
 								if UniversalAutoload.showDebug then print("USING LOAD PLACE - height: " .. tostring(spec.currentLoadHeight)) end
 								return thisLoadPlace
@@ -3031,16 +3031,17 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 				spec.currentLoadAreaIndex = i
 			end
 		end
+		spec.currentLoadAreaIndex = 1
 		if spec.useHorizontalLoading and count < 4 then
 			if UniversalAutoload.showDebug then print("START NEW LAYER " .. count) end
 			spec.currentLoadingPlace = nil
 			spec.currentLayerHeight = spec.nextLayerHeight
-			-- print("currentLayerHeight:" .. spec.currentLayerHeight)
+			spec.nextLayerHeight = 0
+			if UniversalAutoload.showDebug then print("currentLayerHeight: " .. spec.currentLayerHeight) end
 			return UniversalAutoload.getLoadPlace(self, containerType, object, count+1)
 		else
 			spec.nextLayerHeight = 0
 			spec.currentLayerHeight = 0
-			spec.currentLoadAreaIndex = 1
 			spec.trailerIsFull = true
 			if spec.baleCollectionMode == true then
 				if UniversalAutoload.showDebug then print("baleCollectionMode: trailerIsFull") end
@@ -3330,6 +3331,80 @@ function UniversalAutoload:ualTestUnloadLocation_Callback(hitObjectId, x, y, z, 
 	end
 	return true
 end
+--
+function UniversalAutoload:testLocation(loadPlace)
+	local spec = self.spec_universalAutoload
+	local i = spec.currentLoadAreaIndex or 1
+	local r = 0.025
+	
+	local sizeX, sizeY, sizeZ
+	local x, y, z
+	local rx, ry, rz
+	local dx, dy, dz
+	if loadPlace == nil then
+		sizeX, sizeY, sizeZ = spec.loadArea[i].width/2, spec.loadArea[i].height/2, spec.loadArea[i].length/2
+		x, y, z = localToWorld(spec.loadArea[i].rootNode, 0, 0, 0)
+		rx, ry, rz = getWorldRotation(spec.loadArea[i].rootNode)
+		dx, dy, dz = localDirectionToWorld(spec.loadArea[i].rootNode, 0, sizeY, 0)
+	else
+		sizeX, sizeY, sizeZ = (loadPlace.sizeX/2)-r, (loadPlace.sizeY/2)-r, (loadPlace.sizeZ/2)-r
+		x, y, z = localToWorld(loadPlace.node, 0, 0, 0)
+		rx, ry, rz = getWorldRotation(loadPlace.node)
+		dx, dy, dz = localDirectionToWorld(loadPlace.node, 0, sizeY, 0)
+	end
+
+	local FLAGS = {}
+	for name, value in pairs(CollisionFlag) do
+		if type(value) == 'number' then
+			local flag = {}
+			flag.name = name
+			flag.value = value
+			table.insert(FLAGS, flag)
+		end
+	end
+	table.sort(FLAGS, function (a, b) return a.value < b.value end)
+	
+	for i, flag in ipairs(FLAGS) do
+		spec.foundObject = false
+		
+		local collisionMask = flag.value
+		overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocation_Callback", self, collisionMask, true, false, true)
+		
+		print(flag.name .. " = " .. tostring(spec.foundObject))
+	end	
+
+	if UniversalAutoload.showDebug then
+		if spec.testLocation == nil then
+			spec.testLocation = {}
+		end
+		spec.testLocation.node = loadPlace and loadPlace.node or spec.loadArea[i].rootNode
+		spec.testLocation.sizeX = 2*sizeX
+		spec.testLocation.sizeY = 2*sizeY
+		spec.testLocation.sizeZ = 2*sizeZ
+	end
+
+	return spec.foundObject
+end
+--
+function UniversalAutoload:ualTestLocation_Callback(hitObjectId, x, y, z, distance)
+	
+    if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
+        local spec = self.spec_universalAutoload
+        local object = UniversalAutoload.getNodeObject(hitObjectId)
+
+        if object ~= nil and object ~= self and UniversalAutoload.getIsValidObject(self, object) then
+			if UniversalAutoload.showDebug then
+				if object.isSplitShape then
+					print("  FOUND SPLIT SHAPE")
+				else
+					print("  FOUND: " .. object.i3dFilename)
+				end
+			end
+            spec.foundObject = true
+        end
+    end
+end
+--
 
 -- OBJECT MOVEMENT FUNCTIONS
 function UniversalAutoload.getNodeObject( objectId )
@@ -3382,8 +3457,6 @@ function UniversalAutoload.getSplitShapeObject( objectId )
 				logObject.fillType = FillType.WOOD
 				
 				UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] = logObject
-				
-				print("CREATED OBJECT "..tostring(logObject))
 			end
 			
 			return UniversalAutoload.SPLITSHAPES_LOOKUP[objectId]
@@ -3394,10 +3467,18 @@ end
 --
 --
 function UniversalAutoload.getObjectPositionNode( object )
+	local node = UniversalAutoload.getObjectRootNode(object)
+	if node == nil or not entityExists(node) then
+		-- print("************************************")
+		-- print("*** getObjectPositionNode == NIL ***")
+		-- DebugUtil.printTableRecursively(object, "--", 0, 1)
+		-- print("************************************")
+		return
+	end
 	if object.isSplitShape and object.positionNodeId then
 		return object.positionNodeId
 	else
-		return UniversalAutoload.getObjectRootNode( object )
+		return node
 	end
 end
 --
@@ -3415,19 +3496,23 @@ end
 --
 function UniversalAutoload.unlinkObject( object )
 	local node = UniversalAutoload.getObjectRootNode(object)
-	local x, y, z = localToWorld(node, 0, 0, 0)
-	local rx, ry, rz = getWorldRotation(node, 0, 0, 0)
-	link(getRootNode(), node)
-	setWorldTranslation(node, x, y, z)
-	setWorldRotation(node, rx, ry, rz)
+	if node ~= nil then
+		local x, y, z = localToWorld(node, 0, 0, 0)
+		local rx, ry, rz = getWorldRotation(node, 0, 0, 0)
+		link(getRootNode(), node)
+		setWorldTranslation(node, x, y, z)
+		setWorldRotation(node, rx, ry, rz)
+	end
 end
 --
 function UniversalAutoload.moveObjectNode( node, p )
-	if p.x ~= nil then
-		setWorldTranslation(node, p.x, p.y, p.z)
-	end
-	if p.rx ~= nil then
-		setWorldRotation(node, p.rx, p.ry, p.rz)
+	if node ~= nil then
+		if p.x ~= nil then
+			setWorldTranslation(node, p.x, p.y, p.z)
+		end
+		if p.rx ~= nil then
+			setWorldRotation(node, p.rx, p.ry, p.rz)
+		end
 	end
 end
 --
@@ -3535,14 +3620,14 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 			local xx,xy,xz = localDirectionToWorld(position.node, s, 0, 0) --length
 			local yx,yy,yz = localDirectionToWorld(position.node, 0, 1, 0) --height
 			local zx,zy,zz = localDirectionToWorld(position.node, 0, 0, 0) --width
-			print(string.format("X %f, %f, %f",xx,xy,xz))
-			print(string.format("Y %f, %f, %f",yx,yy,yz))
-			print(string.format("Z %f, %f, %f",zx,zy,zz))
+			-- print(string.format("X %f, %f, %f",xx,xy,xz))
+			-- print(string.format("Y %f, %f, %f",yx,yy,yz))
+			-- print(string.format("Z %f, %f, %f",zx,zy,zz))
 			
 			if not object.isLoaded then
 				object.isLoaded = true
 				local rx,ry,rz = localRotationToWorld(position.node, 0, 0, s*math.pi/2)
-				print(string.format("R %f, %f, %f",rx,ry,rz))
+				-- print(string.format("R %f, %f, %f",rx,ry,rz))
 				
 				n[1].rx = rx
 				n[1].ry = ry
@@ -3551,7 +3636,7 @@ function UniversalAutoload:moveObjectNodes( object, position, baleMode )
 				local X = object.sizeY/2
 				local Y = object.sizeX/2
 				local Z = object.sizeZ/2
-				print(string.format("D %f, %f, %f", X, Y, Z))
+				-- print(string.format("D %f, %f, %f", X, Y, Z))
 				n[1].x = n[1].x + xx*X + yx*Y + zx*Z
 				n[1].y = n[1].y + xy*X + yy*Y + zy*Z
 				n[1].z = n[1].z + xz*X + yz*Y + zz*Z

@@ -229,9 +229,9 @@ end
 
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS
 UniversalAutoload.lastClosestVehicle = nil
-function UniversalAutoload:OverwrittenUpdateObjects(superFunc)
+function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 
-	superFunc(self)
+	superFunc(self, ...)
 		
 	if self.mission.player.isControlled and not g_gui:getIsGuiVisible() then
 		-- print("Player Is Controlled")
@@ -1096,6 +1096,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 					spec.currentLoadAreaIndex = 1
 					spec.currentLoadingPlace = nil
 					spec.nextLayerHeight = 0
+					spec.currentLayerCount = 0
 					spec.currentLayerHeight = 0
 				else
 					spec.partiallyUnloaded = true
@@ -2295,7 +2296,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							for _ = 1, #spec.sortedObjectsToLoad do
 								local nextObject = spec.sortedObjectsToLoad[i]
 								if lastObjectType == UniversalAutoload.getContainerType(nextObject) then
-									-- print("DELETE SAME OBJECT TYPE: "..lastObjectType.name)
+									if UniversalAutoload.showDebug then print("DELETE SAME OBJECT TYPE: "..lastObjectType.name) end
 									table.remove(spec.sortedObjectsToLoad, i)
 								else
 									i = i + 1
@@ -2596,7 +2597,7 @@ function UniversalAutoload:loadObject(object)
 		local containerType = UniversalAutoload.getContainerType(object)
 		
 		if UniversalAutoload.showDebug then print("") end
-					
+		
 		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
 
@@ -2896,7 +2897,7 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.resetLoadingPattern = false
 end
 --
-function UniversalAutoload:getLoadPlace(containerType, object, count)
+function UniversalAutoload:getLoadPlace(containerType, object)
     local spec = self.spec_universalAutoload
 	count = count or 1
 	
@@ -2916,6 +2917,7 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 			
 				spec.nextLayerHeight = spec.nextLayerHeight or 0
 				spec.currentLoadHeight = spec.currentLoadHeight or 0
+				spec.currentLayerCount = spec.currentLayerCount or 0
 				spec.currentLayerHeight = spec.currentLayerHeight or 0
 			
 				while spec.currentLoadLength < spec.loadArea[i].length do
@@ -2937,8 +2939,11 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 						end
 					end
 
-					if spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight then
-						if object.isSplitShape or (containerType.isBale and not spec.zonesOverlap) or (spec.currentLoadingPlace
+					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
+					local layerOverMaxHeight = spec.useHorizontalLoading and spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
+
+					if loadOverMaxHeight then
+						if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or (spec.currentLoadingPlace
 						and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
 							if UniversalAutoload.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
 							spec.currentLoadingPlace = nil
@@ -2947,14 +2952,14 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 						end
 					end
 					
-					if not spec.currentLoadingPlace or spec.useHorizontalLoading then
+					if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) then
 						if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
 						containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
 						UniversalAutoload.createLoadingPlace(self, containerType)
 					end
 
 					local thisLoadPlace = spec.currentLoadingPlace
-					if thisLoadPlace ~= nil then
+					if thisLoadPlace ~= nil and not layerOverMaxHeight then
 					
 						local containerFitsInLoadSpace = containerType.flipYZ == thisLoadPlace.flipYZ and
 							((containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
@@ -3003,6 +3008,7 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
 										if UniversalAutoload.showDebug then print("useHorizontalLoading: " .. spec.currentLayerHeight) end
 									end
+									spec.currentLoadHeight = spec.currentLayerHeight
 									useThisLoadSpace = true
 								else
 									if not spec.trailerIsFull then
@@ -3019,7 +3025,7 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 									spec.currentLoadingPlace = nil
 								end
 								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
-								spec.nextLayerHeight = math.max(spec.currentLayerHeight + spec.currentLoadHeight, spec.nextLayerHeight)
+								spec.nextLayerHeight = math.max(spec.currentLoadHeight, spec.nextLayerHeight)
 								if UniversalAutoload.showDebug then print("nextLayerHeight: " .. spec.nextLayerHeight) end
 								
 								if UniversalAutoload.showDebug then print("USING LOAD PLACE - height: " .. tostring(spec.currentLoadHeight)) end
@@ -3037,19 +3043,22 @@ function UniversalAutoload:getLoadPlace(containerType, object, count)
 			if #spec.loadArea > 1 and i <= #spec.loadArea then
 				if UniversalAutoload.showDebug then print("TRY NEXT LOADING AREA ("..tostring(i)..")...") end
 				spec.currentLoadAreaIndex = i
+				spec.nextLayerHeight = 0
+				spec.currentLayerHeight = 0
 			end
 		end
 		spec.currentLoadAreaIndex = 1
-		if spec.useHorizontalLoading and count < 4 then
-			if UniversalAutoload.showDebug then print("START NEW LAYER " .. count) end
+		if spec.useHorizontalLoading and spec.currentLayerCount < 4
+		and not (spec.baleCollectionMode and spec.nextLayerHeight == 0) then
+			spec.currentLayerCount = spec.currentLayerCount + 1
 			spec.currentLoadingPlace = nil
 			spec.currentLayerHeight = spec.nextLayerHeight
 			spec.nextLayerHeight = 0
+			if UniversalAutoload.showDebug then print("START NEW LAYER") end
+			if UniversalAutoload.showDebug then print("currentLayerCount: " .. spec.currentLayerCount) end
 			if UniversalAutoload.showDebug then print("currentLayerHeight: " .. spec.currentLayerHeight) end
-			return UniversalAutoload.getLoadPlace(self, containerType, object, count+1)
+			return UniversalAutoload.getLoadPlace(self, containerType, object)
 		else
-			spec.nextLayerHeight = 0
-			spec.currentLayerHeight = 0
 			spec.trailerIsFull = true
 			if spec.baleCollectionMode == true then
 				if UniversalAutoload.showDebug then print("baleCollectionMode: trailerIsFull") end
@@ -3785,6 +3794,9 @@ function UniversalAutoload:removeLoadedObject(object)
 		if next(spec.loadedObjects) == nil then
 			spec.resetLoadingPattern = true
 			spec.currentLoadAreaIndex = 1
+			spec.nextLayerHeight = 0
+			spec.currentLayerCount = 0
+			spec.currentLayerHeight = 0
 		end
 		return true
 	end
@@ -3808,7 +3820,6 @@ function UniversalAutoload:addAvailableObject(object)
 		end
 		
 		if spec.isLoading and UniversalAutoload.isValidForLoading(self, object) then
-			print("ADDING OBJECT")
 			table.insert(spec.sortedObjectsToLoad, object)
 		end
 		
@@ -4009,6 +4020,9 @@ function UniversalAutoload:clearLoadedObjects()
 		UniversalAutoload.resetLoadingPattern(self)
 		spec.trailerIsFull = false
 		spec.partiallyUnloaded = false
+		spec.nextLayerHeight = 0
+		spec.currentLayerCount = 0
+		spec.currentLayerHeight = 0
 	end
 	return palletCount, balesCount
 end

@@ -333,40 +333,7 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 		-- print( "  >> " .. xmlFilename )
 		
 		if customEnvironment ~= nil then
-			local objectName = UniversalAutoload.getObjectNameFromXml(xmlFilename)
-			local customName = customEnvironment..":"..objectName
-
-			if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] ~= nil then
-				-- print("FOUND CUSTOM CONFIG FOR " .. xmlFilename)
-				return
-			end
-			
-			if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName] ~= nil then
-				-- print("USING BASE CONFIG FOR " .. xmlFilename)
-				
-				UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] = {}
-				newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName]
-				oldType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName]
-
-				newType.name = customName
-				newType.type = oldType.type
-				newType.containerIndex = oldType.containerIndex
-				newType.sizeX = oldType.sizeX
-				newType.sizeY = oldType.sizeY
-				newType.sizeZ = oldType.sizeZ
-				newType.isBale = oldType.isBale
-				newType.flipYZ = oldType.flipYZ
-				newType.neverStack = oldType.neverStack
-				newType.neverRotate = oldType.neverRotate
-				newType.alwaysRotate = oldType.alwaysRotate
-
-				if oldType.isBale then
-					newType.width = oldType.width
-					newType.length = oldType.length
-				end
-				print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ, newType.type ))
-				return
-			end
+			UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, customEnvironment)
 		end
 		
 		local loadedVehicleXML = false
@@ -386,6 +353,44 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 			xmlFile:delete()
 		end
 
+	end
+end
+--
+function UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, customEnvironment)
+
+	local objectName = UniversalAutoload.getObjectNameFromXml(xmlFilename)
+	local customName = customEnvironment..":"..objectName
+
+	if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] ~= nil then
+		print("FOUND CUSTOM CONFIG FOR " .. xmlFilename)
+		return
+	end
+	
+	if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName] ~= nil then
+		print("USING BASE CONFIG FOR " .. xmlFilename)
+		
+		UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] = {}
+		newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName]
+		oldType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName]
+
+		newType.name = customName
+		newType.type = oldType.type
+		newType.containerIndex = oldType.containerIndex
+		newType.sizeX = oldType.sizeX
+		newType.sizeY = oldType.sizeY
+		newType.sizeZ = oldType.sizeZ
+		newType.isBale = oldType.isBale
+		newType.flipYZ = oldType.flipYZ
+		newType.neverStack = oldType.neverStack
+		newType.neverRotate = oldType.neverRotate
+		newType.alwaysRotate = oldType.alwaysRotate
+
+		if oldType.isBale then
+			newType.width = oldType.width
+			newType.length = oldType.length
+		end
+		print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ, newType.type ))
+		return
 	end
 end
 --

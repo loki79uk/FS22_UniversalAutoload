@@ -4121,8 +4121,15 @@ function UniversalAutoload.getContainerType(object)
 	local objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 	if objectType == nil then
 		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
-			UniversalAutoload.UNKNOWN_TYPES[name] = true
-			print("*** UNIVERSAL AUTOLOAD - UNKNOWN OBJECT TYPE: ".. name.." ***")
+			if object.xmlFilename and object.customEnvironment then
+				print("*** UNIVERSAL AUTOLOAD - importUnknownSpecFromExisting: ".. name.." ***")
+				UniversalAutoloadManager.importUnknownSpecFromExisting(object.xmlFilename, object.customEnvironment)
+				objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+			end
+			if objectType == nil then
+				UniversalAutoload.UNKNOWN_TYPES[name] = true
+				print("*** UNIVERSAL AUTOLOAD - UNKNOWN OBJECT TYPE: ".. name.." ***")
+			end
 		end
 	end
 	

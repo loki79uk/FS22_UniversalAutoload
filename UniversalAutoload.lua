@@ -14,6 +14,7 @@ UniversalAutoload.delayTime = 200
 
 local debugKeys = false
 local debugConsole = false
+local debugVehicles = false
 
 -- EVENTS
 source(g_currentModDirectory.."events/CycleContainerEvent.lua")
@@ -955,7 +956,7 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	-- print("setBaleCollectionMode: "..self:getFullName().." - "..tostring(baleCollectionMode))
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - setBaleCollectionMode")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - setBaleCollectionMode") end
 		return
 	end
 		
@@ -981,7 +982,7 @@ end
 function UniversalAutoload:startLoading(noEventSend)
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - startLoading")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - startLoading") end
 		return
 	end
 
@@ -1783,7 +1784,7 @@ function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil then
 		local spec = self.spec_universalAutoload
 		if spec==nil or not spec.isAutoloadEnabled then
-			print(self:getFullName() .. ": UAL DISABLED - onPostLoad")
+			if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onPostLoad") end
 			return
 		end
 
@@ -1823,7 +1824,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - saveToXMLFile")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - saveToXMLFile") end
 		return
 	end
 
@@ -1857,7 +1858,7 @@ function UniversalAutoload:onPreDelete()
 	-- print("UniversalAutoload - onPreDelete")
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onPreDelete")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onPreDelete") end
 		return
 	end
 	
@@ -1878,7 +1879,7 @@ function UniversalAutoload:onDelete()
 	-- print("UniversalAutoload - onDelete")
     local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onDelete")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onDelete") end
 		return
 	end
 	
@@ -1901,7 +1902,7 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 	--if self.isClient and g_dedicatedServer==nil then
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onFoldStateChanged")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onFoldStateChanged") end
 		return
 	end
 	
@@ -1963,7 +1964,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 	
 	if isAutoloadEnabled then
 		if spec==nil or not spec.isAutoloadEnabled then
-			print(self:getFullName() .. ": UAL DISABLED - onReadStream")
+			if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onReadStream") end
 			self.spec_universalAutoload = {}
 			spec = self.spec_universalAutoload
 		end
@@ -2043,7 +2044,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onUpdate")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onUpdate") end
 		return
 	end
 
@@ -2349,7 +2350,7 @@ function UniversalAutoload:onActivate(isControlling)
 	if UniversalAutoload.showDebug then print("*** "..self:getFullName().." ***") end
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onActivate")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onActivate") end
 		return
 	end
 	
@@ -2362,7 +2363,7 @@ function UniversalAutoload:onDeactivate()
 	-- print("onDeactivate: "..self:getFullName())
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - onDeactivate")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onDeactivate") end
 		return
 	end
 	
@@ -2376,7 +2377,7 @@ function UniversalAutoload:determineTipside()
 	-- currently only used for the KRONE Profi Liner Curtain Trailer
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - determineTipside")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - determineTipside") end
 		return
 	end
 
@@ -2941,6 +2942,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 
 					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
 					local layerOverMaxHeight = spec.useHorizontalLoading and spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
+					
+					print("loadOverMaxHeight: "..tostring(loadOverMaxHeight))
+					print("layerOverMaxHeight: "..tostring(layerOverMaxHeight))
 
 					if loadOverMaxHeight then
 						if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or (spec.currentLoadingPlace
@@ -3005,10 +3009,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								and not spec.partiallyUnloaded and not spec.trailerIsFull then
 								
 									if spec.useHorizontalLoading then
+										spec.currentLoadHeight = spec.currentLayerHeight
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
 										if UniversalAutoload.showDebug then print("useHorizontalLoading: " .. spec.currentLayerHeight) end
 									end
-									spec.currentLoadHeight = spec.currentLayerHeight
 									useThisLoadSpace = true
 								else
 									if not spec.trailerIsFull then
@@ -3100,7 +3104,7 @@ end
 function UniversalAutoload:getIsLoadingKeyAllowed()
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - getIsLoadingKeyAllowed")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - getIsLoadingKeyAllowed") end
 		return
 	end
 
@@ -3116,7 +3120,7 @@ end
 function UniversalAutoload:getIsUnloadingKeyAllowed()
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - getIsUnloadingKeyAllowed")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - getIsUnloadingKeyAllowed") end
 		return
 	end
 
@@ -3145,7 +3149,7 @@ end
 function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - getIsLoadingVehicleAllowed")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - getIsLoadingVehicleAllowed") end
 		return false
 	end
 	
@@ -3209,7 +3213,7 @@ end
 function UniversalAutoload:getIsLoadingAreaAllowed(i)
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
-		print(self:getFullName() .. ": UAL DISABLED - getIsLoadingAreaAllowed")
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - getIsLoadingAreaAllowed") end
 		return false
 	end
 	

@@ -2943,9 +2943,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
 					local layerOverMaxHeight = spec.useHorizontalLoading and spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
 					
-					print("loadOverMaxHeight: "..tostring(loadOverMaxHeight))
-					print("layerOverMaxHeight: "..tostring(layerOverMaxHeight))
-
 					if loadOverMaxHeight then
 						if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or (spec.currentLoadingPlace
 						and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then

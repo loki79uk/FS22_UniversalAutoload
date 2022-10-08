@@ -335,27 +335,29 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 	if xmlFilename ~= nil and not (string.find(xmlFilename, "multiPurchase") or string.find(xmlFilename, "multipleItemPurchase") ) then	
 		-- print( "  >> " .. xmlFilename )
 		
+		local foundExisting = false
 		if customEnvironment ~= nil then
-			UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, customEnvironment)
+			foundExisting = UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, customEnvironment)
 		end
 		
-		local loadedVehicleXML = false
-		local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
+		if not foundExisting then
+			local loadedVehicleXML = false
+			local xmlFile = XMLFile.load("configXml", xmlFilename, Vehicle.xmlSchema)
 
-		if xmlFile~=nil and xmlFile:hasProperty("vehicle.base") then
-			loadedVehicleXML = true
-			UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnvironment)
-		end
-		xmlFile:delete()
-		
-		if not loadedVehicleXML then
-			xmlFile = XMLFile.load("baleConfigXml", xmlFilename, BaleManager.baleXMLSchema)
-			if xmlFile~=nil and xmlFile:hasProperty("bale") then
-				UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironment)
+			if xmlFile~=nil and xmlFile:hasProperty("vehicle.base") then
+				loadedVehicleXML = true
+				UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnvironment)
 			end
 			xmlFile:delete()
+			
+			if not loadedVehicleXML then
+				xmlFile = XMLFile.load("baleConfigXml", xmlFilename, BaleManager.baleXMLSchema)
+				if xmlFile~=nil and xmlFile:hasProperty("bale") then
+					UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironment)
+				end
+				xmlFile:delete()
+			end
 		end
-
 	end
 end
 --
@@ -365,12 +367,12 @@ function UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, cus
 	local customName = customEnvironment..":"..objectName
 
 	if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] ~= nil then
-		print("FOUND CUSTOM CONFIG FOR " .. xmlFilename)
-		return
+		-- print("FOUND CUSTOM CONFIG FOR " .. customName)
+		return true
 	end
 	
 	if UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[objectName] ~= nil then
-		print("USING BASE CONFIG FOR " .. xmlFilename)
+		-- print("USING BASE CONFIG FOR " .. customName)
 		
 		UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName] = {}
 		newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[customName]
@@ -393,7 +395,7 @@ function UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, cus
 			newType.length = oldType.length
 		end
 		print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ, newType.type ))
-		return
+		return true
 	end
 end
 --

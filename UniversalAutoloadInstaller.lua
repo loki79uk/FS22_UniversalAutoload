@@ -67,7 +67,9 @@ UniversalAutoload.VALID_OBJECTS = {
 	[1] = "pallet",
 	[2] = "bigBag",
 	[3] = "treeSaplingPallet",
-	[4] = "pdlc_pumpsAndHosesPack.hosePallet"
+	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
+	[5] = "FS22_MaizePlus.fillablePallet",
+	[6] = "FS22_MaizePlus.roundbaleCCM80"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES

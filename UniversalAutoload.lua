@@ -77,6 +77,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfCovered", "Prevent loading when covered (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUncovered", "Prevent loading when uncovered (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isBoxTrailer", "If trailer is enclosed with a rear door", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".options#isLogTrailer", "If trailer is a logging trailer - will load only logs, dropped from above", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isBaleTrailer", "If trailer should use an automatic bale collection mode", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#isCurtainTrailer", "Automatically detect the available load side (if the trailer has curtain sides)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#enableRearLoading", "Use the automatic rear loading trigger", false)
@@ -1435,6 +1436,7 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[i].noLoadingIfUncovered  = loadArea.noLoadingIfUncovered
 						end
 						spec.isBoxTrailer = config.isBoxTrailer
+						spec.isLogTrailer = config.isLogTrailer
 						spec.isBaleTrailer = config.isBaleTrailer
 						spec.isCurtainTrailer = config.isCurtainTrailer
 						spec.enableRearLoading = config.enableRearLoading
@@ -1492,6 +1494,7 @@ function UniversalAutoload:onLoad(savegame)
 							j = j + 1
 						end
 						spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
+						spec.isLogTrailer = xmlFile:getValue(key..".options#isLogTrailer", false)
 						spec.isBaleTrailer = xmlFile:getValue(key..".options#isBaleTrailer", hasBaleHeight)
 						spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
 						spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)

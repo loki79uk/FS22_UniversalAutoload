@@ -220,6 +220,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					end
 						
 					config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
+					config.isLogTrailer = xmlFile:getValue(configKey..".options#isLogTrailer", false)
 					config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", hasBaleHeight)
 					config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 					config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
@@ -1136,7 +1137,7 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 
 		superFunc(self, storeItem, vehicle, saleItem)
 		
-		if vehicle.spec_universalAutoload ~= nil then
+		if vehicle.spec_universalAutoload ~= nil and vehicle.spec_universalAutoload.isAutoloadEnabled then
 		
 			local itemElement = self.attributeItem:clone(self.attributesLayout)
 			local iconElement = itemElement:getDescendantByName("icon")

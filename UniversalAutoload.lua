@@ -1829,6 +1829,15 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	end
 
 	-- print("UniversalAutoload - saveToXMLFile: "..self:getFullName())
+	if spec.baleCollectionMode then
+		UniversalAutoload.setBaleCollectionMode(self, false)
+		for object,_ in pairs(spec.loadedObjects) do
+			if object ~= nil and object.isRoundbale~=nil then
+				UniversalAutoload.unlinkObject(object)
+				UniversalAutoload.addToPhysics(self, object)
+			end
+		end
+	end
 	if spec.resetLoadingPattern ~= false then
 		UniversalAutoload.resetLoadingPattern(self)
 	end
@@ -2166,7 +2175,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		-- CREATE AND LOAD BALES (IF REQUESTED)
 		if spec.spawnBales then
 			spec.spawnBalesDelayTime = spec.spawnBalesDelayTime or 0
-			if spec.spawnBalesDelayTime > UniversalAutoload.delayTime/4 then
+			if spec.spawnBalesDelayTime > UniversalAutoload.delayTime then
 				spec.spawnBalesDelayTime = 0
 				bale = spec.baleToSpawn
 				local baleObject = UniversalAutoload.createBale(self, bale.xmlFile, bale.fillTypeIndex, bale.wrapState)
@@ -2180,14 +2189,14 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					print("..adding bales complete!")
 				end
 			else
-				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + dt
+				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + (3*dt)
 			end
 		end
 		
 		-- CREATE AND LOAD PALLETS (IF REQUESTED)
 		if spec.spawnPallets and not spec.spawningPallet then
 			spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime or 0
-			if spec.spawnPalletsDelayTime > UniversalAutoload.delayTime/4 then
+			if spec.spawnPalletsDelayTime > UniversalAutoload.delayTime then
 				spec.spawnPalletsDelayTime = 0
 
 				local i = math.random(1, #spec.palletsToSpawn)
@@ -2323,6 +2332,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					end
 				else
 					spec.loadDelayTime = spec.loadDelayTime + dt
+					if spec.baleCollectionMode or spec.useHorizontalLoading then
+						spec.loadDelayTime = spec.loadDelayTime + (3*dt)
+					end
 				end
 			end
 			
@@ -2449,7 +2461,7 @@ function UniversalAutoload.isValidForManualLoading(object)
 			return true
 		end
 		if object.isSplitShape then
-			print("split shape root node: " .. tostring(rootNode))
+			-- print("split shape root node: " .. tostring(rootNode))
 			return true
 		end
 	end
@@ -2787,36 +2799,54 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("doRotate: " .. tostring(doRotate) )
 	end
 	
+	local N, M = N1, M1
+	local rotation = 0
+	local sizeX = containerType.sizeX
+	local sizeY = containerType.sizeY
+	local sizeZ = containerType.sizeZ
+	local containerSizeX = containerType.sizeX
+	local containerSizeY = containerType.sizeY
+	local containerSizeZ = containerType.sizeZ
+	local containerFlipYZ = containerType.flipYZ
+	
+	-- APPLY ROTATION
 	if doRotate then
 		N, M = N2, M2
 		rotation = math.pi/2
-		sizeZ = containerType.sizeX
-		sizeY = containerType.sizeY
 		sizeX = containerType.sizeZ
-	else
-		N, M = N1, M1
-		rotation = 0
-		sizeX = containerType.sizeX
 		sizeY = containerType.sizeY
-		sizeZ = containerType.sizeZ
+		sizeZ = containerType.sizeX
 	end
 	
 	--TEST FOR ROUNDBALE PACKING
 	local r = 0.70710678
 	local R = ((3/4)+(r/4))
 	local roundbaleOffset = 0
-	local useRoundbalePacking = false
+	local useRoundbalePacking = nil
 	if containerType.isBale and sizeX==sizeZ then
 		-- print("IS ROUNDBALE")
 		isRoundbale = true
-		NR = math.floor(width / (R*containerType.sizeX))
-		MR = math.floor(length / (R*containerType.sizeX))
-		if NR > N and width >= (2*R)*containerType.sizeX then
-			-- print("ROUNDBALE PACKING")
-			useRoundbalePacking = true
-			N, M = NR, MR
-			sizeX = R*containerType.sizeX
+
+		if spec.useHorizontalLoading then
+		-- LONGWAYS ROUNDBALE STACKING
+			-- rotation = 0 
+			rotation = math.pi/2
+			containerFlipYZ = false
+			containerSizeY = containerType.sizeZ
+			containerSizeZ = containerType.sizeY
+			useRoundbalePacking = false
+		else
+		-- UPRIGHT ROUNDBALE STACKING
+			NR = math.floor(width / (R*containerType.sizeX))
+			MR = math.floor(length / (R*containerType.sizeX))
+			if NR > N and width >= (2*R)*containerType.sizeX then
+				-- print("ROUNDBALE PACKING")
+				useRoundbalePacking = true
+				N, M = NR, MR
+				sizeX = R*containerType.sizeX
+			end
 		end
+		
 	end
 	
 	--UPDATE NEW PACKING DIMENSIONS
@@ -2835,9 +2865,33 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		spec.currentLoadLength = sizeZ
 	end
 	
-	if useRoundbalePacking then
+	if useRoundbalePacking == false then
+		
+		local baleEnds = true
+		local layerOffset = spec.currentLayerCount * containerSizeX/2
+		
+		-- FIRST BALE ON A LAYER
+		if spec.currentLoadLength == containerSizeX then
+			-- if baleEnds and spec.currentLayerCount == 0 then
+				-- spec.currentLoadLength = spec.currentLoadLength + containerSizeX
+			-- end
+			spec.currentLoadLength = spec.currentLoadLength + layerOffset
+		end
+		
+		-- LAST BALE ON A LAYER
+		if spec.currentLoadLength > spec.loadArea[i].length - layerOffset then
+			spec.currentLoadLength = spec.currentLoadLength + layerOffset + containerSizeX
+		end
+		
+		-- LAST BALE ON FIRST LAYER
+		-- if baleEnds and spec.currentLayerCount == 0 and spec.currentLoadLength > spec.loadArea[i].length - containerSizeX then
+			-- spec.currentLoadLength = spec.currentLoadLength + containerSizeX
+		-- end
+		
+
+	elseif useRoundbalePacking == true then
 		if (spec.currentLoadWidth/sizeX) % 2 == 0 then
-			roundbaleOffset = containerType.sizeZ/2
+			roundbaleOffset = containerSizeZ/2
 		end
 	end
 	
@@ -2854,21 +2908,21 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		-- print("CREATE NEW LOADING PLACE")
 		loadPlace = {}
 		loadPlace.node = createTransformGroup("loadPlace")
-		loadPlace.sizeX = containerType.sizeX
-		loadPlace.sizeY = containerType.sizeY
-		loadPlace.sizeZ = containerType.sizeZ
-		loadPlace.flipYZ = containerType.flipYZ
+		loadPlace.sizeX = containerSizeX
+		loadPlace.sizeY = containerSizeY
+		loadPlace.sizeZ = containerSizeZ
+		loadPlace.flipYZ = containerFlipYZ
 		loadPlace.isRoundbale = isRoundbale
 		loadPlace.roundbaleOffset = roundbaleOffset
 		loadPlace.useRoundbalePacking = useRoundbalePacking
 		loadPlace.containerType = containerType
 		loadPlace.rotation = rotation
-		if useRoundbalePacking then
-			loadPlace.sizeX = r*containerType.sizeX
-			loadPlace.sizeZ = r*containerType.sizeZ
+		if useRoundbalePacking == true then
+			loadPlace.sizeX = r*containerSizeX
+			loadPlace.sizeZ = r*containerSizeZ
 		end
 		if containerType.isBale then
-			loadPlace.baleOffset = containerType.sizeY/2
+			loadPlace.baleOffset = containerSizeY/2
 		end
 		
 		--LOAD FROM THE CORRECT SIDE
@@ -2962,9 +3016,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local thisLoadPlace = spec.currentLoadingPlace
 					if thisLoadPlace ~= nil and not layerOverMaxHeight then
 					
-						local containerFitsInLoadSpace = containerType.flipYZ == thisLoadPlace.flipYZ and
-							((containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
-							or (loadPlace.useRoundbalePacking and containerType.sizeX==containerType.sizeZ))
+						local containerFitsInLoadSpace = 
+							(loadPlace.useRoundbalePacking ~= nil and containerType.sizeX==containerType.sizeX) or
+							(containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
 
 						local thisLoadHeight = spec.currentLoadHeight
 						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
@@ -2978,9 +3032,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								
 									while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
-										then
+										local placeEmpty = UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
+										local placeBelowFull = UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)
+										if placeEmpty and (thisLoadHeight<=0 or placeBelowFull) then
 											spec.currentLoadHeight = thisLoadHeight
 											useThisLoadSpace = true
 											break
@@ -3025,7 +3079,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								if containerType.neverStack then
 									spec.currentLoadingPlace = nil
 								end
+								
 								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+
 								spec.nextLayerHeight = math.max(spec.currentLoadHeight, spec.nextLayerHeight)
 								if UniversalAutoload.showDebug then print("nextLayerHeight: " .. spec.nextLayerHeight) end
 								
@@ -3923,7 +3979,10 @@ function UniversalAutoload:createPallet(xmlFilename)
 				-- table.insert(UniversalAutoload.testPallets, pallet)
 			-- end
 			
-			if not UniversalAutoload.loadObject(vehicle, pallet) then
+			if UniversalAutoload.loadObject(vehicle, pallet) then
+				spec.spawnPalletsDelayTime = 0
+			else
+				spec.spawnPalletsDelayTime = UniversalAutoload.delayTime
 				g_currentMission:removeVehicle(pallet, true)
 				
 				if spec.palletsToSpawn and #spec.palletsToSpawn>1 then

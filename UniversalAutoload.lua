@@ -245,7 +245,7 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 		for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 			if vehicle ~= nil then
 				local SPEC = vehicle.spec_universalAutoload
-				if SPEC.playerInTrigger[playerId] == true and
+				if SPEC.playerInTrigger~=nil and SPEC.playerInTrigger[playerId] == true and
 				g_currentMission.nodeToObject[vehicle.rootNode]~=nil then
 					local distance = calcDistanceFrom(player.rootNode, vehicle.rootNode)
 					if distance < closestVehicleDistance then
@@ -1972,14 +1972,8 @@ end
 function UniversalAutoload:onReadStream(streamId, connection)
 	-- print("onReadStream")
     local spec = self.spec_universalAutoload
-	local isAutoloadEnabled = streamReadBool(streamId)
 	
-	if isAutoloadEnabled then
-		if spec==nil or not spec.isAutoloadEnabled then
-			if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onReadStream") end
-			self.spec_universalAutoload = {}
-			spec = self.spec_universalAutoload
-		end
+	if streamReadBool(streamId) then
 		print("Universal Autoload Enabled: " .. self:getFullName())
 		spec.isAutoloadEnabled = true
 		spec.currentTipside = streamReadString(streamId)
@@ -2003,10 +1997,6 @@ function UniversalAutoload:onReadStream(streamId, connection)
 	else
 		print("Universal Autoload Disabled: " .. self:getFullName())
 		spec.isAutoloadEnabled = false
-		--if spec ~= nil then
-			--print("*** MP Client - SET UAL SPEC TO NIL ***")
-			--self.spec_universalAutoload = nil
-		--end
 		UniversalAutoload.removeEventListeners(self)
 	end
 end
@@ -2014,7 +2004,6 @@ end
 function UniversalAutoload:onWriteStream(streamId, connection)
 	-- print("onWriteStream")
     local spec = self.spec_universalAutoload
-
 	if spec~=nil and spec.isAutoloadEnabled then
 		streamWriteBool(streamId, true)
 		
@@ -2055,7 +2044,7 @@ end
 function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
-	if spec==nil or not spec.isAutoloadEnabled then
+	if spec==nil or not spec.isAutoloadEnabled or spec.playerInTrigger==nil then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onUpdate") end
 		return
 	end
@@ -4019,7 +4008,7 @@ end
 function UniversalAutoload:createPallets(pallets)
 	local spec = self.spec_universalAutoload
 	
-	if spec ~= nil then
+	if spec~=nil and spec.isAutoloadEnabled then
 		if debugConsole then print("ADD PALLETS: " .. self:getFullName()) end
 		self:setAllTensionBeltsActive(false)
 		spec.spawnPallets = true
@@ -4054,7 +4043,7 @@ end
 function UniversalAutoload:createBales(bale)
 	local spec = self.spec_universalAutoload
 	
-	if spec ~= nil then
+	if spec~=nil and spec.isAutoloadEnabled then
 		if debugConsole then print("ADD BALES: " .. self:getFullName()) end
 		self:setAllTensionBeltsActive(false)
 		spec.spawnBales = true
@@ -4066,7 +4055,7 @@ function UniversalAutoload:clearLoadedObjects()
 	local spec = self.spec_universalAutoload
 	local palletCount, balesCount = 0, 0
 	
-	if spec ~= nil and spec.loadedObjects ~= nil then
+	if spec~=nil and spec.isAutoloadEnabled and spec.loadedObjects ~= nil then
 		if debugConsole then print("CLEAR OBJECTS: " .. self:getFullName()) end
 		self:setAllTensionBeltsActive(false)
 		for _, object in pairs(spec.loadedObjects) do
@@ -4588,18 +4577,18 @@ end
 -- Courseplay interface functions.
 function UniversalAutoload:ualIsFull()
 	local spec = self.spec_universalAutoload
-	return spec~=nil and spec.trailerIsFull
+	return (spec~=nil and spec.isAutoloadEnabled) and spec.trailerIsFull
 end
 --
 function UniversalAutoload:ualGetLoadedBales()
 	local spec = self.spec_universalAutoload
-	return spec~=nil and spec.loadedObjects
+	return (spec~=nil and spec.isAutoloadEnabled) and spec.loadedObjects
 end
 --
 function UniversalAutoload:ualHasLoadedBales()
 	print("UAL/CP - ualHasLoadedBales")
 	local spec = self.spec_universalAutoload
-	return spec~=nil and spec.totalUnloadCount > 0
+	return (spec~=nil and spec.isAutoloadEnabled) and spec.totalUnloadCount > 0
 end
 --
 function UniversalAutoload:ualIsObjectLoadable(object)

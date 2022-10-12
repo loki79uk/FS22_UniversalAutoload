@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<texts>
+		<text name="configuration_universalAutoload" text="Универсальная Автозагрузка"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Переключить загрузку"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Автоматический сбор тюков"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Разгрузка"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Сменить сторону разгрузки"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Переключить фильтр загрузки"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Переключение горизонтальной загрузки"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" text="Изменить выбранный тип материала (след.)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" text="Изменить выбранный тип материала (пред.)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" text="Выбрать все типы материалов"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" text="Изменить выбранный тип контейнера (след.)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" text="Изменить выбранный тип контейнера (пред.)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" text="Выбрать все типы контейнеров"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS" text="Прикрепить/открепить ремни"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR" text="Открыть/Закрыть заднюю дверь"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" text="Открыть/Закрыть боковой тент"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" text="Режим полной отладки"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" text="Режим простой отладки"/>
+
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="Зона разгрузки занята. Пожалуйста, очистите зону разгрузки."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="Нет совместимых товаров для погрузки или разгрузки."/>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="Загрузочное пространство заполнено. Невозможно загрузить больше предметов такого размера."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться."/>
+		
+		<text name="universalAutoload_tipside" text="Сторона разгрузки"/>
+		<text name="universalAutoload_left" text="Слева"/>
+		<text name="universalAutoload_right" text="Справа"/>
+		<text name="universalAutoload_none" text="Нет"/>
+		<text name="universalAutoload_loadingFilter" text="Фильтр загрузки"/>
+		<text name="universalAutoload_loadingMethod" text="Способ загрузки"/>
+		<text name="universalAutoload_layer" text="Слой"/>
+		<text name="universalAutoload_stack" text="Стек"/>
+		<text name="universalAutoload_fullOnly" text="Только полные"/>
+		<text name="universalAutoload_loadAny" text="Любой"/>
+		<text name="universalAutoload_startLoading" text="Начать загрузку"/>
+		<text name="universalAutoload_stopLoading" text="Остановить загрузку"/>
+		<text name="universalAutoload_unloadAll" text="Разгрузка"/>
+		<text name="universalAutoload_baleMode" text="Автосбор тюков"/>
+		<text name="universalAutoload_enabled" text="Включено"/>
+		<text name="universalAutoload_disabled" text="Отключено"/>
+		<text name="universalAutoload_activate" text="Активировать"/>
+		<text name="universalAutoload_deactivate" text="Деактивировать"/>
+		<text name="universalAutoload_materialType" text="Тип материала"/>
+		<text name="universalAutoload_containerType" text="Тип контейнера"/>
+		<text name="universalAutoload_ALL" text="Все"/>
+		<text name="universalAutoload_LIQUID_TANK" text="IBC-бак"/>
+		<text name="universalAutoload_EURO_PALLET" text="Европоддон"/>
+		<text name="universalAutoload_PIONEER_PALLET" text="Поддон Pioneer"/>
+		<text name="universalAutoload_BIGBAG_PALLET" text="Поддон Bigbag"/>
+		<text name="universalAutoload_BIGBAG" text="Bigbag"/>
+		<text name="universalAutoload_POTATOBOX" text="Ящик картофеля"/>
+		<text name="universalAutoload_BALE" text="Тюк"/>
+		<text name="universalAutoload_ROUND_BALE" text="Круглый тюк"/>
+		<text name="universalAutoload_SQUARE_BALE" text="Квадратный тюк"/>
+		<text name="universalAutoload_LOGS" text="брёвна"/>
+    </texts>
+</l10n>

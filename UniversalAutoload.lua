@@ -2043,6 +2043,9 @@ end
 function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
+	-- if spec~=nil and spec.playerInTrigger==nil then
+		-- print(self:getFullName() .. ": PLAYER IN TRIGGER IS NIL")
+	-- end
 	if spec==nil or not spec.isAutoloadEnabled or spec.playerInTrigger==nil then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onUpdate") end
 		return

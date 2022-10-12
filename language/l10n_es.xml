@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<texts>
+		<text name="configuration_universalAutoload" text="Autoload Universal"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Cambiar carga/descarga"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Modo de recogida automática de balas"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Descargar"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Cambiar lado de descarga"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Cambiar filtro de carga"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Alternar carga horizontal"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" text="Cambiar material seleccionado (siguiente)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" text="Cambiar material seleccionado (anterior)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" text="Seleccionar todos los materiales"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" text="Cambiar tipo de contenedor (siguiente)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" text="Cambiar tipo de contenedor (anterior)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" text="Todos los tipos de contenedor"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS" text="Soltar/Sujetar cintas tensoras"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR" text="Abrir/Cerrar puerta trasera"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" text="Abrir/Cerrar cortina lateral"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" text="Modo debug completa"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" text="Modo debug simple"/>
+
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="Area de descarga bloqueada. Por favor despeje la zona."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="No hay productos compatibles para cargar o descargar."/>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="Area de carga completa. No es posible cargar mas objetos de este tamaño."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="No es posible cargar en movimiento. Por favor detengase completamente antes de cargar el tráiler."/>
+		
+		<text name="universalAutoload_tipside" text="Lado de descarga"/>
+		<text name="universalAutoload_left" text="Izquierda"/>
+		<text name="universalAutoload_right" text="Derecha"/>
+		<text name="universalAutoload_none" text="Ninguno"/>
+		<text name="universalAutoload_loadingFilter" text="Filtro de carga"/>
+		<text name="universalAutoload_loadingMethod" text="Método de carga"/>
+		<text name="universalAutoload_layer" text="Capa"/>
+		<text name="universalAutoload_stack" text="Pila"/>
+		<text name="universalAutoload_fullOnly" text="Solo completo"/>
+		<text name="universalAutoload_loadAny" text="Cualquiera"/>
+		<text name="universalAutoload_startLoading" text="Empezar carga"/>
+		<text name="universalAutoload_stopLoading" text="Detener carga"/>
+		<text name="universalAutoload_unloadAll" text="Descargar"/>
+		<text name="universalAutoload_baleMode" text="Modo Auto-Paca"/>
+		<text name="universalAutoload_enabled" text="Activado"/>
+		<text name="universalAutoload_disabled" text="Desactivado"/>
+		<text name="universalAutoload_activate" text="Activar"/>
+		<text name="universalAutoload_deactivate" text="Desactivar"/>
+		<text name="universalAutoload_materialType" text="Tipo de material"/>
+		<text name="universalAutoload_containerType" text="Tipo de contenedor"/>
+		<text name="universalAutoload_ALL" text="Cualquiera"/>
+		<text name="universalAutoload_LIQUID_TANK" text="Palé de líquido"/>
+		<text name="universalAutoload_EURO_PALLET" text="Palé"/>
+		<text name="universalAutoload_PIONEER_PALLET" text="Palé Pioneer"/>
+		<text name="universalAutoload_BIGBAG_PALLET" text="Palé de sacos grandes"/>
+		<text name="universalAutoload_BIGBAG" text="Saco grande"/>
+		<text name="universalAutoload_POTATOBOX" text="Caja de patatas"/>
+		<text name="universalAutoload_BALE" text="Paca"/>
+		<text name="universalAutoload_ROUND_BALE" text="Paca redonda"/>
+		<text name="universalAutoload_SQUARE_BALE" text="Paca rectangular"/>
+		<text name="universalAutoload_LOGS" text="Troncos"/>
+    </texts>
+</l10n>

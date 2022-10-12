@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<texts>
+		<text name="configuration_universalAutoload" text="Universele Autoload"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Laden starten/stoppen"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Automatische balenophaalmodus"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Lossen"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Schakelaar loszijde"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Schakelaar laad filter"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Toggle horizontaal laden"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" text="Geselecteerd producttype wijzigen (volgende)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" text="Geselecteerd producttype wijzigen (vorige)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" text="Selecteer alle producttypes"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" text="Geselecteerd containertype wijzigen (volgende)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" text="Geselecteerd containertype wijzigen (vorige)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" text="Selecteer alle containertypes"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS" text="Spanbanden vast-/losmaken"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR" text="Openen/sluiten achterdeur"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" text="Openen/sluiten schuifzeil"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" text="Volledige debug-modus"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" text="Eenvoudige debug-modus"/>
+
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="Er zijn geen ondersteunde producten gevonden voor het in- en uitladen."/>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="Laadruimte is vol. Kan geen items van deze grootte meer laden."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden."/>
+		
+		<text name="universalAutoload_tipside" text="Loszijde"/>
+		<text name="universalAutoload_left" text="Links"/>
+		<text name="universalAutoload_right" text="Rechts"/>
+		<text name="universalAutoload_none" text="Niks"/>
+		<text name="universalAutoload_loadingFilter" text="Laad filter"/>
+		<text name="universalAutoload_loadingMethod" text="Laadmethode"/>
+		<text name="universalAutoload_layer" text="Laag"/>
+		<text name="universalAutoload_stack" text="Stack"/>
+		<text name="universalAutoload_fullOnly" text="Alleen volle"/>
+		<text name="universalAutoload_loadAny" text="Alles"/>
+		<text name="universalAutoload_startLoading" text="Start laden"/>
+		<text name="universalAutoload_stopLoading" text="Stop laden"/>
+		<text name="universalAutoload_unloadAll" text="Lossen"/>
+		<text name="universalAutoload_baleMode" text="Auto-Bale Mode"/>
+		<text name="universalAutoload_enabled" text="Ingeschakeld"/>
+		<text name="universalAutoload_disabled" text="Uitgeschakeld"/>
+		<text name="universalAutoload_activate" text="Activeer"/>
+		<text name="universalAutoload_deactivate" text="Deactiveren"/>
+		<text name="universalAutoload_materialType" text="Producttype"/>
+		<text name="universalAutoload_containerType" text="Containertype"/>
+		<text name="universalAutoload_ALL" text="Alles"/>
+		<text name="universalAutoload_LIQUID_TANK" text="IBC VloeistofTank"/>
+		<text name="universalAutoload_EURO_PALLET" text="Europallet"/>
+		<text name="universalAutoload_PIONEER_PALLET" text="Pioneer-pallet"/>
+		<text name="universalAutoload_BIGBAG_PALLET" text="Bigbag-pallet"/>
+		<text name="universalAutoload_BIGBAG" text="Bigbag"/>
+		<text name="universalAutoload_POTATOBOX" text="Aardappelkist"/>
+		<text name="universalAutoload_BALE" text="Balen"/>
+		<text name="universalAutoload_ROUND_BALE" text="Ronde balen"/>
+		<text name="universalAutoload_SQUARE_BALE" text="Vierkante balen"/>
+		<text name="universalAutoload_LOGS" text="Stammen"/>
+    </texts>
+</l10n>

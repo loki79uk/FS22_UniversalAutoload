@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<texts>
+		<text name="configuration_universalAutoload" text="通用自动装载"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="切换装载"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="自动捡包模式"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="卸载"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="切换卸载端"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="切换装载过滤器"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="切换水平装载"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" text="改变选定的材料类型（下一个）"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" text="改变选定的材料类型（上一个）"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" text="选择所有材料类型"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" text="改变选定的容器类型（下一个）"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" text="改变选定的容器类型（上一个）"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" text="选择所有容器类型"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS" text="拉紧/松开张力带"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR" text="打开/关闭后门"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" text="打开/关闭侧门"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" text="完全调试模式"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" text="简单调试模式"/>
+
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="卸货区被占用。请清理卸货区。"/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="没有相应的货物可供装货或卸货。"/>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="已装满。无法再装载任何此尺寸的物品。"/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="运动中不允许装载。在装载拖车之前，请停车。"/>
+		
+		<text name="universalAutoload_tipside" text="卸货端"/>
+		<text name="universalAutoload_left" text="左"/>
+		<text name="universalAutoload_right" text="右"/>
+		<text name="universalAutoload_none" text="空"/>
+		<text name="universalAutoload_loadingFilter" text="装载过滤器"/>
+		<text name="universalAutoload_loadingMethod" text="装载方法"/>
+		<text name="universalAutoload_layer" text="层数"/>
+		<text name="universalAutoload_stack" text="堆栈"/>
+		<text name="universalAutoload_fullOnly" text="仅装满"/>
+		<text name="universalAutoload_loadAny" text="任何类型"/>
+		<text name="universalAutoload_startLoading" text="开始装载"/>
+		<text name="universalAutoload_stopLoading" text="停止装载"/>
+		<text name="universalAutoload_unloadAll" text="卸载"/>
+		<text name="universalAutoload_baleMode" text="自动打包模式"/>
+		<text name="universalAutoload_enabled" text="已启用"/>
+		<text name="universalAutoload_disabled" text="已停用"/>
+		<text name="universalAutoload_activate" text="激活"/>
+		<text name="universalAutoload_deactivate" text="停用"/>
+		<text name="universalAutoload_materialType" text="材料类型"/>
+		<text name="universalAutoload_containerType" text="容器类型"/>
+		<text name="universalAutoload_ALL" text="全部"/>
+		<text name="universalAutoload_LIQUID_TANK" text="IBC罐"/>
+		<text name="universalAutoload_EURO_PALLET" text="欧式托盘"/>
+		<text name="universalAutoload_PIONEER_PALLET" text="Pioneer Pallet"/>
+		<text name="universalAutoload_BIGBAG_PALLET" text="大袋托盘"/>
+		<text name="universalAutoload_BIGBAG" text="大袋"/>
+		<text name="universalAutoload_POTATOBOX" text="马铃薯箱"/>
+		<text name="universalAutoload_BALE" text="捆包"/>
+		<text name="universalAutoload_ROUND_BALE" text="圆包"/>
+		<text name="universalAutoload_SQUARE_BALE" text="方包"/>
+		<text name="universalAutoload_LOGS" text="日志"/>
+    </texts>
+</l10n>

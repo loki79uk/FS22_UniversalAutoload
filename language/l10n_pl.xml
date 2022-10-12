@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<texts>
+		<text name="configuration_universalAutoload" text="Universalne Autoładowanie"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Przełącz ładowanie"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Tryb automatycznego zbierania beli"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Rozładuj"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Przełącz stronę rozładunku"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Przełącz filtr ładowania"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Przełączanie ładowania poziomego"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" text="Zmień wybrany typ materiału (następny)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" text="Zmień wybrany typ materiału (poprzedni)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" text="Wybierz wszystkie typy materiałów"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" text="Zmień wybrany typ kontenera (następny)"/>
+		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" text="Zmień wybrany typ kontenera (poprzedni)"/>
+		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" text="Wybierz wszystkie typy kontenerów"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS" text="Zapinanie/Odpinanie pasów napinających"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR" text="Otwórz/zamknij tylne drzwi"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" text="Otwórz/zamknij kurtyny"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" text="Pełny Tryb Debugu"/>
+		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" text="Prosty Tryb Debugu"/>
+
+		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="Żadne zgodne towary nie są dostępne do załadunku lub rozładunku."/>
+		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="Jesteś Zapchany. Niemożna więcej załadować."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz."/>
+		
+		<text name="universalAutoload_tipside" text="Strona rozładunku"/>
+		<text name="universalAutoload_left" text="Lewa"/>
+		<text name="universalAutoload_right" text="Prawa"/>
+		<text name="universalAutoload_none" text="Żadna"/>
+		<text name="universalAutoload_loadingFilter" text="Filtr ładowania"/>
+		<text name="universalAutoload_loadingMethod" text="Metoda ładowania"/>
+		<text name="universalAutoload_layer" text="Warstwa"/>
+		<text name="universalAutoload_stack" text="Stos"/>
+		<text name="universalAutoload_fullOnly" text="Tylko pełne"/>
+		<text name="universalAutoload_loadAny" text="Każde"/>
+		<text name="universalAutoload_startLoading" text="Rozpocznij ładowanie"/>
+		<text name="universalAutoload_stopLoading" text="Zatrzymaj ładowanie"/>
+		<text name="universalAutoload_unloadAll" text="Rozładuj"/>
+		<text name="universalAutoload_baleMode" text="Tryb Auto-Bale"/>
+		<text name="universalAutoload_enabled" text="Włączone"/>
+		<text name="universalAutoload_disabled" text="Wyłączone"/>
+		<text name="universalAutoload_activate" text="Aktywuj"/>
+		<text name="universalAutoload_deactivate" text="Dezaktywuj"/>
+		<text name="universalAutoload_materialType" text="Typ materiału"/>
+		<text name="universalAutoload_containerType" text="Typ kontenera"/>
+		<text name="universalAutoload_ALL" text="Wszystko"/>
+		<text name="universalAutoload_LIQUID_TANK" text="Zbiornik Płynów"/>
+		<text name="universalAutoload_EURO_PALLET" text="Euro Paleta"/>
+		<text name="universalAutoload_PIONEER_PALLET" text="Pioneer Paleta"/>
+		<text name="universalAutoload_BIGBAG_PALLET" text="Bigbag Paleta"/>
+		<text name="universalAutoload_BIGBAG" text="Torba"/>
+		<text name="universalAutoload_POTATOBOX" text="Ziemnioki"/>
+		<text name="universalAutoload_BALE" text="Bele"/>
+		<text name="universalAutoload_ROUND_BALE" text="Okrągłe bele"/>
+		<text name="universalAutoload_SQUARE_BALE" text="Kańciaste bele"/>
+		<text name="universalAutoload_LOGS" text="Kłody"/>
+    </texts>
+</l10n>

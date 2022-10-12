@@ -2,7 +2,7 @@
 <modDesc descVersion="67">
 
     <author>loki_79</author>
-    <version>1.2.2.16</version>
+    <version>1.2.2.17</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -14,6 +14,7 @@
 		<pl>Universalne Autoładowanie</pl>
 		<es>Autoload Universal</es>
 		<br>Carregamento Automático Universal</br>
+		<tr>Evrensel Otomatik Yükleme</tr>
 		<cs>通用自动装载</cs>
     </title>
 	
@@ -539,6 +540,80 @@ v1.0.2.0
 TRADUÇÃO - BR por Myiamoto86
 ]]>
 </br>
+<tr><![CDATA[Düz yataklı römorklar için otomatik yükleme uzmanlığı. Bu gerçek temel oyun römorklarını ve dorselerini otomatik olarak değiştirir ve çiftliğinizdeki tüm yeni veya mevcut römork ve dorselere uygulanır. Kendi mod römorklarınıza veya paletlerinize ekleme talimatları için lütfen birlikte verilen "readme" dosyasına bakın.
+
+Özellikler:
+- Herhangi bir uyumlu palet tipini yükler (aşağıdaki listeye bakın)
+- Uyumlu herhangi bir römork ve dorseye otomatik olarak yüklenir (aşağıdaki listeye bakın)
+- Seçilen malzeme veya konteyner tipine göre Yükleme ve Boşaltma
+- Yüklemeyi yalnızca tam paletlerle sınırlayabilir
+- Karışık türleri sırayla yüklemek için 'TÜMÜ'nü seçin
+- En iyi paketleme verimliliği için karışık paletler boyut sırasına göre yüklenir
+- Oyuncu yayayken römorklarla etkileşime girebilir (bir araca bağlı olmasa bile)
+
+'KRONE Trailer Profi Liner' için Özel Özellikler
+- Yükleme/Boşaltma yalnızca bölmenin açık olduğu tarafta kullanılabilir
+- Forklitle doğrudan arkadan yükleme
+- Arka kapı ve bölme oyuncu yayaykende açılıp kapatılabilir
+
+Aşağıdaki kapsayıcı türleri için yapılandırıldı:
+- Büyük torbalar
+- Büyük çuval paletler
+- Euro Paletler
+- IBC Sıvı Tankları
+- Kare Balyalar
+- Patates Kutuları (mod gerektirir: Seed Potato Pack)
+Aşağıdaki römorklar için yapılandırılmıştır:
+- Brantner DD 24073/2 XXL (Balya Römorku)
+- Bremer Transportwagen TP 500 S
+- BÖCKMANN MH-AL 4320/35
+- BÖCKMANN KK 3018/27 H
+- Demco Steel Drop Deck
+- Farmtech DPW 1800 (standard)
+- Fliegl DTS 5.9
+- KRONE Trailer Profi Liner
+- Kröger PWO 24
+- LODE KING Renown Drop Deck
+- Welger DK 115 (Balya Römorku)
+- Salek ANS-1900 (Balya Römorku)
+
+Aşağıdaki araçlar için yapılandırılmıştır:
+- Lizard Pickup 1986
+- Lizard Pickup 2017
+- Mahindra Retriever
+- JohnDeer XUV865M
+- Kubota RTV-XG850
+- Kubota RTV-X1140
+- Tren (yalnızca araç vagonu)
+
+Changelog:
+v1.2.1.0
+- Bazen birden fazla yükleme bölgesi olan araçlarda meydana gelen LUA hatası düzeltmesi
+v1.2.0.0
+- Balya toplama modu eklendi
+- Yalnızca arkadan yükleme/boşaltma seçeneği eklendi
+- Paletlerin trene otomatik yüklenmesi için destek eklendi (yalnızca araç vagonu)
+- Otomatik yüklemenin ne zaman aktif olduğunu göstermek için mağaza yapılandırma sayfasına bir simge eklendi
+- Daha az hileli bir "otomatik yükleme ışığı" seçeneği için "manuel YüklemeOnly" global seçeneği eklendi
+- Yüklenen palet başına ücretlendirme için global seçenek eklendi, ör.: pricePerPallet="10"
+- Devre dışı bırakma seçeneği eklendi (küresel veya araç başına)
+- Kapalı/açıksa yükleme yok seçeneği eklendi (kapaklı treylerler için)
+- Birden fazla yükleme bölgesi eklendi (Alçak dorseler artık her iki alana da yüklenebilir)
+- Nesnelerin elle yüklenmesi eklendi (küçük nesneler veya süper güç)
+- Yeni konsol komutları eklendi (daha fazla ayrıntı için readme dosyasına bakın)
+- Olay dinleyicilerini doğru şekilde kaldırmak için uygulanan işlev (GtX)
+v1.1.0.0
+- Balyalar ve paletler için farklı istifleme yükseklikleri eklendi
+- Paletler, kütleye göre farklı yüksekliklerde istiflenir (ağırlık dağılımını iyileştirmek için)
+- Forklift ile iyileştirilmiş manuel yükleme ve boşaltma
+- KRONE ve low loader treylerlere manuel yandan yükleme eklendi
+- Kutu Römork araç tipi eklendi
+v1.0.2.0
+  - 1.4.1.0 ile çalışacak şekilde güncellendi
+  
+ÇEVİRİ - RedBeard54
+]]>
+</tr>
 <cs><![CDATA[平板拖车的自动装载专业化。 这将自动修改游戏拖车，并将应用于你的农场上任何新的或现有的拖车。 关于如何添加到你自己的mod拖车或货盘上，请看附带的readme文件的说明。
 
 特点。
@@ -621,6 +696,8 @@ v1.0.2.0
         <sourceFile filename="UniversalAutoloadInstaller.lua" />
     </extraSourceFiles>
 	
+    <l10n filenamePrefix="language/l10n" />
+	
  	<actions>
 		<action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
 		<action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
@@ -694,645 +771,5 @@ v1.0.2.0
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_r" />
 		</actionBinding>
 	</inputBinding>
-	
-	<l10n>
-		<text name="configuration_universalAutoload">
-			<en>Universal Autoload</en>
-			<de>Universal Autoload</de>
-			<fr>Autoload Universel</fr>
-			<ru>Универсальная автозагрузка</ru>
-			<nl>Universele Autoload</nl>
-			<cz>Univerzální Autoload</cz>
-			<pl>Universalne Autoładowanie</pl>
-			<es>Autoload Universal</es>
-			<br>Autoload Universal</br>
-			<cs>通用自动装载</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING">
-			<en>Toggle loading</en>
-			<de>Laden umschalten</de>
-			<fr>Activer le chargement</fr>
-			<ru>Переключить загрузку</ru>
-			<nl>Laden starten/stoppen</nl>
-			<cz>Přepnout nakládání</cz>
-			<pl>Przełącz ładowanie</pl>
-			<es>Cambiar carga/descarga</es>
-			<br>Carregar</br>
-			<cs>切换装载</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION">
-			<en>Automatic Bale Collection Mode</en>
-			<de>Automatischer Ballensammel-Modus</de>
-			<fr>Mode de collecte automatique des balles</fr>
-			<ru>Автоматический сбор тюков</ru>
-			<nl>Automatische balenophaalmodus</nl>
-			<cz>Režim automatického sběru balíků</cz>
-			<pl>Tryb automatycznego zbierania beli</pl>
-			<es>Modo de recogida automática de balas</es>
-			<br>Modo de coleta automática de fardos</br>
-			<cs>自动捡包模式</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL">
-			<en>Unload</en>
-			<de>Abladen</de>
-			<fr>Décharger tous</fr>
-			<ru>Разгрузка</ru>
-			<nl>Lossen</nl>
-			<cz>Vyložit</cz>
-			<pl>Rozładuj</pl>
-			<es>Descargar</es>
-			<br>Descarregar</br>
-			<cs>卸载</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
-			<en>Toggle unloading side</en>
-			<de>Aktive entladeseite umschalten</de>
-			<fr>Choix du côté actif</fr>
-			<ru>Сменить сторону разгрузки</ru>
-			<nl>Schakelaar loszijde</nl>
-			<cz>Přepnout stranu vykládky</cz>
-			<pl>Przełącz stronę rozładunku</pl>
-			<es>Cambiar lado de descarga</es>
-			<br>Lado p/ descarregar</br>
-			<cs>切换卸载端</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER">
-			<en>Toggle loading filter</en>
-			<de>Ladefilter umschalten</de>
-			<fr>Sélection du chargement</fr>
-			<ru>Переключить фильтр загрузки</ru>
-			<nl>Schakelaar laad filter</nl>
-			<cz>Přepnout filtr nakládky</cz>
-			<pl>Przełącz filtr ładowania</pl>
-			<es>Cambiar filtro de carga</es>
-			<br>Filtro de carregamento</br>
-			<cs>切换装载过滤器</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL">
-			<en>Toggle horizontal loading</en>
-			<de>Horizontales Laden umschalten</de>
-			<fr>Basculement du chargement horizontal</fr>
-			<ru>Переключение горизонтальной загрузки</ru>
-			<nl>Toggle horizontaal laden</nl>
-			<cz>Přepínání horizontálního zatížení</cz>
-			<pl>Przełączanie ładowania poziomego</pl>
-			<es>Alternar carga horizontal</es>
-			<br>Alternar carregamento horizontal</br>
-			<cs>切换水平装载</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
-			<en>Change selected material type (next)</en>
-			<de>Materialtyp wechseln (vorwärts)</de>
-			<fr>Sélection du type de marchandise (suivant)</fr>
-			<ru>Изменить выбранный тип материала (след.)</ru>
-			<nl>Geselecteerd producttype wijzigen (volgende)</nl>
-			<cz>Změnit vybraný typ materiálu (další)</cz>
-			<pl>Zmień wybrany typ materiału (następny)</pl>
-			<es>Cambiar material seleccionado (siguiente)</es>
-			<br>Trocar tipo de material selecionado (prox.)</br>
-			<cs>改变选定的材料类型（下一个）</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
-			<en>Change selected material type (previous)</en>
-			<de>Materialtyp wechseln (rückwärts)</de>
-			<fr>Sélection du type de marchandise (précédent)</fr>
-			<ru>Изменить выбранный тип материала (пред.)</ru>
-			<nl>Geselecteerd producttype wijzigen (vorige)</nl>
-			<cz>Změnit vybraný typ materiálu (předchozí)</cz>
-			<pl>Zmień wybrany typ materiału (poprzedni)</pl>
-			<es>Cambiar material seleccionado (anterior)</es>
-			<br>Trocar tipo de material selecionado (ant.)</br>
-			<cs>改变选定的材料类型（上一个）</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
-			<en>Select all material types</en>
-			<de>Alle Materialtyp auswählen</de>
-			<fr>Sélectionner tous types de marchandises</fr>
-			<ru>Выбрать все типы материалов</ru>
-			<nl>Selecteer alle producttypes</nl>
-			<cz>Vyberte všechny typy materiálů</cz>
-			<pl>Wybierz wszystkie typy materiałów</pl>
-			<es>Seleccionar todos los materiales</es>
-			<br>Seleciona todos os tipos de materiais</br>
-			<cs>选择所有材料类型</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
-			<en>Change selected container type (next)</en>
-			<de>Containertyp wechseln (vorwärts)</de>
-			<fr>Sélection du type de conditionnement (suivant)</fr>
-			<ru>Изменить выбранный тип контейнера (след.)</ru>
-			<nl>Geselecteerd containertype wijzigen (volgende)</nl>
-			<cz>Změnit vybraný typ kontejneru (další)</cz>
-			<pl>Zmień wybrany typ kontenera (następny)</pl>
-			<es>Cambiar tipo de contenedor (siguiente)</es>
-			<br>Trocar tipo de contêiner (prox.)</br>
-			<cs>改变选定的容器类型（下一个）</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
-			<en>Change selected container type (previous)</en>
-			<de>Containertyp wechseln (rückwärts)</de>
-			<fr>Sélection du type de conditionnement (précédent)</fr>
-			<ru>Изменить выбранный тип контейнера (пред.)</ru>
-			<nl>Geselecteerd containertype wijzigen (vorige)</nl>
-			<cz>Změnit vybraný typ kontejneru (předchozí)</cz>
-			<pl>Zmień wybrany typ kontenera (poprzedni)</pl>
-			<es>Cambiar tipo de contenedor (anterior)</es>
-			<br>Trocar tipo de contêiner (ant.)</br>
-			<cs>改变选定的容器类型（上一个）</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
-			<en>Select all container types</en>
-			<de>Alle Containertypen auswählen</de>
-			<fr>Sélectionner tous types de conditionnement</fr>
-			<ru>Выбрать все типы контейнеров</ru>
-			<nl>Selecteer alle containertypes</nl>
-			<cz>Vyberte všechny typy kontejnerů</cz>
-			<pl>Wybierz wszystkie typy kontenerów</pl>
-			<es>Todos los tipos de contenedor</es>
-			<br>Marca todos os tipos de contêiners</br>
-			<cs>选择所有容器类型</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BELTS">
-			<en>Fasten/Unfasten tension belts</en>
-			<de>Spanngurte anbringen/lösen</de>
-			<fr>Attacher/détacher les sangles de serrage</fr>
-			<ru>Прикрепить/открепить ремни</ru>
-			<nl>Spanbanden vast-/losmaken</nl>
-			<cz>Zapnout/odepnout upínací pásy</cz>
-			<pl>Zapinanie/Odpinanie pasów napinających</pl>
-			<es>Soltar/Sujetar cintas tensoras </es>
-			<br>Apertar/Soltar cintos de tensão</br>
-			<cs>拉紧/松开张力带</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_DOOR">
-			<en>Open/Close rear door</en>
-			<de>Hintertür Öffnen/Schließen</de>
-			<fr>Ouvrir/fermer la porte arrière</fr>
-			<ru>Открыть/Закрыть заднюю дверь</ru>
-			<nl>Openen/sluiten achterdeur</nl>
-			<cz>Otevřít/zavřít zadní dveře</cz>
-			<pl>Otwórz/zamknij tylne drzwi</pl>
-			<es>Abrir/Cerrar puerta trasera</es>
-			<br>Abrir/Fechar porta traseira</br>
-			<cs>打开/关闭后门</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
-			<en>Open/Close curtain side</en>
-			<de>Plane öffnen/schließen</de>
-			<fr>Ouvrir/fermer la bâche</fr>
-			<ru>Открыть/Закрыть боковой тент</ru>
-			<nl>Openen/sluiten schuifzeil</nl>
-			<cz>Otevřít/zavřít boční závěs</cz>
-			<pl>Otwórz/zamknij kurtyny</pl>
-			<es>Abrir/Cerrar cortina lateral</es>
-			<br>Abrir/Fechar cortina lateral</br>
-			<cs>打开/关闭侧门</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG">
-			<en>Full debug mode</en>
-			<de>Vollständiger Debug-Modus</de>
-			<fr>Mode débogage complet</fr>
-			<ru>Режим полной отладки</ru>
-			<nl>Volledige debug-modus</nl>
-			<cz>Úplný režim ladění</cz>
-			<pl>Pełny Tryb Debugu</pl>
-			<es>Modo debug completa</es>
-			<br>Modo de depuração total</br>
-			<cs>完全调试模式</cs>
-		</text>
-		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING">
-			<en>Simple debug mode</en>
-			<de>Einfacher Debug-Modus</de>
-			<fr>Mode débogage simple</fr>
-			<ru>Режим простой отладки</ru>
-			<nl>Eenvoudige debug-modus</nl>
-			<cz>Jednoduchý režim ladění</cz>
-			<pl>Prosty Tryb Debugu</pl>
-			<es>Modo debug simple</es>
-			<br>Modo de depuração simples</br>
-			<cs>简单调试模式</cs>
-		</text>
-
-		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA">
-			<en>Unloading area is blocked. Please clear the unloading area.</en>
-			<de>Der Entladebereich ist blockiert. Bitte räumen Sie den Abladebereich.</de>
-			<fr>La zone de déchargement est bloquée. Veuillez libérer la zone de déchargement.</fr>
-			<ru>Зона разгрузки занята. Пожалуйста, очистите зону разгрузки.</ru>
-			<nl>Losplaats is geblokkeerd. Maak ruimte vrij op de losplaats.</nl>
-			<cz>Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky.</cz>
-			<pl>Obszar rozładunku jest zablokowany. Oczyść obszar rozładunku.</pl>
-			<es>Area de descarga bloqueada. Por favor despeje la zona.</es>
-			<br>Área de descarregamento bloqueada. Por favor, limpe a área de descarga.</br>
-			<cs>卸货区被占用。请清理卸货区。</cs>
-		</text>
-		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND">
-			<en>No compatible goods are available for loading or unloading.</en>
-			<de>Es sind keine kompatiblen Waren zum Be- oder Entladen vorhanden.</de>
-			<fr>Aucune marchandise compatible n'est disponible pour le chargement ou le déchargement.</fr>
-			<ru>Нет совместимых товаров для погрузки или разгрузки.</ru>
-			<nl>Er zijn geen ondersteunde producten gevonden voor het in- en uitladen.</nl>
-			<cz>Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku.</cz>
-			<pl>Żadne zgodne towary nie są dostępne do załadunku lub rozładunku.</pl>
-			<es>No hay productos compatibles para cargar o descargar.</es>
-			<br>Nenhum item compatível está disponível para cargarregar ou descarregar.</br>
-			<cs>没有相应的货物可供装货或卸货。</cs>
-		</text>
-		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT">
-			<en>Loading area is full. Unable to load any more items of this size.</en>
-			<de>Der Ladebereich ist voll. Es können keine weiteren Artikel dieser Größe geladen werden.</de>
-			<fr>La zone de chargement est pleine. Impossible de charger d'autres articles de cette taille.</fr>
-			<ru>Загрузочное пространство заполнено. Невозможно загрузить больше предметов такого размера.</ru>
-			<nl>Laadruimte is vol. Kan geen items van deze grootte meer laden.</nl>
-			<cz>Ložná plocha je plná. Nelze načíst další položky této velikosti.</cz>
-			<pl>Jesteś Zapchany. Niemożna więcej załadować.</pl>
-			<es>Area de carga completa. No es posible cargar mas objetos de este tamaño.</es>
-			<br>A área de carregamento está cheia. Não foi possível carregar mais destes itens.</br>
-			<cs>已装满。无法再装载任何此尺寸的物品。</cs>
-		</text>
-		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY">
-			<en>No loading allowed unless stationary. Please come to a complete stop before loading the trailer.</en>
-			<de>Das Beladen ist nur im Stillstand erlaubt. Bitte halten Sie vor dem Beladen des Anhängers vollständig an.</de>
-			<fr>Le chargement est interdit à moins d'être à l'arrêt. Veuillez vous arrêter complètement avant de charger la remorque.</fr>
-			<ru>Погрузка разрешена только в неподвижном состоянии. Перед погрузкой прицепа необходимо полностью остановиться.</ru>
-			<nl>Er mag niet geladen worden tenzij het voertuig stilstaat. Gelieve te stoppen met bewegen of de trailer opnieuw te laden.</nl>
-			<cz>Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte.</cz>
-			<pl>Nie można załadować podczas jazdy. Zatrzymaj pojazd zanim załadujesz.</pl>
-			<es>No es posible cargar en movimiento. Por favor detengase completamente antes de cargar el tráiler.</es>
-			<br>Nenhum carregamento permitido apenas parado. Por favor, pare completamente antes de carregar o trailer.</br>
-			<cs>运动中不允许装载。在装载拖车之前，请停车。</cs>
-		</text>
-		<text name="universalAutoload_tipside">
-			<en>Unloading side</en>
-			<de>Aktive entladeseite</de>
-			<fr>Côté actif</fr>
-			<ru>Сторона разгрузки</ru>
-			<nl>Loszijde</nl>
-			<cz>Vykládací strana</cz>
-			<pl>Strona rozładunku</pl>
-			<es>Lado de descarga</es>
-			<br>Lado de descarregamento</br>
-			<cs>卸货端</cs>
-		</text>
-		<text name="universalAutoload_left">
-			<en>Left</en>
-			<de>Links</de>
-			<fr>Gauche</fr>
-			<ru>Слева</ru>
-			<nl>Links</nl>
-			<cz>Vlevo</cz>
-			<pl>Lewa</pl>
-			<es>Izquierda</es>
-			<br>Esquerda</br>
-			<cs>左</cs>
-		</text>
-		<text name="universalAutoload_right">
-			<en>Right</en>
-			<de>Rechts</de>
-			<fr>Droit</fr>
-			<ru>Справа</ru>
-			<nl>Rechts</nl>
-			<cz>Vpravo</cz>
-			<pl>Prawa</pl>
-			<es>Derecha</es>
-			<br>Direita</br>
-			<cs>右</cs>
-		</text>
-		<text name="universalAutoload_none">
-			<en>None</en>
-			<de>Keine</de>
-			<fr>Aucun</fr>
-			<ru>Нет</ru>
-			<nl>Niks</nl>
-			<cz>Nic</cz>
-			<pl>Żadna</pl>
-			<es>Ninguno</es>
-			<br>Nenhum</br>
-			<cs>空</cs>
-		</text>
-		<text name="universalAutoload_loadingFilter">
-			<en>Loading filter</en>
-			<de>Ladefilter</de>
-			<fr>Choix du chargement</fr>
-			<ru>Фильтр загрузки</ru>
-			<nl>Laad filter</nl>
-			<cz>Filtr nakládky</cz>
-			<pl>Filtr ładowania</pl>
-			<es>Filtro de carga</es>
-			<br>Filtro de carregamento</br>
-			<cs>装载过滤器</cs>
-		</text>
-		<text name="universalAutoload_loadingMethod">
-			<en>Loading Method</en>
-			<de>Ladeverfahren</de>
-			<fr>Méthode de chargement</fr>
-			<ru>Способ загрузки</ru>
-			<nl>Laadmethode</nl>
-			<cz>Způsob nakládky</cz>
-			<pl>Metoda ładowania</pl>
-			<es>Método de carga</es>
-			<br>Método de carregamento</br>
-			<cs>装载方法</cs>
-		</text>
-		<text name="universalAutoload_layer">
-			<en>Layer</en>
-			<de>Ebene</de>
-			<fr>Couche</fr>
-			<ru>Слой</ru>
-			<nl>Laag</nl>
-			<cz>Vrstva</cz>
-			<pl>Warstwa</pl>
-			<es>Capa</es>
-			<br>Camada</br>
-			<cs>层数</cs>
-		</text>
-		<text name="universalAutoload_stack">
-			<en>Stack</en>
-			<de>Stapel</de>
-			<fr>Pile</fr>
-			<ru>Стек</ru>
-			<nl>Stack</nl>
-			<cz>Stoh</cz>
-			<pl>Stos</pl>
-			<es>Pila</es>
-			<br>Pilha</br>
-			<cs>堆栈</cs>
-		</text>
-		<text name="universalAutoload_fullOnly">
-			<en>Full only</en>
-			<de>Nur volle</de>
-			<fr>Complet uniquement</fr>
-			<ru>Только полные</ru>
-			<nl>Alleen volle</nl>
-			<cz>Pouze plné</cz>
-			<pl>Tylko pełne</pl>
-			<es>Solo completo</es>
-			<br>Completo apenas</br>
-			<cs>仅装满</cs>
-		</text>
-		<text name="universalAutoload_loadAny">
-			<en>Any</en>
-			<de>Jede</de>
-			<fr>Tout</fr>
-			<ru>Любой</ru>
-			<nl>Alles</nl>
-			<cz>Vše</cz>
-			<pl>Każde</pl>
-			<es>Cualquiera</es>
-			<br>Qualquer</br>
-			<cs>任何类型</cs>
-		</text>
-		<text name="universalAutoload_startLoading">
-			<en>Start loading</en>
-			<de>Laden starten</de>
-			<fr>Démarrer chargement</fr>
-			<ru>Начать загрузку</ru>
-			<nl>Start laden</nl>
-			<cz>Začít nakládku</cz>
-			<pl>Rozpocznij ładowanie</pl>
-			<es>Empezar carga</es>
-			<br>Iniciar carregamento</br>
-			<cs>开始装载</cs>
-		</text>
-		<text name="universalAutoload_stopLoading">
-			<en>Stop loading</en>
-			<de>Laden stoppen</de>
-			<fr>Arrêter le chargement</fr>
-			<ru>Остановить загрузку</ru>
-			<nl>Stop laden</nl>
-			<cz>Zastavit nakládku</cz>
-			<pl>Zatrzymaj ładowanie</pl>
-			<es>Detener carga</es>
-			<br>Parar carregamento</br>
-			<cs>停止装载</cs>
-		</text>
-		<text name="universalAutoload_unloadAll">
-			<en>Unload</en>
-			<de>Abladen</de>
-			<fr>Décharger</fr>
-			<ru>Разгрузка</ru>
-			<nl>Lossen</nl>
-			<cz>Vyložit</cz>
-			<pl>Rozładuj</pl>
-			<es>Descargar</es>
-			<br>Descarregar</br>
-			<cs>卸载</cs>
-		</text>
-		<text name="universalAutoload_baleMode">
-			<en>Auto-Bale Mode</en>
-			<de>Auto-Ballen-Modus</de>
-			<fr>Mode Auto-Balles</fr>
-			<ru>Автосбор тюков</ru>
-			<nl>Auto-Bale Mode</nl>
-			<cz>Sbírka Auto-Bale Režim</cz>
-			<pl>Tryb Auto-Bale</pl>
-			<es>Modo Auto-Paca</es>
-			<br>Modo Auto Fardo</br>
-			<cs>自动打包模式</cs>
-		</text>
-		<text name="universalAutoload_enabled">
-			<en>Enabled</en>
-			<de>Aktiviert</de>
-			<fr>Activé</fr>
-			<ru>Включено</ru>
-			<nl>Ingeschakeld</nl>
-			<cz>Povoleno</cz>
-			<pl>Włączone</pl>
-			<es>Activado</es>
-			<br>Habilitado</br>
-			<cs>已启用</cs>
-		</text>
-		<text name="universalAutoload_disabled">
-			<en>Disabled</en>
-			<de>Deaktiviert</de>
-			<fr>Désactivé</fr>
-			<ru>Отключено</ru>
-			<nl>Uitgeschakeld</nl>
-			<cz>Zakázáno</cz>
-			<pl>Wyłączone</pl>
-			<es>Desactivado</es>
-			<br>Deficiente</br>
-			<cs>已停用</cs>
-		</text>
-		<text name="universalAutoload_activate">
-			<en>Activate</en>
-			<de>Aktivieren</de>
-			<fr>Activer</fr>
-			<ru>Активировать</ru>
-			<nl>Activeer</nl>
-			<cz>Aktivace</cz>
-			<pl>Aktywuj</pl>
-			<es>Activar</es>
-			<br>Ativar</br>
-			<cs>激活</cs>
-		</text>
-		<text name="universalAutoload_deactivate">
-			<en>Deactivate</en>
-			<de>Deaktivieren</de>
-			<fr>Désactiver</fr>
-			<ru>Деактивировать</ru>
-			<nl>Deactiveren</nl>
-			<cz>Deaktivace</cz>
-			<pl>Dezaktywuj</pl>
-			<es>Desactivar</es>
-			<br>Desativar</br>
-			<cs>停用</cs>
-		</text>
-		<text name="universalAutoload_materialType">
-			<en>Material type</en>
-			<de>Materialtyp</de>
-			<fr>Marchandise sélectionnée</fr>
-			<ru>Тип материала</ru>
-			<nl>Producttype</nl>
-			<cz>Typ materiálu</cz>
-			<pl>Typ materiału</pl>
-			<es>Tipo de material</es>
-			<br>Tipo de material</br>
-			<cs>材料类型</cs>
-		</text>
-		<text name="universalAutoload_containerType">
-			<en>Container type</en>
-			<de>Containertyp</de>
-			<fr>Conditionnement sélectionné</fr>
-			<ru>Тип контейнера</ru>
-			<nl>Containertype</nl>
-			<cz>Typ kontejneru</cz>
-			<pl>Typ kontenera</pl>
-			<es>Tipo de contenedor</es>
-			<br>Tipo de contêiner</br>
-			<cs>容器类型</cs>
-		</text>
-		<text name="universalAutoload_ALL">
-			<en>All</en>
-			<de>Alle</de>
-			<fr>Tous</fr>
-			<ru>Все</ru>
-			<nl>Alles</nl>
-			<cz>Vše</cz>
-			<pl>Wszystko</pl>
-			<es>Cualquiera</es>
-			<br>Todos</br>
-			<cs>全部</cs>
-		</text>
-		<text name="universalAutoload_LIQUID_TANK">
-			<en>IBC Tank</en>
-			<de>Flüssigkeitstank</de>
-			<fr>Réservoir de liquide IBC</fr>
-			<ru>IBC-бак</ru>
-			<nl>IBC VloeistofTank</nl>
-			<cz>IBC nádrž</cz>
-			<pl>Zbiornik Płynów</pl>
-			<es>Palé de líquido</es>
-			<br>Tanque líquido IBC</br>
-			<cs>IBC罐</cs>
-		</text>
-		<text name="universalAutoload_EURO_PALLET">
-			<en>Euro Pallet</en>
-			<de>Euro-Palette</de>
-			<fr>Palette euro</fr>
-			<ru>Европоддон</ru>
-			<nl>Europallet</nl>
-			<cz>Europaleta</cz>
-			<pl>Euro Paleta</pl>
-			<es>Palé</es>
-			<br>Euro Pallet</br>
-			<cs>欧式托盘</cs>
-		</text>
-		<text name="universalAutoload_PIONEER_PALLET">
-			<en>Pioneer Pallet</en>
-			<de>Pioneer-Palette</de>
-			<fr>Palette pioneer</fr>
-			<ru>Поддон Pioneer</ru>
-			<nl>Pioneer-pallet</nl>
-			<cz>Pioneer paleta</cz>
-			<pl>Pioneer Paleta</pl>
-			<es>Palé Pioneer</es>
-			<br>Pioneer Pallet</br>
-			<cs>Pioneer Pallet</cs>
-		</text>
-		<text name="universalAutoload_BIGBAG_PALLET">
-			<en>Bigbag Pallet</en>
-			<de>Bigbag-Palette</de>
-			<fr>Palette de big bag</fr>
-			<ru>Поддон Bigbag</ru>
-			<nl>Bigbag-pallet</nl>
-			<cz>Bigbag paleta</cz>
-			<pl>Bigbag Paleta</pl>
-			<es>Palé de sacos grandes</es>
-			<br>Bigbag Pallet</br>
-			<cs>大袋托盘</cs>
-		</text>
-		<text name="universalAutoload_BIGBAG">
-			<en>Bigbag</en>
-			<de>Bigbag</de>
-			<fr>Big bag</fr>
-			<ru>Bigbag</ru>
-			<nl>Bigbag</nl>
-			<cz>Bigbag</cz>
-			<pl>Torba</pl>
-			<es>Saco grande</es>
-			<br>Bigbag</br>
-			<cs>大袋</cs>
-		</text>
-		<text name="universalAutoload_POTATOBOX">
-			<en>Potato Box</en>
-			<de>Kartoffelkiste</de>
-			<fr>Palox pommes de terre</fr>
-			<ru>Ящик картофеля</ru>
-			<nl>Aardappelkist</nl>
-			<cz>Krabice brambor</cz>
-			<pl>Ziemnioki</pl>
-			<es>Caja de patatas</es>
-			<br>Caixa de batatas</br>
-			<cs>马铃薯箱</cs>
-		</text>
-		<text name="universalAutoload_BALE">
-			<en>Bale</en>
-			<de>Ballen</de>
-			<fr>Balle</fr>
-			<ru>Тюк</ru>
-			<nl>Balen</nl>
-			<cz>Balík</cz>
-			<pl>Bele</pl>
-			<es>Paca</es>
-			<br>Fardo</br>
-			<cs>捆包</cs>
-		</text>
-		<text name="universalAutoload_ROUND_BALE">
-			<en>Round bale</en>
-			<de>Rundballen</de>
-			<fr>Balle Ronde</fr>
-			<ru>Круглый тюк</ru>
-			<nl>Ronde balen</nl>
-			<cz>Kulatý balík</cz>
-			<pl>Okrągłe bele</pl>
-			<es>Paca redonda</es>
-			<br>Fardo redondo</br>
-			<cs>圆包</cs>
-		</text>
-		<text name="universalAutoload_SQUARE_BALE">
-			<en>Square bale</en>
-			<de>Quaderballen</de>
-			<fr>Balle carrée</fr>
-			<ru>Квадратный тюк</ru>
-			<nl>Vierkante balen</nl>
-			<cz>Hranatý balík</cz>
-			<pl>Kańciaste bele</pl>
-			<es>Paca rectangular</es>
-			<br>fardo quadrado</br>
-			<cs>方包</cs>
-		</text>
-		<text name="universalAutoload_LOGS">
-			<en>Logs</en>
-			<de>Stämme</de>
-			<fr>Grumes</fr>
-			<ru>брёвна</ru>
-			<nl>Stammen</nl>
-			<cz>Polena</cz>
-			<pl>Kłody</pl>
-			<es>Troncos</es>
-			<br>Toros</br>
-			<cs>日志</cs>
-		</text>
-	</l10n>
 
 </modDesc>

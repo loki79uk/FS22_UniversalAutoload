@@ -157,7 +157,6 @@ end
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanStartFieldWork", UniversalAutoload.getCanStartFieldWork)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
 end
 
 function UniversalAutoload:getCanStartFieldWork(superFunc)
@@ -3281,13 +3280,6 @@ function UniversalAutoload:getIsUnloadingAreaAllowed(i)
 	local spec = self.spec_universalAutoload
 	
     return true
-end
---
-function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
-	if self.spec_universalAutoload == nil then
-		return superFunc(self)
-	end
-	return UniversalAutoload.getIsLoadingVehicleAllowed(self) and -1 or math.huge
 end
 --
 function UniversalAutoload:testLocationIsFull(loadPlace, offset)

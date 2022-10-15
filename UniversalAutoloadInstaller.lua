@@ -150,8 +150,13 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 					end
 					local objectType = xmlFile:getValue(objectTypeKey.."#name")
 					objectType = objectType:gsub(":", ".")
-					table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
-					print("   - " .. tostring(objectType))
+					
+					local customEnvironment, _ = objectType:match( "^(.-)%.(.+)$" )
+					if customEnvironment==nil or g_modIsLoaded[customEnvironment] then
+						table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
+						print("   - " .. tostring(objectType))
+					end
+					
 					i = i + 1
 				end
 			end
@@ -294,22 +299,25 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 				local default = UniversalAutoload[containerType] or {}
 
 				local name = xmlFile:getValue(configKey.."#name")
-				local config = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-				if config == nil or overwriteExisting then
-					UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
-					newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-					newType.name = name
-					newType.type = containerType
-					newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
-					newType.sizeX = xmlFile:getValue(configKey.."#sizeX", default.sizeX or 1.5)
-					newType.sizeY = xmlFile:getValue(configKey.."#sizeY", default.sizeY or 1.5)
-					newType.sizeZ = xmlFile:getValue(configKey.."#sizeZ", default.sizeZ or 1.5)
-					newType.isBale = xmlFile:getValue(configKey.."#isBale", default.isBale or false)
-					newType.flipYZ = xmlFile:getValue(configKey.."#flipYZ", default.flipYZ or false)
-					newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
-					newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
-					newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
-					print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", newType.type, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
+				local customEnvironment, _ = name:match( "^(.-):(.+)$" )
+				if customEnvironment==nil or g_modIsLoaded[customEnvironment] then
+					local config = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+					if config == nil or overwriteExisting then
+						UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name] = {}
+						newType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+						newType.name = name
+						newType.type = containerType
+						newType.containerIndex = UniversalAutoload.CONTAINERS_INDEX[containerType] or 1
+						newType.sizeX = xmlFile:getValue(configKey.."#sizeX", default.sizeX or 1.5)
+						newType.sizeY = xmlFile:getValue(configKey.."#sizeY", default.sizeY or 1.5)
+						newType.sizeZ = xmlFile:getValue(configKey.."#sizeZ", default.sizeZ or 1.5)
+						newType.isBale = xmlFile:getValue(configKey.."#isBale", default.isBale or false)
+						newType.flipYZ = xmlFile:getValue(configKey.."#flipYZ", default.flipYZ or false)
+						newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
+						newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
+						newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
+						print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", newType.type, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
+					end				
 				end
 
 			else
@@ -908,15 +916,14 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 	local rootVehicle = vehicle:getRootVehicle()
 	if rootVehicle ~= nil then
 		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
+		if rootVehicle:getFullName() == "Diesel Locomotive" then
+			print("*** CANNOT RESET TRAIN - terrible things will happen ***")
+			return true
+		end
 		if rootVehicle == g_currentMission.controlledVehicle then
-			if rootVehicle:getFullName() == "Diesel Locomotive" then
-				print("*** CANNOT RESET TRAIN - terrible things will happen ***")
-				return true
-			else
-				print("*** Resetting with standard console command ***")
-				UniversalAutoload.clearLoadedObjects(vehicle)
-				return false
-			end
+			print("*** Resetting with standard console command ***")
+			UniversalAutoload.clearLoadedObjects(vehicle)
+			return false
 		end
 	end
 	

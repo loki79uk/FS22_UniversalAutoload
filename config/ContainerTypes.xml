@@ -61,37 +61,6 @@
 		<containerConfiguration containerType="POTATOBOX" name="FS22_Seedpotato_Farm_Pack:Potatoboxmedium"/>
 		<containerConfiguration containerType="POTATOBOX" name="FS22_Seedpotato_Farm_Pack:Potatoboxpremium"/>
 
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:chickenFood_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:feedPellets_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:grainGrist_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:heucobs_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:horseFood_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:minerals_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:pigFood_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:powerFood_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:sheepFood_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:DSVseeds_pallet" sizeY="0.77" sizeZ="0.90"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:chickenFood_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:feedPellets_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:grainGrist_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:heucobs_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:horseFood_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:minerals_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:pigFood_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:powerFood_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:sheepFood_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="ALL" name="FS22_MaizePlus:DSVseeds_sack" sizeX="0.40" sizeY="0.13" sizeZ="0.80"/>
-		<containerConfiguration containerType="BIGBAG" name="FS22_MaizePlus:bigBag"/>
-		<containerConfiguration containerType="LIQUID_TANK" name="FS22_MaizePlus:liquidTank"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:fillablePallet"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale80_pallet" sizeY="1.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale80CG_pallet" sizeY="1.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale80CL_pallet" sizeY="1.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale80Ng_pallet" sizeY="1.90"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale80_2Ng_pallet" sizeY="1.80"/>
-		<containerConfiguration containerType="EURO_PALLET" name="FS22_MaizePlus:squarebale120Ng_pallet" sizeX="1.25" sizeY="2.45" sizeZ="1.25"/>
-		<containerConfiguration containerType="BALE" name="FS22_MaizePlus:roundbaleCCM80" sizeX="0.85" sizeY="1.15" sizeZ="0.85" isRoundbale="true" flipYZ="true"/>
-
     </containerConfigurations>
 </universalAutoload>
 

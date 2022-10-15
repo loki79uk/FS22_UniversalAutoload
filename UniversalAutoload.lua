@@ -305,6 +305,12 @@ function UniversalAutoload:updateActionEventKeys()
 			local actions = UniversalAutoload.ACTIONS
 			local ignoreCollisions = true
 
+			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
+			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+			spec.unloadAllActionEventId = actionEventId
+			if debugKeys then print("  UNLOAD_ALL: "..tostring(valid)) end
+			spec.updateToggleLoading = true
+			
 			if not UniversalAutoload.manualLoadingOnly then
 				
 				if spec.isBaleTrailer then
@@ -319,59 +325,64 @@ function UniversalAutoload:updateActionEventKeys()
 				spec.toggleLoadingActionEventId = actionEventId
 				if debugKeys then print("  TOGGLE_LOADING: "..tostring(valid)) end
 
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-				spec.toggleLoadingFilterActionEventId = actionEventId
-				if debugKeys then print("  TOGGLE_FILTER: "..tostring(valid)) end
+				if not spec.isLogTrailer then
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.toggleLoadingFilterActionEventId = actionEventId
+					if debugKeys then print("  TOGGLE_FILTER: "..tostring(valid)) end
+					spec.updateToggleFilter = true
+				end
 			end
 			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_HORIZONTAL, self, UniversalAutoload.actionEventToggleHorizontalLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			spec.toggleHorizontalLoadingActionEventId = actionEventId
-			if debugKeys then print("  TOGGLE_HORIZONTAL: "..tostring(valid)) end
-
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
-			spec.unloadAllActionEventId = actionEventId
-			if debugKeys then print("  UNLOAD_ALL: "..tostring(valid)) end
-			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			spec.cycleMaterialActionEventId = actionEventId
-			if debugKeys then print("  CYCLE_MATERIAL_FW: "..tostring(valid)) end
-
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
-			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
-			if debugKeys then print("  CYCLE_MATERIAL_BW: "..tostring(valid)) end
-			
-			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_MATERIALS, self, UniversalAutoload.actionEventSelectAllMaterials, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-			g_inputBinding:setActionEventTextVisibility(actionEventId, false)
-			if debugKeys then print("  SELECT_ALL_MATERIALS: "..tostring(valid)) end
-			
-			if UniversalAutoload.chatKeyConflict ~= true then
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
+			if not spec.isLogTrailer then
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_HORIZONTAL, self, UniversalAutoload.actionEventToggleHorizontalLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
-				spec.cycleContainerActionEventId = actionEventId
-				if debugKeys then print("  CYCLE_CONTAINER_FW: "..tostring(valid)) end
+				spec.toggleHorizontalLoadingActionEventId = actionEventId
+				if debugKeys then print("  TOGGLE_HORIZONTAL: "..tostring(valid)) end
+				spec.updateHorizontalLoading = true
+				
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				spec.cycleMaterialActionEventId = actionEventId
+				if debugKeys then print("  CYCLE_MATERIAL_FW: "..tostring(valid)) end
 
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
-				if debugKeys then print("  CYCLE_CONTAINER_BW: "..tostring(valid)) end
-
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_CONTAINERS, self, UniversalAutoload.actionEventSelectAllContainers, false, true, false, true, nil, nil, ignoreCollisions, true)
+				if debugKeys then print("  CYCLE_MATERIAL_BW: "..tostring(valid)) end
+				
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_MATERIALS, self, UniversalAutoload.actionEventSelectAllMaterials, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
-				if debugKeys then print("  SELECT_ALL_CONTAINERS: "..tostring(valid)) end
-			end
+				if debugKeys then print("  SELECT_ALL_MATERIALS: "..tostring(valid)) end
+				spec.updateCycleMaterial = true
+				
+				if UniversalAutoload.chatKeyConflict ~= true then
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					spec.cycleContainerActionEventId = actionEventId
+					if debugKeys then print("  CYCLE_CONTAINER_FW: "..tostring(valid)) end
+
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
+					g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+					if debugKeys then print("  CYCLE_CONTAINER_BW: "..tostring(valid)) end
+
+					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_CONTAINERS, self, UniversalAutoload.actionEventSelectAllContainers, false, true, false, true, nil, nil, ignoreCollisions, true)
+					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+					if debugKeys then print("  SELECT_ALL_CONTAINERS: "..tostring(valid)) end
+					spec.updateCycleContainer = true
+				end
 			
+			end
+
 			if not spec.isCurtainTrailer and not spec.rearUnloadingOnly and not spec.frontUnloadingOnly then
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, ignoreCollisions, true)
 				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 				spec.toggleTipsideActionEventId = actionEventId
 				if debugKeys then print("  TOGGLE_TIPSIDE: "..tostring(valid)) end
+				spec.updateToggleTipside = true
 			end
 			
 			if g_currentMission.player.isControlled then
@@ -381,6 +392,7 @@ function UniversalAutoload:updateActionEventKeys()
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleBeltsActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_BELTS: "..tostring(valid)) end
+					spec.updateToggleBelts = true
 				end
 				
 				if spec.isCurtainTrailer or spec.isBoxTrailer then
@@ -388,6 +400,7 @@ function UniversalAutoload:updateActionEventKeys()
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleDoorActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_DOOR: "..tostring(valid)) end
+					spec.updateToggleDoor = true
 				end
 					
 				if spec.isCurtainTrailer then
@@ -395,6 +408,7 @@ function UniversalAutoload:updateActionEventKeys()
 					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
 					spec.toggleCurtainActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_CURTAIN: "..tostring(valid)) end
+					spec.updateToggleCurtain = true
 				end
 				
 			end
@@ -411,15 +425,6 @@ function UniversalAutoload:updateActionEventKeys()
 				if debugKeys then print("  TOGGLE_DEBUG: "..tostring(valid)) end
 			end
 
-			spec.updateCycleMaterial = true
-			spec.updateCycleContainer = true
-			spec.updateToggleDoor = true
-			spec.updateToggleCurtain = true
-			spec.updateToggleTipside = true
-			spec.updateToggleBelts = true
-			spec.updateToggleFilter = true
-			spec.updateToggleLoading = true
-			spec.updateHorizontalLoading = true
 			if debugKeys then print("*** updateActionEventKeys ***") end
 		end
 	end
@@ -1027,7 +1032,11 @@ function UniversalAutoload:createSortedObjectsToLoad(availableObjects)
 		end
 	end
 	if #sortedObjectsToLoad > 1 then
-		table.sort(sortedObjectsToLoad, UniversalAutoload.sortPalletsForLoading)
+		if spec.isLogTrailer then
+			table.sort(sortedObjectsToLoad, UniversalAutoload.sortLogsForLoading)
+		else
+			table.sort(sortedObjectsToLoad, UniversalAutoload.sortPalletsForLoading)
+		end
 	end
 	for _, object in pairs(sortedObjectsToLoad) do
 		object.sort = nil
@@ -1045,6 +1054,13 @@ function UniversalAutoload.sortPalletsForLoading(w1,w2)
 	elseif w1.sort.area == w2.sort.area and w1.sort.material < w2.sort.material then
 		return true
 	elseif w1.sort.area > w2.sort.area then
+		return true
+	end
+end
+--
+function UniversalAutoload.sortLogsForLoading(w1,w2)
+	-- SORT BY:  LENGTH
+	if w1.sizeY > w2.sizeY then
 		return true
 	end
 end
@@ -1546,19 +1562,24 @@ function UniversalAutoload:onLoad(savegame)
 		local x0, y0, z0 = math.huge, math.huge, math.huge
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
 		
+		local actualRootNode = self.spec_tensionBelts.rootNode or self.rootNode
+		if self.spec_tensionBelts.rootNode~=nil and self.spec_tensionBelts.rootNode~=self.rootNode then
+			print("*** USING TENSION BELT ROOT NODE ***")
+		end
+		
 		for i, loadArea in pairs(spec.loadArea) do
 			-- create bounding box for loading area
 			local offsetX, offsetY, offsetZ = unpack(spec.loadArea[i].offset)
 			loadArea.rootNode = createTransformGroup("LoadAreaCentre")
-			link(self.rootNode, loadArea.rootNode)
+			link(actualRootNode, loadArea.rootNode)
 			setTranslation(loadArea.rootNode, offsetX, offsetY, offsetZ)
 
 			loadArea.startNode = createTransformGroup("LoadAreaStart")
-			link(self.rootNode, loadArea.startNode)
+			link(actualRootNode, loadArea.startNode)
 			setTranslation(loadArea.startNode, offsetX, offsetY, offsetZ+(loadArea.length/2))
 			
 			loadArea.endNode = createTransformGroup("LoadAreaEnd")
-			link(self.rootNode, loadArea.endNode)
+			link(actualRootNode, loadArea.endNode)
 			setTranslation(loadArea.endNode, offsetX, offsetY, offsetZ-(loadArea.length/2))
 			
 			-- measure bounding box for all loading areas
@@ -1579,15 +1600,15 @@ function UniversalAutoload:onLoad(savegame)
 		local offsetX, offsetY, offsetZ = (x0+x1)/2, y0, (z0+z1)/2
 		
 		spec.loadVolume.rootNode = createTransformGroup("loadVolumeCentre")
-		link(self.rootNode, spec.loadVolume.rootNode)
+		link(actualRootNode, spec.loadVolume.rootNode)
 		setTranslation(spec.loadVolume.rootNode, offsetX, offsetY, offsetZ)
 
 		spec.loadVolume.startNode = createTransformGroup("loadVolumeStart")
-		link(self.rootNode, spec.loadVolume.startNode)
+		link(actualRootNode, spec.loadVolume.startNode)
 		setTranslation(spec.loadVolume.startNode, offsetX, offsetY, offsetZ+(spec.loadVolume.length/2))
 		
 		spec.loadVolume.endNode = createTransformGroup("loadVolumeEnd")
-		link(self.rootNode, spec.loadVolume.endNode)
+		link(actualRootNode, spec.loadVolume.endNode)
 		setTranslation(spec.loadVolume.endNode, offsetX, offsetY, offsetZ-(spec.loadVolume.length/2))
 
 		-- load trigger i3d file
@@ -2279,10 +2300,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			if spec.isLoading then
 				spec.loadDelayTime = spec.loadDelayTime or 0
 				if spec.loadDelayTime > UniversalAutoload.delayTime then
-					local lastObjectType = nil
+					local lastObject = nil
 					local loadedObject = false
 					for index, object in ipairs(spec.sortedObjectsToLoad) do
-						lastObjectType = UniversalAutoload.getContainerType(object)
+						lastObject = object
 						if UniversalAutoload.loadObject(self, object) then
 							loadedObject = true
 							if spec.firstAttemptToLoad then
@@ -2295,15 +2316,18 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						break
 					end
 					if not loadedObject then
-						if #spec.sortedObjectsToLoad > 0 and lastObjectType ~= nil then
-							local i = 1
+						if #spec.sortedObjectsToLoad > 0 and lastObject ~= nil then
+							local i = #spec.sortedObjectsToLoad
 							for _ = 1, #spec.sortedObjectsToLoad do
 								local nextObject = spec.sortedObjectsToLoad[i]
-								if lastObjectType == UniversalAutoload.getContainerType(nextObject) then
+								local lastObjectType = UniversalAutoload.getContainerType(lastObject)
+								local shorterLog = lastObject.isSplitShape and nextObject.isSplitShape and nextObject.sizeY <= lastObject.sizeY
+								
+								if lastObjectType == UniversalAutoload.getContainerType(nextObject) and not shorterLog then
 									if UniversalAutoload.showDebug then print("DELETE SAME OBJECT TYPE: "..lastObjectType.name) end
 									table.remove(spec.sortedObjectsToLoad, i)
 								else
-									i = i + 1
+									i = i - 1
 								end
 							end
 						end
@@ -2325,9 +2349,12 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						end
 					end
 				else
-					spec.loadDelayTime = spec.loadDelayTime + dt
-					if spec.baleCollectionMode or spec.useHorizontalLoading then
+					if spec.isLogTrailer then
+						spec.loadDelayTime = spec.loadDelayTime + (dt/3)
+					elseif spec.baleCollectionMode or spec.useHorizontalLoading then
 						spec.loadDelayTime = spec.loadDelayTime + (3*dt)
+					else 
+						spec.loadDelayTime = spec.loadDelayTime + dt
 					end
 				end
 			end
@@ -2335,8 +2362,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			-- DELAY AFTER LOAD/UNLOAD FOR MP POSITION SYNC
 			if spec.doPostLoadDelay then
 				spec.postLoadDelayTime = spec.postLoadDelayTime or 0
+				local logDelay = spec.isLogTrailer and 1000 or 0
 				local mpDelay = g_currentMission.missionDynamicInfo.isMultiplayer and 1000 or 0
-				if spec.postLoadDelayTime > UniversalAutoload.delayTime + mpDelay then
+				if spec.postLoadDelayTime > UniversalAutoload.delayTime + mpDelay + logDelay then
 					UniversalAutoload.resetLoadingState(self)
 				else
 					spec.postLoadDelayTime = spec.postLoadDelayTime + dt
@@ -2415,6 +2443,9 @@ end
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
 	
+	if spec.isLogTrailer then
+		return object.isSplitShape
+	end
 	if spec.baleCollectionMode and object.isRoundbale==nil then
 		return false
 	end
@@ -2607,8 +2638,11 @@ function UniversalAutoload:loadObject(object)
 		
 		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
-
-			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, spec.baleCollectionMode) then
+		
+			--ALTERNATE LOG ORIENTATION FOR EACH LAYER
+			--local rotateLogs = spec.isLogTrailer and (spec.currentLayerCount % 2 ~= 0)
+			local rotateLogs = spec.isLogTrailer and (math.random(0,1) > 0.5);
+			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, rotateLogs, spec.baleCollectionMode) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 				
@@ -2631,7 +2665,7 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 	-- print("UniversalAutoload - unloadObject")
 	if object ~= nil and UniversalAutoload.isValidForUnloading(self, object) then
 	
-		if UniversalAutoload.moveObjectNodes(self, object, unloadPlace, false) then
+		if UniversalAutoload.moveObjectNodes(self, object, unloadPlace, false, false) then
 			UniversalAutoload.clearPalletFromAllVehicles(self, object)
 			UniversalAutoload.addAvailableObject(self, object)
 			return true
@@ -2771,6 +2805,16 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea[i].width
 	local length = spec.loadArea[i].length
+	
+	--ALTERNATE LOG PACKING FOR EACH LAYER
+	if spec.isLogTrailer then
+		local N = math.floor(width / containerType.sizeZ)
+		if N > 1 and spec.currentLayerCount % 2 ~= 0 then
+			width = (N-1) * containerType.sizeZ
+		end
+	end
+	
+	--CALCULATE PACKING DIMENSIONS
 	local N1 = math.floor(width / containerType.sizeX)
 	local M1 = math.floor(length / containerType.sizeZ)
 	local N2 = math.floor(width / containerType.sizeZ)
@@ -2850,12 +2894,15 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		spec.currentActualWidth = N * sizeX
 		spec.currentActualLength = spec.currentLoadLength
 		spec.currentLoadLength = spec.currentLoadLength + sizeZ
+		if spec.isLogTrailer then
+			spec.currentLoadLength = spec.currentLoadLength + 0.1
+		end
 	else
 		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
 	end
 
 	if spec.currentLoadLength == 0 then
-		-- print("LOAD LENGTH WAS ZERO")
+		print("LOAD LENGTH WAS ZERO")
 		spec.currentLoadLength = sizeZ
 	end
 	
@@ -3001,7 +3048,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						end
 					end
 					
-					if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) then
+					if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) or spec.isLogTrailer then
 						if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
 						containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
 						UniversalAutoload.createLoadingPlace(self, containerType)
@@ -3010,7 +3057,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local thisLoadPlace = spec.currentLoadingPlace
 					if thisLoadPlace ~= nil and not layerOverMaxHeight then
 					
-						local containerFitsInLoadSpace = 
+						local containerFitsInLoadSpace = spec.isLogTrailer or 
 							(loadPlace.useRoundbalePacking ~= nil and containerType.sizeX==containerType.sizeX) or
 							(containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
 
@@ -3020,7 +3067,16 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
-							if not self:ualGetIsMoving() and not spec.baleCollectionMode then
+							if spec.isLogTrailer then
+							
+								local logLoadHeight = maxLoadAreaHeight + 0.1
+								setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
+								if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
+									spec.currentLoadHeight = 0
+									useThisLoadSpace = true
+								end
+
+							elseif not self:ualGetIsMoving() and not spec.baleCollectionMode then
 								local increment = 0.1
 								if spec.useHorizontalLoading then
 								
@@ -3099,7 +3155,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			end
 		end
 		spec.currentLoadAreaIndex = 1
-		if spec.useHorizontalLoading and spec.currentLayerCount < 4
+		if (spec.isLogTrailer and spec.currentLayerCount < 10)
+		or (spec.useHorizontalLoading and spec.currentLayerCount < 5)
 		and not (spec.baleCollectionMode and spec.nextLayerHeight == 0) then
 			spec.currentLayerCount = spec.currentLayerCount + 1
 			spec.currentLoadingPlace = nil
@@ -3668,7 +3725,7 @@ function UniversalAutoload:addBaleModeBale(node)
 	setRotation(node, rx, ry, rz)
 end
 --
-function UniversalAutoload:moveObjectNodes( object, position, isLoading, baleMode )
+function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateLogs, baleMode )
 
 	local rootNodes = UniversalAutoload.getRootNodes(object)
 	local node = rootNodes[1]
@@ -3682,7 +3739,7 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, baleMod
 		-- SPLITSHAPE ROTATION
 		if object.isSplitShape then
 		
-			local s = math.floor(math.random(0,1)+0.5) * 2 - 1;
+			local s = rotateLogs and 1 or -1
 			local xx,xy,xz = localDirectionToWorld(position.node, s, 0, 0) --length
 			local yx,yy,yz = localDirectionToWorld(position.node, 0, 1, 0) --height
 			local zx,zy,zz = localDirectionToWorld(position.node, 0, 0, 0) --width
@@ -3982,10 +4039,13 @@ function UniversalAutoload:createPallet(xmlFilename)
 						end
 					end
 				end
+				if spec.palletsToSpawn and #spec.palletsToSpawn==1 then
+					spec.palletsToSpawn = nil
+				end
 			end
 			
 			vehicle.spec_universalAutoload.spawningPallet = nil
-			if vehicle.spec_universalAutoload.trailerIsFull == true then
+			if vehicle.spec_universalAutoload.trailerIsFull == true or not spec.palletsToSpawn then
 				vehicle.spec_universalAutoload.spawnPallets = false
 				vehicle.spec_universalAutoload.doPostLoadDelay = true
 				vehicle.spec_universalAutoload.doSetTensionBelts = true
@@ -4054,7 +4114,13 @@ function UniversalAutoload:clearLoadedObjects()
 		if debugConsole then print("CLEAR OBJECTS: " .. self:getFullName()) end
 		self:setAllTensionBeltsActive(false)
 		for _, object in pairs(spec.loadedObjects) do
-			if object.isRoundbale == nil then
+			if object.isSplitShape then
+				UniversalAutoload.SPLITSHAPES_LOOKUP[object.nodeId] = nil
+				g_currentMission:removeKnownSplitShape(object.nodeId)
+				if entityExists(object.nodeId) then
+					delete(object.nodeId)
+				end
+			elseif object.isRoundbale == nil then
 				g_currentMission:removeVehicle(object, true)
 				palletCount = palletCount + 1
 			else

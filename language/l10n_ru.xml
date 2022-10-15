@@ -55,6 +55,6 @@
 		<text name="universalAutoload_BALE" text="Тюк"/>
 		<text name="universalAutoload_ROUND_BALE" text="Круглый тюк"/>
 		<text name="universalAutoload_SQUARE_BALE" text="Квадратный тюк"/>
-		<text name="universalAutoload_LOGS" text="брёвна"/>
+		<text name="universalAutoload_LOGS" text="Брёвна"/>
     </texts>
 </l10n>

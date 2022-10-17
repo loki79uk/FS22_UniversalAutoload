@@ -11,6 +11,7 @@ UniversalAutoload.showDebug = false
 UniversalAutoload.showLoading = false
 
 UniversalAutoload.delayTime = 200
+UniversalAutoload.logSpace = 0.25
 
 local debugKeys = false
 local debugConsole = false
@@ -2321,9 +2322,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							for _ = 1, #spec.sortedObjectsToLoad do
 								local nextObject = spec.sortedObjectsToLoad[i]
 								local lastObjectType = UniversalAutoload.getContainerType(lastObject)
-								local shorterLog = lastObject.isSplitShape and nextObject.isSplitShape and nextObject.sizeY <= lastObject.sizeY
-								
-								if lastObjectType == UniversalAutoload.getContainerType(nextObject) and not shorterLog then
+								local nextObjectType = UniversalAutoload.getContainerType(nextObject)
+								local shorterLog = nextObject~=nil and lastObject.isSplitShape and nextObject.isSplitShape and nextObject.sizeY <= lastObject.sizeY
+
+								if lastObjectType == nextObjectType and not shorterLog then
 									if UniversalAutoload.showDebug then print("DELETE SAME OBJECT TYPE: "..lastObjectType.name) end
 									table.remove(spec.sortedObjectsToLoad, i)
 								else
@@ -2443,8 +2445,11 @@ end
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
 	
-	if spec.isLogTrailer then
-		return object.isSplitShape
+	if object.isSplitShape and object.sizeY > spec.loadArea[spec.currentLoadAreaIndex].length then
+		return false
+	end
+	if spec.isLogTrailer and not object.isSplitShape then
+		return false
 	end
 	if spec.baleCollectionMode and object.isRoundbale==nil then
 		return false
@@ -2894,8 +2899,8 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		spec.currentActualWidth = N * sizeX
 		spec.currentActualLength = spec.currentLoadLength
 		spec.currentLoadLength = spec.currentLoadLength + sizeZ
-		if spec.isLogTrailer then
-			spec.currentLoadLength = spec.currentLoadLength + 0.1
+		if spec.isLogTrailer and spec.currentActualLength~=0 then
+			spec.currentLoadLength = spec.currentLoadLength + UniversalAutoload.logSpace
 		end
 	else
 		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
@@ -3069,11 +3074,13 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							local useThisLoadSpace = false
 							if spec.isLogTrailer then
 							
-								local logLoadHeight = maxLoadAreaHeight + 0.1
-								setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
-								if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
-									spec.currentLoadHeight = 0
-									useThisLoadSpace = true
+								if not self:ualGetIsMoving() then
+									local logLoadHeight = maxLoadAreaHeight + 0.1
+									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
+									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
+										spec.currentLoadHeight = 0
+										useThisLoadSpace = true
+									end
 								end
 
 							elseif not self:ualGetIsMoving() and not spec.baleCollectionMode then

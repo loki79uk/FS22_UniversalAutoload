@@ -3624,6 +3624,7 @@ function UniversalAutoload.getObjectPositionNode( object )
 		print("*** getObjectPositionNode == NIL ***")
 		DebugUtil.printTableRecursively(object, "--", 0, 1)
 		print("************************************")
+		UniversalAutoload.SPLITSHAPES_LOOKUP[object] = nil
 		return
 	end
 	if object.isSplitShape and object.positionNodeId then
@@ -4236,6 +4237,10 @@ end
 --
 function UniversalAutoload.getContainerType(object)
 
+	if object == nil then
+		return nil
+	end
+
 	if object.i3dFilename == nil then
 		--print("getContainerType: i3dFilename == NIL")
 		if object.isSplitShape then
@@ -4469,7 +4474,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			end
 		end
 	
-		for _,object in pairs(spec.availableObjects) do
+		for i, object in pairs(spec.availableObjects) do
 			if object ~= nil then
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
@@ -4481,11 +4486,14 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 					else
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREY, offset )
 					end
+				else
+					table.remove(i, spec.availableObjects)
+					break
 				end
 			end
 		end
 		
-		for _,object in pairs(spec.loadedObjects) do
+		for i, object in pairs(spec.loadedObjects) do
 			if object ~= nil then
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
@@ -4497,6 +4505,9 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 					else
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREY, offset )
 					end
+				else
+					table.remove(i, spec.loadedObjects)
+					break
 				end
 			end
 		end

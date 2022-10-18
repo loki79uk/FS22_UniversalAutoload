@@ -1821,6 +1821,14 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLoadingFilter = true
 			spec.baleCollectionMode = false
 			spec.useHorizontalLoading = spec.horizontalLoading or false
+			--server only
+			spec.currentLoadWidth = 0
+			spec.currentLoadLength = 0
+			spec.currentLoadHeight = 0
+			spec.currentActualWidth = 0
+			spec.currentActualLength = 0
+			spec.currentLoadAreaIndex = 1
+			spec.resetLoadingPattern = false
 		else
 			--client+server
 			spec.currentTipside = savegame.xmlFile:getValue(savegame.key..".universalAutoload#tipside", "left")
@@ -2445,7 +2453,11 @@ end
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
 	
-	if object.isSplitShape and object.sizeY > spec.loadArea[spec.currentLoadAreaIndex].length then
+	if object == nil then
+		return false
+	end
+	
+	if object.isSplitShape and object.sizeY > spec.loadArea[spec.currentLoadAreaIndex or 1].length then
 		return false
 	end
 	if spec.isLogTrailer and not object.isSplitShape then
@@ -3881,7 +3893,7 @@ function UniversalAutoload:addLoadedObject(object)
 	
 	if spec.loadedObjects[object] == nil and (spec.autoLoadingObjects[object] == nil or not UniversalAutoload.isValidForManualLoading(object)) then
 		spec.loadedObjects[object] = object
-		spec.objectToLoadingAreaIndex[object] = spec.currentLoadAreaIndex
+		spec.objectToLoadingAreaIndex[object] = spec.currentLoadAreaIndex or 1
 		spec.totalUnloadCount = spec.totalUnloadCount + 1
 		if object.addDeleteListener ~= nil then
 			object:addDeleteListener(self, "ualOnDeleteLoadedObject_Callback")

@@ -746,6 +746,81 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 	return "Please enter a vehicle with a UAL trailer attached to use this command"
 end
 --
+function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
+
+	local length = nil
+	local treeTypeName = "PINE"
+	
+	if tonumber(arg1) then
+		length = tonumber(arg1)
+		treeTypeName = arg2
+	elseif tonumber(arg2) then
+		length = tonumber(arg2)
+		treeTypeName = arg1
+	else
+		treeTypeName = arg1
+	end
+	
+	local availableLogTypes = {
+		OAK = 3,
+		ELM = 5,
+		PINE = 8,
+		BIRCH = 5,
+		MAPLE = 2,
+		POPLAR = 8,
+		SPRUCE = 6,
+		WILLOW = 2,
+		CYPRESS = 2,
+		HICKORY = 4,
+		STONEPINE = 8
+	}
+
+	treeTypeName = string.upper(treeTypeName or "")
+	if availableLogTypes[treeTypeName]==nil then
+		return "Error: Invalid lumber type. Valid types are " .. table.concatKeys(availableLogTypes, ", ")
+	end
+	
+	local maxLength = availableLogTypes[treeTypeName]
+	if treeTypeName == 'ELM' then treeTypeName = 'AMERICANELM' end
+	if treeTypeName == 'HICKORY' then treeTypeName = 'SHAGBARKHICKORY' end
+	if length == nil then length = maxLength end
+	if length > maxLength then
+		print("using maximum length " .. maxLength .. "m")
+		length = maxLength
+	end
+	
+	if g_currentMission.controlledVehicle ~= nil then
+
+		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		local count = 0
+		
+		if next(vehicles) ~= nil then
+			for vehicle, hasAutoload in pairs(vehicles) do
+				if hasAutoload then
+				
+					local spec = vehicle.spec_universalAutoload
+					local trailerLength = spec.loadArea[spec.currentLoadAreaIndex or 1].length
+					if length > trailerLength then
+						length = math.floor(trailerLength - 0.1)
+						print("resizing to fit trailer " .. length .. "m")
+					end
+
+					count = count + 1
+					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
+					UniversalAutoload.setBaleCollectionMode(vehicle, false)
+					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+
+					UniversalAutoload.clearLoadedObjects(vehicle)
+					UniversalAutoload.createLogs(vehicle, treeTypeName, length)
+				end
+			end
+		end
+	
+		if count>0 then return "Begin adding logs now.." end
+	end
+	return "Please enter a vehicle with a UAL trailer attached to use this command"
+end
+--
 function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, width, height, length, wrapState, modName)
 	local usage = "ualAddBales fillTypeName isRoundBale [width] [height/diameter] [length] [wrapState] [modName]"
 
@@ -832,27 +907,31 @@ end
 --
 function UniversalAutoloadManager:consoleClearLoadedObjects()
 	
-	local palletCount, balesCount = 0, 0
+	local palletCount, balesCount, logCount = 0, 0, 0
 	if g_currentMission.controlledVehicle ~= nil then
 		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
 				if hasAutoload then
-					N, M = UniversalAutoload.clearLoadedObjects(vehicle)
-					palletCount = palletCount + N
-					balesCount = balesCount + M
+					P, B, L = UniversalAutoload.clearLoadedObjects(vehicle)
+					palletCount = palletCount + P
+					balesCount = balesCount + B
+					logCount = logCount + L
 				end
 			end
 		end
 	end
 
-	if palletCount > 0 and balesCount == 0 then
+	if palletCount > 0 and balesCount == 0 and logCount == 0 then
 		return string.format("REMOVED: %d pallets", palletCount)
 	end
-	if balesCount > 0 and palletCount == 0 then
+	if balesCount > 0 and palletCount == 0 and logCount == 0 then
 		return string.format("REMOVED: %d bales", balesCount)
 	end
-	return string.format("REMOVED: %d pallets, %d bales", palletCount, balesCount)
+	if logCount > 0 and palletCount == 0 and balesCount == 0 then
+		return string.format("REMOVED: %d logs", logCount)
+	end
+	return string.format("REMOVED: %d pallets, %d bales, %d logs", palletCount, balesCount, logCount)
 end
 --
 function UniversalAutoloadManager:consoleCreateBoundingBox()
@@ -1063,6 +1142,7 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualAddSquareBales_220", "Fill current vehicle with medium square bales", "consoleAddSquareBales_220", UniversalAutoloadManager)
 		addConsoleCommand("ualAddSquareBales_240", "Fill current vehicle with large square bales", "consoleAddSquareBales_240", UniversalAutoloadManager)
 		addConsoleCommand("ualAddPallets", "Fill current vehicle with specified pallets (fill type)", "consoleAddPallets", UniversalAutoloadManager)
+		addConsoleCommand("ualAddLogs", "Fill current vehicle with specified logs (length / fill type)", "consoleAddLogs", UniversalAutoloadManager)
 		addConsoleCommand("ualClearLoadedObjects", "Remove all loaded objects from current vehicle", "consoleClearLoadedObjects", UniversalAutoloadManager)
 		addConsoleCommand("ualResetVehicles", "Reset all vehicles with autoload (and any attached) to the shop", "consoleResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
@@ -1080,6 +1160,7 @@ function UniversalAutoloadManager:loadMap(name)
 			removeConsoleCommand("ualAddSquareBales_220")
 			removeConsoleCommand("ualAddSquareBales_240")
 			removeConsoleCommand("ualAddPallets")
+			removeConsoleCommand("ualAddLogs")
 			removeConsoleCommand("ualClearLoadedObjects")
 			removeConsoleCommand("ualResetVehicles")
 			removeConsoleCommand("ualImportUserConfigurations")

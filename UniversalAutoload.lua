@@ -2204,10 +2204,10 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				spec.spawnBalesDelayTime = 0
 				bale = spec.baleToSpawn
 				local baleObject = UniversalAutoload.createBale(self, bale.xmlFile, bale.fillTypeIndex, bale.wrapState)
-				if not UniversalAutoload.loadObject(self, baleObject) then
+				if baleObject ~= nil and not UniversalAutoload.loadObject(self, baleObject) then
 					baleObject:delete()
 				end
-				if spec.currentLoadingPlace == nil then
+				if baleObject == nil or spec.currentLoadingPlace == nil then
 					spec.spawnBales = false
 					spec.doPostLoadDelay = true
 					spec.doSetTensionBelts = true
@@ -2215,6 +2215,48 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 			else
 				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + (3*dt)
+			end
+		end
+		
+		-- CREATE AND LOAD LOGS (IF REQUESTED)
+		if spec.spawnLogs then
+			spec.spawnLogsDelayTime = spec.spawnLogsDelayTime or 0
+			if spec.spawnLogsDelayTime > UniversalAutoload.delayTime then
+
+				if spec.spawnedLogId == nil then
+					log = spec.logToSpawn
+					spec.spawnedLogIdIncrement = 0
+					spec.spawnedLogId = UniversalAutoload.createLog(self, log.treeType, log.length)
+				else
+					local logId = spec.spawnedLogId + spec.spawnedLogIdIncrement
+					local logObject = UniversalAutoload.getSplitShapeObject(logId)
+
+					if logObject ~= nil and entityExists(logId) then
+						if not UniversalAutoload.loadObject(self, logObject) then
+							delete(logId)
+							spec.currentLoadingPlace = nil
+						end
+						if spec.currentLoadingPlace == nil then
+							spec.spawnLogs = false
+							spec.doPostLoadDelay = true
+							spec.doSetTensionBelts = true
+							print("..adding logs complete!")
+						end
+						spec.spawnLogsDelayTime = 0
+						spec.spawnedLogId = nil
+					else
+						spec.spawnedLogIdIncrement = spec.spawnedLogIdIncrement + 1
+						if spec.spawnedLogIdIncrement > 99 then
+							spec.spawnLogs = false
+							spec.spawnedLogId = nil
+							print("..error spawning log - aborting!")
+						end
+					end
+					
+				end
+
+			else
+				spec.spawnLogsDelayTime = spec.spawnLogsDelayTime + dt
 			end
 		end
 		
@@ -2658,8 +2700,7 @@ function UniversalAutoload:loadObject(object)
 		if loadPlace ~= nil then
 		
 			--ALTERNATE LOG ORIENTATION FOR EACH LAYER
-			--local rotateLogs = spec.isLogTrailer and (spec.currentLayerCount % 2 ~= 0)
-			local rotateLogs = spec.isLogTrailer and (math.random(0,1) > 0.5);
+			local rotateLogs = object.isSplitShape and (math.random(0,1) > 0.5);
 			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, rotateLogs, spec.baleCollectionMode) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
@@ -3561,10 +3602,12 @@ end
 function UniversalAutoload.getSplitShapeObject( objectId )
 
 	if not entityExists(objectId) then
+		-- print("entity NOT exists")
 		UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] = nil
 		return
 	end
 	
+	--print("RigidBodyType: " .. tostring(getRigidBodyType(objectId)))
 	if getRigidBodyType(objectId) == RigidBodyType.DYNAMIC then
 	
 		local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(objectId))
@@ -3620,10 +3663,10 @@ end
 function UniversalAutoload.getObjectPositionNode( object )
 	local node = UniversalAutoload.getObjectRootNode(object)
 	if node == nil or not entityExists(node) then
-		print("************************************")
-		print("*** getObjectPositionNode == NIL ***")
-		DebugUtil.printTableRecursively(object, "--", 0, 1)
-		print("************************************")
+		-- print("************************************")
+		-- print("*** getObjectPositionNode == NIL ***")
+		-- DebugUtil.printTableRecursively(object, "--", 0, 1)
+		-- print("************************************")
 		UniversalAutoload.SPLITSHAPES_LOOKUP[object] = nil
 		return
 	end
@@ -4104,6 +4147,76 @@ function UniversalAutoload:createPallets(pallets)
 	end
 end
 --
+function UniversalAutoload:createLog(treeType, length)
+	local spec = self.spec_universalAutoload
+
+	local x, y, z = getWorldTranslation(spec.loadVolume.rootNode)
+	dirX, dirY, dirZ = localDirectionToWorld(spec.loadVolume.rootNode, 0, 0, 1)
+	y = y + 50
+	
+	if treeType == 'SPRUCE' then
+		if math.random(1, 100) > 50 then treeType = 'SPRUCE1' else treeType = 'SPRUCE2' end
+	end
+	if treeType == 'WILLOW' then
+		if math.random(1, 100) > 50 then treeType = 'WILLOW1' else treeType = 'WILLOW2' end
+	end
+
+	local treeTypeDesc = g_treePlantManager:getTreeTypeDescFromName(treeType)
+	local growthState = #treeTypeDesc.treeFilenames
+	local treeId, splitShapeFileId = g_treePlantManager:loadTreeNode(treeTypeDesc, x, y, z, 0, 0, 0, growthState)
+
+	if treeId ~= 0 then
+		if getFileIdHasSplitShapes(splitShapeFileId) then
+			local tree = {
+				node = treeId,
+				growthState = growthState,
+				z = z,
+				y = y,
+				x = x,
+				rz = 0,
+				ry = 0,
+				rx = 0,
+				treeType = treeTypeDesc.index,
+				splitShapeFileId = splitShapeFileId,
+				hasSplitShapes = true
+			}
+
+			table.insert(g_treePlantManager.treesData.splitTrees, tree)
+
+			g_treePlantManager.loadTreeTrunkData = {
+				offset = 0.5,
+				framesLeft = 2,
+				shape = treeId + 2,
+				x = x,
+				y = y,
+				z = z,
+				length = length,
+				dirX = dirX,
+				dirY = dirY,
+				dirZ = dirZ,
+				delimb = true
+			}
+		else
+			delete(treeId)
+		end
+	end
+	
+	return treeId
+end
+--
+function UniversalAutoload:createLogs(treeType, length)
+	local spec = self.spec_universalAutoload
+	
+	if spec~=nil and spec.isAutoloadEnabled then
+		if debugConsole then print("ADD LOGS: " .. self:getFullName()) end
+		self:setAllTensionBeltsActive(false)
+		spec.spawnLogs = true
+		spec.logToSpawn = {}
+		spec.logToSpawn.treeType = treeType
+		spec.logToSpawn.length = length
+	end
+end
+--
 function UniversalAutoload:createBale(xmlFilename, fillTypeIndex, wrapState)
 	local spec = self.spec_universalAutoload
 
@@ -4137,7 +4250,7 @@ end
 --
 function UniversalAutoload:clearLoadedObjects()
 	local spec = self.spec_universalAutoload
-	local palletCount, balesCount = 0, 0
+	local palletCount, balesCount, logCount = 0, 0, 0
 	
 	if spec~=nil and spec.isAutoloadEnabled and spec.loadedObjects ~= nil then
 		if debugConsole then print("CLEAR OBJECTS: " .. self:getFullName()) end
@@ -4149,6 +4262,7 @@ function UniversalAutoload:clearLoadedObjects()
 				if entityExists(object.nodeId) then
 					delete(object.nodeId)
 				end
+				logCount = logCount + 1
 			elseif object.isRoundbale == nil then
 				g_currentMission:removeVehicle(object, true)
 				palletCount = palletCount + 1
@@ -4166,7 +4280,7 @@ function UniversalAutoload:clearLoadedObjects()
 		spec.currentLayerCount = 0
 		spec.currentLayerHeight = 0
 	end
-	return palletCount, balesCount
+	return palletCount, balesCount, logCount
 end
 --
 
@@ -4474,7 +4588,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			end
 		end
 	
-		for i, object in pairs(spec.availableObjects) do
+		for _, object in pairs(spec.availableObjects) do
 			if object ~= nil then
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
@@ -4486,14 +4600,11 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 					else
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREY, offset )
 					end
-				else
-					table.remove(i, spec.availableObjects)
-					break
 				end
 			end
 		end
 		
-		for i, object in pairs(spec.loadedObjects) do
+		for _, object in pairs(spec.loadedObjects) do
 			if object ~= nil then
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
@@ -4505,9 +4616,6 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 					else
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREY, offset )
 					end
-				else
-					table.remove(i, spec.loadedObjects)
-					break
 				end
 			end
 		end

@@ -626,7 +626,7 @@ function UniversalAutoloadManager:consoleResetVehicles()
 	UniversalAutoload.VEHICLES = {}
 	print(string.format("Resetting %d vehicles now..", #UniversalAutoloadManager.resetList))
 	
-	UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+	UniversalAutoloadManager.resetNextVehicle()
 	
 end
 --
@@ -639,6 +639,7 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 	
 	if vehicleCount > 0 then
 		vehicleCount = 0
+		local doResetVehicle = false
 		for key, configGroup in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
 			for index, config in pairs(configGroup) do
 				if oldVehicleConfigurations[key] and oldVehicleConfigurations[key][index]
@@ -646,14 +647,14 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 					local foundFirstMatch = false
 					-- FIRST LOOK IF THIS IS THE CURRENT CONTROLLED VECHILE
 					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-						print(vehicle.configFileName .. " - " .. tostring(vehicle.spec_universalAutoload.boughtConfig) .. " / " .. index)
+						-- print(vehicle.configFileName .. " - " .. tostring(vehicle.spec_universalAutoload.boughtConfig) .. " / " .. index)
 						if string.find(vehicle.configFileName, key) and vehicle.spec_universalAutoload.boughtConfig == index then
 							local rootVehicle = vehicle:getRootVehicle()
 							if rootVehicle == g_currentMission.controlledVehicle then
 								foundFirstMatch = true
 								print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
 								if not UniversalAutoloadManager.resetVehicle(vehicle) then
-									g_currentMission:consoleCommandReloadVehicle()
+									doResetVehicle = true
 								end
 							end
 						end
@@ -666,7 +667,7 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 								vehicleCount = vehicleCount + 1
 								print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
 								if not UniversalAutoloadManager.resetVehicle(vehicle) then
-									g_currentMission:consoleCommandReloadVehicle()
+									doResetVehicle = true
 								end
 							else
 								print("ONLY ONE OF EACH VEHICLE CONFIGURATION CAN BE RESET USING THIS COMMAND")
@@ -675,6 +676,9 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 					end
 				end
 			end
+		end
+		if doResetVehicle then
+			g_currentMission:consoleCommandReloadVehicle()
 		end
 	end
 	
@@ -764,15 +768,15 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 	local availableLogTypes = {
 		OAK = 3,
 		ELM = 5,
-		PINE = 8,
+		PINE = 12,
 		BIRCH = 5,
 		MAPLE = 2,
-		POPLAR = 8,
+		POPLAR = 12,
 		SPRUCE = 6,
 		WILLOW = 2,
 		CYPRESS = 2,
 		HICKORY = 4,
-		STONEPINE = 8
+		STONEPINE = 12
 	}
 
 	treeTypeName = string.upper(treeTypeName or "")
@@ -799,9 +803,8 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 				if hasAutoload then
 				
 					local spec = vehicle.spec_universalAutoload
-					local trailerLength = spec.loadArea[spec.currentLoadAreaIndex or 1].length
-					if length > trailerLength then
-						length = math.floor(trailerLength - 0.1)
+					if length > spec.maxSingleLength then
+						length = spec.maxSingleLength
 						print("resizing to fit trailer " .. length .. "m")
 					end
 
@@ -969,15 +972,17 @@ function UniversalAutoloadManager.getAttachedVehicles(vehicle)
 end
 
 -- 
-function UniversalAutoloadManager.resetNextVehicle(resetList)
+function UniversalAutoloadManager.resetNextVehicle()
 
+	local resetList = UniversalAutoloadManager.resetList
 	if resetList ~= nil and next(resetList) ~= nil then
 		local vehicle = resetList[#resetList]
 		table.remove(resetList, #resetList)
 		if not UniversalAutoloadManager.resetVehicle(vehicle) then
+			UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
 			g_currentMission:consoleCommandReloadVehicle()
 			g_currentMission.isReloadingVehicles = true
-			UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+			UniversalAutoloadManager.resetNextVehicle()
 		end
 	else
 		UniversalAutoloadManager.resetCount = nil
@@ -997,6 +1002,9 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
 		if rootVehicle:getFullName() == "Diesel Locomotive" then
 			print("*** CANNOT RESET TRAIN - terrible things will happen ***")
+			if UniversalAutoloadManager.resetCount then
+				UniversalAutoloadManager.resetNextVehicle()
+			end
 			return true
 		end
 		if rootVehicle == g_currentMission.controlledVehicle then
@@ -1040,7 +1048,7 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 			end
 			
 			xmlFile:delete()
-			UniversalAutoloadManager.resetNextVehicle(UniversalAutoloadManager.resetList)
+			UniversalAutoloadManager.resetNextVehicle()
 		end
 		
 		VehicleLoadingUtil.loadVehicleFromSavegameXML(xmlFile, key, true, true, nil, true, asyncCallbackFunction, nil, {})

@@ -271,7 +271,12 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 		end
 		if closestVehicle ~= nil then
 			UniversalAutoload.forceRaiseActive(closestVehicle)
-			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
+			local SPEC = closestVehicle.spec_universalAutoload
+			if SPEC ~= nil and SPEC.isLogTrailer then
+				g_currentMission:addExtraPrintText(closestVehicle:getFullName() .. " = " .. SPEC.maxSingleLength .. "m")
+			else
+				g_currentMission:addExtraPrintText(closestVehicle:getFullName())
+			end
 		end
 	end
 end
@@ -1569,6 +1574,7 @@ function UniversalAutoload:onLoad(savegame)
 			print("*** USING TENSION BELT ROOT NODE ***")
 		end
 		
+		spec.maxSingleLength = 0
 		for i, loadArea in pairs(spec.loadArea) do
 			-- create bounding box for loading area
 			local offsetX, offsetY, offsetZ = unpack(spec.loadArea[i].offset)
@@ -1591,6 +1597,10 @@ function UniversalAutoload:onLoad(savegame)
 			if y1 < offsetY+(loadArea.height) then y1 = offsetY+(loadArea.height) end
 			if z0 > offsetZ-(loadArea.length/2) then z0 = offsetZ-(loadArea.length/2) end
 			if z1 < offsetZ+(loadArea.length/2) then z1 = offsetZ+(loadArea.length/2) end
+			
+			if loadArea.length > spec.maxSingleLength then
+				spec.maxSingleLength = math.floor(loadArea.length)
+			end
 		end
 	
 		-- create bounding box for all loading areas
@@ -2017,7 +2027,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.isUnloading = streamReadBool(streamId)
 		spec.validLoadCount = streamReadInt32(streamId)
 		spec.validUnloadCount = streamReadInt32(streamId)
-		
+		spec.maxSingleLength = streamReadInt32(streamId)
 		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
 		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
 		
@@ -2048,6 +2058,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.isUnloading = spec.isUnloading or false
 		spec.validLoadCount = spec.validLoadCount or 0
 		spec.validUnloadCount = spec.validUnloadCount or 0
+		spec.maxSingleLength = spec.maxSingleLength or 0
 		UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
 		UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false
 		
@@ -2062,7 +2073,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteBool(streamId, spec.isUnloading)
 		streamWriteInt32(streamId, spec.validLoadCount)
 		streamWriteInt32(streamId, spec.validUnloadCount)
-		
+		streamWriteInt32(streamId, spec.maxSingleLength)
 		streamWriteBool(streamId, UniversalAutoload.disableAutoStrap)
 		streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly)
 	else
@@ -2151,6 +2162,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		else
 			spec.menuDelayTime = spec.menuDelayTime + dt
 		end
+		if spec.isLogTrailer and not playerActive then
+			g_currentMission:addExtraPrintText(self:getFullName() .. " = " .. spec.maxSingleLength .. "m")
+		end
 	end
 	
 	if self.isServer then
@@ -2225,28 +2239,30 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 
 				if spec.spawnedLogId == nil then
 					log = spec.logToSpawn
-					spec.spawnedLogIdIncrement = 0
 					spec.spawnedLogId = UniversalAutoload.createLog(self, log.treeType, log.length)
 				else
-					local logId = spec.spawnedLogId + spec.spawnedLogIdIncrement
-					local logObject = UniversalAutoload.getSplitShapeObject(logId)
+					if not g_treePlantManager.loadTreeTrunkData then
+						for increment = 1, 50 do
+							local logId = spec.spawnedLogId + increment
+							local logObject = UniversalAutoload.getSplitShapeObject(logId)
 
-					if logObject ~= nil and entityExists(logId) then
-						if not UniversalAutoload.loadObject(self, logObject) then
-							delete(logId)
-							spec.currentLoadingPlace = nil
+							if logObject ~= nil and entityExists(logId) then
+								if not UniversalAutoload.loadObject(self, logObject) then
+									delete(logId)
+									spec.currentLoadingPlace = nil
+								end
+								if spec.currentLoadingPlace == nil then
+									spec.spawnLogs = false
+									spec.doPostLoadDelay = true
+									spec.doSetTensionBelts = true
+									print("..adding logs complete!")
+								end
+								spec.spawnLogsDelayTime = 0
+								spec.spawnedLogId = nil
+								break
+							end
 						end
-						if spec.currentLoadingPlace == nil then
-							spec.spawnLogs = false
-							spec.doPostLoadDelay = true
-							spec.doSetTensionBelts = true
-							print("..adding logs complete!")
-						end
-						spec.spawnLogsDelayTime = 0
-						spec.spawnedLogId = nil
-					else
-						spec.spawnedLogIdIncrement = spec.spawnedLogIdIncrement + 1
-						if spec.spawnedLogIdIncrement > 99 then
+						if spec.spawnedLogId ~= nil then
 							spec.spawnLogs = false
 							spec.spawnedLogId = nil
 							print("..error spawning log - aborting!")
@@ -3004,7 +3020,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("-------------------------------")
 	end
 	
-	if spec.currentLoadLength<spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
+	if spec.currentLoadLength<=spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
 		-- print("CREATE NEW LOADING PLACE")
 		loadPlace = {}
 		loadPlace.node = createTransformGroup("loadPlace")

@@ -10,7 +10,7 @@
 			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/fliegl/dts59/dts59.xml">
-            <loadingArea offset="0 1.205 -1.5" width="2.30" height="2.10" length="5.0" baleHeight="2.8"/>
+            <loadingArea offset="0 1.205 -1.75" width="2.30" height="2.10" length="5.5" baleHeight="2.8"/>
             <loadingArea offset="0 1.392 1.80" width="2.30" height="1.95" length="1.4" baleHeight="2.8"/>
 			<options isBaleTrailer="true"/>
         </vehicleConfiguration>
@@ -101,7 +101,7 @@
 		
 		<!-- SUPPORTED FORESTRY VEHICLES/TRAILERS -->
 		<vehicleConfiguration configFileName="data/vehicles/fliegl/timberRunner/timberRunner.xml">
-            <loadingArea offset="0 1.666 0" width="2.40" height="2.2" length="12.0"/>
+            <loadingArea offset="0 1.666 -0.05" width="2.40" height="2.2" length="12.1"/>
 			<options isLogTrailer="true"/>
         </vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/andersonGroup/m160/m160.xml">

@@ -730,17 +730,10 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 		
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
-				if hasAutoload then
-					count = count + 1
-					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
-					UniversalAutoload.setBaleCollectionMode(vehicle, false)
-					if palletsOnly then
-						UniversalAutoload.setContainerTypeIndex(vehicle, 2)
-					else
-						UniversalAutoload.setContainerTypeIndex(vehicle, 1)
+				if hasAutoload and vehicle:getIsActiveForInput() then
+					if UniversalAutoload.createPallets(vehicle, pallets) then
+						count = count + 1
 					end
-					UniversalAutoload.clearLoadedObjects(vehicle)
-					UniversalAutoload.createPallets(vehicle, pallets)
 				end
 			end
 		end
@@ -761,7 +754,7 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 	elseif tonumber(arg2) then
 		length = tonumber(arg2)
 		treeTypeName = arg1
-	else
+	elseif arg1 ~= nil then
 		treeTypeName = arg1
 	end
 	
@@ -800,21 +793,15 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 		
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
-				if hasAutoload then
-				
+				if hasAutoload and vehicle:getIsActiveForInput() then
 					local spec = vehicle.spec_universalAutoload
 					if length > spec.maxSingleLength then
-						length = spec.maxSingleLength
+						length = spec.maxSingleLength - 0.1
 						print("resizing to fit trailer " .. length .. "m")
 					end
-
-					count = count + 1
-					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
-					UniversalAutoload.setBaleCollectionMode(vehicle, false)
-					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
-
-					UniversalAutoload.clearLoadedObjects(vehicle)
-					UniversalAutoload.createLogs(vehicle, treeTypeName, length)
+					if UniversalAutoload.createLogs(vehicle, treeTypeName, length) then
+						count = count + 1
+					end
 				end
 			end
 		end
@@ -869,12 +856,10 @@ function UniversalAutoloadManager:consoleAddBales(fillTypeName, isRoundbale, wid
 		
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
-				if hasAutoload then
-					count = count + 1
-					UniversalAutoload.clearLoadedObjects(vehicle)
-					UniversalAutoload.setMaterialTypeIndex(vehicle, 1)
-					UniversalAutoload.setContainerTypeIndex(vehicle, 1)
-					UniversalAutoload.createBales(vehicle, bale)
+				if hasAutoload and vehicle:getIsActiveForInput() then
+					if UniversalAutoload.createBales(vehicle, bale) then
+						count = count + 1
+					end
 				end
 			end
 		end
@@ -915,7 +900,7 @@ function UniversalAutoloadManager:consoleClearLoadedObjects()
 		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
-				if hasAutoload then
+				if hasAutoload and vehicle:getIsActiveForInput() then
 					P, B, L = UniversalAutoload.clearLoadedObjects(vehicle)
 					palletCount = palletCount + P
 					balesCount = balesCount + B

@@ -273,7 +273,7 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 			UniversalAutoload.forceRaiseActive(closestVehicle)
 			local SPEC = closestVehicle.spec_universalAutoload
 			if SPEC ~= nil and SPEC.isLogTrailer then
-				g_currentMission:addExtraPrintText(closestVehicle:getFullName() .. " = " .. SPEC.maxSingleLength .. "m")
+				g_currentMission:addExtraPrintText(closestVehicle:getFullName() .. string.format(" = %.1fm",SPEC.maxSingleLength))
 			else
 				g_currentMission:addExtraPrintText(closestVehicle:getFullName())
 			end
@@ -1440,6 +1440,10 @@ function UniversalAutoload:onLoad(savegame)
 
 		local configFileName = self.configFileName
 		local xmlFile = XMLFile.load("configXml", configFileName, Vehicle.xmlSchema)
+		
+		if self:getFullName() == 'Lizard Sugarbeet Wagon' then
+			self.getName = Utils.overwrittenFunction(self.getName, function(self, superFunc) return "Timber Wagon" end)
+		end
 
 		if self.customEnvironment ~= nil then
 			configFileName = Utils.removeModDirectory(configFileName)
@@ -1611,7 +1615,7 @@ function UniversalAutoload:onLoad(savegame)
 			if z1 < offsetZ+(loadArea.length/2) then z1 = offsetZ+(loadArea.length/2) end
 			
 			if loadArea.length > spec.maxSingleLength then
-				spec.maxSingleLength = math.floor(loadArea.length)
+				spec.maxSingleLength = math.floor(10*loadArea.length)/10
 			end
 		end
 	
@@ -2174,8 +2178,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		else
 			spec.menuDelayTime = spec.menuDelayTime + dt
 		end
-		if spec.isLogTrailer and not playerActive then
-			g_currentMission:addExtraPrintText(self:getFullName() .. " = " .. spec.maxSingleLength .. "m")
+		if spec.isLogTrailer and isActiveForInput and not playerActive then
+			g_currentMission:addExtraPrintText(self:getFullName() .. string.format(" = %.1fm",spec.maxSingleLength))
 		end
 	end
 	
@@ -3122,7 +3126,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
 					
-					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerType.sizeY and not spec.disableHeightLimit then
+					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerType.sizeY
+					and not spec.disableHeightLimit and not spec.isLogTrailer then
 						if density > 0.5 then
 							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
 						end
@@ -3170,7 +3175,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
 										spec.currentLoadHeight = spec.currentLayerHeight
-										spec.loadSpeedFactor = maxLoadAreaHeight/(maxLoadAreaHeight+spec.currentLoadHeight)/mass
+										local massFactor = math.clamp((1/mass)/2, 0.2, 1)
+										local heightFactor = maxLoadAreaHeight/(maxLoadAreaHeight+spec.currentLoadHeight)
+										spec.loadSpeedFactor = math.clamp(heightFactor*massFactor, 0.2, 1)
 										-- print("loadSpeedFactor: " .. spec.loadSpeedFactor)
 										useThisLoadSpace = true
 									end
@@ -3260,8 +3267,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 		and not (spec.baleCollectionMode and spec.nextLayerHeight == 0) then
 			spec.currentLayerCount = spec.currentLayerCount + 1
 			spec.currentLoadingPlace = nil
-			spec.currentLayerHeight = spec.nextLayerHeight
-			spec.nextLayerHeight = 0
+			if not spec.isLogTrailer or (spec.isLogTrailer and spec.nextLayerHeight > 0) then
+				spec.currentLayerHeight = spec.nextLayerHeight
+				spec.nextLayerHeight = 0
+			end
 			if UniversalAutoload.showDebug then print("START NEW LAYER") end
 			if UniversalAutoload.showDebug then print("currentLayerCount: " .. spec.currentLayerCount) end
 			if UniversalAutoload.showDebug then print("currentLayerHeight: " .. spec.currentLayerHeight) end
@@ -4175,7 +4184,19 @@ function UniversalAutoload:createPallets(pallets)
 	local spec = self.spec_universalAutoload
 	
 	if spec~=nil and spec.isAutoloadEnabled then
+		if spec.isLogTrailer then
+			print("Log trailer - cannot load bales")
+			return false
+		end
 		if debugConsole then print("ADD PALLETS: " .. self:getFullName()) end
+		UniversalAutoload.setMaterialTypeIndex(self, 1)
+		UniversalAutoload.setBaleCollectionMode(self, false)
+		if palletsOnly then
+			UniversalAutoload.setContainerTypeIndex(self, 2)
+		else
+			UniversalAutoload.setContainerTypeIndex(self, 1)
+		end
+		UniversalAutoload.clearLoadedObjects(self)
 		self:setAllTensionBeltsActive(false)
 		spec.spawnPallets = true
 		spec.palletsToSpawn = {}
@@ -4183,6 +4204,7 @@ function UniversalAutoload:createPallets(pallets)
 		for _, pallet in pairs(pallets) do
 			table.insert(spec.palletsToSpawn, pallet)
 		end
+		return true
 	end
 end
 --
@@ -4254,11 +4276,16 @@ function UniversalAutoload:createLogs(treeType, length)
 	
 	if spec~=nil and spec.isAutoloadEnabled then
 		if debugConsole then print("ADD LOGS: " .. self:getFullName()) end
+		UniversalAutoload.setMaterialTypeIndex(self, 1)
+		UniversalAutoload.setBaleCollectionMode(self, false)
+		UniversalAutoload.setContainerTypeIndex(self, 1)
+		UniversalAutoload.clearLoadedObjects(self)		
 		self:setAllTensionBeltsActive(false)
 		spec.spawnLogs = true
 		spec.logToSpawn = {}
 		spec.logToSpawn.treeType = treeType
 		spec.logToSpawn.length = length
+		return true
 	end
 end
 --
@@ -4286,10 +4313,18 @@ function UniversalAutoload:createBales(bale)
 	local spec = self.spec_universalAutoload
 	
 	if spec~=nil and spec.isAutoloadEnabled then
+		if spec.isLogTrailer then
+			print("Log trailer - cannot load bales")
+			return false
+		end
 		if debugConsole then print("ADD BALES: " .. self:getFullName()) end
+		UniversalAutoload.clearLoadedObjects(self)
+		UniversalAutoload.setMaterialTypeIndex(self, 1)
+		UniversalAutoload.setContainerTypeIndex(self, 1)
 		self:setAllTensionBeltsActive(false)
 		spec.spawnBales = true
 		spec.baleToSpawn = bale
+		return true
 	end
 end
 --

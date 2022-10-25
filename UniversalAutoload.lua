@@ -934,6 +934,12 @@ function UniversalAutoload:setHorizontalLoading(state, noEventSend)
 	local spec = self.spec_universalAutoload
 
 	spec.useHorizontalLoading = state
+	
+	if spec.useHorizontalLoading == true then
+		spec.loadSpeedFactor = 3
+	else
+		spec.loadSpeedFactor = 1
+	end
 
 	UniversalAutoloadSetHorizontalLoadingEvent.sendEvent(self, state, noEventSend)
 	
@@ -986,6 +992,12 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	end
 	
 	spec.baleCollectionMode = baleCollectionMode
+	
+	if spec.baleCollectionMode == true then
+		spec.loadSpeedFactor = 3
+	else
+		spec.loadSpeedFactor = 1
+	end
 	
 	UniversalAutoloadSetBaleCollectionModeEvent.sendEvent(self, baleCollectionMode, noEventSend)
 	spec.updateToggleLoading = true
@@ -2228,7 +2240,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					print("..adding bales complete!")
 				end
 			else
-				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + (3*dt)
+				spec.loadSpeedFactor = spec.loadSpeedFactor or 1
+				spec.spawnBalesDelayTime = spec.spawnBalesDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
 		
@@ -2238,11 +2251,16 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			if spec.spawnLogsDelayTime > UniversalAutoload.delayTime then
 
 				if spec.spawnedLogId == nil then
-					log = spec.logToSpawn
-					spec.spawnedLogId = UniversalAutoload.createLog(self, log.treeType, log.length)
+					if not UniversalAutoload.spawningLog then
+						log = spec.logToSpawn
+						spec.spawnedLogId = UniversalAutoload.createLog(self, log.treeType, log.length)
+						if spec.spawnedLogId == nil then
+							spec.spawnLogsDelayTime = 0
+						end
+					end
 				else
 					if not g_treePlantManager.loadTreeTrunkData then
-						for increment = 1, 50 do
+						for increment = 0, 99 do
 							local logId = spec.spawnedLogId + increment
 							local logObject = UniversalAutoload.getSplitShapeObject(logId)
 
@@ -2259,12 +2277,14 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								end
 								spec.spawnLogsDelayTime = 0
 								spec.spawnedLogId = nil
+								UniversalAutoload.spawningLog = false
 								break
 							end
 						end
 						if spec.spawnedLogId ~= nil then
 							spec.spawnLogs = false
 							spec.spawnedLogId = nil
+							UniversalAutoload.spawningLog = false
 							print("..error spawning log - aborting!")
 						end
 					end
@@ -2272,7 +2292,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 
 			else
-				spec.spawnLogsDelayTime = spec.spawnLogsDelayTime + dt
+				spec.spawnLogsDelayTime = spec.spawnLogsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
 		
@@ -2292,7 +2312,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				UniversalAutoload.createPallet(self, pallet)
 				spec.lastSpawnedPallet = pallet
 			else
-				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + dt
+				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
 		
@@ -2418,13 +2438,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 						end
 					end
 				else
-					if spec.isLogTrailer then
-						spec.loadDelayTime = spec.loadDelayTime + (dt/3)
-					elseif spec.baleCollectionMode or spec.useHorizontalLoading then
-						spec.loadDelayTime = spec.loadDelayTime + (3*dt)
-					else 
-						spec.loadDelayTime = spec.loadDelayTime + dt
-					end
+					spec.loadSpeedFactor = spec.loadSpeedFactor or 1
+					spec.loadDelayTime = spec.loadDelayTime + (spec.loadSpeedFactor*dt)
 				end
 			end
 			
@@ -3017,8 +3032,13 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("currentLoadLength: " .. tostring(spec.currentLoadLength) )
 		print("currentActualWidth: " .. tostring(spec.currentActualWidth) )
 		print("currentActualLength: " .. tostring(spec.currentActualLength) )
+		print("currentLoadHeight: " .. tostring(spec.currentLoadHeight) )
+		print("currentLayerCount: " .. tostring(spec.currentLayerCount) )
+		print("currentLayerHeight: " .. tostring(spec.currentLayerHeight) )
+		print("nextLayerHeight: " .. tostring(spec.nextLayerHeight) )
 		print("-------------------------------")
 	end
+	
 	
 	if spec.currentLoadLength<=spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
 		-- print("CREATE NEW LOADING PLACE")
@@ -3090,6 +3110,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				spec.currentLoadHeight = spec.currentLoadHeight or 0
 				spec.currentLayerCount = spec.currentLayerCount or 0
 				spec.currentLayerHeight = spec.currentLayerHeight or 0
+				
+				local mass = UniversalAutoload.getContainerMass(object)
+				local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
+				local density = math.min(mass/volume, 1.5)
 			
 				while spec.currentLoadLength < spec.loadArea[i].length do
 
@@ -3099,9 +3123,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					end
 					
 					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerType.sizeY and not spec.disableHeightLimit then
-						local mass = UniversalAutoload.getContainerMass(object)
-						local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
-						local density = math.min(mass/volume, 1.5)
 						if density > 0.5 then
 							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
 						end
@@ -3145,10 +3166,12 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							if spec.isLogTrailer then
 							
 								if not self:ualGetIsMoving() then
-									local logLoadHeight = maxLoadAreaHeight + 0.1
+									local logLoadHeight = math.min(spec.currentLayerHeight+containerType.sizeY, maxLoadAreaHeight) + 0.1
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
-										spec.currentLoadHeight = 0
+										spec.currentLoadHeight = spec.currentLayerHeight
+										spec.loadSpeedFactor = maxLoadAreaHeight/(maxLoadAreaHeight+spec.currentLoadHeight)/mass
+										-- print("loadSpeedFactor: " .. spec.loadSpeedFactor)
 										useThisLoadSpace = true
 									end
 								end
@@ -4165,6 +4188,12 @@ end
 --
 function UniversalAutoload:createLog(treeType, length)
 	local spec = self.spec_universalAutoload
+	
+	if UniversalAutoload.spawningLog then
+		return nil
+	end
+	
+	UniversalAutoload.spawningLog = true
 
 	local x, y, z = getWorldTranslation(spec.loadVolume.rootNode)
 	dirX, dirY, dirZ = localDirectionToWorld(spec.loadVolume.rootNode, 0, 0, 1)
@@ -4432,6 +4461,9 @@ function UniversalAutoload.getContainerMass(object)
 			if object.getMass ~= nil then
 				-- print("GET BALE MASS")
 				mass = object:getMass()
+			else
+				-- print("GET SPLITSHAPE MASS")
+				mass = getMass(object.nodeId)
 			end
 		else
 			-- print("GET OBJECT MASS")

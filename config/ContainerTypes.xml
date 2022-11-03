@@ -54,6 +54,7 @@
 		<containerConfiguration containerType="BALE" name="packedSquareBale120" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
 		<containerConfiguration containerType="BALE" name="cottonSquarebale488" sizeX="2.40" sizeY="2.40" sizeZ="4.88"/>
 		
+		<containerConfiguration containerType="EURO_PALLET" name="pdlc_agiPack:liquidSeedTreatmentPallet" sizeY="0.420"/>
 		<containerConfiguration containerType="EURO_PALLET" name="pdlc_pumpsAndHosesPack:hosePallet" sizeX="1.000" sizeY="2.000" sizeZ="2.000"/>
 
 		<containerConfiguration containerType="POTATOBOX" name="FS22_Seedpotato_Farm_Pack:PotatoBox"/>

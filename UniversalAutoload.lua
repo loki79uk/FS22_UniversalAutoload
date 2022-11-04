@@ -2873,7 +2873,7 @@ function UniversalAutoload.unmountDynamicMount(object)
 	if object.dynamicMountObject ~= nil then
 		local vehicle = object.dynamicMountObject
 		-- print("Remove Dynamic Mount from: "..vehicle:getFullName())
-		vehicle:removeDynamicMountedObject(object, false)
+		vehicle:removeDynamicMountedObject(object, true)
 		object:unmountDynamic()
 		if object.additionalDynamicMountJointNode ~= nil then
 			delete(object.additionalDynamicMountJointNode)

@@ -12,6 +12,7 @@ UniversalAutoload.showLoading = false
 
 UniversalAutoload.delayTime = 200
 UniversalAutoload.logSpace = 0.25
+UniversalAutoload.SPLITSHAPES_LOOKUP = {}
 
 local debugKeys = false
 local debugConsole = false
@@ -3174,9 +3175,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
 										spec.currentLoadHeight = spec.currentLayerHeight
-										local massFactor = math.clamp((1/mass)/2, 0.2, 1)
+										local massFactor = UniversalAutoload.clamp((1/mass)/2, 0.2, 1)
 										local heightFactor = maxLoadAreaHeight/(maxLoadAreaHeight+spec.currentLoadHeight)
-										spec.loadSpeedFactor = math.clamp(heightFactor*massFactor, 0.2, 1)
+										spec.loadSpeedFactor = UniversalAutoload.clamp(heightFactor*massFactor, 0.2, 1)
 										-- print("loadSpeedFactor: " .. spec.loadSpeedFactor)
 										useThisLoadSpace = true
 									end
@@ -3660,10 +3661,6 @@ function UniversalAutoload.getSplitShapeObject( objectId )
 		local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(objectId))
 		if splitType ~= nil then
 
-			if UniversalAutoload.SPLITSHAPES_LOOKUP == nil then
-				UniversalAutoload.SPLITSHAPES_LOOKUP = {}
-			end
-			
 			if UniversalAutoload.SPLITSHAPES_LOOKUP[objectId] == nil then
 			
 				local sizeX, sizeY, sizeZ, numConvexes, numAttachments = getSplitShapeStats(objectId)
@@ -4797,6 +4794,12 @@ function UniversalAutoload.DrawDebugPallet( node, w, h, l, showCube, showAxis, c
 	
 	end
 
+end
+
+function UniversalAutoload.clamp(x, min, max)
+    if x < min then return min end
+    if x > max then return max end
+    return x
 end
 
 -- ADD CUSTOM STRINGS FROM ModDesc.xml TO GLOBAL g_i18n

@@ -2812,7 +2812,11 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 				elseif spec.rearUnloadingOnly then
 					offsetZ = -spec.loadVolume.length - spec.loadVolume.width/2
 				else
-					offsetX = 1.5*spec.loadVolume.width
+					if spec.isLogTrailer then
+						offsetX = 2*spec.loadVolume.width
+					else
+						offsetX = 1.5*spec.loadVolume.width
+					end
 					if spec.currentTipside == "right" then offsetX = -offsetX end
 				end
 

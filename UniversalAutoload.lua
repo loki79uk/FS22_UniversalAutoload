@@ -52,6 +52,8 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerLog", "The price charged for each auto-loaded log (default is zero)", 0)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerBale", "The price charged for each auto-loaded bale (default is zero)", 0)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerPallet", "The price charged for each auto-loaded pallet (default is zero)", 0)
 	
 	local objectTypesKey = "universalAutoload.objectTypes.objectType(?)"
@@ -2740,8 +2742,16 @@ function UniversalAutoload:loadObject(object)
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 				
-				if UniversalAutoload.pricePerPallet > 0 then
-					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI)
+				if object.isSplitShape then
+					if UniversalAutoload.pricePerLog > 0 then
+						g_currentMission:addMoney(-UniversalAutoload.pricePerLog, self:getOwnerFarmId(), MoneyType.AI, true, true)
+					end
+				elseif object.isRoundbale~=nil then
+					if UniversalAutoload.pricePerBale > 0 then
+						g_currentMission:addMoney(-UniversalAutoload.pricePerBale, self:getOwnerFarmId(), MoneyType.AI, true, true)
+					end
+				elseif UniversalAutoload.pricePerPallet > 0 then
+					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 				end
 			
 				if UniversalAutoload.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]",

@@ -108,6 +108,8 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 		UniversalAutoload.showDebug = false
 		UniversalAutoload.disableAutoStrap = false
 		UniversalAutoload.manualLoadingOnly = false
+		UniversalAutoload.pricePerLog = 0
+		UniversalAutoload.pricePerBale = 0
 		UniversalAutoload.pricePerPallet = 0
 	end
 	
@@ -132,10 +134,14 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
 				UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
 				UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
+				UniversalAutoload.pricePerLog = xmlFile:getValue("universalAutoload#pricePerLog", 0)
+				UniversalAutoload.pricePerBale = xmlFile:getValue("universalAutoload#pricePerBale", 0)
 				UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
 				print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
 				print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
 				print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
+				print("  >> Price Per Log: " .. tostring(UniversalAutoload.pricePerLog))
+				print("  >> Price Per Bale: " .. tostring(UniversalAutoload.pricePerBale))
 				print("  >> Price Per Pallet: " .. tostring(UniversalAutoload.pricePerPallet))
 			end
 			

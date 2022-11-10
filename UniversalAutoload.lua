@@ -156,6 +156,10 @@ function UniversalAutoload.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
 	SpecializationUtil.registerFunction(vehicleType, "ualIsObjectLoadable", UniversalAutoload.ualIsObjectLoadable)
+	--- Autodrive functions
+	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
+	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
+	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
@@ -4911,3 +4915,28 @@ function UniversalAutoload:ualIsObjectLoadable(object)
 	end
 	return false
 end
+
+function UniversalAutoload:ualStartLoad()
+	UniversalAutoload.onAIFieldWorkerStart(self)
+end
+
+function UniversalAutoload:ualStopLoad()
+	UniversalAutoload.onAIFieldWorkerEnd(self)
+end
+
+function UniversalAutoload:ualUnload(tipSideString)
+	self:ualStopLoad()
+	UniversalAutoload.setCurrentTipside(self, tipSideString or "none")
+	UniversalAutoload.startUnloading(self)
+end
+
+--[[
+	TODO: 
+		- AD needs functions like: 
+			- :ualGetFillUnitFillLevel()
+		 	- :ualGetFillUnitCapactiy()
+			- :ualGetFillUnitFreeCapacity()
+			
+			in function: AutoDrive:getALObjectFillLevels(object) for better performance.
+		
+]]

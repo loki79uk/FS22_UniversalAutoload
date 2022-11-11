@@ -17,6 +17,7 @@ UniversalAutoload.SPLITSHAPES_LOOKUP = {}
 local debugKeys = false
 local debugConsole = false
 local debugVehicles = false
+local debugMultiplayer = true
 
 -- EVENTS
 source(g_currentModDirectory.."events/CycleContainerEvent.lua")
@@ -1443,6 +1444,14 @@ function UniversalAutoload:onLoad(savegame)
 	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
 	
+	if debugMultiplayer then
+		if self.isServer then
+			print("SERVER - " .. self:getFullName())
+		elseif self.isClient then
+			print("CLIENT - " .. self:getFullName())
+		end
+	end
+
 	if self.isServer then
 
 		local configFileName = self.configFileName
@@ -1833,8 +1842,7 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentContainerIndex = 1
 	spec.currentLoadingFilter = true
 	spec.baleCollectionMode = false
-	spec.useHorizontalLoading = spec.horizontalLoading or false
-
+	spec.useHorizontalLoading = false
 end
 
 -- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED
@@ -2033,7 +2041,7 @@ end
 
 -- NETWORKING FUNCTIONS
 function UniversalAutoload:onReadStream(streamId, connection)
-	-- print("onReadStream")
+	if debugMultiplayer then print("onReadStream - " .. self:getFullName()) end
     local spec = self.spec_universalAutoload
 	
 	if streamReadBool(streamId) then
@@ -2051,8 +2059,12 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.validLoadCount = streamReadInt32(streamId)
 		spec.validUnloadCount = streamReadInt32(streamId)
 		spec.maxSingleLength = streamReadInt32(streamId)
-		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
-		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+		spec.isBoxTrailer = streamReadBool(streamId)
+		spec.isLogTrailer = streamReadBool(streamId)
+		spec.isBaleTrailer = streamReadBool(streamId)
+		spec.isCurtainTrailer = streamReadBool(streamId)
+		spec.rearUnloadingOnly = streamReadBool(streamId)
+		spec.frontUnloadingOnly = streamReadBool(streamId)
 		
 		if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 			UniversalAutoload.VEHICLES[self] = self
@@ -2065,11 +2077,10 @@ function UniversalAutoload:onReadStream(streamId, connection)
 end
 --
 function UniversalAutoload:onWriteStream(streamId, connection)
-	-- print("onWriteStream")
+	if debugMultiplayer then print("onWriteStream - " .. self:getFullName()) end
     local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		streamWriteBool(streamId, true)
-		
 		spec.currentTipside = spec.currentTipside or "left"
 		spec.currentLoadside = spec.currentLoadside or "both"
 		spec.currentMaterialIndex = spec.currentMaterialIndex or 1
@@ -2082,8 +2093,12 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.validLoadCount = spec.validLoadCount or 0
 		spec.validUnloadCount = spec.validUnloadCount or 0
 		spec.maxSingleLength = spec.maxSingleLength or 0
-		UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
-		UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false
+		spec.isBoxTrailer = spec.isBoxTrailer or false
+		spec.isLogTrailer = spec.isLogTrailer or false
+		spec.isBaleTrailer = spec.isBaleTrailer or false
+		spec.isCurtainTrailer = spec.isCurtainTrailer or false
+		spec.rearUnloadingOnly = spec.rearUnloadingOnly or false
+		spec.frontUnloadingOnly = spec.frontUnloadingOnly or false
 		
 		streamWriteString(streamId, spec.currentTipside)
 		streamWriteString(streamId, spec.currentLoadside)
@@ -2097,8 +2112,12 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteInt32(streamId, spec.validLoadCount)
 		streamWriteInt32(streamId, spec.validUnloadCount)
 		streamWriteInt32(streamId, spec.maxSingleLength)
-		streamWriteBool(streamId, UniversalAutoload.disableAutoStrap)
-		streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly)
+		streamWriteBool(streamId, spec.isBoxTrailer)
+		streamWriteBool(streamId, spec.isLogTrailer)
+		streamWriteBool(streamId, spec.isBaleTrailer)
+		streamWriteBool(streamId, spec.isCurtainTrailer)
+		streamWriteBool(streamId, spec.rearUnloadingOnly)
+		streamWriteBool(streamId, spec.frontUnloadingOnly)
 	else
 		streamWriteBool(streamId, false)
 	end
@@ -2108,9 +2127,7 @@ end
 function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
 	-- print("UniversalAutoload - onUpdate")
 	local spec = self.spec_universalAutoload
-	-- if spec~=nil and spec.playerInTrigger==nil then
-		-- print(self:getFullName() .. ": PLAYER IN TRIGGER IS NIL")
-	-- end
+	
 	if spec==nil or not spec.isAutoloadEnabled or spec.playerInTrigger==nil then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onUpdate") end
 		return
@@ -2371,7 +2388,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 		end
 
-		local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
+		local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
 		if isActiveForInputIgnoreSelection or isActiveForLoading or playerTriggerActive or spec.baleCollectionModeDeactivated or spec.aiLoadingActive then
 		
 			if spec.baleCollectionMode and not isActiveForLoading or spec.aiLoadingActive then
@@ -2596,7 +2613,7 @@ end
 function UniversalAutoload:countActivePallets()
 	-- print("COUNT ACTIVE PALLETS")
 	local spec = self.spec_universalAutoload
-	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
+	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
 	
 	local totalAvailableCount = 0
 	local validLoadCount = 0
@@ -4065,7 +4082,7 @@ end
 --
 function UniversalAutoload:removeAvailableObject(object)
 	local spec = self.spec_universalAutoload
-	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
+	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
 	
 	if spec.availableObjects[object] ~= nil then
 		spec.availableObjects[object] = nil
@@ -4538,6 +4555,9 @@ end
 function UniversalAutoload.getMaterialTypeName(object)
 	local fillUnitIndex = UniversalAutoload.getMaterialType(object)
 	local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(fillUnitIndex)
+	if fillTypeName == nil or fillTypeName == "UNKNOWN" then
+		fillTypeName = "ALL"
+	end
 	return fillTypeName
 end
 --
@@ -4638,6 +4658,8 @@ function UniversalAutoload.raiseObjectDirtyFlags(object)
 	if object.raiseDirtyFlags ~= nil then
 		if object.isRoundbale ~= nil then
 			object:raiseDirtyFlags(object.physicsObjectDirtyFlag)
+			object.sendPosX, object.sendPosY, object.sendPosZ = getWorldTranslation(object.nodeId)
+			object.sendRotX, object.sendRotY, object.sendRotZ = getWorldRotation(object.nodeId)
 		else
 			object:raiseDirtyFlags(object.vehicleDirtyFlag)
 		end

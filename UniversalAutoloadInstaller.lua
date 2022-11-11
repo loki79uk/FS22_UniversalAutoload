@@ -1169,6 +1169,49 @@ function UniversalAutoloadManager:loadMap(name)
 	end
 end
 
+-- SYNC SETTINGS:
+Player.readStream = Utils.overwrittenFunction(Player.readStream,
+	function(self, superFunc, streamId, connection, objectId)
+		superFunc(self, streamId, connection, objectId)
+		print("Player.readStream")
+	end
+)
+Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
+	function(self, superFunc, streamId, connection)
+		superFunc(self, streamId, connection)
+		print("Player.writeStream")
+	end
+)
+
+-- SEND SETTINGS TO CLIENT:
+FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.sendInitialClientState,
+	function(self, superFunc, connection, user, farm)
+		superFunc(self, connection, user, farm)
+		print("FSBaseMission.sendInitialClientState")
+		print("  user: " .. tostring(user.nickname))
+		print("  farm: " .. tostring(farm.name))
+
+		-- UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
+		-- UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false
+		-- UniversalAutoload.pricePerLog = UniversalAutoload.pricePerLog or 0
+		-- UniversalAutoload.pricePerBale = UniversalAutoload.pricePerBale or 0
+		-- UniversalAutoload.pricePerPallet = UniversalAutoload.pricePerPallet or 0
+		
+		-- streamWriteBool(streamId, UniversalAutoload.disableAutoStrap)
+		-- streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly)
+		-- streamWriteInt32(streamId, spec.pricePerLog)
+		-- streamWriteInt32(streamId, spec.pricePerBale)
+		-- streamWriteInt32(streamId, spec.pricePerPallet)
+
+		-- UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
+		-- UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+		-- spec.pricePerLog = streamReadInt32(streamId)
+		-- spec.pricePerBale = streamReadInt32(streamId)
+		-- spec.pricePerPallet = streamReadInt32(streamId)
+	end
+)
+
+
 function UniversalAutoloadManager:deleteMap()
 end
 

@@ -2388,8 +2388,8 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 		end
 
-		local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
-		if isActiveForInputIgnoreSelection or isActiveForLoading or playerTriggerActive or spec.baleCollectionModeDeactivated or spec.aiLoadingActive then
+		local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
+		if isActiveForInputIgnoreSelection or isActiveForLoading or playerTriggerActive or spec.baleCollectionModeDeactivated or spec.aiLoadingActive or spec.baleCollectionMode then
 		
 			if spec.baleCollectionMode and not isActiveForLoading or spec.aiLoadingActive then
 				if spec.availableBaleCount > 0 and not spec.trailerIsFull then
@@ -2613,7 +2613,7 @@ end
 function UniversalAutoload:countActivePallets()
 	-- print("COUNT ACTIVE PALLETS")
 	local spec = self.spec_universalAutoload
-	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
+	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
 	
 	local totalAvailableCount = 0
 	local validLoadCount = 0
@@ -2640,7 +2640,7 @@ function UniversalAutoload:countActivePallets()
 				if UniversalAutoload.isValidForUnloading(self, object) then
 					validUnloadCount = validUnloadCount + 1
 				end
-				if isActiveForLoading then
+				if isActiveForLoading or spec.baleCollectionMode then
 					UniversalAutoload.raiseObjectDirtyFlags(object)
 				end
 			end
@@ -4082,7 +4082,7 @@ end
 --
 function UniversalAutoload:removeAvailableObject(object)
 	local spec = self.spec_universalAutoload
-	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay or spec.baleCollectionMode
+	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
 	
 	if spec.availableObjects[object] ~= nil then
 		spec.availableObjects[object] = nil

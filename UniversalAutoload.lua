@@ -1547,9 +1547,14 @@ function UniversalAutoload:onLoad(savegame)
 							hasBaleHeight = hasBaleHeight or type(spec.loadArea[j+1].baleHeight) == 'number'
 							j = j + 1
 						end
+						local isBaleTrailer = xmlFile:getValue(key..".options#isBaleTrailer", nil)
+						local horizontalLoading = xmlFile:getValue(key..".options#horizontalLoading", nil)
+						
+						spec.horizontalLoading = horizontalLoading or isBaleTrailer or false
+						spec.isBaleTrailer = isBaleTrailer or hasBaleHeight
+						
 						spec.isBoxTrailer = xmlFile:getValue(key..".options#isBoxTrailer", false)
 						spec.isLogTrailer = xmlFile:getValue(key..".options#isLogTrailer", false)
-						spec.isBaleTrailer = xmlFile:getValue(key..".options#isBaleTrailer", hasBaleHeight)
 						spec.isCurtainTrailer = xmlFile:getValue(key..".options#isCurtainTrailer", false)
 						spec.enableRearLoading = xmlFile:getValue(key..".options#enableRearLoading", false)
 						spec.enableSideLoading = xmlFile:getValue(key..".options#enableSideLoading", false)
@@ -1559,7 +1564,6 @@ function UniversalAutoload:onLoad(savegame)
 						spec.noLoadingIfUncovered = xmlFile:getValue(key..".options#noLoadingIfUncovered", false)
 						spec.rearUnloadingOnly = xmlFile:getValue(key..".options#rearUnloadingOnly", false)
 						spec.frontUnloadingOnly = xmlFile:getValue(key..".options#frontUnloadingOnly", false)
-						spec.horizontalLoading = xmlFile:getValue(key..".options#horizontalLoading", false)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
 						spec.disableHeightLimit = xmlFile:getValue(key..".options#disableHeightLimit", false)
 						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
@@ -1842,7 +1846,7 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentContainerIndex = 1
 	spec.currentLoadingFilter = true
 	spec.baleCollectionMode = false
-	spec.useHorizontalLoading = false
+	spec.useHorizontalLoading = spec.horizontalLoading or false
 end
 
 -- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED
@@ -1853,8 +1857,8 @@ function UniversalAutoload:onPostLoad(savegame)
 			if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onPostLoad") end
 			return
 		end
-
-		if savegame.resetVehicles then
+		
+		if savegame.resetVehicles or g_currentMission.isReloadingVehicles or savegame.xmlFile.filename=="" then
 			--client+server
 			spec.currentTipside = "left"
 			spec.currentLoadside = "both"

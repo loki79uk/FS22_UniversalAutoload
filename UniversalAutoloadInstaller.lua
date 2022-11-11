@@ -231,10 +231,15 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 						hasBaleHeight = hasBaleHeight or type(config.loadingArea[j+1].baleHeight) == 'number'
 						j = j + 1
 					end
+					
+					local isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", nil)
+					local horizontalLoading = xmlFile:getValue(configKey..".options#horizontalLoading", nil)
+					
+					config.horizontalLoading = horizontalLoading or isBaleTrailer or false
+					config.isBaleTrailer = isBaleTrailer or hasBaleHeight
 						
 					config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
 					config.isLogTrailer = xmlFile:getValue(configKey..".options#isLogTrailer", false)
-					config.isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", hasBaleHeight)
 					config.isCurtainTrailer = xmlFile:getValue(configKey..".options#isCurtainTrailer", false)
 					config.enableRearLoading = xmlFile:getValue(configKey..".options#enableRearLoading", false)
 					config.enableSideLoading = xmlFile:getValue(configKey..".options#enableSideLoading", false)
@@ -244,7 +249,6 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.noLoadingIfUncovered = xmlFile:getValue(configKey..".options#noLoadingIfUncovered", false)
 					config.rearUnloadingOnly = xmlFile:getValue(configKey..".options#rearUnloadingOnly", false)
 					config.frontUnloadingOnly = xmlFile:getValue(configKey..".options#frontUnloadingOnly", false)
-					config.horizontalLoading = xmlFile:getValue(configKey..".options#horizontalLoading", false)
 					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 					config.disableHeightLimit = xmlFile:getValue(configKey..".options#disableHeightLimit", false)
 					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
@@ -643,6 +647,7 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 	local userSettingsFile = Utils.getFilename(UniversalAutoload.userSettingsFile, getUserProfileAppPath())
 	local vehicleCount, objectCount = UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, true)
 	
+	g_currentMission.isReloadingVehicles = true
 	if vehicleCount > 0 then
 		vehicleCount = 0
 		local doResetVehicle = false
@@ -685,6 +690,8 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		end
 		if doResetVehicle then
 			g_currentMission:consoleCommandReloadVehicle()
+		else
+			g_currentMission.isReloadingVehicles = false
 		end
 	end
 	
@@ -971,13 +978,18 @@ function UniversalAutoloadManager.resetNextVehicle()
 		table.remove(resetList, #resetList)
 		if not UniversalAutoloadManager.resetVehicle(vehicle) then
 			UniversalAutoloadManager.resetCount = UniversalAutoloadManager.resetCount + 1
-			g_currentMission:consoleCommandReloadVehicle()
-			g_currentMission.isReloadingVehicles = true
+			UniversalAutoloadManager.resetControlledVehicle = true
 			UniversalAutoloadManager.resetNextVehicle()
 		end
 	else
+		if UniversalAutoloadManager.resetControlledVehicle then
+			UniversalAutoloadManager.resetControlledVehicle = false
+			g_currentMission:consoleCommandReloadVehicle()
+			g_currentMission.isReloadingVehicles = true
+		else
+			g_currentMission.isReloadingVehicles = false
+		end
 		UniversalAutoloadManager.resetCount = nil
-		g_currentMission.isReloadingVehicles = false
 	end
 end
 --
@@ -991,7 +1003,7 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 	local rootVehicle = vehicle:getRootVehicle()
 	if rootVehicle ~= nil then
 		print("ROOT VEHICLE: " .. rootVehicle:getFullName())
-		if rootVehicle:getFullName() == "Diesel Locomotive" then
+		if rootVehicle:getFullName():find("Locomotive") then
 			print("*** CANNOT RESET TRAIN - terrible things will happen ***")
 			if UniversalAutoloadManager.resetCount then
 				UniversalAutoloadManager.resetNextVehicle()

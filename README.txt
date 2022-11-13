@@ -22,7 +22,7 @@
    · Welger DK 115 (bale trailer)
    · Salek ANS-1900 (bale trailer)
 
-  SUPPORTED VEHCILES:
+  SUPPORTED VEHICLES:
    · Lizard Pickup 1986
    · Lizard Pickup 2017
    · Mahindra Retriever

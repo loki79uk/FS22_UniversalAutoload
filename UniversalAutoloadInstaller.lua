@@ -1182,26 +1182,26 @@ function UniversalAutoloadManager:loadMap(name)
 end
 
 -- SYNC SETTINGS:
-Player.readStream = Utils.overwrittenFunction(Player.readStream,
-	function(self, superFunc, streamId, connection, objectId)
-		superFunc(self, streamId, connection, objectId)
-		print("Player.readStream")
-	end
-)
-Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
-	function(self, superFunc, streamId, connection)
-		superFunc(self, streamId, connection)
-		print("Player.writeStream")
-	end
-)
+-- Player.readStream = Utils.overwrittenFunction(Player.readStream,
+	-- function(self, superFunc, streamId, connection, objectId)
+		-- superFunc(self, streamId, connection, objectId)
+		-- -- print("Player.readStream")
+	-- end
+-- )
+-- Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
+	-- function(self, superFunc, streamId, connection)
+		-- superFunc(self, streamId, connection)
+		-- -- print("Player.writeStream")
+	-- end
+-- )
 
 -- SEND SETTINGS TO CLIENT:
 FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.sendInitialClientState,
 	function(self, superFunc, connection, user, farm)
 		superFunc(self, connection, user, farm)
-		print("FSBaseMission.sendInitialClientState")
-		print("  user: " .. tostring(user.nickname))
-		print("  farm: " .. tostring(farm.name))
+		
+		if debugMultiplayer then print("  user: " .. tostring(user.nickname) .. " " .. tostring(farm.name)) end
+		print("connectedToDedicatedServer: " .. tostring(g_currentMission.connectedToDedicatedServer))
 
 		-- UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
 		-- UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false

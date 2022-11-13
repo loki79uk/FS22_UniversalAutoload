@@ -300,7 +300,7 @@ function UniversalAutoload:clearActionEvents()
 end
 --
 function UniversalAutoload:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
-	if self.isClient then
+	if self.isClient and g_dedicatedServer==nil then
 		local spec = self.spec_universalAutoload
 		UniversalAutoload.clearActionEvents(self)
 
@@ -312,7 +312,7 @@ function UniversalAutoload:onRegisterActionEvents(isActiveForInput, isActiveForI
 end
 --
 function UniversalAutoload:updateActionEventKeys()
-	if self.isClient then
+	if self.isClient and g_dedicatedServer==nil then
 		local spec = self.spec_universalAutoload
 		
 		if spec~=nil and spec.isAutoloadEnabled and spec.actionEvents ~= nil and next(spec.actionEvents) == nil then
@@ -1164,12 +1164,12 @@ function UniversalAutoload:showWarningMessage(messageId, noEventSend)
 	-- print("Show Warning Message: "..self:getFullName() )
 	local spec = self.spec_universalAutoload
 	
-	if self.isClient then
+	if self.isClient and g_dedicatedServer==nil then
 		-- print("CLIENT: "..g_i18n:getText(UniversalAutoload.WARNINGS[messageId]))
-		g_currentMission:showBlinkingWarning(g_i18n:getText(UniversalAutoload.WARNINGS[messageId]), 2000);
-	end
-	
-	if self.isServer then
+		if self == UniversalAutoload.lastClosestVehicle or self.rootVehicle == g_currentMission.controlledVehicle then
+			g_currentMission:showBlinkingWarning(g_i18n:getText(UniversalAutoload.WARNINGS[messageId]), 2000);
+		end
+	elseif self.isServer then
 		-- print("SERVER: "..g_i18n:getText(UniversalAutoload.WARNINGS[messageId]))
 		UniversalAutoloadWarningMessageEvent.sendEvent(self, messageId, noEventSend)
 	end
@@ -1443,14 +1443,6 @@ function UniversalAutoload:onLoad(savegame)
 
 	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
-	
-	if debugMultiplayer then
-		if self.isServer then
-			print("SERVER - " .. self:getFullName())
-		elseif self.isClient then
-			print("CLIENT - " .. self:getFullName())
-		end
-	end
 
 	if self.isServer then
 
@@ -1986,7 +1978,7 @@ end
 
 -- SET FOLDING STATE FLAG ON FOLDING STATE CHANGE
 function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
-	--if self.isClient and g_dedicatedServer==nil then
+	-- print("UniversalAutoload - onFoldStateChanged")
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onFoldStateChanged") end

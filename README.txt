@@ -23,7 +23,6 @@
    · Salek ANS-1900 (bale trailer)
 
   SUPPORTED VEHCILES:
-   · Antonio Carraro Tigrecar 3200
    · Lizard Pickup 1986
    · Lizard Pickup 2017
    · Mahindra Retriever
@@ -32,6 +31,7 @@
    · Kubota RTV-X1140
    · Train (vehicle carriage)
    · Train (timber carriage)
+   · Antonio Carraro Tigrecar 3200
    
   SUPPORTED FORESTRY VEHICLES/TRAILERS:
    · Anderson Group M160

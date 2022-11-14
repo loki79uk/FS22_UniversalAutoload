@@ -23,6 +23,7 @@
    · Salek ANS-1900 (bale trailer)
 
   SUPPORTED VEHCILES:
+   · Antonio Carraro Tigrecar 3200
    · Lizard Pickup 1986
    · Lizard Pickup 2017
    · Mahindra Retriever

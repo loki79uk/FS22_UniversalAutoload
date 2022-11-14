@@ -31,6 +31,7 @@
    · Kubota RTV-X1140
    · Train (vehicle carriage)
    · Train (timber carriage)
+   · Antonio Carraro Tigrecar 3200
    
   SUPPORTED FORESTRY VEHICLES/TRAILERS:
    · Anderson Group M160

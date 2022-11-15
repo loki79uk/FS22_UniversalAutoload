@@ -2284,25 +2284,26 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					end
 				else
 					if not g_treePlantManager.loadTreeTrunkData then
-						for increment = 0, 99 do
+						for increment = 0, 999 do
 							local logId = spec.spawnedLogId + increment
-							local logObject = UniversalAutoload.getSplitShapeObject(logId)
-
-							if logObject ~= nil and entityExists(logId) then
-								if not UniversalAutoload.loadObject(self, logObject) then
-									delete(logId)
-									spec.currentLoadingPlace = nil
+							if entityExists(logId) then
+								local logObject = UniversalAutoload.getSplitShapeObject(logId)
+								if logObject ~= nil then
+									if not UniversalAutoload.loadObject(self, logObject) then
+										delete(logId)
+										spec.currentLoadingPlace = nil
+									end
+									if spec.currentLoadingPlace == nil then
+										spec.spawnLogs = false
+										spec.doPostLoadDelay = true
+										spec.doSetTensionBelts = true
+										print("..adding logs complete!")
+									end
+									spec.spawnLogsDelayTime = 0
+									spec.spawnedLogId = nil
+									UniversalAutoload.spawningLog = false
+									break
 								end
-								if spec.currentLoadingPlace == nil then
-									spec.spawnLogs = false
-									spec.doPostLoadDelay = true
-									spec.doSetTensionBelts = true
-									print("..adding logs complete!")
-								end
-								spec.spawnLogsDelayTime = 0
-								spec.spawnedLogId = nil
-								UniversalAutoload.spawningLog = false
-								break
 							end
 						end
 						if spec.spawnedLogId ~= nil then
@@ -2312,7 +2313,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							print("..error spawning log - aborting!")
 						end
 					end
-					
 				end
 
 			else
@@ -2502,6 +2502,7 @@ function UniversalAutoload:onActivate(isControlling)
 	if self.isServer then
 		UniversalAutoload.forceRaiseActive(self, true)
 	end
+	UniversalAutoload.lastClosestVehicle = nil
 end
 --
 function UniversalAutoload:onDeactivate()
@@ -4934,6 +4935,7 @@ function UniversalAutoload:ualIsObjectLoadable(object)
 	return false
 end
 
+-- Autodrive interface functions.
 function UniversalAutoload:ualStartLoad()
 	UniversalAutoload.onAIFieldWorkerStart(self)
 end

@@ -79,12 +79,13 @@
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:paperRollPallet" sizeX="2.42" sizeY="1.7" sizeZ="1.62" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pepperGrinderPallet" sizeX="1.24" sizeY="1.0" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pictureFramePallet" sizeX="1.24" sizeY="0.5" sizeZ="0.84" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:planksPallet" sizeX="2.5" sizeY="0.76" sizeZ="0.88" />
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:planksPallet" sizeX="2.5" sizeY="0.77" sizeZ="0.88" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:prefabWallPallet" sizeX="2.46" sizeY="2.64" sizeZ="1.76" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:shingleGenericPallet" sizeX="1.24" sizeY="1.36" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:staircaseRailingPallet" sizeX="1.24" sizeY="0.84" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:tablePallet" sizeX="2.42" sizeY="0.58" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:woodBeamPallet" sizeX="2.70" sizeY="0.94" sizeZ="0.92" />
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:saplingPalletRisutec" sizeX="1.25" sizeY="0.60" sizeZ="0.85" neverStack="true" />
     </containerConfigurations>
 </universalAutoload>
 

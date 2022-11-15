@@ -771,19 +771,54 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 		treeTypeName = arg1
 	end
 	
-	local availableLogTypes = {
-		OAK = 3,
-		ELM = 5,
-		PINE = 12,
-		BIRCH = 5,
-		MAPLE = 2,
-		POPLAR = 12,
-		SPRUCE = 6,
-		WILLOW = 2,
-		CYPRESS = 2,
-		HICKORY = 4,
-		STONEPINE = 12
-	}
+	local availableLogTypes
+
+	if pdlc_forestryPack==nil then
+		availableLogTypes = {
+			OAK = 3.5,
+			ELM = 3.5,
+			PINE = 30,
+			BIRCH = 5,
+			MAPLE = 2,
+			POPLAR = 18,
+			SPRUCE = 34,
+			WILLOW = 2.5,
+			CYPRESS = 2.5,
+			HICKORY = 4.2,
+			STONEPINE = 8,
+		}
+	else
+		availableLogTypes = {
+			OAK = 3.5,
+			ELM = 3.5,
+			PINE = 30,
+			BIRCH = 5,
+			MAPLE = 2,
+			POPLAR = 18,
+			SPRUCE = 34,
+			WILLOW = 2.5,
+			CYPRESS = 2.5,
+			HICKORY = 4.2,
+			DEADWOOD = 20,
+			STONEPINE = 8,
+			GIANTSEQUOIA = 7,
+			PONDEROSAPINE = 32,
+			LODGEPOLEPINE = 32
+		}
+	end
+	-- RISUTEC_OAK
+	-- RISUTEC_PINE
+	-- RISUTEC_BIRCH
+	-- RISUTEC_MAPLE
+	-- RISUTEC_SPRUCE1
+	-- RISUTEC_WILLOW1
+	-- RISUTEC_CYPRESS
+	-- RISUTEC_STONEPINE
+	-- RISUTEC_AMERICANELM
+	-- RISUTEC_GIANTSEQUOIA
+	-- RISUTEC_LODGEPOLEPINE
+	-- RISUTEC_PONDEROSAPINE
+	-- RISUTEC_SHAGBARKHICKORY
 
 	treeTypeName = string.upper(treeTypeName or "")
 	if availableLogTypes[treeTypeName]==nil then

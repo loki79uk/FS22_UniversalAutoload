@@ -2,7 +2,7 @@
 <modDesc descVersion="69">
 
     <author>loki_79</author>
-    <version>1.2.3.13</version>
+    <version>1.2.4.0</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -66,7 +66,18 @@ Configured for the following vehicles:
 - Kubota RTV-X1140
 - Train (vehicle carriage)
 
+Configured for the following Platinum DLC vehicles:
+- Train (planks, flatBed & timber carriages)
+- Volvo SM 462
+- Pfanzelt P13 4272
+- Schwarzmüller Timber Trailer
+- Schwarzmüller Timber Trailer Semi
+- Schwarzmüller Low Loader 4A
+- Schwarzmüller Low Loader 3A
+
 Changelog:
+v1.3.0.0
+- Configured to support Platinum DLC
 v1.2.1.0
 - Hotfix for a LUA error that would sometimes occur for vehicles with multiple loading zones
 v1.2.0.0

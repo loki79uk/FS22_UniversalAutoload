@@ -279,12 +279,7 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 		end
 		if closestVehicle ~= nil then
 			UniversalAutoload.forceRaiseActive(closestVehicle)
-			local SPEC = closestVehicle.spec_universalAutoload
-			if SPEC ~= nil and SPEC.isLogTrailer then
-				g_currentMission:addExtraPrintText(closestVehicle:getFullName() .. string.format(" = %.1fm",SPEC.maxSingleLength))
-			else
-				g_currentMission:addExtraPrintText(closestVehicle:getFullName())
-			end
+			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
 		end
 	end
 end
@@ -1602,7 +1597,6 @@ function UniversalAutoload:onLoad(savegame)
 			print("*** USING TENSION BELT ROOT NODE ***")
 		end
 		
-		spec.maxSingleLength = 0
 		for i, loadArea in pairs(spec.loadArea) do
 			-- create bounding box for loading area
 			local offsetX, offsetY, offsetZ = unpack(spec.loadArea[i].offset)
@@ -1625,10 +1619,6 @@ function UniversalAutoload:onLoad(savegame)
 			if y1 < offsetY+(loadArea.height) then y1 = offsetY+(loadArea.height) end
 			if z0 > offsetZ-(loadArea.length/2) then z0 = offsetZ-(loadArea.length/2) end
 			if z1 < offsetZ+(loadArea.length/2) then z1 = offsetZ+(loadArea.length/2) end
-			
-			if loadArea.length > spec.maxSingleLength then
-				spec.maxSingleLength = math.floor(10*loadArea.length)/10
-			end
 		end
 	
 		-- create bounding box for all loading areas
@@ -2054,7 +2044,6 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.isUnloading = streamReadBool(streamId)
 		spec.validLoadCount = streamReadInt32(streamId)
 		spec.validUnloadCount = streamReadInt32(streamId)
-		spec.maxSingleLength = streamReadInt32(streamId)
 		spec.isBoxTrailer = streamReadBool(streamId)
 		spec.isLogTrailer = streamReadBool(streamId)
 		spec.isBaleTrailer = streamReadBool(streamId)
@@ -2088,7 +2077,6 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.isUnloading = spec.isUnloading or false
 		spec.validLoadCount = spec.validLoadCount or 0
 		spec.validUnloadCount = spec.validUnloadCount or 0
-		spec.maxSingleLength = spec.maxSingleLength or 0
 		spec.isBoxTrailer = spec.isBoxTrailer or false
 		spec.isLogTrailer = spec.isLogTrailer or false
 		spec.isBaleTrailer = spec.isBaleTrailer or false
@@ -2107,7 +2095,6 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteBool(streamId, spec.isUnloading)
 		streamWriteInt32(streamId, spec.validLoadCount)
 		streamWriteInt32(streamId, spec.validUnloadCount)
-		streamWriteInt32(streamId, spec.maxSingleLength)
 		streamWriteBool(streamId, spec.isBoxTrailer)
 		streamWriteBool(streamId, spec.isLogTrailer)
 		streamWriteBool(streamId, spec.isBaleTrailer)
@@ -2197,9 +2184,6 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			end
 		else
 			spec.menuDelayTime = spec.menuDelayTime + dt
-		end
-		if spec.isLogTrailer and isActiveForInput and not playerActive then
-			g_currentMission:addExtraPrintText(self:getFullName() .. string.format(" = %.1fm",spec.maxSingleLength))
 		end
 	end
 	
@@ -4650,6 +4634,18 @@ function UniversalAutoload.getPalletIsFull(object)
 	end
 	return true
 end
+--
+function UniversalAutoload:getMaxSingleLength()
+	local spec = self.spec_universalAutoload
+
+	local maxSingleLength = 0
+	for i, loadArea in pairs(spec.loadArea) do
+		if loadArea.length > maxSingleLength then
+			maxSingleLength = math.floor(10*loadArea.length)/10
+		end
+	end
+	return maxSingleLength
+end				
 --
 function UniversalAutoload.raiseObjectDirtyFlags(object)
 	if object.raiseDirtyFlags ~= nil then

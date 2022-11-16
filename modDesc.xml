@@ -2,7 +2,7 @@
 <modDesc descVersion="69">
 
     <author>loki_79</author>
-    <version>1.2.4.0</version>
+    <version>1.2.4.1</version>
 	
     <title>
         <en>Universal Autoload</en>
@@ -64,6 +64,7 @@ Configured for the following vehicles:
 - JohnDeer XUV865M
 - Kubota RTV-XG850
 - Kubota RTV-X1140
+- Antonio Carraro Tigrecar 3200
 - Train (vehicle carriage)
 
 Configured for the following Platinum DLC vehicles:

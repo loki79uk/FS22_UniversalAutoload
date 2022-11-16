@@ -842,9 +842,9 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 		if next(vehicles) ~= nil then
 			for vehicle, hasAutoload in pairs(vehicles) do
 				if hasAutoload and vehicle:getIsActiveForInput() then
-					local spec = vehicle.spec_universalAutoload
-					if length > spec.maxSingleLength then
-						length = spec.maxSingleLength - 0.1
+					local maxSingleLength = UniversalAutoload.getMaxSingleLength(vehicle)
+					if length > maxSingleLength then
+						length = maxSingleLength - 0.1
 						print("resizing to fit trailer " .. length .. "m")
 					end
 					if UniversalAutoload.createLogs(vehicle, treeTypeName, length) then
@@ -1319,7 +1319,7 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 		superFunc(self, storeItem, vehicle, saleItem)
 		
 		if vehicle.spec_universalAutoload ~= nil and vehicle.spec_universalAutoload.isAutoloadEnabled then
-		
+			
 			local itemElement = self.attributeItem:clone(self.attributesLayout)
 			local iconElement = itemElement:getDescendantByName("icon")
 			local textElement = itemElement:getDescendantByName("text")
@@ -1330,7 +1330,28 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 			iconElement:setImageUVs(nil, 0, 0, 0, 1, 1, 0, 1, 1)
 			iconElement:setVisible(true)
 			textElement:setText(g_i18n:getText("configuration_universalAutoload"))
+			
+			if vehicle.spec_universalAutoload.isLogTrailer then
+				local maxSingleLengthString
+				local maxSingleLength = UniversalAutoload.getMaxSingleLength(vehicle)
+				local nearestHalfValue = math.floor(2*maxSingleLength)/2
+				if nearestHalfValue % 1 < 0.1 then
+					maxSingleLengthString = string.format("  %dm", nearestHalfValue)
+				else
+					maxSingleLengthString = string.format("  %.1fm", nearestHalfValue)
+				end
+
+				local itemElement2 = self.attributeItem:clone(self.attributesLayout)
+				local iconElement2 = itemElement2:getDescendantByName("icon")
+				local textElement2 = itemElement2:getDescendantByName("text")
+
+				itemElement2:reloadFocusHandling(true)
+				iconElement2:applyProfile(ShopConfigScreen.GUI_PROFILE.WORKING_WIDTH)
+				textElement2:setText(g_i18n:getText("infohud_length") .. maxSingleLengthString)
+			end
+			
 			self.attributesLayout:invalidateLayout()
+
 		end
 
 	end

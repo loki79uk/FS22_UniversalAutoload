@@ -68,8 +68,9 @@ UniversalAutoload.VALID_OBJECTS = {
 	[2] = "bigBag",
 	[3] = "treeSaplingPallet",
 	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
-	[5] = "FS22_MaizePlus.fillablePallet",
-	[6] = "FS22_MaizePlus.roundbaleCCM80"
+	[5] = "pdlc_forestryPack.woodContainer",
+	[6] = "FS22_MaizePlus.fillablePallet",
+	[7] = "FS22_MaizePlus.roundbaleCCM80"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES
@@ -773,7 +774,7 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 	
 	local availableLogTypes
 
-	if pdlc_forestryPack==nil then
+	if g_modIsLoaded["pdlc_forestryPack"] then
 		availableLogTypes = {
 			OAK = 3.5,
 			ELM = 3.5,
@@ -1109,6 +1110,12 @@ function UniversalAutoloadManager:loadMap(name)
 		end
 	end
 
+	if g_modIsLoaded["pdlc_forestryPack"] then
+		print("** Forestry Pack is loaded **")
+		table.insert(UniversalAutoload.CONTAINERS, "SHIPPING_CONTAINER")
+		UniversalAutoload.SHIPPING_CONTAINER = { sizeX = 2.44, sizeY = 2.59, sizeZ = 0.00 }
+	end
+	
 	if g_modIsLoaded["FS22_Seedpotato_Farm_Pack"] or g_modIsLoaded["FS22_SeedPotatoFarmBuildings"] then
 		print("** Seedpotato Farm Pack is loaded **")
 		table.insert(UniversalAutoload.CONTAINERS, "POTATOBOX")

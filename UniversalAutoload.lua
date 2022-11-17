@@ -128,6 +128,10 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadHeight", "Last used load height", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used expected load width", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualLength", "Last used complete load length", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", nil)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
@@ -199,6 +203,8 @@ function UniversalAutoload.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onActivate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onDeactivate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onMovingToolChanged", UniversalAutoload)
+
 	--- Courseplay event listeners.
 	SpecializationUtil.registerEventListener(vehicleType, "onAIImplementStart", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onAIImplementEnd", UniversalAutoload)
@@ -231,6 +237,7 @@ function UniversalAutoload.removeEventListeners(vehicleType)
 	removeUnusedEventListener(vehicleType, "onActivate", UniversalAutoload)
 	removeUnusedEventListener(vehicleType, "onDeactivate", UniversalAutoload)
 	removeUnusedEventListener(vehicleType, "onFoldStateChanged", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onMovingToolChanged", UniversalAutoload)
 	
 	removeUnusedEventListener(vehicleType, "onAIImplementStart", UniversalAutoload)
 	removeUnusedEventListener(vehicleType, "onAIImplementEnd", UniversalAutoload)
@@ -1124,20 +1131,22 @@ function UniversalAutoload:startUnloading(noEventSend)
 				self:setAllTensionBeltsActive(false)
 				for object, unloadPlace in pairs(spec.objectsToUnload) do
 					if not UniversalAutoload.unloadObject(self, object, unloadPlace) then
-						-- print("THERE WAS A PROBLEM UNLOADING...")
+						if UniversalAutoload.showDebug then print("THERE WAS A PROBLEM UNLOADING...") end
 					end
 				end
 				spec.objectsToUnload = {}
+				spec.currentLoadingPlace = nil
 				if spec.totalUnloadCount == 0 then
+					if UniversalAutoload.showDebug then print("FULLY UNLOADED...") end
 					spec.trailerIsFull = false
 					spec.partiallyUnloaded = false
 					spec.resetLoadingPattern = true
 					spec.currentLoadAreaIndex = 1
-					spec.currentLoadingPlace = nil
 					spec.nextLayerHeight = 0
 					spec.currentLayerCount = 0
 					spec.currentLayerHeight = 0
 				else
+					if UniversalAutoload.showDebug then print("PARTIALLY UNLOADED...") end
 					spec.partiallyUnloaded = true
 				end
 			else
@@ -1855,7 +1864,11 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLoadHeight = 0
 			spec.currentActualWidth = 0
 			spec.currentActualLength = 0
+			spec.currentLayerCount = 0
+			spec.currentLayerHeight = 0
+			spec.nextLayerHeight = 0
 			spec.currentLoadAreaIndex = 1
+			spec.lastLoadedObjectLength = nil
 			spec.resetLoadingPattern = false
 		else
 			--client+server
@@ -1872,7 +1885,11 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLoadHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadHeight", 0)
 			spec.currentActualWidth = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualWidth", 0)
 			spec.currentActualLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#actualLength", 0)
+			spec.currentLayerCount = savegame.xmlFile:getValue(savegame.key..".universalAutoload#layerCount", 0)
+			spec.currentLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#layerHeight", 0)
+			spec.nextLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#nextLayerHeight", 0)
 			spec.currentLoadAreaIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadAreaIndex", 1)
+			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", nil)
 			spec.resetLoadingPattern = false
 		end
 	
@@ -1918,6 +1935,10 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	xmlFile:setValue(correctedKey.."#loadLength", spec.currentLoadLength or 0)
 	xmlFile:setValue(correctedKey.."#actualWidth", spec.currentActualWidth or 0)
 	xmlFile:setValue(correctedKey.."#actualLength", spec.currentActualLength or 0)
+	xmlFile:setValue(correctedKey.."#layerCount", spec.currentLayerCount or 0)
+	xmlFile:setValue(correctedKey.."#layerHeight", spec.currentLayerHeight or 0)
+	xmlFile:setValue(correctedKey.."#nextLayerHeight", spec.nextLayerHeight or 0)
+	xmlFile:setValue(correctedKey.."#lastLoadedObjectLength", spec.lastLoadedObjectLength or nil)
 	xmlFile:setValue(correctedKey.."#loadAreaIndex", spec.currentLoadAreaIndex or 1)
 		
 end
@@ -1979,6 +2000,44 @@ function UniversalAutoload:onFoldStateChanged(direction, moveToMiddle)
 		-- print("onFoldStateChanged: "..self:getFullName())
 		spec.foldAnimationStarted = true
 		UniversalAutoload.updateActionEventText(self)
+	end
+end
+--
+function UniversalAutoload:onMovingToolChanged(tool, transSpeed, dt)
+	-- print("UniversalAutoload - onMovingToolChanged")
+	local spec = self.spec_universalAutoload
+	if spec==nil or not spec.isAutoloadEnabled then
+		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onMovingToolChanged") end
+		return
+	end
+	
+	if self.isServer then
+		-- print("onMovingToolChanged: "..self:getFullName())
+		if tool.axis == "AXIS_DRAWBAR" then
+			local _, _, z = getTranslation(tool.node)
+			local extensionLength = UniversalAutoload.clamp(math.abs(z), 0, 3)
+	
+			local loadArea = spec.loadArea[1]
+			if loadArea.originalLength == nil then
+				loadArea.originalLength = loadArea.length
+				local X, Y, Z = unpack(loadArea.offset)
+				loadArea.X = X
+				loadArea.Y = Y
+				loadArea.Z = Z
+				
+				spec.loadVolume.originalLength = spec.loadVolume.length
+				local X0, Y0, Z0 = getTranslation(spec.loadVolume.rootNode)
+				spec.loadVolume.X = X0
+				spec.loadVolume.Y = Y0
+				spec.loadVolume.Z = Z0
+			end
+			
+			loadArea.length = loadArea.originalLength + extensionLength
+			spec.loadVolume.length = spec.loadVolume.originalLength + extensionLength
+			setTranslation(loadArea.endNode, loadArea.X, loadArea.Y, loadArea.Z-(loadArea.length/2))
+			setTranslation(loadArea.rootNode, loadArea.X, loadArea.Y, loadArea.Z-(extensionLength/2))
+			setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z-(extensionLength/2))
+		end
 	end
 end
 --
@@ -2422,8 +2481,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								local lastObjectType = UniversalAutoload.getContainerType(lastObject)
 								local nextObjectType = UniversalAutoload.getContainerType(nextObject)
 								local shorterLog = nextObject~=nil and lastObject.isSplitShape and nextObject.isSplitShape and nextObject.sizeY <= lastObject.sizeY
-
-								if lastObjectType == nextObjectType and not shorterLog then
+								local shorterContatiner = nextObject~=nil and lastObject.spec_woodContainer and nextObject.spec_woodContainer and nextObject.spec_woodContainer.targetLength <= lastObject.spec_woodContainer.targetLength
+								
+								if lastObjectType == nextObjectType and not shorterLog and not shorterContatiner then
 									if UniversalAutoload.showDebug then print("DELETE SAME OBJECT TYPE: "..lastObjectType.name) end
 									table.remove(spec.sortedObjectsToLoad, i)
 								else
@@ -2538,12 +2598,13 @@ end
 --
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
+	local maxLength = spec.loadArea[spec.currentLoadAreaIndex or 1].length
 	
 	if object == nil then
 		return false
 	end
 	
-	if object.isSplitShape and object.sizeY > spec.loadArea[spec.currentLoadAreaIndex or 1].length then
+	if object.isSplitShape and object.sizeY > maxLength then
 		return false
 	end
 	if spec.isLogTrailer and not object.isSplitShape then
@@ -2556,6 +2617,9 @@ function UniversalAutoload:isValidForLoading(object)
 		return false
 	end
 	if object.spec_umbilicalReelOverload ~= nil and object.spec_umbilicalReelOverload.isOverloading then
+		return false
+	end
+	if object.spec_woodContainer ~= nil and object.spec_woodContainer.targetLength > maxLength then
 		return false
 	end
 	
@@ -2755,6 +2819,8 @@ function UniversalAutoload:loadObject(object)
 				elseif UniversalAutoload.pricePerPallet > 0 then
 					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 				end
+				
+				spec.lastLoadedObjectLength = containerType.sizeZ
 			
 				if UniversalAutoload.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]",
 					containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
@@ -2855,7 +2921,7 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 				break
 			end
 		end
-		if not thisAreaClear and not object.isSplitShape then
+		if (not thisAreaClear and not object.isSplitShape) or unloadPlace.heightAboveGround > 0 then
 			spec.unloadingAreaClear = false
 		end
 	end
@@ -3056,9 +3122,9 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("currentLayerCount: " .. tostring(spec.currentLayerCount) )
 		print("currentLayerHeight: " .. tostring(spec.currentLayerHeight) )
 		print("nextLayerHeight: " .. tostring(spec.nextLayerHeight) )
+		print("lastLoadedObjectLength: " .. tostring(spec.lastLoadedObjectLength) )
 		print("-------------------------------")
 	end
-	
 	
 	if spec.currentLoadLength<=spec.loadArea[i].length and spec.currentLoadWidth<=spec.currentActualWidth then
 		-- print("CREATE NEW LOADING PLACE")
@@ -3104,18 +3170,26 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.currentLoadLength = 0
 	spec.currentActualWidth = 0
 	spec.currentActualLength = 0
+	spec.lastLoadedObjectLength = nil
 	spec.currentLoadingPlace = nil
 	spec.resetLoadingPattern = false
 end
 --
 function UniversalAutoload:getLoadPlace(containerType, object)
     local spec = self.spec_universalAutoload
-	count = count or 1
 	
-	if containerType ~= nil then
+	if containerType==nil or (spec.trailerIsFull and not spec.partiallyUnloaded) then
+		return
+	end
+	
+	if not self:ualGetIsMoving() or spec.baleCollectionMode then
 		if UniversalAutoload.showDebug then
 			print("===============================")
 			-- print("FIND LOADING PLACE FOR "..containerType.name)
+		end
+		if spec.isLogTrailer and spec.lastLoadedObjectLength and spec.lastLoadedObjectLength < containerType.sizeZ then
+			if UniversalAutoload.showDebug then print("NEW OBJECT is longer than previous") end
+			spec.resetLoadingPattern = true
 		end
 
 		local i = spec.currentLoadAreaIndex or 1
@@ -3228,10 +3302,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 										thisLoadHeight = thisLoadHeight - increment
 									end
 								end
-							else
-								if containerType.isBale and not spec.zonesOverlap
-								and not spec.partiallyUnloaded and not spec.trailerIsFull then
-								
+							else --spec.baleCollectionMode
+								if (containerType.isBale and not spec.zonesOverlap and not spec.partiallyUnloaded) then
 									if spec.useHorizontalLoading then
 										spec.currentLoadHeight = spec.currentLayerHeight
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
@@ -3239,10 +3311,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									end
 									useThisLoadSpace = true
 								else
-									if not spec.trailerIsFull then
-										--NO_LOADING_UNLESS_STATIONARY
-										UniversalAutoload.showWarningMessage(self, 4)
-									end
 									return
 								end
 							end
@@ -3300,6 +3368,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			if UniversalAutoload.showDebug then print("FULL - NO MORE ROOM") end
 		end
 		if UniversalAutoload.showDebug then print("===============================") end
+	else
+		if UniversalAutoload.showDebug then print("CAN'T LOAD WHEN MOVING...") end
+		--NO_LOADING_UNLESS_STATIONARY
+		UniversalAutoload.showWarningMessage(self, 4)
 	end
 end
 
@@ -3488,7 +3560,7 @@ function UniversalAutoload:testLocationIsFull(loadPlace, offset)
 	
 	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
-
+	
 	return spec.foundObject
 end
 --
@@ -3897,6 +3969,14 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 				n[1].z = n[1].z + xz*X + yz*Y + zz*Z
 			end
 
+		end
+		
+		-- SHIPPING CONTAINER ROTATION
+		if object.spec_woodContainer and isLoading then
+			local rx,ry,rz = localRotationToWorld(position.node, 0, math.pi, 0)
+			n[1].rx = rx
+			n[1].ry = ry
+			n[1].rz = rz
 		end
 		
 		for i = 1, #rootNodes do
@@ -4486,12 +4566,21 @@ function UniversalAutoload.getContainerType(object)
 		end
 	end
 	
+	if object.spec_woodContainer ~= nil then
+		objectType.sizeZ = object.spec_woodContainer.targetLength or 999
+		objectType.sizeZ = 1.015 * objectType.sizeZ
+		objectType.isContainer = true
+	end
+	
 	return objectType
 end
 --
-function UniversalAutoload.getContainerDimensions(containerType)
+function UniversalAutoload.getContainerDimensions(object)
+	local containerType = UniversalAutoload.getContainerType(object)
+
 	if containerType ~= nil then
 		local w, h, l = containerType.sizeX, containerType.sizeY, containerType.sizeZ
+
 		if containerType.flipXY then
 			w, h = containerType.sizeY, containerType.sizeX
 		end
@@ -4548,7 +4637,13 @@ function UniversalAutoload:getSelectedContainerType()
 end
 --
 function UniversalAutoload:getSelectedContainerText()
-   return g_i18n:getText("universalAutoload_"..UniversalAutoload.getSelectedContainerType(self))
+	local selectedContainerType = UniversalAutoload.getSelectedContainerType(self)
+	
+	if selectedContainerType == "SHIPPING_CONTAINER" then
+		return g_i18n:getText("storeItem_shippingContainer", 'pdlc_forestryPack')
+	else
+		return g_i18n:getText("universalAutoload_"..selectedContainerType)
+	end
 end
 --
 function UniversalAutoload:getSelectedMaterialType()
@@ -4706,7 +4801,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
-					local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
+					local w, h, l = UniversalAutoload.getContainerDimensions(object)
 					local offset = 0 if containerType.isBale then offset = h/2 end
 					if UniversalAutoload.isValidForLoading(self, object) then
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREEN, offset )
@@ -4722,7 +4817,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 				local node = UniversalAutoload.getObjectPositionNode(object)
 				if node ~= nil then
 					local containerType = UniversalAutoload.getContainerType(object)
-					local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
+					local w, h, l = UniversalAutoload.getContainerDimensions(object)
 					local offset = 0 if containerType.isBale then offset = h/2 end
 					if UniversalAutoload.isValidForUnloading(self, object) then 
 						UniversalAutoload.DrawDebugPallet( node, w, h, l, true, false, GREEN, offset )
@@ -4736,7 +4831,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 		UniversalAutoload.buildObjectsToUnloadTable(self)
 		for object, unloadPlace in pairs(spec.objectsToUnload) do
 			local containerType = UniversalAutoload.getContainerType(object)
-			local w, h, l = UniversalAutoload.getContainerDimensions(containerType)
+			local w, h, l = UniversalAutoload.getContainerDimensions(object)
 			local offset = 0 if containerType.isBale then offset = h/2 end
 			if spec.unloadingAreaClear then
 				UniversalAutoload.DrawDebugPallet( unloadPlace.node, w, h, l, true, false, CYAN, offset )
@@ -4828,7 +4923,7 @@ function UniversalAutoload.DrawDebugPallet( node, w, h, l, showCube, showAxis, c
 	end
 
 end
-
+--
 function UniversalAutoload.clamp(x, min, max)
     if x < min then return min end
     if x > max then return max end

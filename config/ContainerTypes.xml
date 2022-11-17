@@ -83,9 +83,11 @@
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:prefabWallPallet" sizeX="2.46" sizeY="2.64" sizeZ="1.76" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:shingleGenericPallet" sizeX="1.24" sizeY="1.36" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:staircaseRailingPallet" sizeX="1.24" sizeY="0.84" sizeZ="0.84" />
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:stonePallet" sizeX="1.250" sizeY="0.80" sizeZ="0.85" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:tablePallet" sizeX="2.42" sizeY="0.58" sizeZ="0.84" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:woodBeamPallet" sizeX="2.70" sizeY="0.94" sizeZ="0.92" />
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:saplingPalletRisutec" sizeX="1.25" sizeY="0.60" sizeZ="0.85" neverStack="true" />
+        <containerConfiguration containerType="SHIPPING_CONTAINER" name="pdlc_forestryPack:shippingContainer" sizeX="2.44" sizeY="2.59" sizeZ="?" neverStack="true" />
     </containerConfigurations>
 </universalAutoload>
 

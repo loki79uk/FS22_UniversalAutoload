@@ -19,13 +19,13 @@
 			<options isBaleTrailer="false"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/demco/steelDropDeck/steelDropDeck.xml">
-            <loadingArea offset="0 1.010 -0.33" width="2.42" height="2.25" length="11.2" baleHeight="2.8"/>
-            <loadingArea offset="0 1.500 6.975" width="2.42" height="2.25" length="3.20" baleHeight="2.8"/>
+            <loadingArea offset="0 1.010 -0.33" width="2.45" height="2.60" length="11.2" baleHeight="2.8"/>
+            <loadingArea offset="0 1.500 6.975" width="2.45" height="2.25" length="3.20" baleHeight="2.8"/>
 			<options isBaleTrailer="false" enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/lodeKing/renownTriAxleBeavertailLowDrop/renownTriAxleBeavertailLowDrop.xml">
-            <loadingArea offset="0 1.010 -1.00" width="2.42" height="2.25" length="11.1" baleHeight="2.8"/>
-            <loadingArea offset="0 1.620 6.235" width="2.42" height="2.25" length="3.20" baleHeight="2.8"/>
+            <loadingArea offset="0 1.010 -1.00" width="2.45" height="2.60" length="11.1" baleHeight="2.8"/>
+            <loadingArea offset="0 1.620 6.235" width="2.45" height="2.25" length="3.20" baleHeight="2.8"/>
 			<options isBaleTrailer="false" enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/krone/profiLiner/profiLiner.xml">
@@ -185,7 +185,7 @@
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/semiLowloader3A/semiLowloader3A.xml">  
-            <loadingArea offset="0 0.905 -1.1" width="2.50" height="2.63" length="9.2"/>
+            <loadingArea offset="0 0.905 -1.1" width="2.50" height="2.63" length="9.20"/>
             <loadingArea offset="0 1.285 5.35" width="2.50" height="2.25" length="3.75"/>
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>

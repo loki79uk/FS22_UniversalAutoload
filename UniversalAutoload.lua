@@ -131,7 +131,7 @@ function UniversalAutoload.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
     schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", nil)
+    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", 0)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
     schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
@@ -1868,7 +1868,7 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLayerHeight = 0
 			spec.nextLayerHeight = 0
 			spec.currentLoadAreaIndex = 1
-			spec.lastLoadedObjectLength = nil
+			spec.lastLoadedObjectLength = 0
 			spec.resetLoadingPattern = false
 		else
 			--client+server
@@ -1889,7 +1889,7 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#layerHeight", 0)
 			spec.nextLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#nextLayerHeight", 0)
 			spec.currentLoadAreaIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadAreaIndex", 1)
-			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", nil)
+			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", 0)
 			spec.resetLoadingPattern = false
 		end
 	
@@ -1938,7 +1938,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	xmlFile:setValue(correctedKey.."#layerCount", spec.currentLayerCount or 0)
 	xmlFile:setValue(correctedKey.."#layerHeight", spec.currentLayerHeight or 0)
 	xmlFile:setValue(correctedKey.."#nextLayerHeight", spec.nextLayerHeight or 0)
-	xmlFile:setValue(correctedKey.."#lastLoadedObjectLength", spec.lastLoadedObjectLength or nil)
+	xmlFile:setValue(correctedKey.."#lastLoadedObjectLength", spec.lastLoadedObjectLength or 0)
 	xmlFile:setValue(correctedKey.."#loadAreaIndex", spec.currentLoadAreaIndex or 1)
 		
 end
@@ -2644,12 +2644,15 @@ function UniversalAutoload:isValidForUnloading(object)
 end
 --
 function UniversalAutoload.isValidForManualLoading(object)
+	if object.isSplitShape then
+		return false
+	end
 	if object.dynamicMountObject ~= nil then
 		return true
 	end
 	if g_currentMission.player ~= nil then
 		local rootNode = UniversalAutoload.getObjectRootNode(object)
-		if g_currentMission.player.pickedUpObject == rootNode then
+		if rootNode ~= nil and g_currentMission.player.pickedUpObject == rootNode then
 			return true
 		end
 	end
@@ -2796,9 +2799,7 @@ function UniversalAutoload:loadObject(object)
 
 		local spec = self.spec_universalAutoload
 		local containerType = UniversalAutoload.getContainerType(object)
-		
-		if UniversalAutoload.showDebug then print("") end
-		
+
 		local loadPlace = UniversalAutoload.getLoadPlace(self, containerType, object)
 		if loadPlace ~= nil then
 		
@@ -3170,7 +3171,7 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.currentLoadLength = 0
 	spec.currentActualWidth = 0
 	spec.currentActualLength = 0
-	spec.lastLoadedObjectLength = nil
+	spec.lastLoadedObjectLength = 0
 	spec.currentLoadingPlace = nil
 	spec.resetLoadingPattern = false
 end
@@ -3184,10 +3185,11 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 	
 	if not self:ualGetIsMoving() or spec.baleCollectionMode then
 		if UniversalAutoload.showDebug then
+			print("")
 			print("===============================")
 			-- print("FIND LOADING PLACE FOR "..containerType.name)
 		end
-		if spec.isLogTrailer and spec.lastLoadedObjectLength and spec.lastLoadedObjectLength < containerType.sizeZ then
+		if spec.isLogTrailer and spec.lastLoadedObjectLength > 0 and spec.lastLoadedObjectLength < containerType.sizeZ then
 			if UniversalAutoload.showDebug then print("NEW OBJECT is longer than previous") end
 			spec.resetLoadingPattern = true
 		end
@@ -3380,7 +3382,12 @@ function UniversalAutoload:getIsValidObject(object)
     local spec = self.spec_universalAutoload
 	
 	if object.isSplitShape then
-		return true
+		if not entityExists(object.nodeId) then
+			UniversalAutoload.removeSplitShapeObject(self, object)
+			return false
+		else
+			return true
+		end
 	end
 	
 	if object.i3dFilename ~= nil then
@@ -3794,13 +3801,8 @@ end
 --
 function UniversalAutoload.getObjectPositionNode( object )
 	local node = UniversalAutoload.getObjectRootNode(object)
-	if node == nil or not entityExists(node) then
-		-- print("************************************")
-		-- print("*** getObjectPositionNode == NIL ***")
-		-- DebugUtil.printTableRecursively(object, "--", 0, 1)
-		-- print("************************************")
-		UniversalAutoload.SPLITSHAPES_LOOKUP[object] = nil
-		return
+	if node == nil then
+		return nil
 	end
 	if object.isSplitShape and object.positionNodeId then
 		return object.positionNodeId
@@ -3816,7 +3818,10 @@ function UniversalAutoload.getObjectRootNode( object )
 	else
 		node = object.nodeId
 	end
-	if node ~= nil and node ~= 0 and (g_currentMission.nodeToObject[node]~=nil or object.isSplitShape) then
+	
+	if node == nil or node == 0 or not entityExists(node) then
+		return nil
+	else
 		return node
 	end
 end
@@ -3891,7 +3896,9 @@ function UniversalAutoload.removeFromPhysics(object)
 
 	if object.isRoundbale~=nil or object.isSplitShape then
 		local node = UniversalAutoload.getObjectRootNode(object)
-		removeFromPhysics(node)
+		if node ~= nil then
+			removeFromPhysics(node)
+		end
 	elseif object.isAddedToPhysics then
 		object:removeFromPhysics()
 	end
@@ -3901,7 +3908,9 @@ function UniversalAutoload:addToPhysics(object)
 
 	if object.isRoundbale~=nil or object.isSplitShape then
 		local node = UniversalAutoload.getObjectRootNode(object)
-		addToPhysics(node)
+		if node ~= nil then
+			addToPhysics(node)
+		end
 	else
 		object:addToPhysics()
 	end
@@ -3933,7 +3942,7 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 
 	local rootNodes = UniversalAutoload.getRootNodes(object)
 	local node = rootNodes[1]
-	if node ~= nil and node ~= 0 and (g_currentMission.nodeToObject[node]~=nil or object.isSplitShape) then
+	if node ~= nil and node ~= 0 and entityExists(node) then
 	
 		UniversalAutoload.unmountDynamicMount(object)
 		UniversalAutoload.removeFromPhysics(object)
@@ -4188,15 +4197,15 @@ end
 --
 function UniversalAutoload:addAutoLoadingObject(object)
 	local spec = self.spec_universalAutoload
-
-	if UniversalAutoload.isValidForManualLoading(object) then
+	
+	if UniversalAutoload.isValidForManualLoading(object) or (object.isSplitShape and self.isLogTrailer) then
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 			end
 			local rootNode = UniversalAutoload.getObjectRootNode(object)
-			if g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
+			if rootNode ~= nil and g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
 				g_currentMission.player:pickUpObject(false)
 			end
 			return true
@@ -4218,6 +4227,14 @@ end
 --
 function UniversalAutoload:ualOnDeleteAutoLoadingObject_Callback(object)
 	UniversalAutoload.removeAutoLoadingObject(self, object)
+end
+--
+function UniversalAutoload:removeSplitShapeObject(object)
+	UniversalAutoload.removeLoadedObject(self, object)
+	UniversalAutoload.removeAvailableObject(self, object)
+	UniversalAutoload.removeFromSortedObjectsToLoad(self, object)
+	UniversalAutoload.removeAutoLoadingObject(self, object)
+	UniversalAutoload.SPLITSHAPES_LOOKUP[object.nodeId] = nil
 end
 --
 function UniversalAutoload:createPallet(xmlFilename)
@@ -4430,7 +4447,7 @@ function UniversalAutoload:clearLoadedObjects()
 		self:setAllTensionBeltsActive(false)
 		for _, object in pairs(spec.loadedObjects) do
 			if object.isSplitShape then
-				UniversalAutoload.SPLITSHAPES_LOOKUP[object.nodeId] = nil
+				UniversalAutoload.removeSplitShapeObject(self, object)
 				g_currentMission:removeKnownSplitShape(object.nodeId)
 				if entityExists(object.nodeId) then
 					delete(object.nodeId)
@@ -4600,7 +4617,9 @@ function UniversalAutoload.getContainerMass(object)
 				mass = object:getMass()
 			else
 				-- print("GET SPLITSHAPE MASS")
-				mass = getMass(object.nodeId)
+				if entityExists(object.nodeId) then
+					mass = getMass(object.nodeId)
+				end
 			end
 		else
 			-- print("GET OBJECT MASS")

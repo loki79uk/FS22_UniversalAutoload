@@ -1838,6 +1838,7 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentLoadingFilter = true
 	spec.baleCollectionMode = false
 	spec.useHorizontalLoading = spec.horizontalLoading or false
+	spec.lastLoadedObjectLength = 0
 end
 
 -- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED

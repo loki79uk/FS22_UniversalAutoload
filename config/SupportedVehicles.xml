@@ -117,15 +117,15 @@
 			<options isLogTrailer="true"/>
 		</vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/rottne/f20D/f20D.xml">  
-			<loadingArea offset="0.000 1.283 -3.9" width="4.0" height="2.0" length="5.5"/>
+			<loadingArea offset="0.0 2.2 -4.5" width="4.2" height="1.5" length="6.2"/>
 			<options isLogTrailer="true"/>
 		</vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/ponsse/bison/bison.xml">  
-			<loadingArea offset="0.000 1.300 -3.1" width="2.4" height="2.2" length="5.5"/>
+			<loadingArea offset="0.0 1.955 -3.7" width="2.5" height="2.0" length="6.2"/>
 			<options isLogTrailer="true"/>
 		</vehicleConfiguration>
 		<vehicleConfiguration configFileName="data/vehicles/komatsu/forwarder875/forwarder875.xml">  
-			<loadingArea offset="0.000 1.308 -3.2" width="2.8" height="2.2" length="4.5"/>
+			<loadingArea offset="0.000 1.9 -4.2" width="2.6" height="2.0" length="6.2"/>
 			<options isLogTrailer="true"/>
 		</vehicleConfiguration>
 
@@ -180,8 +180,8 @@
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/lowloader4A/lowloader4A.xml">  
-            <loadingArea offset="0 0.925 -2.4" width="2.42" height="2.25" length="6.1"/>
-            <loadingArea offset="0 1.150 2.1" width="2.42" height="2.25" length="2.3"/>
+            <loadingArea offset="0 0.925 -2.4" width="2.45" height="2.60" length="6.1"/>
+            <loadingArea offset="0 1.150 2.1" width="2.45" height="2.41" length="2.3"/>
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/semiLowloader3A/semiLowloader3A.xml">  

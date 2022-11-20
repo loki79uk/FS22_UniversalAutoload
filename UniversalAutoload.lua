@@ -2481,7 +2481,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								local lastObjectType = UniversalAutoload.getContainerType(lastObject)
 								local nextObjectType = UniversalAutoload.getContainerType(nextObject)
 								local shorterLog = nextObject~=nil and lastObject.isSplitShape and nextObject.isSplitShape and nextObject.sizeY <= lastObject.sizeY
-								local shorterContatiner = nextObject~=nil and lastObject.spec_woodContainer and nextObject.spec_woodContainer and nextObject.spec_woodContainer.targetLength <= lastObject.spec_woodContainer.targetLength
+								local shorterContatiner = nextObject~=nil and UniversalAutoload.isShippingContainer(lastObject) and UniversalAutoload.isShippingContainer(nextObject) and nextObject.spec_woodContainer.targetLength <= lastObject.spec_woodContainer.targetLength
 								
 								if lastObjectType == nextObjectType and not shorterLog and not shorterContatiner then
 									if UniversalAutoload.showDebug then print("DELETE SAME OBJECT TYPE: "..lastObjectType.name) end
@@ -2619,7 +2619,7 @@ function UniversalAutoload:isValidForLoading(object)
 	if object.spec_umbilicalReelOverload ~= nil and object.spec_umbilicalReelOverload.isOverloading then
 		return false
 	end
-	if object.spec_woodContainer ~= nil and object.spec_woodContainer.targetLength > maxLength then
+	if UniversalAutoload.isShippingContainer(object) and object.spec_woodContainer.targetLength > maxLength then
 		return false
 	end
 	
@@ -2627,7 +2627,7 @@ function UniversalAutoload:isValidForLoading(object)
 	local isSelectedContainer = UniversalAutoload.getPalletIsSelectedContainer(self, object)
 	local isBeingManuallyLoaded = spec.autoLoadingObjects[object] ~= nil
 	local isValidLoadSide = spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object)
-	local isValidLoadFilter = not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object))
+	local isValidLoadFilter = not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) or UniversalAutoload.isShippingContainer(object)
 	-- print("isSelectedMaterial: " .. tostring( isSelectedMaterial ))
 	-- print("isSelectedContainer: " .. tostring(  isSelectedContainer ))
 	-- print("isBeingManuallyLoaded: " .. tostring(  isBeingManuallyLoaded ))
@@ -3981,7 +3981,7 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 		end
 		
 		-- SHIPPING CONTAINER ROTATION
-		if object.spec_woodContainer and isLoading then
+		if UniversalAutoload.isShippingContainer(object) and isLoading then
 			local rx,ry,rz = localRotationToWorld(position.node, 0, math.pi, 0)
 			n[1].rx = rx
 			n[1].ry = ry
@@ -4198,6 +4198,11 @@ end
 function UniversalAutoload:addAutoLoadingObject(object)
 	local spec = self.spec_universalAutoload
 	
+	if UniversalAutoload.isShippingContainer(object) then
+	-- shipping containers causing too much trouble for manual loading..
+		return false
+	end
+
 	if UniversalAutoload.isValidForManualLoading(object) or (object.isSplitShape and self.isLogTrailer) then
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
@@ -4583,7 +4588,7 @@ function UniversalAutoload.getContainerType(object)
 		end
 	end
 	
-	if object.spec_woodContainer ~= nil then
+	if UniversalAutoload.isShippingContainer(object) then
 		objectType.sizeZ = object.spec_woodContainer.targetLength or 999
 		objectType.sizeZ = 1.015 * objectType.sizeZ
 		objectType.isContainer = true
@@ -4747,6 +4752,11 @@ function UniversalAutoload.getPalletIsFull(object)
 		end
 	end
 	return true
+end
+--
+function UniversalAutoload.isShippingContainer(object)
+
+	return object.spec_woodContainer ~= nil
 end
 --
 function UniversalAutoload:getMaxSingleLength()

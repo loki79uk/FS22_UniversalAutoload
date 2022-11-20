@@ -3193,28 +3193,31 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							maxLoadAreaHeight = 5*containerType.sizeY
 						end
 					end
-
+					
 					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
-					local layerOverMaxHeight = spec.useHorizontalLoading and spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
-					
-					if loadOverMaxHeight then
-						if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or (spec.currentLoadingPlace
-						and UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace)) then
-							if UniversalAutoload.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
-							spec.currentLoadingPlace = nil
-						else
-							if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM PREVIOUS PLACE - TRY AGAIN") end
+					local layerOverMaxHeight = spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
+					local ignoreHeightForContainer = UniversalAutoload.isShippingContainer(object) and not (spec.isCurtainTrailer or spec.isBoxTrailer)
+					if spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
+						if UniversalAutoload.showDebug then print("CONTAINER IS TOO TALL FOR THIS AREA") end
+					else
+						if spec.currentLoadingPlace and loadOverMaxHeight then
+							if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or
+							UniversalAutoload.testLocationIsFull(self, spec.currentLoadingPlace) then
+								if UniversalAutoload.showDebug then print("LOADING PLACE IS FULL - SET TO NIL") end
+								spec.currentLoadingPlace = nil
+							else
+								if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM PREVIOUS PLACE - TRY AGAIN") end
+							end
 						end
-					end
-					
-					if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) or spec.isLogTrailer then
-						if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
-						containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
-						UniversalAutoload.createLoadingPlace(self, containerType)
+						if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) or spec.isLogTrailer then
+							if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
+							containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
+							UniversalAutoload.createLoadingPlace(self, containerType)
+						end
 					end
 
 					local thisLoadPlace = spec.currentLoadingPlace
-					if thisLoadPlace ~= nil and not layerOverMaxHeight then
+					if thisLoadPlace ~= nil then
 					
 						local containerFitsInLoadSpace = spec.isLogTrailer or 
 							(loadPlace.useRoundbalePacking ~= nil and containerType.sizeX==containerType.sizeX) or

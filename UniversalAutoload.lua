@@ -4036,6 +4036,10 @@ function UniversalAutoload:ualUnloadingTrigger_Callback(triggerId, otherActorId,
 				if onEnter then
 					UniversalAutoload.addLoadedObject(self, object)
 				elseif onLeave then
+					if UniversalAutoload.isShippingContainer(object) and object.dynamicMountObject == self then
+						if UniversalAutoload.showDebug then print("SHIPPING CONTAINER GLITCH") end
+						return
+					end
 					UniversalAutoload.removeLoadedObject(self, object)
 				end
 			end

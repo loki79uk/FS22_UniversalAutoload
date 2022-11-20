@@ -981,6 +981,50 @@ function UniversalAutoloadManager:consoleCreateBoundingBox()
 	return "Bounding box created successfully"
 end
 --
+function UniversalAutoloadManager:consoleSpawnTestPallets()
+	local usage = "Usage: consoleSpawnTestPallets"
+	
+	if g_currentMission.controlledVehicle ~= nil then
+	
+		local vehicles = UniversalAutoloadManager.getAttachedVehicles(g_currentMission.controlledVehicle)
+		
+		if next(vehicles) ~= nil then
+			for vehicle, hasAutoload in pairs(vehicles) do
+				if hasAutoload and vehicle:getIsActiveForInput() then
+
+					UniversalAutoload.testPallets = {}
+					UniversalAutoload.testPalletsCount = 0;
+					for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
+						local xmlName = fillType.palletFilename
+						if xmlName ~= nil and not xmlName:find("fillablePallet") then
+							print(string.format("%s - %s", fillType, xmlName))
+							UniversalAutoload.createPallet(vehicle, xmlName)
+						end
+					end
+					return "Test pallets created successfully"
+				end
+			end
+		end
+		
+		-- if next(UniversalAutoload.testPallets) and isActiveForInputIgnoreSelection then
+			-- if #UniversalAutoload.testPallets == UniversalAutoload.testPalletsCount then
+				-- print("TEST PALLETS SPAWNED")
+				-- print(string.format("%s, %s, %s, %s", "name", "volume", "mass", "density"))
+				-- for _, pallet in pairs(UniversalAutoload.testPallets) do
+					-- local config = UniversalAutoload.getContainerType(pallet)
+					-- local mass = UniversalAutoload.getContainerMass(pallet)
+					-- local volume = config.sizeX * config.sizeY * config.sizeZ
+					-- print(string.format("%s, %f, %f, %f", config.name, volume, mass, mass/volume))
+					-- g_currentMission:removeVehicle(pallet, true)
+				-- end
+				-- UniversalAutoload.testPallets = {}
+			-- end
+		-- end
+	end
+	return "Please enter a vehicle with a UAL trailer attached to use this command"
+	
+end
+--
 function UniversalAutoloadManager.addAttachedVehicles(vehicle, vehicles)
 
 	if vehicle.getAttachedImplements ~= nil then
@@ -1198,7 +1242,7 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualResetVehicles", "Reset all vehicles with autoload (and any attached) to the shop", "consoleResetVehicles", UniversalAutoloadManager)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
-		
+		addConsoleCommand("ualSpawnTestPallets", "Create one of each pallet type (not loaded)", "consoleSpawnTestPallets", UniversalAutoloadManager)
 		
 		local oldCleanUp = getmetatable(_G).__index.cleanUp
 		getmetatable(_G).__index.cleanUp = function()
@@ -1216,6 +1260,7 @@ function UniversalAutoloadManager:loadMap(name)
 			removeConsoleCommand("ualResetVehicles")
 			removeConsoleCommand("ualImportUserConfigurations")
 			removeConsoleCommand("ualCreateBoundingBox")
+			removeConsoleCommand("ualSpawnTestPallets")
 			oldCleanUp()
 		end
 	end

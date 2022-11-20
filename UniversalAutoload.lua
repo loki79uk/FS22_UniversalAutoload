@@ -1825,6 +1825,7 @@ function UniversalAutoload:onLoad(savegame)
 		spec.totalUnloadCount = 0
 		spec.validLoadCount = 0
 		spec.validUnloadCount = 0
+		spec.lastLoadedObjectLength = 0
 
 	end
 
@@ -1838,10 +1839,10 @@ function UniversalAutoload:onLoad(savegame)
 	spec.currentLoadingFilter = true
 	spec.baleCollectionMode = false
 	spec.useHorizontalLoading = spec.horizontalLoading or false
-	spec.lastLoadedObjectLength = 0
+
 end
 
--- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED
+-- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED (not when buying)
 function UniversalAutoload:onPostLoad(savegame)
     if self.isServer and savegame ~= nil then
 		local spec = self.spec_universalAutoload
@@ -2383,43 +2384,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
-		
-		-- -- PRINT ALL THE TEST PALLETS INFORMATION
-		-- if self:getFullName() == "Lizard Vehicle Wagon" then
-			-- if not UniversalAutoload.runOnce then
-				-- UniversalAutoload.runOnce = true
-				-- UniversalAutoload.testPallets = {}
-				-- UniversalAutoload.testPalletsCount = 0;
-				-- local pallets = {}
-				-- for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
-					-- local xmlName = fillType.palletFilename
-					-- if xmlName ~= nil and not xmlName:find("fillablePallet") then
-						-- pallets[fillType.name] = xmlName
-					-- end
-				-- end
-				-- for fillType, xmlName in pairs(pallets) do
-					-- print(string.format("%s - %s", fillType, xmlName))
-					-- UniversalAutoload.createPallet(self, xmlName)
-					-- UniversalAutoload.testPalletsCount = UniversalAutoload.testPalletsCount + 1
-				-- end
-			-- end
-			
-			-- if next(UniversalAutoload.testPallets) and isActiveForInputIgnoreSelection then
-				-- if #UniversalAutoload.testPallets == UniversalAutoload.testPalletsCount then
-					-- print("TEST PALLETS SPAWNED")
-					-- print(string.format("%s, %s, %s, %s", "name", "volume", "mass", "density"))
-					-- for _, pallet in pairs(UniversalAutoload.testPallets) do
-						-- local config = UniversalAutoload.getContainerType(pallet)
-						-- local mass = UniversalAutoload.getContainerMass(pallet)
-						-- local volume = config.sizeX * config.sizeY * config.sizeZ
-						-- print(string.format("%s, %f, %f, %f", config.name, volume, mass, mass/volume))
-						-- g_currentMission:removeVehicle(pallet, true)
-					-- end
-					-- UniversalAutoload.testPallets = {}
-				-- end
-			-- end
-		-- end
-		
+
 		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
 		local playerTriggerActive = false
 		if not isActiveForInputIgnoreSelection then
@@ -4255,9 +4220,9 @@ function UniversalAutoload:createPallet(xmlFilename)
 			local fillTypeIndex = pallet:getFillUnitFirstSupportedFillType(1)
 			pallet:addFillUnitFillLevel(1, 1, math.huge, fillTypeIndex, ToolType.UNDEFINED, nil)
 			
-			if UniversalAutoload.testPallets ~= nil then
-				table.insert(UniversalAutoload.testPallets, pallet)
-			end
+			-- if UniversalAutoload.testPallets ~= nil then
+				-- table.insert(UniversalAutoload.testPallets, pallet)
+			-- end
 			
 			if UniversalAutoload.loadObject(vehicle, pallet) then
 				spec.spawnPalletsDelayTime = 0

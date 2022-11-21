@@ -3199,6 +3199,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local ignoreHeightForContainer = UniversalAutoload.isShippingContainer(object) and not (spec.isCurtainTrailer or spec.isBoxTrailer)
 					if spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
 						if UniversalAutoload.showDebug then print("CONTAINER IS TOO TALL FOR THIS AREA") end
+						return
 					else
 						if spec.currentLoadingPlace and loadOverMaxHeight then
 							if ((object.isSplitShape or containerType.isBale) and not spec.zonesOverlap) or

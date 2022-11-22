@@ -2321,38 +2321,41 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					if not UniversalAutoload.spawningLog then
 						log = spec.logToSpawn
 						spec.spawnedLogId = UniversalAutoload.createLog(self, log.treeType, log.length)
+						UniversalAutoload.createdLogId = nil
+						UniversalAutoload.createdTreeId = spec.spawnedLogId
 						if spec.spawnedLogId == nil then
 							spec.spawnLogsDelayTime = 0
 						end
 					end
 				else
-					if not g_treePlantManager.loadTreeTrunkData then
-						for increment = 0, 999 do
-							local logId = spec.spawnedLogId + increment
-							if entityExists(logId) then
-								local logObject = UniversalAutoload.getSplitShapeObject(logId)
-								if logObject ~= nil then
-									if not UniversalAutoload.loadObject(self, logObject) then
-										delete(logId)
-										spec.currentLoadingPlace = nil
-									end
-									if spec.currentLoadingPlace == nil then
-										spec.spawnLogs = false
-										spec.doPostLoadDelay = true
-										spec.doSetTensionBelts = true
-										print("..adding logs complete!")
-									end
-									spec.spawnLogsDelayTime = 0
-									spec.spawnedLogId = nil
-									UniversalAutoload.spawningLog = false
-									break
+					if not g_treePlantManager.loadTreeTrunkData and UniversalAutoload.createdLogId then
+
+						local logId = UniversalAutoload.createdLogId
+						if entityExists(logId) then
+							local logObject = UniversalAutoload.getSplitShapeObject(logId)
+							if logObject ~= nil then
+								if not UniversalAutoload.loadObject(self, logObject) then
+									delete(logId)
+									spec.currentLoadingPlace = nil
 								end
+								if spec.currentLoadingPlace == nil then
+									spec.spawnLogs = false
+									spec.doPostLoadDelay = true
+									spec.doSetTensionBelts = true
+									print("..adding logs complete!")
+								end
+								spec.spawnLogsDelayTime = 0
+								spec.spawnedLogId = nil
+								UniversalAutoload.spawningLog = false
 							end
 						end
+
 						if spec.spawnedLogId ~= nil then
 							spec.spawnLogs = false
 							spec.spawnedLogId = nil
 							UniversalAutoload.spawningLog = false
+							UniversalAutoload.createdLogId = nil
+							UniversalAutoload.createdTreeId = nil
 							print("..error spawning log - aborting!")
 						end
 					end
@@ -4747,8 +4750,10 @@ function UniversalAutoload.raiseObjectDirtyFlags(object)
 	if object.raiseDirtyFlags ~= nil then
 		if object.isRoundbale ~= nil then
 			object:raiseDirtyFlags(object.physicsObjectDirtyFlag)
-			object.sendPosX, object.sendPosY, object.sendPosZ = getWorldTranslation(object.nodeId)
-			object.sendRotX, object.sendRotY, object.sendRotZ = getWorldRotation(object.nodeId)
+			if entityExists(object.nodeId) then
+				object.sendPosX, object.sendPosY, object.sendPosZ = getWorldTranslation(object.nodeId)
+				object.sendRotX, object.sendRotY, object.sendRotZ = getWorldRotation(object.nodeId)
+			end
 		else
 			object:raiseDirtyFlags(object.vehicleDirtyFlag)
 		end
@@ -4929,6 +4934,18 @@ function UniversalAutoload.clamp(x, min, max)
     if x < min then return min end
     if x > max then return max end
     return x
+end
+
+-- DETECT SPAWNED LOGS
+local oldAddToPhysics = getmetatable(_G).__index.addToPhysics
+getmetatable(_G).__index.addToPhysics = function(node, ...)
+	oldAddToPhysics(node, ...)
+	if getRigidBodyType(node) == RigidBodyType.DYNAMIC and getSplitType(node) ~= 0 then
+		if not UniversalAutoload.createdLogId and UniversalAutoload.createdTreeId and node > UniversalAutoload.createdTreeId then
+			-- print("*** ADDED TO PHYSICS - node: " .. tostring(node) .. " ***")
+			UniversalAutoload.createdLogId = node
+		end
+	end
 end
 
 -- ADD CUSTOM STRINGS FROM ModDesc.xml TO GLOBAL g_i18n

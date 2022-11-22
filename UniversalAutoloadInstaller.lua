@@ -805,19 +805,6 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 			LODGEPOLEPINE = 32
 		}
 	end
-	-- RISUTEC_OAK
-	-- RISUTEC_PINE
-	-- RISUTEC_BIRCH
-	-- RISUTEC_MAPLE
-	-- RISUTEC_SPRUCE1
-	-- RISUTEC_WILLOW1
-	-- RISUTEC_CYPRESS
-	-- RISUTEC_STONEPINE
-	-- RISUTEC_AMERICANELM
-	-- RISUTEC_GIANTSEQUOIA
-	-- RISUTEC_LODGEPOLEPINE
-	-- RISUTEC_PONDEROSAPINE
-	-- RISUTEC_SHAGBARKHICKORY
 
 	treeTypeName = string.upper(treeTypeName or "")
 	if availableLogTypes[treeTypeName]==nil then

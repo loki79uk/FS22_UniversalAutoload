@@ -2,27 +2,28 @@
 <modDesc descVersion="69">
 
     <author>loki_79</author>
-    <version>1.2.4.7</version>
-	
+    <version>1.2.4.8</version>
+    
     <title>
         <en>Universal Autoload</en>
-		<!-- <de>Universal Autoload</de> -->
-		<fr>Autoload Universel</fr>
-		<ru>Универсальная Автозагрузка</ru>
-		<nl>Universele Autoload</nl>
-		<cz>Univerzální Autoload</cz>
-		<pl>Universalne Autoładowanie</pl>
-		<es>Autoload Universal</es>
-		<br>Carregamento Automático Universal</br>
-		<tr>Evrensel Otomatik Yükleme</tr>
-		<cs>通用自动装载</cs>
+        <!-- <de>Universal Autoload</de> -->
+        <fr>Autoload Universel</fr>
+        <ru>Универсальная Автозагрузка</ru>
+        <nl>Universele Autoload</nl>
+        <cz>Univerzální Autoload</cz>
+        <pl>Universalne Autoładowanie</pl>
+        <es>Autoload Universal</es>
+        <br>Carregamento Automático Universal</br>
+        <tr>Evrensel Otomatik Yükleme</tr>
+        <cs>通用自动装载</cs>
     </title>
-	
+    
     <description>
 <en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included readme file for instructions on adding to your own mod trailers or pallets.
 
 Features:
 - Loads any compatible pallet/container types (see list below)
+- Loads lumber to any supported forestry vehicles
 - Installed automatically on any compatible trailers (see list below)
 - Load and Unload by selected material or container type
 - Can also restrict loading to full pallets only
@@ -79,6 +80,11 @@ Configured for the following Platinum DLC vehicles:
 Changelog:
 v1.3.0.0
 - Configured to support Platinum DLC
+- Able to load lumber onto supported forestry vehicles
+- Support for the new shipping containers
+- Correctly handles the extendable "Schwarzmüller Low Loader 3A"
+- Support for "Pumps and Hoses" DLC
+- Support for bale collection mode in CoursePlay
 v1.2.1.0
 - Hotfix for a LUA error that would sometimes occur for vehicles with multiple loading zones
 v1.2.0.0
@@ -109,6 +115,7 @@ v1.0.2.0
 
 Funktionen:
 - Lädt jede Art von kompatiblen Paletten oder Containern (siehe Liste unten)
+- Lädt Holz auf beliebige Forstfahrzeuge
 - Wird automatisch auf allen kompatiblen Anhängern installiert (siehe Liste unten)
 - Be- und Entladen durch Auswahl der Warenart oder des Containertyps
 - Möglichkeit, nur vollständig gefüllte Paletten zu laden
@@ -153,6 +160,13 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.3.0.0
+- Konfiguriert zur Unterstützung des Platin-DLCs
+- Holz kann auf unterstützte Forstfahrzeuge geladen werden
+- Unterstützung für die neuen Frachtcontainer
+- Korrekte Handhabung des ausfahrbaren "Schwarzmüller Tiefladers 3A"
+- Unterstützung für "Pumpen und Schläuche" DLC
+- Unterstützung für den Ballensammelmodus in CoursePlay
 v1.2.1.0
 - Hotfix für einen LUA-Fehler, der manchmal bei Fahrzeugen mit mehreren Ladezonen auftrat
 v1.2.0.0
@@ -182,7 +196,8 @@ v1.0.2.0
 <fr><![CDATA[Ajoute la capacité de chargement automatique pour les remorques de transport et les plateaux.  La modification est automatique pour tous les équipements compatibles de base dans le jeu. Elle est appliquée pour les équipements déjà présents dans votre ferme aussi bien que pour vos futurs achats. Le fichier README donne les indications nécessaires pour ajouter vos propres remorques ou palettes moddées.
 
 Fonctionnalités :
-- Charge tout type de palettes ou conteneurs compatibles (voir liste ci-dessous) 
+- Charge tout type de palettes ou conteneurs compatibles (voir liste ci-dessous)
+- Chargement du bois sur tout véhicule forestier supporté
 - Installé automatiquement sur toutes les remorques ou plateaux compatibles (voir liste ci-dessous)
 - Chargement et déchargement par sélection du type de marchandises ou par type de conditonnement 
 - Possibilité de ne charger que les palettes complètement remplies
@@ -227,6 +242,13 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.3.0.0
+- Configuré pour supporter le DLC Platinum
+- Possibilité de charger du bois sur les véhicules forestiers pris en charge.
+- Prise en charge des nouveaux conteneurs d'expédition
+- Prise en charge correcte de la "Schwarzmüller Low Loader 3A" extensible.
+- Prise en charge du DLC "Pompes et tuyaux".
+- Prise en charge du mode de collecte des balles dans CoursePlay
 v1.2.1.0
 - Correction d'une erreur LUA qui se produisait parfois pour les véhicules ayant plusieurs zones de chargement
 v1.2.0.0
@@ -257,6 +279,7 @@ v1.0.2.0
 
 Funkce:
 - Naloží všechny kompatibilní typy palet/kontejnerů (viz seznam níže)
+- Nakládá řezivo na jakákoli podpíraná lesnická vozidla
 - Instaluje se automaticky na všechny kompatibilní přívěsy (viz seznam níže)
 - Nakládka a vykládka podle vybraného materiálu nebo typu kontejneru
 - Může také omezit nakládání pouze na plné palety
@@ -301,6 +324,13 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.3.0.0
+- Nakonfigurováno tak, aby podporovalo Platinum DLC
+- Možnost nakládat dřevo na podporovaná lesnická vozidla
+- Podpora nových přepravních kontejnerů
+- Správně zpracovává výsuvný "nízký nakladač Schwarzmüller 3A"
+- Podpora DLC "Čerpadla a hadice"
+- Podpora režimu sběru balíků v CoursePlay
 v1.2.1.0
 - Oprava chyby LUA, která se někdy vyskytovala u vozidel s více nakládacími zónami
 v1.2.0.0
@@ -332,6 +362,7 @@ CZ překlad: SniperKittenCZ
 <pl><![CDATA[Specjalizacja autoloading dla przyczep z platformą. To automatycznie modyfikuje rzeczywiste zwiastuny gry podstawowej i zostanie zastosowane do wszystkich nowych lub istniejących zwiastunów na twojej farmie. Proszę zapoznać się z plikiem README, aby uzyskać instrukcje dotyczące dodawania do własnych przyczep lub palet z modami.
 Cechy:
 - Ładuje dowolne kompatybilne typy palet/kontenerów (patrz lista poniżej)
+- Załadunek tarcicy na dowolny pojazd leśny
 - Instalowany automatycznie na dowolnych kompatybilnych przyczepach (patrz lista poniżej)
 - Załadunek i rozładunek według wybranego materiału lub typu kontenera
 - Może również ograniczyć załadunek tylko do pełnych palet
@@ -375,6 +406,13 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.3.0.0
+- Skonfigurowany do obsługi Platynowych DLC
+- Możliwość załadowania drewna na obsługiwane pojazdy leśne
+- Wsparcie dla nowych kontenerów transportowych
+- Poprawna obsługa wysuwanej "Schwarzmüller Low Loader 3A"
+- Wsparcie dla "Pompy i węże" DLC
+- Wsparcie dla trybu zbierania bel w CoursePlay
 v1.2.1.0
 - Poprawka do błędu LUA, który czasami występował w przypadku pojazdów z wieloma strefami załadunku
 v1.2.0.0
@@ -406,6 +444,7 @@ TRANSLATION - PL by ELRICOFATAL
 
 Características:
 - Carga cualquier palé/contenedor compatible (ver lista abajo)
+- Carga de madera a cualquier vehículo forestal soportado
 - Instalado automáticamente en cualquier tráiler compatible (ver lista abajo)
 - Carga y descarga por material seleccionado o por tipo de contenedor
 - Se puede restringir para cargar solo palés
@@ -450,6 +489,13 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.3.0.0
+- Configurado para soportar el DLC de Platino
+- Posibilidad de cargar madera en los vehículos forestales compatibles
+- Soporte para los nuevos contenedores de transporte
+- Maneja correctamente el "Cargador bajo Schwarzmüller 3A" extensible
+- Soporte para el DLC "Bombas y mangueras"
+- Soporte para el modo de recogida de balas en CoursePlay
 v1.2.1.0
 - Corrección de un error de LUA que a veces se producía en vehículos con múltiples zonas de carga
 v1.2.0.0
@@ -481,6 +527,7 @@ TRANSLATION - ES by Aphroo7
 
 Características:
 - Carrega qualquer tipo de palete/contêiner compatível (veja a lista abaixo)
+- Carrega madeira serrada para qualquer veículo florestal apoiado
 - Instalado automaticamente em qualquer reboque compatível (veja a lista abaixo)
 - Carregar e descarregar por material selecionado ou tipo de contêiner
 - Também pode restringir o carregamento apenas para paletes completos
@@ -525,6 +572,13 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.3.0.0
+- Configurado para suportar Platinum DLC
+- Capaz de carregar madeira serrada em veículos florestais suportados
+- Apoio para os novos contêineres marítimos
+- Manipula corretamente o "Schwarzmüller Low Loader 3A" expansível
+- Suporte para "Bombas e Mangueiras" DLC
+- Apoio ao modo de coleta de fardos no CoursePlay
 v1.2.1.0
 - Correção a quente para um erro de LUA que às vezes ocorreria para veículos com múltiplas zonas de carga
 v1.2.0.0
@@ -556,6 +610,7 @@ TRADUÇÃO - BR por Myiamoto86
 
 Özellikler:
 - Herhangi bir uyumlu palet tipini yükler (aşağıdaki listeye bakın)
+- Keresteleri desteklenen orman araçlarına yükler
 - Uyumlu herhangi bir römork ve dorseye otomatik olarak yüklenir (aşağıdaki listeye bakın)
 - Seçilen malzeme veya konteyner tipine göre Yükleme ve Boşaltma
 - Yüklemeyi yalnızca tam paletlerle sınırlayabilir
@@ -599,6 +654,13 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+v1.3.0.0
+- Platinum DLC'yi desteklemek için yapılandırıldı
+- Desteklenen ormancılık araçlarına kereste yükleyebilme
+- Yeni nakliye konteynerleri için destek
+- Uzatılabilir "Schwarzmüller Low Loader 3A "yı doğru şekilde kullanır
+- "Pompalar ve Hortumlar" DLC'si için destek
+- CoursePlay'de balya toplama modu desteği
 v1.2.1.0
 - Bazen birden fazla yükleme bölgesi olan araçlarda meydana gelen LUA hatası düzeltmesi
 v1.2.0.0
@@ -628,29 +690,30 @@ v1.0.2.0
 </tr>
 <cs><![CDATA[平板拖车的自动装载专业化。 这将自动修改游戏拖车，并将应用于你的农场上任何新的或现有的拖车。 关于如何添加到你自己的mod拖车或货盘上，请看附带的readme文件的说明。
 
-特点。
-- 加载任何兼容的托盘/容器类型（见下面的列表）。
-- 自动安装在任何兼容的拖车上（见下面的列表）。
+特点
+- 加载任何兼容的托盘/容器类型（见下面的列表）
+- 将木材装载到任何支持的林业车辆上
+- 自动安装在任何兼容的拖车上（见下面的列表）
 - 按选定的材料或容器类型装载和卸载
 - 也可以限制只装满货盘
 - 选择 "所有 "来依次装载混合类型的货物 
 - 混合货盘按大小顺序装载，以获得最佳的包装效率
-- 当玩家步行时，可以与拖车互动（即使没有连接到车辆上）。
+- 当玩家步行时，可以与拖车互动（即使没有连接到车辆上）
 
 "KRONE Trailer Profi Liner"的特殊功能
 - 只有在侧面打开的那一面才可以装/卸货
 - 直接从叉车上进行后部装载
 - 后门和侧面可以由步行的玩家打开和关闭
 
-为以下集装箱类型进行配置。
+为以下集装箱类型进行配置
 - 大包
 - 大包货盘
 - 欧式托盘
 - IBC液体罐
 - 方形包
-- 马铃薯箱（需要mod：Seed Potato Pack）。
+- 马铃薯箱（需要mod：Seed Potato Pack）
 
-为以下拖车配置。
+为以下拖车配置
 - 布兰特纳DD 24073/2 XXL (捆包拖车)
 - Bremer Transportwagen TP 500 S
 - Böckmann MH-AL 4320/35
@@ -664,7 +727,7 @@ v1.0.2.0
 - Welger DK 115 (草包拖车)
 - 萨利克 ANS-1900 (捆绑式拖车)
 
-为以下车辆配置。
+为以下车辆配置
 - Lizard Pickup 1986
 - Lizard Pickup 2017
 - 马恒达 Retriever
@@ -673,25 +736,32 @@ v1.0.2.0
 - 久保田RTV-X1140
 - 火车(汽车车厢)
 
-更改日志。
+更改日志
+v1.3.0.0
+- 配置为支持白金DLC
+- 能够在支持的林业车辆上装载木材
+- 支持新的运输集装箱
+- 正确处理可扩展的 "Schwarzmüller Low Loader 3A"
+- 支持泵和软管DLC
+- 支持CoursePlay中的草捆收集模式
 v1.2.1.0
 - 热修复了一个LUA错误，该错误有时会发生在有多个装载区的车辆上
 v1.2.0.0
 - 增加了包收集模式
 - 增加了只在后部装货/卸货的选项
-- 增加了对自动装载托盘到火车上的支持（仅限车辆车厢）。
-- 在商店配置页面中增加了一个图标，以显示自动装载的激活情况。
-- 增加了全局选项 "仅手动装载"，以减少欺骗性的 "自动装载"选项。
+- 增加了对自动装载托盘到火车上的支持（仅限车辆车厢）
+- 在商店配置页面中增加了一个图标，以显示自动装载的激活情况
+- 增加了全局选项 "仅手动装载"，以减少欺骗性的 "自动装载"选项
 - 增加了全局选项，按装载的货盘收费，例如：pricePerPallet="10"
-- 增加了disableAutoStrap选项（全局或每辆车）。
-- 增加了有盖/无盖的不装货选项（对于有盖的拖车）。
-- 增加了多个装载区（阶梯甲板现在可以装载到两个区域）。
-- 增加了手动装载物体的功能（小物体或超强度）。
-- 增加了新的控制台命令（详情见readme文件）。
-- 实现了正确删除事件监听器的功能（归功于GtX）。
+- 增加了disableAutoStrap选项（全局或每辆车）
+- 增加了有盖/无盖的不装货选项（对于有盖的拖车）
+- 增加了多个装载区（阶梯甲板现在可以装载到两个区域）
+- 增加了手动装载物体的功能（小物体或超强度）
+- 增加了新的控制台命令（详情见readme文件）
+- 实现了正确删除事件监听器的功能（归功于GtX）
 v1.1.0.0
 - 增加了包和托盘的不同堆放高度
-- 托盘根据质量堆叠到不同的高度（以改善重量分配）。
+- 托盘根据质量堆叠到不同的高度（以改善重量分配）
 - 改进了用叉车进行手动装卸的方法
 - 为KRONE和低位装载机拖车增加了手动侧面装载功能
 - 增加了箱式拖车车辆类型
@@ -700,88 +770,88 @@ v1.0.2.0
  ]]>
  </cs>
     </description>
-	
-	<multiplayer supported="true" />
-	<iconFilename>modIcon.dds</iconFilename>
-	
-	<extraSourceFiles>
+    
+    <multiplayer supported="true" />
+    <iconFilename>modIcon.dds</iconFilename>
+    
+    <extraSourceFiles>
         <sourceFile filename="UniversalAutoloadInstaller.lua" />
     </extraSourceFiles>
-	
+    
     <l10n filenamePrefix="language/l10n" />
-	
- 	<actions>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-		<action name="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
-	</actions>
-	
-	<inputBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_r" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_i" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_u" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" >
-			<binding device="KB_MOUSE_DEFAULT" input="" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_t" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_t" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_l" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_f12" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f12" />
-		</actionBinding>
-		<actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" >
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_r" />
-		</actionBinding>
-	</inputBinding>
+    
+     <actions>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_FILTER" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_BELTS" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_DOOR" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+        <action name="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
+    </actions>
+    
+    <inputBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_r" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_i" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_u" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" >
+            <binding device="KB_MOUSE_DEFAULT" input="" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_t" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_t" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_l" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_f12" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f12" />
+        </actionBinding>
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" >
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_r" />
+        </actionBinding>
+    </inputBinding>
 
 </modDesc>

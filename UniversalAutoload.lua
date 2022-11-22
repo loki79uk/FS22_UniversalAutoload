@@ -41,7 +41,7 @@ source(g_currentModDirectory.."events/WarningMessageEvent.lua")
 
 -- REQUIRED SPECIALISATION FUNCTIONS
 function UniversalAutoload.prerequisitesPresent(specializations)
-    return SpecializationUtil.hasSpecialization(TensionBelts, specializations)
+	return SpecializationUtil.hasSpecialization(TensionBelts, specializations)
 end
 --
 function UniversalAutoload.initSpecialization()
@@ -121,44 +121,44 @@ function UniversalAutoload.initSpecialization()
 
 	local schemaSavegame = Vehicle.xmlSchemaSavegame
 	local specKey = "vehicles.vehicle(?).universalAutoload"
-    schemaSavegame:register(XMLValueType.STRING, specKey.."#tipside", "Last used tip side", "none")
-    schemaSavegame:register(XMLValueType.STRING, specKey.."#loadside", "Last used load side", "both")
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadWidth", "Last used load width", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadLength", "Last used load length", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadHeight", "Last used load height", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used expected load width", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualLength", "Last used complete load length", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
-    schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", 0)
+	schemaSavegame:register(XMLValueType.STRING, specKey.."#tipside", "Last used tip side", "none")
+	schemaSavegame:register(XMLValueType.STRING, specKey.."#loadside", "Last used load side", "both")
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadWidth", "Last used load width", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadLength", "Last used load length", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#loadHeight", "Last used load height", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualWidth", "Last used expected load width", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#actualLength", "Last used complete load length", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
+	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", 0)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
-    schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
-    schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
-    schemaSavegame:register(XMLValueType.BOOL, specKey.."#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
-    schemaSavegame:register(XMLValueType.BOOL, specKey.."#useHorizontalLoading", "Last used horizontal loading state", false)
-    schemaSavegame:register(XMLValueType.BOOL, specKey.."#baleCollectionMode", "Enable manual toggling of the automatic bale collection mode", false)
+	schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
+	schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
+	schemaSavegame:register(XMLValueType.BOOL, specKey.."#loadingFilter", "TRUE=Load full pallets only; FALSE=Load any pallets", false)
+	schemaSavegame:register(XMLValueType.BOOL, specKey.."#useHorizontalLoading", "Last used horizontal loading state", false)
+	schemaSavegame:register(XMLValueType.BOOL, specKey.."#baleCollectionMode", "Enable manual toggling of the automatic bale collection mode", false)
 
 end
 --
 function UniversalAutoload.registerFunctions(vehicleType)
-    SpecializationUtil.registerFunction(vehicleType, "ualGetIsMoving", UniversalAutoload.ualGetIsMoving)
-    SpecializationUtil.registerFunction(vehicleType, "ualGetIsFilled", UniversalAutoload.ualGetIsFilled)
-    SpecializationUtil.registerFunction(vehicleType, "ualGetIsCovered", UniversalAutoload.ualGetIsCovered)
-    SpecializationUtil.registerFunction(vehicleType, "ualGetIsFolding", UniversalAutoload.ualGetIsFolding)
-    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteLoadedObject_Callback", UniversalAutoload.ualOnDeleteLoadedObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAvailableObject_Callback", UniversalAutoload.ualOnDeleteAvailableObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAutoLoadingObject_Callback", UniversalAutoload.ualOnDeleteAutoLoadingObject_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualTestLocation_Callback", UniversalAutoload.ualTestLocation_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualTestUnloadLocation_Callback", UniversalAutoload.ualTestUnloadLocation_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualTestLocationOverlap_Callback", UniversalAutoload.ualTestLocationOverlap_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualPlayerTrigger_Callback", UniversalAutoload.ualPlayerTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualLoadingTrigger_Callback", UniversalAutoload.ualLoadingTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualUnloadingTrigger_Callback", UniversalAutoload.ualUnloadingTrigger_Callback)
-    SpecializationUtil.registerFunction(vehicleType, "ualAutoLoadingTrigger_Callback", UniversalAutoload.ualAutoLoadingTrigger_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetIsMoving", UniversalAutoload.ualGetIsMoving)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetIsFilled", UniversalAutoload.ualGetIsFilled)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetIsCovered", UniversalAutoload.ualGetIsCovered)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetIsFolding", UniversalAutoload.ualGetIsFolding)
+	SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteLoadedObject_Callback", UniversalAutoload.ualOnDeleteLoadedObject_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAvailableObject_Callback", UniversalAutoload.ualOnDeleteAvailableObject_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualOnDeleteAutoLoadingObject_Callback", UniversalAutoload.ualOnDeleteAutoLoadingObject_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualTestLocation_Callback", UniversalAutoload.ualTestLocation_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualTestUnloadLocation_Callback", UniversalAutoload.ualTestUnloadLocation_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualTestLocationOverlap_Callback", UniversalAutoload.ualTestLocationOverlap_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualPlayerTrigger_Callback", UniversalAutoload.ualPlayerTrigger_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualLoadingTrigger_Callback", UniversalAutoload.ualLoadingTrigger_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualUnloadingTrigger_Callback", UniversalAutoload.ualUnloadingTrigger_Callback)
+	SpecializationUtil.registerFunction(vehicleType, "ualAutoLoadingTrigger_Callback", UniversalAutoload.ualAutoLoadingTrigger_Callback)
 	--- Courseplay functions
 	SpecializationUtil.registerFunction(vehicleType, "ualHasLoadedBales", UniversalAutoload.ualHasLoadedBales)
-    SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
+	SpecializationUtil.registerFunction(vehicleType, "ualIsFull", UniversalAutoload.ualIsFull)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
 	SpecializationUtil.registerFunction(vehicleType, "ualIsObjectLoadable", UniversalAutoload.ualIsObjectLoadable)
 	--- Autodrive functions
@@ -168,8 +168,8 @@ function UniversalAutoload.registerFunctions(vehicleType)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanStartFieldWork", UniversalAutoload.getCanStartFieldWork)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
+	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanStartFieldWork", UniversalAutoload.getCanStartFieldWork)
+	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
 end
 
@@ -192,13 +192,13 @@ function UniversalAutoload:getCanImplementBeUsedForAI(superFunc)
 end
 --
 function UniversalAutoload.registerEventListeners(vehicleType)
-    SpecializationUtil.registerEventListener(vehicleType, "onLoad", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onReadStream", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onDelete", UniversalAutoload)
-    SpecializationUtil.registerEventListener(vehicleType, "onPreDelete", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onLoad", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onReadStream", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onDelete", UniversalAutoload)
+	SpecializationUtil.registerEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onUpdate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onActivate", UniversalAutoload)
 	SpecializationUtil.registerEventListener(vehicleType, "onDeactivate", UniversalAutoload)
@@ -228,10 +228,10 @@ function UniversalAutoload.removeEventListeners(vehicleType)
 	end
 	
 	-- (called during 'onLoad' so do not unregister that)
-    removeUnusedEventListener(vehicleType, "onPostLoad", UniversalAutoload)
-    removeUnusedEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
-    removeUnusedEventListener(vehicleType, "onDelete", UniversalAutoload)
-    removeUnusedEventListener(vehicleType, "onPreDelete", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onPostLoad", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onRegisterActionEvents", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onDelete", UniversalAutoload)
+	removeUnusedEventListener(vehicleType, "onPreDelete", UniversalAutoload)
 	
 	removeUnusedEventListener(vehicleType, "onUpdate", UniversalAutoload)
 	removeUnusedEventListener(vehicleType, "onActivate", UniversalAutoload)
@@ -776,7 +776,7 @@ end
 --
 function UniversalAutoload.actionEventToggleLoading(self, actionName, inputValue, callbackState, isAnalog)
 	-- print("actionEventToggleLoading: "..self:getFullName())
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	if not spec.isLoading then
 		UniversalAutoload.startLoading(self)
 	else
@@ -1475,11 +1475,11 @@ function UniversalAutoload:onLoad(savegame)
 						spec.loadArea = {}
 						for i, loadArea in pairs(config.loadingArea) do
 							spec.loadArea[i] = {}
-							spec.loadArea[i].width      = loadArea.width
-							spec.loadArea[i].length     = loadArea.length
-							spec.loadArea[i].height     = loadArea.height
+							spec.loadArea[i].width	  = loadArea.width
+							spec.loadArea[i].length	 = loadArea.length
+							spec.loadArea[i].height	 = loadArea.height
 							spec.loadArea[i].baleHeight = loadArea.baleHeight
-							spec.loadArea[i].offset     = loadArea.offset
+							spec.loadArea[i].offset	 = loadArea.offset
 							spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
 							spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
 							spec.loadArea[i].noLoadingIfCovered  = loadArea.noLoadingIfCovered
@@ -1531,11 +1531,11 @@ function UniversalAutoload:onLoad(savegame)
 								break
 							end
 							spec.loadArea[j+1] = {}
-							spec.loadArea[j+1].width      = xmlFile:getValue(loadAreaKey.."#width")
-							spec.loadArea[j+1].length     = xmlFile:getValue(loadAreaKey.."#length")
-							spec.loadArea[j+1].height     = xmlFile:getValue(loadAreaKey.."#height")
+							spec.loadArea[j+1].width	  = xmlFile:getValue(loadAreaKey.."#width")
+							spec.loadArea[j+1].length	 = xmlFile:getValue(loadAreaKey.."#length")
+							spec.loadArea[j+1].height	 = xmlFile:getValue(loadAreaKey.."#height")
 							spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
-							spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+							spec.loadArea[j+1].offset	 = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
 							spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 							spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 							spec.loadArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
@@ -1589,7 +1589,7 @@ function UniversalAutoload:onLoad(savegame)
 		end
 	end
 
-    if self.isServer and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
+	if self.isServer and self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 
 		--initialise server only arrays
 		spec.triggers = {}
@@ -1666,7 +1666,7 @@ function UniversalAutoload:onLoad(savegame)
 			setScale(unloadingTrigger.node, spec.loadVolume.width-boundary, spec.loadVolume.height, spec.loadVolume.length-boundary)
 			
 			table.insert(spec.triggers, unloadingTrigger)
-            addTrigger(unloadingTrigger.node, "ualUnloadingTrigger_Callback", self)
+			addTrigger(unloadingTrigger.node, "ualUnloadingTrigger_Callback", self)
 		end
 		
 		local playerTrigger = {}
@@ -1679,7 +1679,7 @@ function UniversalAutoload:onLoad(savegame)
 			setScale(playerTrigger.node, 5*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+2*spec.loadVolume.width)
 			
 			table.insert(spec.triggers, playerTrigger)
-            addTrigger(playerTrigger.node, "ualPlayerTrigger_Callback", self)
+			addTrigger(playerTrigger.node, "ualPlayerTrigger_Callback", self)
 		end
 
 		if not UniversalAutoload.manualLoadingOnly then
@@ -1844,7 +1844,7 @@ end
 
 -- "ON POST LOAD" CALLED AFTER VEHICLE IS LOADED (not when buying)
 function UniversalAutoload:onPostLoad(savegame)
-    if self.isServer and savegame ~= nil then
+	if self.isServer and savegame ~= nil then
 		local spec = self.spec_universalAutoload
 		if spec==nil or not spec.isAutoloadEnabled then
 			if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onPostLoad") end
@@ -1942,7 +1942,7 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	xmlFile:setValue(correctedKey.."#nextLayerHeight", spec.nextLayerHeight or 0)
 	xmlFile:setValue(correctedKey.."#lastLoadedObjectLength", spec.lastLoadedObjectLength or 0)
 	xmlFile:setValue(correctedKey.."#loadAreaIndex", spec.currentLoadAreaIndex or 1)
-		
+	
 end
 
 -- "ON DELETE" CLEANUP TRIGGER NODES
@@ -1958,18 +1958,18 @@ function UniversalAutoload:onPreDelete()
 		-- print("PRE DELETE: " .. self:getFullName() )
 		UniversalAutoload.VEHICLES[self] = nil
 	end
-    if self.isServer then
-        if spec.triggers ~= nil then
+	if self.isServer then
+		if spec.triggers ~= nil then
 			for _, trigger in pairs(spec.triggers) do
 				removeTrigger(trigger.node)
-			end            
-        end
-    end
+			end
+		end
+	end
 end
 --
 function UniversalAutoload:onDelete()
 	-- print("UniversalAutoload - onDelete")
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - onDelete") end
 		return
@@ -1979,13 +1979,13 @@ function UniversalAutoload:onDelete()
 		-- print("DELETE: " .. self:getFullName() )
 		UniversalAutoload.VEHICLES[self] = nil
 	end
-    if self.isServer then
-        if spec.triggers ~= nil then
+	if self.isServer then
+		if spec.triggers ~= nil then
 			for _, trigger in pairs(spec.triggers) do
 				removeTrigger(trigger.node)
-			end            
-        end
-    end
+			end
+		end
+	end
 end
 
 
@@ -2089,7 +2089,7 @@ end
 -- NETWORKING FUNCTIONS
 function UniversalAutoload:onReadStream(streamId, connection)
 	if debugMultiplayer then print("onReadStream - " .. self:getFullName()) end
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	
 	if streamReadBool(streamId) then
 		print("Universal Autoload Enabled: " .. self:getFullName())
@@ -2124,7 +2124,7 @@ end
 --
 function UniversalAutoload:onWriteStream(streamId, connection)
 	if debugMultiplayer then print("onWriteStream - " .. self:getFullName()) end
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		streamWriteBool(streamId, true)
 		spec.currentTipside = spec.currentTipside or "left"
@@ -2934,7 +2934,7 @@ function UniversalAutoload.unmountDynamicMount(object)
 end
 
 function UniversalAutoload:createLoadingPlace(containerType)
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	
 	spec.currentLoadingPlace = nil
 	
@@ -3131,7 +3131,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 end
 --
 function UniversalAutoload:resetLoadingPattern()
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	if UniversalAutoload.showDebug then print("RESET LOADING PATTERN") end
 	spec.currentLoadWidth = 0
 	spec.currentLoadHeight = 0
@@ -3144,7 +3144,7 @@ function UniversalAutoload:resetLoadingPattern()
 end
 --
 function UniversalAutoload:getLoadPlace(containerType, object)
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	
 	if containerType==nil or (spec.trailerIsFull and not spec.partiallyUnloaded) then
 		return
@@ -3350,7 +3350,7 @@ end
 
 -- OBJECT PICKUP LOGIC FUNCTIONS
 function UniversalAutoload:getIsValidObject(object)
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	
 	if object.isSplitShape then
 		if not entityExists(object.nodeId) then
@@ -3377,7 +3377,7 @@ function UniversalAutoload:getIsValidObject(object)
 		end
 	end
 	
-    return false
+	return false
 end
 --
 function UniversalAutoload:getDynamicMountTimeToMount(superFunc)
@@ -3430,7 +3430,7 @@ function UniversalAutoload:getIsUnloadingKeyAllowed()
 	if spec.baleCollectionMode then
 		return false
 	end
-    return true
+	return true
 end
 --
 function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
@@ -3522,7 +3522,7 @@ end
 function UniversalAutoload:getIsUnloadingAreaAllowed(i)
 	local spec = self.spec_universalAutoload
 	
-    return true
+	return true
 end
 --
 function UniversalAutoload:testLocationIsFull(loadPlace, offset)
@@ -3571,15 +3571,15 @@ end
 --
 function UniversalAutoload:ualTestLocationOverlap_Callback(hitObjectId, x, y, z, distance)
 	
-    if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
-        local spec = self.spec_universalAutoload
-        local object = UniversalAutoload.getNodeObject(hitObjectId)
+	if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
+		local spec = self.spec_universalAutoload
+		local object = UniversalAutoload.getNodeObject(hitObjectId)
 
-        if object ~= nil and object ~= self and object ~= spec.currentObject then
+		if object ~= nil and object ~= self and object ~= spec.currentObject then
 			-- print(object.i3dFilename)
-            spec.foundObject = true
-        end
-    end
+			spec.foundObject = true
+		end
+	end
 end
 --
 function UniversalAutoload:testLoadAreaIsEmpty()
@@ -3689,11 +3689,11 @@ end
 --
 function UniversalAutoload:ualTestLocation_Callback(hitObjectId, x, y, z, distance)
 	
-    if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
-        local spec = self.spec_universalAutoload
-        local object = UniversalAutoload.getNodeObject(hitObjectId)
+	if hitObjectId ~= 0 and getHasClassId(hitObjectId, ClassIds.SHAPE) then
+		local spec = self.spec_universalAutoload
+		local object = UniversalAutoload.getNodeObject(hitObjectId)
 
-        if object ~= nil and object ~= self and UniversalAutoload.getIsValidObject(self, object) then
+		if object ~= nil and object ~= self and UniversalAutoload.getIsValidObject(self, object) then
 			if UniversalAutoload.showDebug then
 				if object.isSplitShape then
 					print("  FOUND SPLIT SHAPE")
@@ -3701,9 +3701,9 @@ function UniversalAutoload:ualTestLocation_Callback(hitObjectId, x, y, z, distan
 					print("  FOUND: " .. object.i3dFilename)
 				end
 			end
-            spec.foundObject = true
-        end
-    end
+			spec.foundObject = true
+		end
+	end
 end
 --
 
@@ -4026,7 +4026,7 @@ function UniversalAutoload:ualLoadingTrigger_Callback(triggerId, otherActorId, o
 				end
 			end
 		end
-    end
+	end
 end
 --
 function UniversalAutoload:ualUnloadingTrigger_Callback(triggerId, otherActorId, onEnter, onLeave, onStay, otherShapeId)
@@ -4796,7 +4796,7 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 				if trigger.name == "rearAutoTrigger" or trigger.name == "leftAutoTrigger" or trigger.name == "rightAutoTrigger" then
 					DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(YELLOW))
 				elseif trigger.name == "leftPickupTrigger" or trigger.name == "rightPickupTrigger"
-				    or trigger.name == "rearPickupTrigger" or trigger.name == "frontPickupTrigger"  then
+					or trigger.name == "rearPickupTrigger" or trigger.name == "frontPickupTrigger"  then
 					DebugUtil.drawDebugCube(trigger.node, 1,1,1, unpack(MAGENTA))
 				end
 			end
@@ -4931,9 +4931,9 @@ function UniversalAutoload.DrawDebugPallet( node, w, h, l, showCube, showAxis, c
 end
 --
 function UniversalAutoload.clamp(x, min, max)
-    if x < min then return min end
-    if x > max then return max end
-    return x
+	if x < min then return min end
+	if x > max then return max end
+	return x
 end
 
 -- DETECT SPAWNED LOGS
@@ -4985,7 +4985,7 @@ function UniversalAutoload:onAIImplementStart()
 end
 --
 function UniversalAutoload:onAIImplementEnd()
-    --- TODO: Folding or closing cover, if needed!
+	--- TODO: Folding or closing cover, if needed!
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled and spec.aiLoadingActive then
 		print("UAL/CP - DEACTIVATE BALE COLLECTION MODE (onAIImplementEnd)")
@@ -4996,7 +4996,7 @@ end
 --
 function UniversalAutoload:onAIFieldWorkerStart()
 	--- TODO: Unfolding or opening cover, if needed!
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		print("UAL/CP - ACTIVATE BALE COLLECTION MODE (onAIFieldWorkerStart)")
 		UniversalAutoload.setBaleCollectionMode(self, true)
@@ -5032,7 +5032,7 @@ function UniversalAutoload:ualHasLoadedBales()
 end
 --
 function UniversalAutoload:ualIsObjectLoadable(object)
-    local spec = self.spec_universalAutoload
+	local spec = self.spec_universalAutoload
 	print("UAL/CP - ualIsObjectLoadable")
 	--- TODO: Returns true, if the given object is loadable.
 	--- For CP, the given object is of the class Bale.

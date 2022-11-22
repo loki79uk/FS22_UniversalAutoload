@@ -1188,12 +1188,12 @@ function UniversalAutoloadManager:loadMap(name)
 	
 	-- ADDITIONAL SETTINGS THIRD
 	print("ADDITIONAL fill type containers")
-    for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
+	for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
 		if fillType.palletFilename then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
 			UniversalAutoloadManager.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
 		end
-    end
+	end
 	for index, baleType in ipairs(g_baleManager.bales) do
 		if baleType.isAvailable then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
@@ -1397,19 +1397,19 @@ ShopConfigScreen.processAttributeData = Utils.overwrittenFunction(ShopConfigScre
 -- Add valid store items to the 'UNIVERSALAUTOLOAD' store pack if it exists.
 -- Using 'table.addElement' will avoid duplicates and errors if Store Pack does not load or exist for some reason ;-)
 StoreManager.loadItem = Utils.overwrittenFunction(StoreManager.loadItem, function(self, superFunc, ...)
-    local storeItem = superFunc(self, ...)
+	local storeItem = superFunc(self, ...)
 
-    if storeItem ~= nil and storeItem.isMod and storeItem.species == "vehicle" then
-        local xmlFile = XMLFile.load("loadItemXml", storeItem.xmlFilename, storeItem.xmlSchema)
+	if storeItem ~= nil and storeItem.isMod and storeItem.species == "vehicle" then
+		local xmlFile = XMLFile.load("loadItemXml", storeItem.xmlFilename, storeItem.xmlSchema)
 
-        -- @Loki Could do more checks if required but why would a mod have the XML key if not UAL?
-        if xmlFile:hasProperty("vehicle.universalAutoload") then
-            -- StoreManager.addPackItem' allows duplicates when using 'gsStoreItemsReload' so not used
-            table.addElement(g_storeManager:getPackItems("UNIVERSALAUTOLOAD"), storeItem.xmlFilename)
-        end
+		-- @Loki Could do more checks if required but why would a mod have the XML key if not UAL?
+		if xmlFile:hasProperty("vehicle.universalAutoload") then
+			-- StoreManager.addPackItem' allows duplicates when using 'gsStoreItemsReload' so not used
+			table.addElement(g_storeManager:getPackItems("UNIVERSALAUTOLOAD"), storeItem.xmlFilename)
+		end
 
-        xmlFile:delete()
-    end
+		xmlFile:delete()
+	end
 
-    return storeItem
+	return storeItem
 end)

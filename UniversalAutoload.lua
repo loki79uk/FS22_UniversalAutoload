@@ -2282,13 +2282,11 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				self:setAllTensionBeltsActive(false)
 				-- *** Don't set belts as they can grab the pallet forks ***
 				-- spec.doSetTensionBelts = true -- spec.doPostLoadDelay = true
-				if UniversalAutoload.loadObject(self, object) then
-					-- print("LOADED PALLET FROM AUTO TRIGGER")
-					spec.autoLoadingObjects[object] = nil
-				else
+				if not UniversalAutoload.loadObject(self, object) then
 					--UNABLE_TO_LOAD_OBJECT
 					UniversalAutoload.showWarningMessage(self, 3)
 				end
+				spec.autoLoadingObjects[object] = nil
 			end
 		end
 		

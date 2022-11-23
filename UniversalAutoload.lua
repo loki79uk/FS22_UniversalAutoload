@@ -2580,6 +2580,9 @@ function UniversalAutoload:isValidForLoading(object)
 	if UniversalAutoload.disableAutoStrap and UniversalAutoload.isStrappedOnOtherVehicle(self, object) then
 		return false
 	end
+	if object.isSplitShape and UniversalAutoload.isLoadedOnTrain(self, object) then
+		return false
+	end
 
 	if object.isSplitShape and object.sizeY > maxLength then
 		return false
@@ -2936,6 +2939,19 @@ function UniversalAutoload.isStrappedOnOtherVehicle(self, object)
 			if vehicle.spec_universalAutoload.loadedObjects[object] then
 				if vehicle.spec_tensionBelts.areBeltsFasten then
 					return vehicle
+				end
+			end
+		end
+	end
+end
+--
+function UniversalAutoload.isLoadedOnTrain(self, object)
+	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+		if vehicle ~= nil and self ~= vehicle then
+			local rootVehicle = vehicle:getRootVehicle()
+			if rootVehicle ~= nil and rootVehicle:getFullName():find("Locomotive") then
+				if vehicle.spec_universalAutoload.loadedObjects[object] then
+					return true
 				end
 			end
 		end

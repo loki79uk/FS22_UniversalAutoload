@@ -63,31 +63,31 @@
         <containerConfiguration containerType="POTATOBOX" name="FS22_Seedpotato_Farm_Pack:Potatoboxpremium"/>
 
         <!-- Platinum DLC -->
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:armoirePallet" sizeX="2.45" sizeY="2.45" sizeZ="1.65" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:barrelPallet" sizeX="1.65" sizeY="1.05" sizeZ="1.25" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bathtubPallet" sizeX="2.45" sizeY="0.7" sizeZ="0.85" neverStack="true" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:birdHousePallet" sizeX="1.25" sizeY="0.58" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bowlsPallet" sizeX="1.25" sizeY="0.96" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bucketPallet" sizeX="1.25" sizeY="0.77" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:cartonRollPallet" sizeX="2.47" sizeY="1.7" sizeZ="1.65" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:catTreePallet" sizeX="1.25" sizeY="0.98" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:chairPallet" sizeX="1.25" sizeY="1.28" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:dogHousePallet" sizeX="1.25" sizeY="1.1" sizeZ="0.88" neverStack="true" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:easelPallet" sizeX="1.25" sizeY="0.70" sizeZ="0.88" />
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:armoirePallet" sizeX="2.45" sizeY="2.45" sizeZ="1.65"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:barrelPallet" sizeX="1.65" sizeY="1.05" sizeZ="1.25"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bathtubPallet" sizeX="2.45" sizeY="0.7" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:birdHousePallet" sizeX="1.25" sizeY="0.58" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bowlsPallet" sizeX="1.25" sizeY="0.96" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:bucketPallet" sizeX="1.25" sizeY="0.77" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:cartonRollPallet" sizeX="2.47" sizeY="1.7" sizeZ="1.65"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:catTreePallet" sizeX="1.25" sizeY="0.98" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:chairPallet" sizeX="1.25" sizeY="1.28" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:dogHousePallet" sizeX="1.25" sizeY="1.1" sizeZ="0.88" neverStack="true"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:easelPallet" sizeX="1.25" sizeY="0.70" sizeZ="0.88"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:floorTilesPallet" sizeX="1.25" sizeY="0.82" sizeZ="0.85"/>
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:metalPallet" sizeX="1.25" sizeY="0.9" sizeZ="0.85" neverStack="true" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:paperRollPallet" sizeX="2.47" sizeY="1.7" sizeZ="1.65" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pepperGrinderPallet" sizeX="1.25" sizeY="1.0" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pictureFramePallet" sizeX="1.25" sizeY="0.5" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:planksPallet" sizeX="2.5" sizeY="0.78" sizeZ="0.90" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:prefabWallPallet" sizeX="2.47" sizeY="2.65" sizeZ="1.76" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:shingleGenericPallet" sizeX="1.24" sizeY="1.36" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:staircaseRailingPallet" sizeX="1.25" sizeY="0.85" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:tablePallet" sizeX="2.44" sizeY="0.58" sizeZ="0.85" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:woodBeamPallet" sizeX="2.74" sizeY="0.94" sizeZ="0.92" />
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:saplingPalletRisutec" sizeX="1.25" sizeY="0.60" sizeZ="0.85" neverStack="true" />
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:metalPallet" sizeX="1.25" sizeY="0.9" sizeZ="0.85" neverStack="true"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:paperRollPallet" sizeX="2.47" sizeY="1.7" sizeZ="1.65"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pepperGrinderPallet" sizeX="1.25" sizeY="1.0" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:pictureFramePallet" sizeX="1.25" sizeY="0.5" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:planksPallet" sizeX="2.5" sizeY="0.78" sizeZ="0.90"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:prefabWallPallet" sizeX="2.47" sizeY="2.65" sizeZ="1.76"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:shingleGenericPallet" sizeX="1.24" sizeY="1.36" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:staircaseRailingPallet" sizeX="1.25" sizeY="0.85" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:tablePallet" sizeX="2.44" sizeY="0.58" sizeZ="0.85"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:woodBeamPallet" sizeX="2.74" sizeY="0.94" sizeZ="0.92"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_forestryPack:saplingPalletRisutec" sizeX="1.25" sizeY="0.60" sizeZ="0.85" neverStack="true"/>
         <containerConfiguration containerType="BIGBAG_PALLET" name="pdlc_forestryPack:stonePallet"/>
-        <containerConfiguration containerType="SHIPPING_CONTAINER" name="pdlc_forestryPack:shippingContainer" sizeX="2.44" sizeY="2.59" sizeZ="?" neverStack="true" />
+        <containerConfiguration containerType="SHIPPING_CONTAINER" name="pdlc_forestryPack:shippingContainer" sizeX="2.44" sizeY="2.59" sizeZ="?" neverStack="true"/>
     </containerConfigurations>
 </universalAutoload>
 

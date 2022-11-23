@@ -728,8 +728,7 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 		if xmlFilename == nil then
 			return "Error: Invalid pallet type. Valid types are " .. table.concatKeys(pallets, ", ")
 		end
-		
-		pallets = nil
+
 		pallets = {}
 		pallets[palletType] = xmlFilename
 	end

@@ -2428,6 +2428,12 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					local lastObject = nil
 					local loadedObject = false
 					for index, object in ipairs(spec.sortedObjectsToLoad) do
+						if not UniversalAutoload.disableAutoStrap then
+							local vehicle = UniversalAutoload.isStrappedOnOtherVehicle(self, object)
+							if vehicle then
+								vehicle:setAllTensionBeltsActive(false)
+							end
+						end
 						lastObject = object
 						if UniversalAutoload.loadObject(self, object) then
 							loadedObject = true
@@ -2571,6 +2577,10 @@ function UniversalAutoload:isValidForLoading(object)
 		return false
 	end
 	
+	if UniversalAutoload.disableAutoStrap and UniversalAutoload.isStrappedOnOtherVehicle(self, object) then
+		return false
+	end
+
 	if object.isSplitShape and object.sizeY > maxLength then
 		return false
 	end
@@ -2908,13 +2918,25 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 						SPEC.resetLoadingPattern = true
 						vehicle:setAllTensionBeltsActive(false)
 					elseif loadedObjectRemoved then
-						if self.spec_tensionBelts.areBeltsFasten then
+						if vehicle.spec_tensionBelts.areBeltsFasten then
 							vehicle:setAllTensionBeltsActive(false)
 							vehicle:setAllTensionBeltsActive(true)
 						end
 					end
 				end
 				UniversalAutoload.forceRaiseActive(vehicle)
+			end
+		end
+	end
+end	
+--
+function UniversalAutoload.isStrappedOnOtherVehicle(self, object)
+	for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+		if vehicle ~= nil and self ~= vehicle then
+			if vehicle.spec_universalAutoload.loadedObjects[object] then
+				if vehicle.spec_tensionBelts.areBeltsFasten then
+					return vehicle
+				end
 			end
 		end
 	end
@@ -4226,39 +4248,38 @@ function UniversalAutoload:createPallet(xmlFilename)
 
 	local function asyncCallbackFunction(vehicle, pallet, palletLoadState, arguments)
 		if palletLoadState == VehicleLoadingUtil.VEHICLE_LOAD_OK then
+			local SPEC = vehicle.spec_universalAutoload
 			local fillTypeIndex = pallet:getFillUnitFirstSupportedFillType(1)
 			pallet:addFillUnitFillLevel(1, 1, math.huge, fillTypeIndex, ToolType.UNDEFINED, nil)
-			
-			-- if UniversalAutoload.testPallets ~= nil then
-				-- table.insert(UniversalAutoload.testPallets, pallet)
-			-- end
-			
+
 			if UniversalAutoload.loadObject(vehicle, pallet) then
-				spec.spawnPalletsDelayTime = 0
+				SPEC.spawnPalletsDelayTime = 0
 			else
-				spec.spawnPalletsDelayTime = UniversalAutoload.delayTime
+				SPEC.spawnPalletsDelayTime = UniversalAutoload.delayTime
 				g_currentMission:removeVehicle(pallet, true)
 				
-				if spec.palletsToSpawn and #spec.palletsToSpawn>1 then
-					for i, name in pairs(spec.palletsToSpawn) do
-						if spec.spawningPallet == name then
-							if debugConsole then print("removing: " .. spec.spawningPallet) end
-							table.remove(spec.palletsToSpawn, i)
-							vehicle.spec_universalAutoload.trailerIsFull = false
+				if SPEC.palletsToSpawn and #SPEC.palletsToSpawn>1 then
+					for i, name in pairs(SPEC.palletsToSpawn) do
+						if SPEC.spawningPallet == name then
+							if debugConsole then print("removing: " .. SPEC.spawningPallet) end
+							table.remove(SPEC.palletsToSpawn, i)
+							SPEC.trailerIsFull = false
 							break
 						end
 					end
 				end
-				if spec.palletsToSpawn and #spec.palletsToSpawn==1 then
-					spec.palletsToSpawn = nil
+				if SPEC.palletsToSpawn and #SPEC.palletsToSpawn==1 then
+					SPEC.palletsToSpawn = nil
 				end
 			end
 			
-			vehicle.spec_universalAutoload.spawningPallet = nil
-			if vehicle.spec_universalAutoload.trailerIsFull == true or not spec.palletsToSpawn then
-				vehicle.spec_universalAutoload.spawnPallets = false
-				vehicle.spec_universalAutoload.doPostLoadDelay = true
-				vehicle.spec_universalAutoload.doSetTensionBelts = true
+			SPEC.spawningPallet = nil
+			if SPEC.trailerIsFull == true or not SPEC.palletsToSpawn then
+				SPEC.spawnPallets = false
+				SPEC.doPostLoadDelay = true
+				SPEC.doSetTensionBelts = true
+				SPEC.lastSpawnedPallet = nil
+				SPEC.palletsToSpawn = {}
 				print(vehicle:getFullName() .. " ..adding pallets complete!")
 			end
 			return
@@ -4942,7 +4963,6 @@ getmetatable(_G).__index.addToPhysics = function(node, ...)
 	oldAddToPhysics(node, ...)
 	if getRigidBodyType(node) == RigidBodyType.DYNAMIC and getSplitType(node) ~= 0 then
 		if not UniversalAutoload.createdLogId and UniversalAutoload.createdTreeId and node > UniversalAutoload.createdTreeId then
-			-- print("*** ADDED TO PHYSICS - node: " .. tostring(node) .. " ***")
 			UniversalAutoload.createdLogId = node
 		end
 	end

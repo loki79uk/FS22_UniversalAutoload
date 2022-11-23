@@ -715,7 +715,6 @@ end
 function UniversalAutoloadManager:consoleAddPallets(palletType)
 
 	local pallets = {}
-	local palletsOnly = true
 	for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
 		local xmlName = fillType.palletFilename
 		if xmlName ~= nil and not xmlName:find("fillablePallet") then
@@ -730,8 +729,8 @@ function UniversalAutoloadManager:consoleAddPallets(palletType)
 			return "Error: Invalid pallet type. Valid types are " .. table.concatKeys(pallets, ", ")
 		end
 		
+		pallets = nil
 		pallets = {}
-		palletsOnly = false
 		pallets[palletType] = xmlFilename
 	end
 	

@@ -772,7 +772,7 @@ function UniversalAutoloadManager:consoleAddLogs(arg1, arg2)
 	
 	local availableLogTypes
 
-	if g_modIsLoaded["pdlc_forestryPack"] then
+	if not g_modIsLoaded["pdlc_forestryPack"] then
 		availableLogTypes = {
 			OAK = 3.5,
 			ELM = 3.5,

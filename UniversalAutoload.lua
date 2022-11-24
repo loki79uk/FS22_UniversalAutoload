@@ -2801,7 +2801,7 @@ function UniversalAutoload:loadObject(object)
 					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 				end
 				
-				spec.lastLoadedObjectLength = containerType.sizeZ
+				spec.lastLoadedObjectLength = containerType.sizeX
 			
 				if UniversalAutoload.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]",
 					containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
@@ -3194,7 +3194,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			print("===============================")
 			-- print("FIND LOADING PLACE FOR "..containerType.name)
 		end
-		if spec.isLogTrailer and spec.lastLoadedObjectLength > 0 and spec.lastLoadedObjectLength < containerType.sizeZ then
+		if spec.isLogTrailer and spec.lastLoadedObjectLength > 0 and spec.lastLoadedObjectLength < containerType.sizeX then
 			if UniversalAutoload.showDebug then print("NEW OBJECT is longer than previous") end
 			spec.resetLoadingPattern = true
 		end

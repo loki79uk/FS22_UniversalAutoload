@@ -218,10 +218,13 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 							break
 						end
 						config.loadingArea[j+1] = {}
-						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width")
-						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length")
-						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height")
+						config.loadingArea[j+1].width  = xmlFile:getValue(loadAreaKey.."#width", nil)
+						config.loadingArea[j+1].length = xmlFile:getValue(loadAreaKey.."#length", nil)
+						config.loadingArea[j+1].height = xmlFile:getValue(loadAreaKey.."#height", nil)
 						config.loadingArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
+						config.loadingArea[j+1].widthAxis  = xmlFile:getValue(loadAreaKey.."#widthAxis", nil)
+						config.loadingArea[j+1].lengthAxis = xmlFile:getValue(loadAreaKey.."#lengthAxis", nil)
+						config.loadingArea[j+1].heightAxis = xmlFile:getValue(loadAreaKey.."#heightAxis", nil)
 						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
 						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
@@ -651,10 +654,10 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 		vehicleCount = 0
 		local doResetVehicle = false
 		for key, configGroup in pairs(UniversalAutoload.VEHICLE_CONFIGURATIONS) do
+			local foundFirstMatch = false
 			for index, config in pairs(configGroup) do
 				if oldVehicleConfigurations[key] and oldVehicleConfigurations[key][index]
 				and not deepCompare(oldVehicleConfigurations[key][index], config) then
-					local foundFirstMatch = false
 					-- FIRST LOOK IF THIS IS THE CURRENT CONTROLLED VECHILE
 					for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
 						-- print(vehicle.configFileName .. " - " .. tostring(vehicle.spec_universalAutoload.boughtConfig) .. " / " .. index)
@@ -664,6 +667,7 @@ function UniversalAutoloadManager:consoleImportUserConfigurations()
 								foundFirstMatch = true
 								print("APPLYING UPDATED SETTINGS: " .. vehicle:getFullName())
 								if not UniversalAutoloadManager.resetVehicle(vehicle) then
+									print("THIS IS CURRENT CONTROLLED VEHICLE: " .. vehicle:getFullName())
 									doResetVehicle = true
 								end
 							end
@@ -1185,19 +1189,21 @@ function UniversalAutoloadManager:loadMap(name)
 	UniversalAutoloadManager.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
 	
 	-- ADDITIONAL SETTINGS THIRD
-	print("ADDITIONAL fill type containers")
+	print("ADDITIONAL containers")
 	for index, fillType in ipairs(g_fillTypeManager.fillTypes) do
 		if fillType.palletFilename then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(fillType.palletFilename)
 			UniversalAutoloadManager.importContainerTypeFromXml(fillType.palletFilename, customEnvironment)
 		end
 	end
+	print("ADDITIONAL bales")
 	for index, baleType in ipairs(g_baleManager.bales) do
 		if baleType.isAvailable then
 			local customEnvironment = UniversalAutoload.getEnvironmentNameFromPath(baleType.xmlFilename)
 			UniversalAutoloadManager.importContainerTypeFromXml(baleType.xmlFilename, customEnvironment)
 		end
 	end
+	print("ADDITIONAL items")
 	for _, storeItem in pairs(g_storeManager:getItems()) do
 		if storeItem.isMod and
 		   storeItem.categoryName == "BALES" or

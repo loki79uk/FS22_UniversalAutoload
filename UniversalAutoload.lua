@@ -12,12 +12,12 @@ UniversalAutoload.showLoading = false
 
 UniversalAutoload.delayTime = 200
 UniversalAutoload.logSpace = 0.25
+UniversalAutoload.maxLayerCount = 20
 UniversalAutoload.SPLITSHAPES_LOOKUP = {}
 
 local debugKeys = false
 local debugConsole = false
 local debugVehicles = false
-local debugMultiplayer = true
 
 -- EVENTS
 source(g_currentModDirectory.."events/CycleContainerEvent.lua")
@@ -77,6 +77,9 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#length", "Length of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#height", "Height of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#baleHeight", "Height of the loading area for BALES only", nil)
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#widthAxis", "Axis name to extend width of the loading area", nil)
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#lengthAxis", "Axis name to extend length of the loading area", nil)
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#heightAxis", "Axis name to extend height of the loading area", nil)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfFolded", "Prevent loading when folded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUnfolded", "Prevent loading when unfolded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfCovered", "Prevent loading when covered (for this area only)", false)
@@ -1447,6 +1450,7 @@ function UniversalAutoload:onLoad(savegame)
 
 	self.spec_universalAutoload = self[UniversalAutoload.specName]
 	local spec = self.spec_universalAutoload
+	if debugVehicles then print("UniversalAutoload - onLoad: "..self.configFileName ) end
 
 	if self.isServer then
 
@@ -1475,11 +1479,14 @@ function UniversalAutoload:onLoad(savegame)
 						spec.loadArea = {}
 						for i, loadArea in pairs(config.loadingArea) do
 							spec.loadArea[i] = {}
-							spec.loadArea[i].width	  = loadArea.width
-							spec.loadArea[i].length	 = loadArea.length
-							spec.loadArea[i].height	 = loadArea.height
-							spec.loadArea[i].baleHeight = loadArea.baleHeight
+							spec.loadArea[i].width   = loadArea.width
+							spec.loadArea[i].length  = loadArea.length
+							spec.loadArea[i].height  = loadArea.height
 							spec.loadArea[i].offset	 = loadArea.offset
+							spec.loadArea[i].baleHeight  = loadArea.baleHeight
+							spec.loadArea[i].widthAxis   = loadArea.widthAxis
+							spec.loadArea[i].lengthAxis  = loadArea.lengthAxis
+							spec.loadArea[i].heightAxis  = loadArea.heightAxis
 							spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
 							spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
 							spec.loadArea[i].noLoadingIfCovered  = loadArea.noLoadingIfCovered
@@ -1531,11 +1538,14 @@ function UniversalAutoload:onLoad(savegame)
 								break
 							end
 							spec.loadArea[j+1] = {}
-							spec.loadArea[j+1].width	  = xmlFile:getValue(loadAreaKey.."#width")
-							spec.loadArea[j+1].length	 = xmlFile:getValue(loadAreaKey.."#length")
-							spec.loadArea[j+1].height	 = xmlFile:getValue(loadAreaKey.."#height")
+							spec.loadArea[j+1].width      = xmlFile:getValue(loadAreaKey.."#width", nil)
+							spec.loadArea[j+1].length     = xmlFile:getValue(loadAreaKey.."#length", nil)
+							spec.loadArea[j+1].height     = xmlFile:getValue(loadAreaKey.."#height", nil)
 							spec.loadArea[j+1].baleHeight = xmlFile:getValue(loadAreaKey.."#baleHeight", nil)
-							spec.loadArea[j+1].offset	 = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+							spec.loadArea[j+1].widthAxis  = xmlFile:getValue(loadAreaKey.."#widthAxis", nil)
+							spec.loadArea[j+1].lengthAxis = xmlFile:getValue(loadAreaKey.."#lengthAxis", nil)
+							spec.loadArea[j+1].heightAxis = xmlFile:getValue(loadAreaKey.."#heightAxis", nil)
+							spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
 							spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 							spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 							spec.loadArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
@@ -1894,6 +1904,10 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", 0)
 			spec.resetLoadingPattern = false
 		end
+		
+		UniversalAutoload.updateWidthAxis(self)
+		UniversalAutoload.updateLengthAxis(self)
+		UniversalAutoload.updateHeightAxis(self)
 	
 	end
 end
@@ -2013,32 +2027,101 @@ function UniversalAutoload:onMovingToolChanged(tool, transSpeed, dt)
 		return
 	end
 	
-	if self.isServer then
-		-- print("onMovingToolChanged: "..self:getFullName())
-		if tool.axis == "AXIS_DRAWBAR" then
-			local _, _, z = getTranslation(tool.node)
-			local extensionLength = UniversalAutoload.clamp(math.abs(z), 0, 3)
+	if self.isServer and tool.axis ~= nil then
+		-- print("onMovingToolChanged: "..self:getFullName().." - "..tool.axis)
+		UniversalAutoload.updateWidthAxis(self)
+		UniversalAutoload.updateLengthAxis(self)
+		UniversalAutoload.updateHeightAxis(self)
+	end
+end
+--
+function UniversalAutoload:updateWidthAxis()
+	local spec = self.spec_universalAutoload
 	
-			local loadArea = spec.loadArea[1]
-			if loadArea.originalLength == nil then
-				loadArea.originalLength = loadArea.length
-				local X, Y, Z = unpack(loadArea.offset)
-				loadArea.X = X
-				loadArea.Y = Y
-				loadArea.Z = Z
-				
-				spec.loadVolume.originalLength = spec.loadVolume.length
-				local X0, Y0, Z0 = getTranslation(spec.loadVolume.rootNode)
-				spec.loadVolume.X = X0
-				spec.loadVolume.Y = Y0
-				spec.loadVolume.Z = Z0
-			end
+	for i, loadArea in pairs(spec.loadArea) do
+		if loadArea.widthAxis ~= nil then
+
+			for i, tool in pairs(self.spec_cylindered.movingTools) do
+				if tool.axis ~= nil and loadArea.widthAxis == tool.axis then
 			
-			loadArea.length = loadArea.originalLength + extensionLength
-			spec.loadVolume.length = spec.loadVolume.originalLength + extensionLength
-			setTranslation(loadArea.endNode, loadArea.X, loadArea.Y, loadArea.Z-(loadArea.length/2))
-			setTranslation(loadArea.rootNode, loadArea.X, loadArea.Y, loadArea.Z-(extensionLength/2))
-			setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z-(extensionLength/2))
+					local x, y, z = getTranslation(tool.node)
+					-- print(self:getFullName() .." - UPDATE WIDTH AXIS: x="..x..",  y="..y..",  z="..z)
+					if loadArea.originalWidth == nil then
+						loadArea.originalWidth = loadArea.width
+						spec.loadVolume.originalWidth = spec.loadVolume.width
+					end
+					local extensionWidth = math.abs(x)
+					loadArea.width = loadArea.originalWidth + extensionWidth
+					spec.loadVolume.width = spec.loadVolume.originalWidth + extensionWidth
+				end
+			end
+		end
+	end
+end
+--
+function UniversalAutoload:updateHeightAxis()
+	local spec = self.spec_universalAutoload
+
+	for i, loadArea in pairs(spec.loadArea) do
+		if loadArea.heightAxis ~= nil then
+
+			for i, tool in pairs(self.spec_cylindered.movingTools) do
+				if tool.axis ~= nil and loadArea.heightAxis == tool.axis then
+			
+					local x, y, z = getTranslation(tool.node)
+					-- print(self:getFullName() .." - UPDATE HEIGHT AXIS: x="..x..",  y="..y..",  z="..z)
+					if loadArea.originalHeight == nil then
+						loadArea.originalHeight = loadArea.height
+						spec.loadVolume.originalHeight = spec.loadVolume.height
+					end
+					local extensionHeight = math.abs(y)
+					loadArea.height = loadArea.originalHeight + extensionHeight
+					spec.loadVolume.height = spec.loadVolume.originalHeight + extensionHeight
+					
+				end
+			end
+		end
+	end
+end
+--
+function UniversalAutoload:updateLengthAxis()
+	local spec = self.spec_universalAutoload
+	
+	for i, loadArea in pairs(spec.loadArea) do
+		if loadArea.lengthAxis ~= nil then
+
+			for i, tool in pairs(self.spec_cylindered.movingTools) do
+				if tool.axis ~= nil and loadArea.lengthAxis == tool.axis then
+			
+					local x, y, z = getTranslation(tool.node)
+					-- print(self:getFullName() .." - UPDATE LENGTH AXIS: x="..x..",  y="..y..",  z="..z)
+					if loadArea.originalLength == nil then
+						loadArea.originalLength = loadArea.length
+						local X, Y, Z = unpack(loadArea.offset)
+						loadArea.X = X
+						loadArea.Y = Y
+						loadArea.Z = Z
+						
+						spec.loadVolume.originalLength = spec.loadVolume.length
+						local X0, Y0, Z0 = getTranslation(spec.loadVolume.rootNode)
+						spec.loadVolume.X = X0
+						spec.loadVolume.Y = Y0
+						spec.loadVolume.Z = Z0
+					end
+
+					local extensionLength = math.abs(z)
+					loadArea.length = loadArea.originalLength + extensionLength
+					spec.loadVolume.length = spec.loadVolume.originalLength + extensionLength
+					setTranslation(loadArea.rootNode, loadArea.X, loadArea.Y, loadArea.Z-(extensionLength/2))
+					setTranslation(loadArea.endNode, loadArea.X, loadArea.Y, loadArea.Z-(loadArea.length/2)-(extensionLength/2))
+					setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z-(extensionLength/2))
+					if spec.rearTriggerId then
+						local depth = 0.05
+						local recess = spec.loadVolume.width/4
+						setTranslation(spec.rearTriggerId, 0, spec.loadVolume.height/2, recess-(spec.loadVolume.length/2)-depth)
+					end
+				end
+			end
 		end
 	end
 end
@@ -2088,7 +2171,6 @@ end
 
 -- NETWORKING FUNCTIONS
 function UniversalAutoload:onReadStream(streamId, connection)
-	if debugMultiplayer then print("onReadStream - " .. self:getFullName()) end
 	local spec = self.spec_universalAutoload
 	
 	if streamReadBool(streamId) then
@@ -2123,7 +2205,6 @@ function UniversalAutoload:onReadStream(streamId, connection)
 end
 --
 function UniversalAutoload:onWriteStream(streamId, connection)
-	if debugMultiplayer then print("onWriteStream - " .. self:getFullName()) end
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		streamWriteBool(streamId, true)
@@ -3357,7 +3438,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			end
 		end
 		spec.currentLoadAreaIndex = 1
-		if (spec.isLogTrailer and spec.currentLayerCount < 10)
+		if (spec.isLogTrailer and spec.currentLayerCount < UniversalAutoload.maxLayerCount)
 		or (spec.useHorizontalLoading and spec.currentLayerCount < 5)
 		and not (spec.baleCollectionMode and spec.nextLayerHeight == 0) then
 			spec.currentLayerCount = spec.currentLayerCount + 1
@@ -4495,7 +4576,6 @@ end
 function UniversalAutoload.getObjectNameFromI3d(i3d_path)
 
 	if i3d_path == nil then
-		--print("getObjectNameFromI3d: i3d_path == NIL")
 		return
 	end
 	
@@ -4506,7 +4586,6 @@ end
 function UniversalAutoload.getObjectNameFromXml(xml_path)
 
 	if xml_path == nil then
-		--print("getObjectNameFromXml: xml_path == NIL")
 		return
 	end
 	
@@ -4517,7 +4596,6 @@ end
 function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
 
 	if i3d_path == nil then
-		--print("getEnvironmentNameFromPath: i3d_path == NIL")
 		return
 	end
 	
@@ -4525,12 +4603,24 @@ function UniversalAutoload.getEnvironmentNameFromPath(i3d_path)
 	if i3d_path:find(g_modsDirectory) then
 		local temp = i3d_path:gsub(g_modsDirectory, "")
 		customEnvironment, _ = temp:match( "^(.-)/(.+)$" )
+	else
+		for i = 1, #g_dlcsDirectories do
+			local dlcsDirectory = g_dlcsDirectories[i].path
+			if dlcsDirectory:find(":") and i3d_path:find(dlcsDirectory) then
+				local temp = i3d_path:gsub(dlcsDirectory, "")
+				customEnvironment, _ = "pdlc_"..temp:match( "^(.-)/(.+)$" )
+			end
+		end
 	end
 	return customEnvironment
 end
 --
 function UniversalAutoload.getValidXmlName(ualConfigName)
 
+	if ualConfigName == nil then
+		return
+	end
+	
 	local xmlFilename = ualConfigName
 	if g_storeManager:getItemByXMLFilename(xmlFilename) then
 		return xmlFilename

@@ -6,7 +6,7 @@
             <options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/brantner/dd24073/dd24073.xml" selectedConfigs="1">
-            <loadingArea offset="0 1.419 -0.75" width="2.41" height="2.25" length="7.35" baleHeight="3.2"/>
+            <loadingArea offset="0 1.419 -0.77" width="2.41" height="2.25" length="7.35" baleHeight="3.2"/>
             <options isBaleTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/fliegl/dts59/dts59.xml">
@@ -168,25 +168,29 @@
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/timberTrailerSemi/timberTrailerSemi.xml">  
-            <loadingArea offset="0 1.5 0.4" width="2.3" height="2.55" length="13"/>
+            <loadingArea offset="0 1.5 0.4" width="2.3" height="2.05" length="13" heightAxis="AXIS_FRONTLOADER_ARM"/>
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/timberTrailer/timberTrailer.xml">  
-            <loadingArea offset="0 1.6 -0.1" width="2.2" height="2.55" length="8.1"/>
+            <loadingArea offset="0 1.6 -0.1" width="2.2" height="2.05" length="8.1" heightAxis="AXIS_FRONTLOADER_ARM"/>
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
-        <vehicleConfiguration configFileName="forestryPack/vehicles/pfanzelt/rwgP13/rwgP13.xml" >  
-            <loadingArea offset="0 1.25 -1.50" width="1.7" height="1.2" length="4.6"/>
+        <vehicleConfiguration configFileName="forestryPack/vehicles/pfanzelt/rwgP13/rwgP13.xml" selectedConfigs="1">  
+            <loadingArea offset="0 1.25 -1.50" width="1.7" height="1.2" length="4.6" lengthAxis="AXIS_FRONTLOADER_ARM2"/>
             <options isLogTrailer="true"/>
+        </vehicleConfiguration>
+        <vehicleConfiguration configFileName="forestryPack/vehicles/pfanzelt/rwgP13/rwgP13.xml" selectedConfigs="2">  
+            <loadingArea offset="0 1.25 -1.50" width="1.7" height="1.2" length="4.6" lengthAxis="AXIS_FRONTLOADER_ARM2"/>
+            <options isLogTrailer="true"/>
+        </vehicleConfiguration>
+        <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/semiLowloader3A/semiLowloader3A.xml">  
+            <loadingArea offset="0 0.905 -1.1" width="2.50" height="2.25" length="9.20" lengthAxis="AXIS_DRAWBAR"/>
+            <loadingArea offset="0 1.285 5.35" width="2.50" height="2.25" length="3.75"/>
+            <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/lowloader4A/lowloader4A.xml">  
             <loadingArea offset="0 0.925 -2.4" width="2.45" height="2.25" length="6.1"/>
             <loadingArea offset="0 1.150 2.1" width="2.45" height="2.25" length="2.3"/>
-            <options enableRearLoading="true" enableSideLoading="true"/>
-        </vehicleConfiguration>
-        <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/semiLowloader3A/semiLowloader3A.xml">  
-            <loadingArea offset="0 0.905 -1.1" width="2.50" height="2.25" length="9.20"/>
-            <loadingArea offset="0 1.285 5.35" width="2.50" height="2.25" length="3.75"/>
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         

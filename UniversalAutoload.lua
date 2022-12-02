@@ -1141,13 +1141,11 @@ function UniversalAutoload:startUnloading(noEventSend)
 				spec.currentLoadingPlace = nil
 				if spec.totalUnloadCount == 0 then
 					if UniversalAutoload.showDebug then print("FULLY UNLOADED...") end
+					UniversalAutoload.resetLoadingLayer(self)
+					UniversalAutoload.resetLoadingPattern(self)
 					spec.trailerIsFull = false
 					spec.partiallyUnloaded = false
-					spec.resetLoadingPattern = true
 					spec.currentLoadAreaIndex = 1
-					spec.nextLayerHeight = 0
-					spec.currentLayerCount = 0
-					spec.currentLayerHeight = 0
 				else
 					if UniversalAutoload.showDebug then print("PARTIALLY UNLOADED...") end
 					spec.partiallyUnloaded = true
@@ -1881,6 +1879,7 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.nextLayerHeight = 0
 			spec.currentLoadAreaIndex = 1
 			spec.lastLoadedObjectLength = 0
+			spec.resetLoadingLayer = false
 			spec.resetLoadingPattern = false
 		else
 			--client+server
@@ -1902,6 +1901,7 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.nextLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#nextLayerHeight", 0)
 			spec.currentLoadAreaIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadAreaIndex", 1)
 			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", 0)
+			spec.resetLoadingLayer = false
 			spec.resetLoadingPattern = false
 		end
 		
@@ -1930,6 +1930,9 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 				UniversalAutoload.addToPhysics(self, object)
 			end
 		end
+	end
+	if spec.resetLoadingLayer ~= false then
+		UniversalAutoload.resetLoadingLayer(self)
 	end
 	if spec.resetLoadingPattern ~= false then
 		UniversalAutoload.resetLoadingPattern(self)
@@ -2999,6 +3002,7 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				if self ~= vehicle then
 					local SPEC = vehicle.spec_universalAutoload
 					if SPEC.totalUnloadCount == 0 then
+						SPEC.resetLoadingLayer = true
 						SPEC.resetLoadingPattern = true
 						vehicle:setAllTensionBeltsActive(false)
 					elseif loadedObjectRemoved then
@@ -3260,6 +3264,15 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.lastLoadedObjectLength = 0
 	spec.currentLoadingPlace = nil
 	spec.resetLoadingPattern = false
+end
+--
+function UniversalAutoload:resetLoadingLayer()
+	local spec = self.spec_universalAutoload
+	if UniversalAutoload.showDebug then print("RESET LAYER") end
+	spec.nextLayerHeight = 0
+	spec.currentLayerCount = 0
+	spec.currentLayerHeight = 0
+	spec.resetLoadingLayer = false
 end
 --
 function UniversalAutoload:getLoadPlace(containerType, object)
@@ -4209,11 +4222,9 @@ function UniversalAutoload:removeLoadedObject(object)
 			object:removeDeleteListener(self, "ualOnDeleteLoadedObject_Callback")
 		end
 		if next(spec.loadedObjects) == nil then
+			spec.resetLoadingLayer = true
 			spec.resetLoadingPattern = true
 			spec.currentLoadAreaIndex = 1
-			spec.nextLayerHeight = 0
-			spec.currentLayerCount = 0
-			spec.currentLayerHeight = 0
 		end
 		return true
 	end
@@ -4561,12 +4572,10 @@ function UniversalAutoload:clearLoadedObjects()
 		end
 		spec.loadedObjects = {}
 		spec.totalUnloadCount = 0
-		UniversalAutoload.resetLoadingPattern(self)
+		spec.resetLoadingLayer = true
+		spec.resetLoadingPattern = true
 		spec.trailerIsFull = false
 		spec.partiallyUnloaded = false
-		spec.nextLayerHeight = 0
-		spec.currentLayerCount = 0
-		spec.currentLayerHeight = 0
 	end
 	return palletCount, balesCount, logCount
 end

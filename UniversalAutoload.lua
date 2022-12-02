@@ -3329,7 +3329,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					
 					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
 					local layerOverMaxHeight = spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
-					local ignoreHeightForContainer = UniversalAutoload.isShippingContainer(object) and not (spec.isCurtainTrailer or spec.isBoxTrailer)
+					local isFirstLayer = (spec.isLogTrailer or spec.useHorizontalLoading) and spec.currentLayerCount == 0
+					local ignoreHeightForContainer = (isFirstLayer or spec.currentLoadingPlace==nil) and not (spec.isCurtainTrailer or spec.isBoxTrailer)
 					if spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
 						if UniversalAutoload.showDebug then print("CONTAINER IS TOO TALL FOR THIS AREA") end
 						return
@@ -3381,17 +3382,21 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							elseif not self:ualGetIsMoving() and not spec.baleCollectionMode then
 								local increment = 0.1
 								if spec.useHorizontalLoading then
-								
-									while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
-										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
-										local placeEmpty = UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-										local placeBelowFull = UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)
-										if placeEmpty and (thisLoadHeight<=0 or placeBelowFull) then
-											spec.currentLoadHeight = thisLoadHeight
-											useThisLoadSpace = true
-											break
+									if isFirstLayer and ignoreHeightForContainer then
+										if UniversalAutoload.showDebug then print("IGNORE HEIGHT FOR CONTAINER") end
+										useThisLoadSpace = true
+									else
+										while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
+											setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
+											local placeEmpty = UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
+											local placeBelowFull = UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)
+											if placeEmpty and (thisLoadHeight<=0 or placeBelowFull) then
+												spec.currentLoadHeight = thisLoadHeight
+												useThisLoadSpace = true
+												break
+											end
+											thisLoadHeight = thisLoadHeight + increment
 										end
-										thisLoadHeight = thisLoadHeight + increment
 									end
 								else
 								

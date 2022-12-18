@@ -3330,8 +3330,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
 					local layerOverMaxHeight = spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
 					local isFirstLayer = (spec.isLogTrailer or spec.useHorizontalLoading) and spec.currentLayerCount == 0
-					local ignoreHeightForContainer = (isFirstLayer or spec.currentLoadingPlace==nil) and not (spec.isCurtainTrailer or spec.isBoxTrailer)
-					if spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
+					local ignoreHeightForContainer = isFirstLayer and not (spec.isCurtainTrailer or spec.isBoxTrailer)
+					if spec.currentLoadingPlace and spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
 						if UniversalAutoload.showDebug then print("CONTAINER IS TOO TALL FOR THIS AREA") end
 						return
 					else
@@ -3382,8 +3382,9 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							elseif not self:ualGetIsMoving() and not spec.baleCollectionMode then
 								local increment = 0.1
 								if spec.useHorizontalLoading then
-									if isFirstLayer and ignoreHeightForContainer then
+									if isFirstLayer and layerOverMaxHeight and ignoreHeightForContainer then
 										if UniversalAutoload.showDebug then print("IGNORE HEIGHT FOR CONTAINER") end
+										spec.currentLoadHeight = thisLoadHeight
 										useThisLoadSpace = true
 									else
 										while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
@@ -3673,7 +3674,7 @@ function UniversalAutoload:testLocationIsFull(loadPlace, offset)
 	spec.foundObject = false
 	spec.currentObject = self
 	
-	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
+	local collisionMask = CollisionFlag.STATIC_OBJECT + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 	
 	return spec.foundObject
@@ -3690,7 +3691,7 @@ function UniversalAutoload:testLocationIsEmpty(loadPlace, object, offset)
 	spec.foundObject = false
 	spec.currentObject = object
 
-	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
+	local collisionMask = CollisionFlag.STATIC_OBJECT + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	if UniversalAutoload.showDebug then
@@ -3732,7 +3733,7 @@ function UniversalAutoload:testLoadAreaIsEmpty()
 	spec.foundObject = false
 	spec.currentObject = nil
 
-	local collisionMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
+	local collisionMask = CollisionFlag.STATIC_OBJECT + CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER
 	overlapBox(x+dx, y+dy, z+dz, rx, ry, rz, sizeX, sizeY, sizeZ, "ualTestLocationOverlap_Callback", self, collisionMask, true, false, true)
 
 	-- print(self:getFullName() .. " IS EMPTY: " .. tostring(not spec.foundObject))
@@ -4577,8 +4578,8 @@ function UniversalAutoload:clearLoadedObjects()
 		end
 		spec.loadedObjects = {}
 		spec.totalUnloadCount = 0
-		spec.resetLoadingLayer = true
-		spec.resetLoadingPattern = true
+		UniversalAutoload.resetLoadingLayer(self)
+		UniversalAutoload.resetLoadingPattern(self)
 		spec.trailerIsFull = false
 		spec.partiallyUnloaded = false
 	end

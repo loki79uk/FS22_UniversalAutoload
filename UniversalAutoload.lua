@@ -288,8 +288,8 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 			end
 		end
 		if closestVehicle ~= nil then
+			UniversalAutoload.printHelpText(closestVehicle)
 			UniversalAutoload.forceRaiseActive(closestVehicle)
-			g_currentMission:addExtraPrintText(closestVehicle:getFullName())
 		end
 	end
 end
@@ -1219,6 +1219,21 @@ function UniversalAutoload:updateActionEventText(loadCount, unloadCount, noEvent
 	end
 	
 	spec.updateToggleLoading = true
+end
+--
+function UniversalAutoload:printHelpText()
+	local spec = self.spec_universalAutoload
+	local textExists = false
+	if #g_currentMission.hud.inputHelp.extraHelpTexts > 0 then
+		for _, text in ipairs(g_currentMission.inGameMenu.hud.inputHelp.extraHelpTexts) do
+			if text == self:getFullName() then
+				textExists = true
+			end
+		end
+	end
+	if not textExists then
+		g_currentMission:addExtraPrintText(self:getFullName())
+	end
 end
 --
 function UniversalAutoload:forceRaiseActive(state, noEventSend)

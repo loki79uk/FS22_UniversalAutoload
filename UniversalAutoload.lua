@@ -3392,7 +3392,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							if spec.isLogTrailer then
 							
 								if not self:ualGetIsMoving() then
-									local logLoadHeight = math.min(spec.currentLayerHeight+containerType.sizeY, maxLoadAreaHeight) + 0.1
+									local logLoadHeight = maxLoadAreaHeight + 0.1
+									if not spec.zonesOverlap then
+										logLoadHeight = math.min(spec.currentLayerHeight+containerType.sizeY, maxLoadAreaHeight) + 0.1
+									end
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
 										spec.currentLoadHeight = spec.currentLayerHeight
@@ -3477,8 +3480,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			if #spec.loadArea > 1 and i <= #spec.loadArea then
 				if UniversalAutoload.showDebug then print("TRY NEXT LOADING AREA ("..tostring(i)..")...") end
 				spec.currentLoadAreaIndex = i
-				spec.nextLayerHeight = 0
-				spec.currentLayerHeight = 0
 			end
 		end
 		spec.currentLoadAreaIndex = 1

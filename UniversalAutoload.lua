@@ -51,6 +51,7 @@ function UniversalAutoload.initSpecialization()
 
 	local globalKey = "universalAutoload"
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#highPriority", "Apply high priority to all UAL key bindings in the F1 menu", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerLog", "The price charged for each auto-loaded log (default is zero)", 0)
@@ -324,9 +325,18 @@ function UniversalAutoload:updateActionEventKeys()
 			if debugKeys then print("updateActionEventKeys: "..self:getFullName()) end
 			local actions = UniversalAutoload.ACTIONS
 			local ignoreCollisions = true
+			
+			local topPriority = GS_PRIO_HIGH
+			local midPriority = GS_PRIO_NORMAL
+			local lowPriority = GS_PRIO_LOW
+			if UniversalAutoload.highPriority == true then
+				topPriority = GS_PRIO_VERY_HIGH
+				midPriority = GS_PRIO_HIGH
+				lowPriority = GS_PRIO_NORMAL
+			end
 
 			local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.UNLOAD_ALL, self, UniversalAutoload.actionEventUnloadAll, false, true, false, true, nil, nil, ignoreCollisions, true)
-			g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+			g_inputBinding:setActionEventTextPriority(actionEventId, topPriority)
 			spec.unloadAllActionEventId = actionEventId
 			if debugKeys then print("  UNLOAD_ALL: "..tostring(valid)) end
 			spec.updateToggleLoading = true
@@ -335,19 +345,19 @@ function UniversalAutoload:updateActionEventKeys()
 				
 				if spec.isBaleTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BALE_COLLECTION, self, UniversalAutoload.actionEventToggleBaleCollectionMode, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+					g_inputBinding:setActionEventTextPriority(actionEventId, topPriority)
 					spec.toggleBaleCollectionModeEventId = actionEventId
 					if debugKeys then print("  TOGGLE_BALE_COLLECTION: "..tostring(valid)) end
 				end
 				
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_LOADING, self, UniversalAutoload.actionEventToggleLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+				g_inputBinding:setActionEventTextPriority(actionEventId, topPriority)
 				spec.toggleLoadingActionEventId = actionEventId
 				if debugKeys then print("  TOGGLE_LOADING: "..tostring(valid)) end
 
 				if not spec.isLogTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_FILTER, self, UniversalAutoload.actionEventToggleFilter, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.toggleLoadingFilterActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_FILTER: "..tostring(valid)) end
 					spec.updateToggleFilter = true
@@ -356,40 +366,40 @@ function UniversalAutoload:updateActionEventKeys()
 			
 			if not spec.isLogTrailer then
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_HORIZONTAL, self, UniversalAutoload.actionEventToggleHorizontalLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 				spec.toggleHorizontalLoadingActionEventId = actionEventId
 				if debugKeys then print("  TOGGLE_HORIZONTAL: "..tostring(valid)) end
 				spec.updateHorizontalLoading = true
 				
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_FW, self, UniversalAutoload.actionEventCycleMaterial_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 				spec.cycleMaterialActionEventId = actionEventId
 				if debugKeys then print("  CYCLE_MATERIAL_FW: "..tostring(valid)) end
 
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_MATERIAL_BW, self, UniversalAutoload.actionEventCycleMaterial_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
+				g_inputBinding:setActionEventTextPriority(actionEventId, lowPriority)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 				if debugKeys then print("  CYCLE_MATERIAL_BW: "..tostring(valid)) end
 				
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_MATERIALS, self, UniversalAutoload.actionEventSelectAllMaterials, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 				g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 				if debugKeys then print("  SELECT_ALL_MATERIALS: "..tostring(valid)) end
 				spec.updateCycleMaterial = true
 				
 				if UniversalAutoload.chatKeyConflict ~= true then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_FW, self, UniversalAutoload.actionEventCycleContainer_FW, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.cycleContainerActionEventId = actionEventId
 					if debugKeys then print("  CYCLE_CONTAINER_FW: "..tostring(valid)) end
 
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.CYCLE_CONTAINER_BW, self, UniversalAutoload.actionEventCycleContainer_BW, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
+					g_inputBinding:setActionEventTextPriority(actionEventId, lowPriority)
 					g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 					if debugKeys then print("  CYCLE_CONTAINER_BW: "..tostring(valid)) end
 
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.SELECT_ALL_CONTAINERS, self, UniversalAutoload.actionEventSelectAllContainers, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					g_inputBinding:setActionEventTextVisibility(actionEventId, false)
 					if debugKeys then print("  SELECT_ALL_CONTAINERS: "..tostring(valid)) end
 					spec.updateCycleContainer = true
@@ -399,7 +409,7 @@ function UniversalAutoload:updateActionEventKeys()
 
 			if not spec.isCurtainTrailer and not spec.rearUnloadingOnly and not spec.frontUnloadingOnly then
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_TIPSIDE, self, UniversalAutoload.actionEventToggleTipside, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+				g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 				spec.toggleTipsideActionEventId = actionEventId
 				if debugKeys then print("  TOGGLE_TIPSIDE: "..tostring(valid)) end
 				spec.updateToggleTipside = true
@@ -409,7 +419,7 @@ function UniversalAutoload:updateActionEventKeys()
 			
 				if not g_currentMission.missionDynamicInfo.isMultiplayer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.toggleBeltsActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_BELTS: "..tostring(valid)) end
 					spec.updateToggleBelts = true
@@ -417,7 +427,7 @@ function UniversalAutoload:updateActionEventKeys()
 				
 				if spec.isCurtainTrailer or spec.isBoxTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_DOOR, self, UniversalAutoload.actionEventToggleDoor, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.toggleDoorActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_DOOR: "..tostring(valid)) end
 					spec.updateToggleDoor = true
@@ -425,7 +435,7 @@ function UniversalAutoload:updateActionEventKeys()
 					
 				if spec.isCurtainTrailer then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_CURTAIN, self, UniversalAutoload.actionEventToggleCurtain, false, true, false, true, nil, nil, ignoreCollisions, true)
-					g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.toggleCurtainActionEventId = actionEventId
 					if debugKeys then print("  TOGGLE_CURTAIN: "..tostring(valid)) end
 					spec.updateToggleCurtain = true
@@ -434,15 +444,15 @@ function UniversalAutoload:updateActionEventKeys()
 			end
 			
 			if self.isServer then
-				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_SHOW_DEBUG, self, UniversalAutoload.actionEventToggleShowDebug, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
-				-- spec.ToggleShowLoadingActionEventId = actionEventId
-				if debugKeys then print("  TOGGLE_DEBUG: "..tostring(valid)) end
-				
 				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_SHOW_LOADING, self, UniversalAutoload.actionEventToggleShowLoading, false, true, false, true, nil, nil, ignoreCollisions, true)
-				g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_LOW)
+				g_inputBinding:setActionEventTextPriority(actionEventId, lowPriority)
 				-- spec.ToggleShowLoadingActionEventId = actionEventId
-				if debugKeys then print("  TOGGLE_DEBUG: "..tostring(valid)) end
+				if debugKeys then print("  TOGGLE_SHOW_LOADING: "..tostring(valid)) end
+				
+				local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_SHOW_DEBUG, self, UniversalAutoload.actionEventToggleShowDebug, false, true, false, true, nil, nil, ignoreCollisions, true)
+				g_inputBinding:setActionEventTextPriority(actionEventId, lowPriority)
+				-- spec.ToggleShowLoadingActionEventId = actionEventId
+				if debugKeys then print("  TOGGLE_SHOW_DEBUG: "..tostring(valid)) end
 			end
 
 			if debugKeys then print("*** updateActionEventKeys ***") end

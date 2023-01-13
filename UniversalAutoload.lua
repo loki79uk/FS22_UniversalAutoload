@@ -3369,10 +3369,16 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								if UniversalAutoload.showDebug then print("PALLET IS MISSING FROM PREVIOUS PLACE - TRY AGAIN") end
 							end
 						end
-						if not spec.currentLoadingPlace or (spec.useHorizontalLoading and not layerOverMaxHeight) or spec.isLogTrailer then
-							if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
-							containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
-							UniversalAutoload.createLoadingPlace(self, containerType)
+						if not spec.currentLoadingPlace or spec.useHorizontalLoading or spec.isLogTrailer then
+							if not spec.useHorizontalLoading or (spec.useHorizontalLoading and not layerOverMaxHeight) then
+								if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
+								containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
+								UniversalAutoload.createLoadingPlace(self, containerType)
+							else
+								if UniversalAutoload.showDebug then print("REACHED MAX LAYER HEIGHT") end
+								spec.currentLoadingPlace = nil
+								break
+							end
 						end
 					end
 

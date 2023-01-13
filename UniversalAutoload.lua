@@ -4260,9 +4260,14 @@ function UniversalAutoload:removeLoadedObject(object)
 			object:removeDeleteListener(self, "ualOnDeleteLoadedObject_Callback")
 		end
 		if next(spec.loadedObjects) == nil then
+			if UniversalAutoload.showDebug then print("FULLY UNLOADED..") end
 			spec.resetLoadingLayer = true
 			spec.resetLoadingPattern = true
+			spec.trailerIsFull = false
+			spec.partiallyUnloaded = false
 			spec.currentLoadAreaIndex = 1
+		else
+			spec.partiallyUnloaded = true
 		end
 		return true
 	end

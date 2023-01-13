@@ -126,7 +126,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 	if g_currentMission:getIsServer() then
 
 		local xmlFile = XMLFile.load("configXml", xmlFilename, UniversalAutoload.xmlSchema)
-		if xmlFile ~= 0 then
+		if xmlFile ~= 0 and xmlFile ~= nil then
 		
 			if overwriteExisting or not UniversalAutoload.globalSettingsLoaded then
 				print("IMPORT Universal Autoload global settings")
@@ -169,6 +169,8 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				end
 			end
 			xmlFile:delete()
+		else
+			print("Universal Autoload - could not open global settings file")
 		end
 	else
 		print("Universal Autoload - global settings are only loaded for the server")
@@ -1261,18 +1263,22 @@ function UniversalAutoloadManager:loadMap(name)
 end
 
 -- SYNC SETTINGS:
--- Player.readStream = Utils.overwrittenFunction(Player.readStream,
-	-- function(self, superFunc, streamId, connection, objectId)
-		-- superFunc(self, streamId, connection, objectId)
-		-- -- print("Player.readStream")
-	-- end
--- )
--- Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
-	-- function(self, superFunc, streamId, connection)
-		-- superFunc(self, streamId, connection)
-		-- -- print("Player.writeStream")
-	-- end
--- )
+Player.readStream = Utils.overwrittenFunction(Player.readStream,
+	function(self, superFunc, streamId, connection, objectId)
+		superFunc(self, streamId, connection, objectId)
+		-- print("Player.readStream")
+		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
+		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+	end
+)
+Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
+	function(self, superFunc, streamId, connection)
+		superFunc(self, streamId, connection)
+		-- print("Player.writeStream")
+		streamWriteBool(streamId, UniversalAutoload.disableAutoStrap or false)
+		streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly or false)
+	end
+)
 
 -- SEND SETTINGS TO CLIENT:
 FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.sendInitialClientState,

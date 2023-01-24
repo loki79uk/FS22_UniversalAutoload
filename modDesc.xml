@@ -2,7 +2,7 @@
 <modDesc descVersion="72">
 
     <author>loki_79</author>
-    <version>1.3.0.8</version>
+    <version>1.3.1.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -78,6 +78,11 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
+v1.3.1.0
+- Added better support for extendable vehicles
+- Included config for Pfanzelt P13 4272
+- Added "High Priority" flag for F1 menu
+- Fix for issue where trailers were still considered as full after selling contents
 v1.3.0.0
 - Configured to support Platinum DLC
 - Able to load lumber onto supported forestry vehicles
@@ -160,6 +165,11 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.3.1.0
+- Bessere Unterstützung für ausfahrbare Fahrzeuge hinzugefügt
+- Konfiguration für Pfanzelt P13 4272 hinzugefügt
+- Flagge "Hohe Priorität" für F1-Menü hinzugefügt
+- Problem behoben, bei dem Anhänger nach dem Verkauf des Inhalts immer noch als voll betrachtet wurden
 v1.3.0.0
 - Konfiguriert zur Unterstützung des Platin-DLCs
 - Holz kann auf unterstützte Forstfahrzeuge geladen werden
@@ -242,6 +252,11 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.3.1.0
+- Ajout d'un meilleur support pour les véhicules extensibles
+- Inclus la configuration pour Pfanzelt P13 4272
+- Ajout de l'indicateur "Haute priorité" pour le menu F1
+- Correction d'un problème où les remorques étaient toujours considérées comme pleines après avoir vendu leur contenu
 v1.3.0.0
 - Configuré pour supporter le DLC Platinum
 - Possibilité de charger du bois sur les véhicules forestiers pris en charge.
@@ -324,6 +339,11 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.3.1.0
+- Přidána lepší podpora pro rozšiřitelná vozidla
+- Zahrnuta konfigurace pro Pfanzelt P13 4272
+- Přidán příznak "Vysoká priorita" pro nabídku F1
+- Oprava problému, kdy byly přívěsy po prodeji obsahu stále považovány za plné
 v1.3.0.0
 - Nakonfigurováno tak, aby podporovalo Platinum DLC
 - Možnost nakládat dřevo na podporovaná lesnická vozidla
@@ -406,6 +426,11 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.3.1.0
+- Dodano lepsze wsparcie dla pojazdów wysuwanych
+- Dołączono konfigurację dla Pfanzelt P13 4272
+- Dodano flagę "High Priority" dla menu F1
+- Poprawka dla błędu, gdzie przyczepy były nadal uważane za pełne po sprzedaży zawartości
 v1.3.0.0
 - Skonfigurowany do obsługi Platynowych DLC
 - Możliwość załadowania drewna na obsługiwane pojazdy leśne
@@ -489,6 +514,11 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.3.1.0
+- Añadido mejor soporte para vehículos extensibles
+- Incluida configuración para Pfanzelt P13 4272
+- Se ha añadido la opción "Alta prioridad" al menú F1
+- Se ha corregido el problema por el que los remolques seguían considerándose llenos después de vender su contenido
 v1.3.0.0
 - Configurado para soportar el DLC de Platino
 - Posibilidad de cargar madera en los vehículos forestales compatibles
@@ -572,6 +602,11 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.3.1.0
+- Adicionado melhor suporte para veículos extensíveis
+- Configuração incluída para Pfanzelt P13 4272
+- Adicionada a bandeira "Alta Prioridade" para o menu F1
+- Fixar para emissão onde os reboques ainda eram considerados como completos após a venda do conteúdo
 v1.3.0.0
 - Configurado para suportar Platinum DLC
 - Capaz de carregar madeira serrada em veículos florestais suportados
@@ -654,6 +689,11 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+v1.3.1.0
+- Uzatılabilir araçlar için daha iyi destek eklendi
+- Pfanzelt P13 4272 için dahili yapılandırma
+- F1 menüsü için "Yüksek Öncelik" bayrağı eklendi
+- İçindekiler satıldıktan sonra römorkların hala dolu olarak kabul edilmesine neden olan sorun düzeltildi
 v1.3.0.0
 - Platinum DLC'yi desteklemek için yapılandırıldı
 - Desteklenen ormancılık araçlarına kereste yükleyebilme
@@ -737,6 +777,11 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
+v1.3.1.0
+- 增加了对可扩展车辆的更好支持
+- 加入了Pfanzelt P13 4272的配置
+- 为F1菜单添加了 "高优先级 "标志
+- 修复了拖车在出售内容后仍被视为满载的问题
 v1.3.0.0
 - 配置为支持白金DLC
 - 能够在支持的林业车辆上装载木材

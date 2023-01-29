@@ -23,7 +23,7 @@
 		<text name="warning_UNIVERSALAUTOLOAD_CLEAR_UNLOADING_AREA" text="Oblast vykládky je blokována. Vyčistěte prosím oblast vykládky."/>
 		<text name="warning_UNIVERSALAUTOLOAD_NO_OBJECTS_FOUND" text="Žádné kompatibilní zboží není k dispozici pro nakládku nebo vykládku."/>
 		<text name="warning_UNIVERSALAUTOLOAD_UNABLE_TO_LOAD_OBJECT" text="Ložná plocha je plná. Nelze načíst další položky této velikosti."/>
-		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="Není povoleno nakládání za pohuybu. Před naložením přívěsu se prosím úplně zastavte."/>
+		<text name="warning_UNIVERSALAUTOLOAD_NO_LOADING_UNLESS_STATIONARY" text="Není povoleno nakládání za pohybu. Před naložením přívěsu se prosím úplně zastavte."/>
 		
 		<text name="universalAutoload_tipside" text="Vykládací strana"/>
 		<text name="universalAutoload_left" text="Vlevo"/>

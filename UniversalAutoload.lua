@@ -169,12 +169,31 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
+	if vehicleType.functions["getFillUnitCapacity"] == nil then
+		SpecializationUtil.registerFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
+	end
+	if vehicleType.functions["getFillUnitFillLevel"] == nil then
+		SpecializationUtil.registerFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
+	end
+	if vehicleType.functions["getFillUnitFreeCapacity"] == nil then
+		SpecializationUtil.registerFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
+	end
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanStartFieldWork", UniversalAutoload.getCanStartFieldWork)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
+	--- Autodrive functions
+	if vehicleType.functions["getFillUnitCapacity"] ~= nil then
+		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
+	end
+	if vehicleType.functions["getFillUnitFillLevel"] ~= nil then
+		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
+	end
+	if vehicleType.functions["getFillUnitFreeCapacity"] ~= nil then
+		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
+	end
 end
 
 function UniversalAutoload:getCanStartFieldWork(superFunc)
@@ -5223,6 +5242,10 @@ function UniversalAutoload:ualIsObjectLoadable(object)
 end
 
 -- Autodrive interface functions.
+--[[
+	TODO:
+    ualStartLoad, i.e. onAIFieldWorkerStart, is only activating the autoload for bales, not pallets etc.
+]]
 function UniversalAutoload:ualStartLoad()
 	UniversalAutoload.onAIFieldWorkerStart(self)
 end
@@ -5231,6 +5254,11 @@ function UniversalAutoload:ualStopLoad()
 	UniversalAutoload.onAIFieldWorkerEnd(self)
 end
 
+--[[
+	TODO:
+    What is the tipSideString to unload on the platform, i.e. pallet to disappear if reached the destination position?
+    What is the tipSideString to unload behind the vehicle / trailer?
+]]
 function UniversalAutoload:ualUnload(tipSideString)
 	self:ualStopLoad()
 	UniversalAutoload.setCurrentTipside(self, tipSideString or "none")
@@ -5247,3 +5275,39 @@ end
 			in function: AutoDrive:getALObjectFillLevels(object) for better performance.
 		
 ]]
+
+--[[
+	TODO:
+    Is spec.validUnloadCount the correct value to get the fill level?
+    Add a better calculation for getFillUnitCapacity, for the moment it returns always 1 more than spec.validUnloadCount
+]]
+function UniversalAutoload:getFillUnitCapacity(superFunc, fillUnitIndex)
+    local spec = self.spec_universalAutoload
+    if spec and spec.isAutoloadEnabled then
+        return (spec.validUnloadCount and (spec.validUnloadCount + 1)) or 0
+    else
+        return superFunc(self, fillUnitIndex)
+    end
+end
+
+function UniversalAutoload:getFillUnitFillLevel(superFunc, fillUnitIndex)
+    local spec = self.spec_universalAutoload
+    if spec and spec.isAutoloadEnabled then
+        return (spec.validUnloadCount and spec.validUnloadCount) or 0
+    else
+        return superFunc(self, fillUnitIndex)
+    end
+end
+
+-- return 0 if trailer is fully loaded / no capacity left
+function UniversalAutoload:getFillUnitFreeCapacity(superFunc, fillUnitIndex)
+    local spec = self.spec_universalAutoload
+    if spec and spec.isAutoloadEnabled then
+            return 0
+        else
+            return self:getFillUnitCapacity(fillUnitIndex) - self:getFillUnitFillLevel(fillUnitIndex)
+        end
+    else
+        return superFunc(self, fillUnitIndex)
+    end
+end

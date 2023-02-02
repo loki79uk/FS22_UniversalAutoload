@@ -3911,7 +3911,7 @@ function UniversalAutoload.getSplitShapeObject( objectId )
 	end
 	
 	--print("RigidBodyType: " .. tostring(getRigidBodyType(objectId)))
-	if getRigidBodyType(objectId) == RigidBodyType.DYNAMIC then
+	if objectId ~= 0 and getRigidBodyType(objectId) == RigidBodyType.DYNAMIC then
 	
 		local splitType = g_splitTypeManager:getSplitTypeByIndex(getSplitType(objectId))
 		if splitType ~= nil then
@@ -5137,10 +5137,14 @@ end
 -- DETECT SPAWNED LOGS
 local oldAddToPhysics = getmetatable(_G).__index.addToPhysics
 getmetatable(_G).__index.addToPhysics = function(node, ...)
+
 	oldAddToPhysics(node, ...)
-	if getRigidBodyType(node) == RigidBodyType.DYNAMIC and getSplitType(node) ~= 0 then
-		if not UniversalAutoload.createdLogId and UniversalAutoload.createdTreeId and node > UniversalAutoload.createdTreeId then
-			UniversalAutoload.createdLogId = node
+	
+	if node ~= 0 and node ~= nil then
+		if getRigidBodyType(node) == RigidBodyType.DYNAMIC and getSplitType(node) ~= 0 then
+			if not UniversalAutoload.createdLogId and UniversalAutoload.createdTreeId and node > UniversalAutoload.createdTreeId then
+				UniversalAutoload.createdLogId = node
+			end
 		end
 	end
 end
@@ -5303,6 +5307,7 @@ end
 function UniversalAutoload:getFillUnitFreeCapacity(superFunc, fillUnitIndex)
     local spec = self.spec_universalAutoload
     if spec and spec.isAutoloadEnabled then
+		if spec.trailerIsFull then
             return 0
         else
             return self:getFillUnitCapacity(fillUnitIndex) - self:getFillUnitFillLevel(fillUnitIndex)

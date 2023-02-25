@@ -3,7 +3,11 @@
 -- ============================================================= --
 UniversalAutoloadHud = {}
 UniversalAutoloadHud.eventName = {}
-UniversalAutoloadHud.selectedMaterial = nil
+UniversalAutoloadHud.material = nil
+UniversalAutoloadHud.container = nil
+UniversalAutoloadHud.filter = nil
+UniversalAutoloadHud.horizontalLoading = nil
+UniversalAutoloadHud.tipside = nil
 
 UniversalAutoloadHud.Colors = {}
 UniversalAutoloadHud.Colors[1] = {'col_white', {1, 1, 1, 1}}
@@ -31,28 +35,31 @@ function UniversalAutoloadHud:draw()
             posY = posY - size - g_currentMission.inGameMenu.hud.inputHelp.helpTextOffsetY
         end
 
+        -- moving down so it doesn't overlap
+        posY = posY - size * 2
+
         if self.material ~= nil then
-            UniversalAutoloadHud:renderText(posX, posY, size, self.material, false, 4)
+            UniversalAutoloadHud:renderText(posX, posY, size, self.material, false, 1)
             posY = posY - size
         end
 
         if self.container ~= nil then
-            UniversalAutoloadHud:renderText(posX, posY, size, self.container, false, 4)
+            UniversalAutoloadHud:renderText(posX, posY, size, self.container, false, 1)
             posY = posY - size
         end
 
         if self.filter ~= nil then
-            UniversalAutoloadHud:renderText(posX, posY, size, self.filter, false, 4)
+            UniversalAutoloadHud:renderText(posX, posY, size, self.filter, false, 1)
             posY = posY - size
         end
 
         if self.horizontalLoading ~= nil then
-            UniversalAutoloadHud:renderText(posX, posY, size, self.horizontalLoading, false, 4)
+            UniversalAutoloadHud:renderText(posX, posY, size, self.horizontalLoading, false, 1)
             posY = posY - size
         end
 
         if self.tipside ~= nil then
-            UniversalAutoloadHud:renderText(posX, posY, size, self.tipside, false, 4)
+            UniversalAutoloadHud:renderText(posX, posY, size, self.tipside, false, 1)
             posY = posY - size
         end
     end

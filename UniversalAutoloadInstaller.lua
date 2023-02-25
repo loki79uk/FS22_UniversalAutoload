@@ -1315,9 +1315,9 @@ function UniversalAutoloadManager:setupHud()
 end
 
 function UniversalAutoloadManager:draw()
-    if not g_gui:getIsGuiVisible() and not g_noHudModeEnabled then
-        UniversalAutoloadManager.infoTextHud:draw()
-    end
+    -- if not g_gui:getIsGuiVisible() and not g_noHudModeEnabled then
+    --     UniversalAutoloadManager.infoTextHud:draw()
+    -- end
 end
 
 function tableContainsValue(container, value)

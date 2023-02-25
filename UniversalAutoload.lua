@@ -612,7 +612,7 @@ function UniversalAutoload:updateHorizontalLoadingActionEvent()
 		end
 		g_inputBinding:setActionEventText(spec.toggleHorizontalLoadingActionEventId, horizontalLoadingText)
 		g_inputBinding:setActionEventTextVisibility(spec.toggleHorizontalLoadingActionEventId, true)
-		UniversalAutoloadHud.updateHorizontalLoading(horizontalLoadingText)
+		UniversalAutoloadHud:updateHorizontalLoading(horizontalLoadingText)
 	end
 end
 --
@@ -628,7 +628,7 @@ function UniversalAutoload:updateToggleTipsideActionEvent()
 			local tipsideText = g_i18n:getText("universalAutoload_tipside")..": "..g_i18n:getText("universalAutoload_"..(spec.currentTipside or "none"))
 			g_inputBinding:setActionEventText(spec.toggleTipsideActionEventId, tipsideText)
 			g_inputBinding:setActionEventTextVisibility(spec.toggleTipsideActionEventId, true)
-			UniversalAutoloadHud.updateTipside(tipsideText)
+			UniversalAutoloadHud:updateTipside(tipsideText)
 		end
 	end
 end
@@ -2634,7 +2634,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			UniversalAutoload.determineTipside(self)
 			UniversalAutoload.countActivePallets(self)
 			UniversalAutoload.drawDebugDisplay(self, isActiveForInput)
-
+			if not g_gui:getIsGuiVisible() and not g_noHudModeEnabled then
+				UniversalAutoloadManager.infoTextHud:draw()
+			end
 		end
 	end
 end

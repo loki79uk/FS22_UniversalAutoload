@@ -3199,17 +3199,21 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	end
 	
 	--UPDATE NEW PACKING DIMENSIONS
+	local addedLoadWidth = sizeX
+	if useRoundbalePacking == false then
+		addedLoadWidth = sizeY
+	end
 	spec.currentLoadHeight = 0	
-	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + sizeX > spec.loadArea[i].width then
-		spec.currentLoadWidth = sizeX
-		spec.currentActualWidth = N * sizeX
+	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + addedLoadWidth > spec.loadArea[i].width then
+		spec.currentLoadWidth = addedLoadWidth
+		spec.currentActualWidth = N * addedLoadWidth
 		spec.currentActualLength = spec.currentLoadLength
 		spec.currentLoadLength = spec.currentLoadLength + sizeZ
 		if spec.isLogTrailer and spec.currentActualLength~=0 then
 			spec.currentLoadLength = spec.currentLoadLength + UniversalAutoload.logSpace
 		end
 	else
-		spec.currentLoadWidth = spec.currentLoadWidth + sizeX
+		spec.currentLoadWidth = spec.currentLoadWidth + addedLoadWidth
 	end
 
 	if spec.currentLoadLength == 0 then

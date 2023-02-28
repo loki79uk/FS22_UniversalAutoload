@@ -3184,6 +3184,8 @@ function UniversalAutoload:createLoadingPlace(containerType)
 			containerSizeY = containerType.sizeZ
 			containerSizeZ = containerType.sizeY
 			useRoundbalePacking = false
+			
+			sizeY = R*containerType.sizeY
 		else
 		-- UPRIGHT ROUNDBALE STACKING
 			NR = math.floor(width / (R*containerType.sizeX))
@@ -3199,9 +3201,9 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	end
 	
 	--UPDATE NEW PACKING DIMENSIONS
-	local addedLoadWidth = sizeX
+	local addedLoadWidth =  sizeX
 	if useRoundbalePacking == false then
-		addedLoadWidth = sizeY
+		addedLoadWidth = containerSizeX
 	end
 	spec.currentLoadHeight = 0	
 	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + addedLoadWidth > spec.loadArea[i].width then
@@ -3353,9 +3355,23 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				spec.currentLoadHeight = spec.currentLoadHeight or 0
 				spec.currentLayerCount = spec.currentLayerCount or 0
 				spec.currentLayerHeight = spec.currentLayerHeight or 0
+
+				local containerSizeX = containerType.sizeX
+				local containerSizeY = containerType.sizeY
+				local containerSizeZ = containerType.sizeZ
+				local containerFlipYZ = containerType.flipYZ
+				
+				--TEST FOR ROUNDBALE PACKING
+				if containerType.isBale and containerType.sizeX==containerType.sizeZ then
+					if spec.useHorizontalLoading then
+					-- LONGWAYS ROUNDBALE STACKING
+						containerSizeY = containerType.sizeZ
+						containerSizeZ = containerType.sizeY
+					end
+				end
 				
 				local mass = UniversalAutoload.getContainerMass(object)
-				local volume = containerType.sizeX * containerType.sizeY * containerType.sizeZ
+				local volume = containerSizeX * containerSizeY * containerSizeZ
 				local density = math.min(mass/volume, 1.5)
 			
 				while spec.currentLoadLength < spec.loadArea[i].length do
@@ -3365,18 +3381,18 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						maxLoadAreaHeight = spec.loadArea[i].baleHeight
 					end
 					
-					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerType.sizeY
+					if (spec.currentLoadHeight > 0 or spec.useHorizontalLoading) and maxLoadAreaHeight > containerSizeY
 					and not spec.disableHeightLimit and not spec.isLogTrailer then
 						if density > 0.5 then
 							maxLoadAreaHeight = maxLoadAreaHeight * (7-(2*density))/6
 						end
-						if maxLoadAreaHeight > 5*containerType.sizeY then
-							maxLoadAreaHeight = 5*containerType.sizeY
+						if maxLoadAreaHeight > 5*containerSizeY then
+							maxLoadAreaHeight = 5*containerSizeY
 						end
 					end
 					
-					local loadOverMaxHeight = spec.currentLoadHeight + containerType.sizeY > maxLoadAreaHeight
-					local layerOverMaxHeight = spec.currentLayerHeight + containerType.sizeY > maxLoadAreaHeight
+					local loadOverMaxHeight = spec.currentLoadHeight + containerSizeY > maxLoadAreaHeight
+					local layerOverMaxHeight = spec.currentLayerHeight + containerSizeY > maxLoadAreaHeight
 					local isFirstLayer = (spec.isLogTrailer or spec.useHorizontalLoading) and spec.currentLayerCount == 0
 					local ignoreHeightForContainer = isFirstLayer and not (spec.isCurtainTrailer or spec.isBoxTrailer)
 					if spec.currentLoadingPlace and spec.currentLoadHeight==0 and loadOverMaxHeight and not ignoreHeightForContainer then
@@ -3395,7 +3411,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						if not spec.currentLoadingPlace or spec.useHorizontalLoading or spec.isLogTrailer then
 							if not spec.useHorizontalLoading or (spec.useHorizontalLoading and not layerOverMaxHeight) then
 								if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
-								containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
+								containerType.name, containerSizeX, containerSizeY, containerSizeZ)) end
 								UniversalAutoload.createLoadingPlace(self, containerType)
 							else
 								if UniversalAutoload.showDebug then print("REACHED MAX LAYER HEIGHT") end
@@ -3408,9 +3424,47 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					local thisLoadPlace = spec.currentLoadingPlace
 					if thisLoadPlace ~= nil then
 					
+						if UniversalAutoload.showDebug then
+							print("-------------------------------")
+							print("thisLoadPlace.sizeX: " .. tostring(thisLoadPlace.sizeX) )
+							print("thisLoadPlace.sizeY: " .. tostring(thisLoadPlace.sizeY) )
+							print("thisLoadPlace.sizeZ: " .. tostring(thisLoadPlace.sizeZ) )
+							print("-------------------------------")
+							print("containerType.sizeX: " .. tostring(containerType.sizeX) )
+							print("containerType.sizeY: " .. tostring(containerType.sizeY) )
+							print("containerType.sizeZ: " .. tostring(containerType.sizeZ) )
+							print("-------------------------------")
+							print("containerSizeX: " .. tostring(containerSizeX) )
+							print("containerSizeY: " .. tostring(containerSizeY) )
+							print("containerSizeZ: " .. tostring(containerSizeZ) )
+							print("-------------------------------")
+						end
+						
+-- ADDING NEW PLACE FOR: roundbale125 [1.300, 1.200, 1.300]
+-- -------------------------------
+-- thisLoadPlace.sizeX: 0.91923878028252
+-- thisLoadPlace.sizeY: 1.2000000476837
+-- thisLoadPlace.sizeZ: 0.91923878028252
+-- -------------------------------
+-- containerType.sizeX: 1.2999999523163
+-- containerType.sizeY: 1.2000000476837
+-- containerType.sizeZ: 1.2999999523163
+-- -------------------------------
+
+-- ADDING NEW PLACE FOR: roundbale125 [1.300, 1.200, 1.300]
+-- -------------------------------
+-- thisLoadPlace.sizeX: 1.2999999523163
+-- thisLoadPlace.sizeY: 1.2999999523163
+-- thisLoadPlace.sizeZ: 1.2000000476837
+-- -------------------------------
+-- containerType.sizeX: 1.2999999523163
+-- containerType.sizeY: 1.2000000476837
+-- containerType.sizeZ: 1.2999999523163
+-- -------------------------------
+					
 						local containerFitsInLoadSpace = spec.isLogTrailer or 
-							(loadPlace.useRoundbalePacking ~= nil and containerType.sizeX==containerType.sizeX) or
-							(containerType.sizeX <= thisLoadPlace.sizeX and containerType.sizeZ <= thisLoadPlace.sizeZ)
+							(loadPlace.useRoundbalePacking ~= nil and containerSizeX==containerSizeZ) or
+							(containerSizeX <= thisLoadPlace.sizeX and containerSizeZ <= thisLoadPlace.sizeZ)
 
 						local thisLoadHeight = spec.currentLoadHeight
 						local x0,y0,z0 = getTranslation(thisLoadPlace.node)
@@ -3423,7 +3477,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								if not self:ualGetIsMoving() then
 									local logLoadHeight = maxLoadAreaHeight + 0.1
 									if not spec.zonesOverlap then
-										logLoadHeight = math.min(spec.currentLayerHeight+containerType.sizeY, maxLoadAreaHeight) + 0.1
+										logLoadHeight = math.min(spec.currentLayerHeight+containerSizeY, maxLoadAreaHeight) + 0.1
 									end
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
@@ -3444,10 +3498,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 										spec.currentLoadHeight = thisLoadHeight
 										useThisLoadSpace = true
 									else
-										while thisLoadHeight < maxLoadAreaHeight - containerType.sizeY do
+										while thisLoadHeight < maxLoadAreaHeight - containerSizeY do
 											setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 											local placeEmpty = UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-											local placeBelowFull = UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY)
+											local placeBelowFull = UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerSizeY)
 											if placeEmpty and (thisLoadHeight<=0 or placeBelowFull) then
 												spec.currentLoadHeight = thisLoadHeight
 												useThisLoadSpace = true
@@ -3461,7 +3515,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									while thisLoadHeight >= -increment do
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
-										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerType.sizeY))
+										and (thisLoadHeight<=0 or UniversalAutoload.testLocationIsFull(self, thisLoadPlace, -containerSizeY))
 										then
 											spec.currentLoadHeight = math.max(0, thisLoadHeight)
 											useThisLoadSpace = true
@@ -3489,7 +3543,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									spec.currentLoadingPlace = nil
 								end
 								
-								spec.currentLoadHeight = spec.currentLoadHeight + containerType.sizeY
+								spec.currentLoadHeight = spec.currentLoadHeight + containerSizeY
 
 								spec.nextLayerHeight = math.max(spec.currentLoadHeight, spec.nextLayerHeight)
 								if UniversalAutoload.showDebug then print("nextLayerHeight: " .. spec.nextLayerHeight) end

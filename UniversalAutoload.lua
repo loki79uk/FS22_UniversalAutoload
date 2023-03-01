@@ -978,7 +978,7 @@ function UniversalAutoload:setHorizontalLoading(state, noEventSend)
 	spec.useHorizontalLoading = state
 	
 	if spec.useHorizontalLoading == true then
-		spec.loadSpeedFactor = 3
+		spec.loadSpeedFactor = 5
 	else
 		spec.loadSpeedFactor = 1
 	end
@@ -3113,26 +3113,46 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	local i = spec.currentLoadAreaIndex or 1
 	
+	--DEFINE CONTAINER SIZES
+	local sizeX = containerType.sizeX
+	local sizeY = containerType.sizeY
+	local sizeZ = containerType.sizeZ
+	local containerSizeX = containerType.sizeX
+	local containerSizeY = containerType.sizeY
+	local containerSizeZ = containerType.sizeZ
+	local containerFlipYZ = containerType.flipYZ
+	
+	--TEST FOR ROUNDBALE PACKING
+	if containerType.isBale and containerSizeX==containerSizeZ then
+		isRoundbale = true
+		if spec.useHorizontalLoading then
+		-- LONGWAYS ROUNDBALE STACKING
+			containerSizeY = containerType.sizeZ
+			containerSizeZ = containerType.sizeY
+			containerFlipYZ = false
+		end
+	end
+	
 	--CALCUATE POSSIBLE ARRAY SIZES
 	local width = spec.loadArea[i].width
 	local length = spec.loadArea[i].length
 	
 	--ALTERNATE LOG PACKING FOR EACH LAYER
 	if spec.isLogTrailer then
-		local N = math.floor(width / containerType.sizeZ)
+		local N = math.floor(width / containerSizeZ)
 		if N > 1 and spec.currentLayerCount % 2 ~= 0 then
-			width = (N-1) * containerType.sizeZ
+			width = (N-1) * containerSizeZ
 		end
 	end
 	
 	--CALCULATE PACKING DIMENSIONS
-	local N1 = math.floor(width / containerType.sizeX)
-	local M1 = math.floor(length / containerType.sizeZ)
-	local N2 = math.floor(width / containerType.sizeZ)
-	local M2 = math.floor(length / containerType.sizeX)
+	local N1 = math.floor(width / containerSizeX)
+	local M1 = math.floor(length / containerSizeZ)
+	local N2 = math.floor(width / containerSizeZ)
+	local M2 = math.floor(length / containerSizeX)
 	
 	--CHOOSE BEST PACKING ORIENTATION
-	local N, M, sizeX, sizeY, sizeZ, rotation
+	local N, M, rotation
 	local shouldRotate = ((N2*M2) > (N1*M1)) or (((N2*M2)==(N1*M1)) and (N1>N2) and (N2*M2)>0)
 	local doRotate = (containerType.alwaysRotate or shouldRotate) and not containerType.neverRotate
 
@@ -3150,13 +3170,6 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	local N, M = N1, M1
 	local rotation = 0
-	local sizeX = containerType.sizeX
-	local sizeY = containerType.sizeY
-	local sizeZ = containerType.sizeZ
-	local containerSizeX = containerType.sizeX
-	local containerSizeY = containerType.sizeY
-	local containerSizeZ = containerType.sizeZ
-	local containerFlipYZ = containerType.flipYZ
 	
 	-- APPLY ROTATION
 	if doRotate then
@@ -3172,38 +3185,27 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	local R = ((3/4)+(r/4))
 	local roundbaleOffset = 0
 	local useRoundbalePacking = nil
-	if containerType.isBale and sizeX==sizeZ then
-		-- print("IS ROUNDBALE")
-		isRoundbale = true
-
+	if isRoundbale then
 		if spec.useHorizontalLoading then
-		-- LONGWAYS ROUNDBALE STACKING
-			-- rotation = 0 
+		-- HORIZONAL ROUNDBALE PACKING
 			rotation = math.pi/2
-			containerFlipYZ = false
-			containerSizeY = containerType.sizeZ
-			containerSizeZ = containerType.sizeY
 			useRoundbalePacking = false
-			
-			sizeY = R*containerType.sizeY
 		else
 		-- UPRIGHT ROUNDBALE STACKING
 			NR = math.floor(width / (R*containerType.sizeX))
 			MR = math.floor(length / (R*containerType.sizeX))
 			if NR > N and width >= (2*R)*containerType.sizeX then
-				-- print("ROUNDBALE PACKING")
 				useRoundbalePacking = true
 				N, M = NR, MR
 				sizeX = R*containerType.sizeX
 			end
 		end
-		
 	end
 	
 	--UPDATE NEW PACKING DIMENSIONS
-	local addedLoadWidth =  sizeX
+	local addedLoadWidth = sizeX
 	if useRoundbalePacking == false then
-		addedLoadWidth = containerSizeX
+		addedLoadWidth = sizeY
 	end
 	spec.currentLoadHeight = 0	
 	if spec.currentLoadWidth == 0 or spec.currentLoadWidth + addedLoadWidth > spec.loadArea[i].width then
@@ -3289,7 +3291,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		end
 		
 		--LOAD FROM THE CORRECT SIDE
-		local posX = -( spec.currentLoadWidth - (spec.currentActualWidth/2) - (sizeX/2) )
+		local posX = -( spec.currentLoadWidth - (spec.currentActualWidth/2) - (addedLoadWidth/2) )
 		local posZ = -( spec.currentLoadLength - (sizeZ/2) ) - roundbaleOffset
 		if spec.currentLoadside == "left" then posX = -posX end
 
@@ -3361,6 +3363,15 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				local containerSizeZ = containerType.sizeZ
 				local containerFlipYZ = containerType.flipYZ
 				
+				if UniversalAutoload.showDebug then
+					print("-------------------------------")
+					print("containerSizeX: " .. tostring(containerSizeX) )
+					print("containerSizeY: " .. tostring(containerSizeY) )
+					print("containerSizeZ: " .. tostring(containerSizeZ) )
+					print("containerFlipYZ: " .. tostring(containerFlipYZ) )
+					print("-------------------------------")
+				end
+				
 				--TEST FOR ROUNDBALE PACKING
 				if containerType.isBale and containerType.sizeX==containerType.sizeZ then
 					if spec.useHorizontalLoading then
@@ -3423,44 +3434,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 
 					local thisLoadPlace = spec.currentLoadingPlace
 					if thisLoadPlace ~= nil then
-					
-						if UniversalAutoload.showDebug then
-							print("-------------------------------")
-							print("thisLoadPlace.sizeX: " .. tostring(thisLoadPlace.sizeX) )
-							print("thisLoadPlace.sizeY: " .. tostring(thisLoadPlace.sizeY) )
-							print("thisLoadPlace.sizeZ: " .. tostring(thisLoadPlace.sizeZ) )
-							print("-------------------------------")
-							print("containerType.sizeX: " .. tostring(containerType.sizeX) )
-							print("containerType.sizeY: " .. tostring(containerType.sizeY) )
-							print("containerType.sizeZ: " .. tostring(containerType.sizeZ) )
-							print("-------------------------------")
-							print("containerSizeX: " .. tostring(containerSizeX) )
-							print("containerSizeY: " .. tostring(containerSizeY) )
-							print("containerSizeZ: " .. tostring(containerSizeZ) )
-							print("-------------------------------")
-						end
-						
--- ADDING NEW PLACE FOR: roundbale125 [1.300, 1.200, 1.300]
--- -------------------------------
--- thisLoadPlace.sizeX: 0.91923878028252
--- thisLoadPlace.sizeY: 1.2000000476837
--- thisLoadPlace.sizeZ: 0.91923878028252
--- -------------------------------
--- containerType.sizeX: 1.2999999523163
--- containerType.sizeY: 1.2000000476837
--- containerType.sizeZ: 1.2999999523163
--- -------------------------------
-
--- ADDING NEW PLACE FOR: roundbale125 [1.300, 1.200, 1.300]
--- -------------------------------
--- thisLoadPlace.sizeX: 1.2999999523163
--- thisLoadPlace.sizeY: 1.2999999523163
--- thisLoadPlace.sizeZ: 1.2000000476837
--- -------------------------------
--- containerType.sizeX: 1.2999999523163
--- containerType.sizeY: 1.2000000476837
--- containerType.sizeZ: 1.2999999523163
--- -------------------------------
 					
 						local containerFitsInLoadSpace = spec.isLogTrailer or 
 							(loadPlace.useRoundbalePacking ~= nil and containerSizeX==containerSizeZ) or

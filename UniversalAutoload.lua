@@ -2563,7 +2563,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							end
 						end
 						lastObject = object
-						if UniversalAutoload.loadObject(self, object) then
+						if UniversalAutoload.loadObject(self, object, true) then
 							loadedObject = true
 							if spec.firstAttemptToLoad then
 								spec.firstAttemptToLoad = false
@@ -2901,7 +2901,7 @@ function UniversalAutoload:createBoundingBox()
 end
 
 -- LOADING AND UNLOADING FUNCTIONS
-function UniversalAutoload:loadObject(object)
+function UniversalAutoload:loadObject(object, chargeForLoading)
 	-- print("UniversalAutoload - loadObject")
 	if object ~= nil and UniversalAutoload.getIsLoadingVehicleAllowed(self) and UniversalAutoload.isValidForLoading(self, object) then
 
@@ -2917,16 +2917,18 @@ function UniversalAutoload:loadObject(object)
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 				
-				if object.isSplitShape then
-					if UniversalAutoload.pricePerLog > 0 then
-						g_currentMission:addMoney(-UniversalAutoload.pricePerLog, self:getOwnerFarmId(), MoneyType.AI, true, true)
+				if chargeForLoading == true then
+					if object.isSplitShape then
+						if UniversalAutoload.pricePerLog > 0 then
+							g_currentMission:addMoney(-UniversalAutoload.pricePerLog, self:getOwnerFarmId(), MoneyType.AI, true, true)
+						end
+					elseif object.isRoundbale~=nil then
+						if UniversalAutoload.pricePerBale > 0 then
+							g_currentMission:addMoney(-UniversalAutoload.pricePerBale, self:getOwnerFarmId(), MoneyType.AI, true, true)
+						end
+					elseif UniversalAutoload.pricePerPallet > 0 then
+						g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 					end
-				elseif object.isRoundbale~=nil then
-					if UniversalAutoload.pricePerBale > 0 then
-						g_currentMission:addMoney(-UniversalAutoload.pricePerBale, self:getOwnerFarmId(), MoneyType.AI, true, true)
-					end
-				elseif UniversalAutoload.pricePerPallet > 0 then
-					g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 				end
 				
 				spec.lastLoadedObjectLength = containerType.sizeX

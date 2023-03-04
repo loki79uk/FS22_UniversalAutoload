@@ -75,6 +75,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.STRING, s.key.."#selectedConfigs", "Selected Configuration Names", nil)
 		s.schema:register(XMLValueType.STRING, s.key.."#useConfigName", "Specific configuration to be used for selected configs", nil)
 		s.schema:register(XMLValueType.VECTOR_TRANS, s.key..".loadingArea(?)#offset", "Offset to the centre of the loading area", "0 0 0")
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#offsetRoot", "Vehicle i3d node that this area offset is relative to", nil)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#width", "Width of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#length", "Length of the loading area", 0)
 		s.schema:register(XMLValueType.FLOAT, s.key..".loadingArea(?)#height", "Height of the loading area", 0)
@@ -102,6 +103,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableHeightLimit", "Disable the density based stacking height limit", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#zonesOverlap", "Flag to identify when the loading areas overlap each other", false)
+		s.schema:register(XMLValueType.STRING, s.key..".options#offsetRoot", "Vehicle i3d node that area offsets are relative to", nil)
 		s.schema:register(XMLValueType.FLOAT, s.key..".options#minLogLength", "The minimum length for logs that will be autoloaded (default is zero)", 0)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full graphical debugging display for this vehicle", false)
 	end
@@ -1527,6 +1529,7 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[i].length  = loadArea.length
 							spec.loadArea[i].height  = loadArea.height
 							spec.loadArea[i].offset	 = loadArea.offset
+							spec.loadArea[i].offsetRoot	 = loadArea.offsetRoot
 							spec.loadArea[i].baleHeight  = loadArea.baleHeight
 							spec.loadArea[i].widthAxis   = loadArea.widthAxis
 							spec.loadArea[i].lengthAxis  = loadArea.lengthAxis
@@ -1552,6 +1555,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.disableAutoStrap = config.disableAutoStrap
 						spec.disableHeightLimit = config.disableHeightLimit
 						spec.zonesOverlap = config.zonesOverlap
+						spec.offsetRoot	 = config.offsetRoot
 						spec.minLogLength = config.minLogLength
 						spec.showDebug = config.showDebug
 						break
@@ -1591,6 +1595,7 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[j+1].lengthAxis = xmlFile:getValue(loadAreaKey.."#lengthAxis", nil)
 							spec.loadArea[j+1].heightAxis = xmlFile:getValue(loadAreaKey.."#heightAxis", nil)
 							spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+							spec.loadArea[j+1].offsetRoot = xmlFile:getValue(loadAreaKey.."#offsetRoot", nil)
 							spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 							spec.loadArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 							spec.loadArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
@@ -1618,6 +1623,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
 						spec.disableHeightLimit = xmlFile:getValue(key..".options#disableHeightLimit", false)
 						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
+						spec.offsetRoot = xmlFile:getValue(key..".options#offsetRoot", nil)
 						spec.minLogLength = xmlFile:getValue(key..".options#minLogLength", UniversalAutoload.minLogLength)
 						spec.showDebug = xmlFile:getValue(key..".options#showDebug", UniversalAutoload.showDebug)
 						break
@@ -1658,23 +1664,33 @@ function UniversalAutoload:onLoad(savegame)
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
 		
 		local actualRootNode = self.spec_tensionBelts.rootNode or self.rootNode
-		if self.spec_tensionBelts.rootNode~=nil and self.spec_tensionBelts.rootNode~=self.rootNode then
-			print("*** USING TENSION BELT ROOT NODE ***")
+		if spec.offsetRoot ~= nil then
+			local otherOffset = self.i3dMappings[spec.offsetRoot]
+			if otherOffset ~= nil then
+				actualRootNode = otherOffset.nodeId or actualRootNode
+			end
 		end
 		
 		for i, loadArea in pairs(spec.loadArea) do
 			-- create bounding box for loading area
 			local offsetX, offsetY, offsetZ = unpack(spec.loadArea[i].offset)
+			local loadAreaRoot = actualRootNode
+			if spec.loadArea[i].offsetRoot ~= nil then
+				local otherOffset = self.i3dMappings[spec.loadArea[i].offsetRoot]
+				if otherOffset ~= nil then
+					loadAreaRoot = otherOffset.nodeId or actualRootNode
+				end
+			end
 			loadArea.rootNode = createTransformGroup("LoadAreaCentre")
-			link(actualRootNode, loadArea.rootNode)
+			link(loadAreaRoot, loadArea.rootNode)
 			setTranslation(loadArea.rootNode, offsetX, offsetY, offsetZ)
 
 			loadArea.startNode = createTransformGroup("LoadAreaStart")
-			link(actualRootNode, loadArea.startNode)
+			link(loadAreaRoot, loadArea.startNode)
 			setTranslation(loadArea.startNode, offsetX, offsetY, offsetZ+(loadArea.length/2))
 			
 			loadArea.endNode = createTransformGroup("LoadAreaEnd")
-			link(actualRootNode, loadArea.endNode)
+			link(loadAreaRoot, loadArea.endNode)
 			setTranslation(loadArea.endNode, offsetX, offsetY, offsetZ-(loadArea.length/2))
 			
 			-- measure bounding box for all loading areas

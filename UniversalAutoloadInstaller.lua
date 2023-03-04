@@ -235,6 +235,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 						config.loadingArea[j+1].lengthAxis = xmlFile:getValue(loadAreaKey.."#lengthAxis", nil)
 						config.loadingArea[j+1].heightAxis = xmlFile:getValue(loadAreaKey.."#heightAxis", nil)
 						config.loadingArea[j+1].offset = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
+						config.loadingArea[j+1].offsetRoot = xmlFile:getValue(loadAreaKey.."#offsetRoot", nil)
 						config.loadingArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
 						config.loadingArea[j+1].noLoadingIfUnfolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfUnfolded", false)
 						config.loadingArea[j+1].noLoadingIfCovered = xmlFile:getValue(loadAreaKey.."#noLoadingIfCovered", false)
@@ -263,6 +264,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 					config.disableHeightLimit = xmlFile:getValue(configKey..".options#disableHeightLimit", false)
 					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
+					config.offsetRoot = xmlFile:getValue(configKey..".options#offsetRoot", nil)
 					config.minLogLength = xmlFile:getValue(configKey..".options#minLogLength", UniversalAutoload.minLogLength)
 					config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
 

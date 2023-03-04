@@ -57,6 +57,7 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerLog", "The price charged for each auto-loaded log (default is zero)", 0)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerBale", "The price charged for each auto-loaded bale (default is zero)", 0)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerPallet", "The price charged for each auto-loaded pallet (default is zero)", 0)
+	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#minLogLength", "The global minimum length for logs that will be autoloaded (default is zero)", 0)
 	
 	local objectTypesKey = "universalAutoload.objectTypes.objectType(?)"
 	UniversalAutoload.xmlSchema:register(XMLValueType.STRING, objectTypesKey.."#name", "Custom vehicle types for objects to be loaded by UAL", nil)
@@ -101,6 +102,7 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableAutoStrap", "Disable the automatic application of tension belts", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#disableHeightLimit", "Disable the density based stacking height limit", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#zonesOverlap", "Flag to identify when the loading areas overlap each other", false)
+		s.schema:register(XMLValueType.FLOAT, s.key..".options#minLogLength", "The minimum length for logs that will be autoloaded (default is zero)", 0)
 		s.schema:register(XMLValueType.BOOL, s.key..".options#showDebug", "Show the full graphical debugging display for this vehicle", false)
 	end
 
@@ -1550,6 +1552,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.disableAutoStrap = config.disableAutoStrap
 						spec.disableHeightLimit = config.disableHeightLimit
 						spec.zonesOverlap = config.zonesOverlap
+						spec.minLogLength = config.minLogLength
 						spec.showDebug = config.showDebug
 						break
 					end
@@ -1615,6 +1618,7 @@ function UniversalAutoload:onLoad(savegame)
 						spec.disableAutoStrap = xmlFile:getValue(key..".options#disableAutoStrap", false)
 						spec.disableHeightLimit = xmlFile:getValue(key..".options#disableHeightLimit", false)
 						spec.zonesOverlap = xmlFile:getValue(key..".options#zonesOverlap", false)
+						spec.minLogLength = xmlFile:getValue(key..".options#minLogLength", UniversalAutoload.minLogLength)
 						spec.showDebug = xmlFile:getValue(key..".options#showDebug", UniversalAutoload.showDebug)
 						break
 					end
@@ -2700,6 +2704,10 @@ end
 function UniversalAutoload:isValidForLoading(object)
 	local spec = self.spec_universalAutoload
 	local maxLength = spec.loadArea[spec.currentLoadAreaIndex or 1].length
+	local minLength = spec.minLogLength
+	if minLength > maxLength or not spec.isLogTrailer then
+		minLength = 0
+	end
 	
 	if object == nil then
 		return false
@@ -2713,6 +2721,9 @@ function UniversalAutoload:isValidForLoading(object)
 	end
 
 	if object.isSplitShape and object.sizeY > maxLength then
+		return false
+	end
+	if object.isSplitShape and object.sizeY < minLength then
 		return false
 	end
 	if spec.isLogTrailer and not object.isSplitShape then

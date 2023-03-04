@@ -111,6 +111,7 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 		UniversalAutoload.pricePerLog = 0
 		UniversalAutoload.pricePerBale = 0
 		UniversalAutoload.pricePerPallet = 0
+		UniversalAutoload.minLogLength = 0
 	end
 	
 	return N,M
@@ -138,6 +139,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				UniversalAutoload.pricePerLog = xmlFile:getValue("universalAutoload#pricePerLog", 0)
 				UniversalAutoload.pricePerBale = xmlFile:getValue("universalAutoload#pricePerBale", 0)
 				UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
+				UniversalAutoload.minLogLength = xmlFile:getValue("universalAutoload#minLogLength", 0)
 				print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
 				print("  >> Menu High Priority: " .. tostring(UniversalAutoload.highPriority))
 				print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
@@ -145,6 +147,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				print("  >> Price Per Log: " .. tostring(UniversalAutoload.pricePerLog))
 				print("  >> Price Per Bale: " .. tostring(UniversalAutoload.pricePerBale))
 				print("  >> Price Per Pallet: " .. tostring(UniversalAutoload.pricePerPallet))
+				print("  >> Minimum Log Length: " .. tostring(UniversalAutoload.minLogLength))
 			end
 			
 			local objectTypesKey = "universalAutoload.objectTypes"
@@ -259,6 +262,7 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					config.disableAutoStrap = xmlFile:getValue(configKey..".options#disableAutoStrap", false)
 					config.disableHeightLimit = xmlFile:getValue(configKey..".options#disableHeightLimit", false)
 					config.zonesOverlap = xmlFile:getValue(configKey..".options#zonesOverlap", false)
+					config.minLogLength = xmlFile:getValue(configKey..".options#minLogLength", UniversalAutoload.minLogLength)
 					config.showDebug = xmlFile:getValue(configKey..".options#showDebug", debugAll)
 
 					if not config.showDebug then
@@ -1299,12 +1303,14 @@ FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.s
 		-- streamWriteInt32(streamId, spec.pricePerLog)
 		-- streamWriteInt32(streamId, spec.pricePerBale)
 		-- streamWriteInt32(streamId, spec.pricePerPallet)
+		-- streamWriteInt32(streamId, spec.minLogLength)
 
 		-- UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
 		-- UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
 		-- spec.pricePerLog = streamReadInt32(streamId)
 		-- spec.pricePerBale = streamReadInt32(streamId)
 		-- spec.pricePerPallet = streamReadInt32(streamId)
+		-- spec.minLogLength = streamReadInt32(streamId)
 	end
 )
 

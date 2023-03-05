@@ -173,15 +173,15 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
-	if vehicleType.functions["getFillUnitCapacity"] == nil then
-		SpecializationUtil.registerFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
-	end
-	if vehicleType.functions["getFillUnitFillLevel"] == nil then
-		SpecializationUtil.registerFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
-	end
-	if vehicleType.functions["getFillUnitFreeCapacity"] == nil then
-		SpecializationUtil.registerFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
-	end
+	-- if vehicleType.functions["getFillUnitCapacity"] == nil then
+		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
+	-- end
+	-- if vehicleType.functions["getFillUnitFillLevel"] == nil then
+		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
+	-- end
+	-- if vehicleType.functions["getFillUnitFreeCapacity"] == nil then
+		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
+	-- end
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
@@ -189,15 +189,15 @@ function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
 	--- Autodrive functions
-	if vehicleType.functions["getFillUnitCapacity"] ~= nil then
-		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
-	end
-	if vehicleType.functions["getFillUnitFillLevel"] ~= nil then
-		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
-	end
-	if vehicleType.functions["getFillUnitFreeCapacity"] ~= nil then
-		SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
-	end
+	-- if vehicleType.functions["getFillUnitCapacity"] ~= nil then
+		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
+	-- end
+	-- if vehicleType.functions["getFillUnitFillLevel"] ~= nil then
+		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
+	-- end
+	-- if vehicleType.functions["getFillUnitFreeCapacity"] ~= nil then
+		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
+	-- end
 end
 
 function UniversalAutoload:getCanStartFieldWork(superFunc)

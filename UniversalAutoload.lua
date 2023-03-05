@@ -170,9 +170,9 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
 	SpecializationUtil.registerFunction(vehicleType, "ualIsObjectLoadable", UniversalAutoload.ualIsObjectLoadable)
 	--- Autodrive functions
-	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
-	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
-	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
+	-- SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
+	-- SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
+	-- SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
 	-- if vehicleType.functions["getFillUnitCapacity"] == nil then
 		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
 	-- end

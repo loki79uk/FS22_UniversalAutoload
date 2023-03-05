@@ -170,34 +170,18 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetLoadedBales", UniversalAutoload.ualGetLoadedBales)
 	SpecializationUtil.registerFunction(vehicleType, "ualIsObjectLoadable", UniversalAutoload.ualIsObjectLoadable)
 	--- Autodrive functions
-	-- SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
-	-- SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
-	-- SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
-	-- if vehicleType.functions["getFillUnitCapacity"] == nil then
-		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
-	-- end
-	-- if vehicleType.functions["getFillUnitFillLevel"] == nil then
-		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
-	-- end
-	-- if vehicleType.functions["getFillUnitFreeCapacity"] == nil then
-		-- SpecializationUtil.registerFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
-	-- end
+	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
+	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
+	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitCapacity", UniversalAutoload.ualGetFillUnitCapacity)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFillLevel", UniversalAutoload.ualGetFillUnitFillLevel)
+	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFreeCapacity", UniversalAutoload.ualGetFillUnitFreeCapacity)
 end
 --
 function UniversalAutoload.registerOverwrittenFunctions(vehicleType)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanStartFieldWork", UniversalAutoload.getCanStartFieldWork)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanImplementBeUsedForAI", UniversalAutoload.getCanImplementBeUsedForAI)
 	SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDynamicMountTimeToMount", UniversalAutoload.getDynamicMountTimeToMount)
-	--- Autodrive functions
-	-- if vehicleType.functions["getFillUnitCapacity"] ~= nil then
-		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitCapacity", UniversalAutoload.getFillUnitCapacity)
-	-- end
-	-- if vehicleType.functions["getFillUnitFillLevel"] ~= nil then
-		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFillLevel", UniversalAutoload.getFillUnitFillLevel)
-	-- end
-	-- if vehicleType.functions["getFillUnitFreeCapacity"] ~= nil then
-		-- SpecializationUtil.registerOverwrittenFunction(vehicleType, "getFillUnitFreeCapacity", UniversalAutoload.getFillUnitFreeCapacity)
-	-- end
 end
 
 function UniversalAutoload:getCanStartFieldWork(superFunc)
@@ -2221,8 +2205,8 @@ function UniversalAutoload:ualGetIsFilled()
 	local isFilled = false
 	if self.spec_fillVolume ~= nil then
 		for _, fillVolume in ipairs(self.spec_fillVolume.volumes) do
-			local capacity = self:getFillUnitCapacity(fillVolume.fillUnitIndex)
-			local fillLevel = self:getFillUnitFillLevel(fillVolume.fillUnitIndex)
+			local capacity = self:ualGetFillUnitCapacity(fillVolume.fillUnitIndex)
+			local fillLevel = self:ualGetFillUnitFillLevel(fillVolume.fillUnitIndex)
 			if fillLevel > 0 then
 				isFilled = true
 			end
@@ -5333,7 +5317,7 @@ end
 	TODO: 
 		- AD needs functions like: 
 			- :ualGetFillUnitFillLevel()
-		 	- :ualGetFillUnitCapactiy()
+		 	- :ualGetFillUnitCapacity()
 			- :ualGetFillUnitFreeCapacity()
 			
 			in function: AutoDrive:getALObjectFillLevels(object) for better performance.
@@ -5345,34 +5329,34 @@ end
     Is spec.validUnloadCount the correct value to get the fill level?
     Add a better calculation for getFillUnitCapacity, for the moment it returns always 1 more than spec.validUnloadCount
 ]]
-function UniversalAutoload:getFillUnitCapacity(superFunc, fillUnitIndex)
+function UniversalAutoload:ualGetFillUnitCapacity(fillUnitIndex)
     local spec = self.spec_universalAutoload
     if spec and spec.isAutoloadEnabled then
         return (spec.validUnloadCount and (spec.validUnloadCount + 1)) or 0
     else
-        return superFunc(self, fillUnitIndex)
+		return 0
     end
 end
 
-function UniversalAutoload:getFillUnitFillLevel(superFunc, fillUnitIndex)
+function UniversalAutoload:ualGetFillUnitFillLevel(fillUnitIndex)
     local spec = self.spec_universalAutoload
     if spec and spec.isAutoloadEnabled then
         return (spec.validUnloadCount and spec.validUnloadCount) or 0
     else
-        return superFunc(self, fillUnitIndex)
+		return 0
     end
 end
 
 -- return 0 if trailer is fully loaded / no capacity left
-function UniversalAutoload:getFillUnitFreeCapacity(superFunc, fillUnitIndex)
+function UniversalAutoload:ualGetFillUnitFreeCapacity(fillUnitIndex)
     local spec = self.spec_universalAutoload
     if spec and spec.isAutoloadEnabled then
 		if spec.trailerIsFull then
             return 0
         else
-            return self:getFillUnitCapacity(fillUnitIndex) - self:getFillUnitFillLevel(fillUnitIndex)
+            return self:ualGetFillUnitCapacity(fillUnitIndex) - self:ualGetFillUnitFillLevel(fillUnitIndex)
         end
     else
-        return superFunc(self, fillUnitIndex)
+		return 0
     end
 end

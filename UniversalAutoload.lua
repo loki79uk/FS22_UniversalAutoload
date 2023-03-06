@@ -139,7 +139,6 @@ function UniversalAutoload.initSpecialization()
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
-	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#lastLoadedObjectLength", "Length of last loaded object", 0)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
@@ -1881,7 +1880,6 @@ function UniversalAutoload:onLoad(savegame)
 		spec.totalUnloadCount = 0
 		spec.validLoadCount = 0
 		spec.validUnloadCount = 0
-		spec.lastLoadedObjectLength = 0
 
 	end
 
@@ -1926,7 +1924,6 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLayerHeight = 0
 			spec.nextLayerHeight = 0
 			spec.currentLoadAreaIndex = 1
-			spec.lastLoadedObjectLength = 0
 			spec.resetLoadingLayer = false
 			spec.resetLoadingPattern = false
 		else
@@ -1948,7 +1945,6 @@ function UniversalAutoload:onPostLoad(savegame)
 			spec.currentLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#layerHeight", 0)
 			spec.nextLayerHeight = savegame.xmlFile:getValue(savegame.key..".universalAutoload#nextLayerHeight", 0)
 			spec.currentLoadAreaIndex = savegame.xmlFile:getValue(savegame.key..".universalAutoload#loadAreaIndex", 1)
-			spec.lastLoadedObjectLength = savegame.xmlFile:getValue(savegame.key..".universalAutoload#lastLoadedObjectLength", 0)
 			spec.resetLoadingLayer = false
 			spec.resetLoadingPattern = false
 		end
@@ -2005,7 +2001,6 @@ function UniversalAutoload:saveToXMLFile(xmlFile, key, usedModNames)
 	xmlFile:setValue(correctedKey.."#layerCount", spec.currentLayerCount or 0)
 	xmlFile:setValue(correctedKey.."#layerHeight", spec.currentLayerHeight or 0)
 	xmlFile:setValue(correctedKey.."#nextLayerHeight", spec.nextLayerHeight or 0)
-	xmlFile:setValue(correctedKey.."#lastLoadedObjectLength", spec.lastLoadedObjectLength or 0)
 	xmlFile:setValue(correctedKey.."#loadAreaIndex", spec.currentLoadAreaIndex or 1)
 	
 end
@@ -2941,11 +2936,11 @@ function UniversalAutoload:loadObject(object, chargeForLoading)
 						g_currentMission:addMoney(-UniversalAutoload.pricePerPallet, self:getOwnerFarmId(), MoneyType.AI, true, true)
 					end
 				end
-				
-				spec.lastLoadedObjectLength = containerType.sizeX
 			
-				if UniversalAutoload.showDebug then print(string.format("LOADED OBJECT: %s [%.3f, %.3f, %.3f]",
-					containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ)) end
+				if UniversalAutoload.showDebug then
+					print(string.format("LOADED TYPE: %s [%.3f, %.3f, %.3f]",
+					containerType.name, containerType.sizeX, containerType.sizeY, containerType.sizeZ))
+				end
 				return true
 			end
 		end
@@ -3217,6 +3212,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	
 	--UPDATE NEW PACKING DIMENSIONS
 	local addedLoadWidth = sizeX
+	local addedLoadLength = sizeZ
 	if useRoundbalePacking == false then
 		addedLoadWidth = sizeY
 	end
@@ -3225,7 +3221,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		spec.currentLoadWidth = addedLoadWidth
 		spec.currentActualWidth = N * addedLoadWidth
 		spec.currentActualLength = spec.currentLoadLength
-		spec.currentLoadLength = spec.currentLoadLength + sizeZ
+		spec.currentLoadLength = spec.currentLoadLength + addedLoadLength
 		if spec.isLogTrailer and spec.currentActualLength~=0 then
 			spec.currentLoadLength = spec.currentLoadLength + UniversalAutoload.logSpace
 		end
@@ -3278,7 +3274,6 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		print("currentLayerCount: " .. tostring(spec.currentLayerCount) )
 		print("currentLayerHeight: " .. tostring(spec.currentLayerHeight) )
 		print("nextLayerHeight: " .. tostring(spec.nextLayerHeight) )
-		print("lastLoadedObjectLength: " .. tostring(spec.lastLoadedObjectLength) )
 		print("-------------------------------")
 	end
 	
@@ -3305,7 +3300,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 		
 		--LOAD FROM THE CORRECT SIDE
 		local posX = -( spec.currentLoadWidth - (spec.currentActualWidth/2) - (addedLoadWidth/2) )
-		local posZ = -( spec.currentLoadLength - (sizeZ/2) ) - roundbaleOffset
+		local posZ = -( spec.currentLoadLength - (addedLoadLength/2) ) - roundbaleOffset
 		if spec.currentLoadside == "left" then posX = -posX end
 
 		--SET POSITION AND ORIENTATION
@@ -3326,7 +3321,6 @@ function UniversalAutoload:resetLoadingPattern()
 	spec.currentLoadLength = 0
 	spec.currentActualWidth = 0
 	spec.currentActualLength = 0
-	spec.lastLoadedObjectLength = 0
 	spec.currentLoadingPlace = nil
 	spec.resetLoadingPattern = false
 end
@@ -3353,8 +3347,8 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 			print("===============================")
 			-- print("FIND LOADING PLACE FOR "..containerType.name)
 		end
-		if spec.isLogTrailer and spec.lastLoadedObjectLength > 0 and spec.lastLoadedObjectLength < containerType.sizeX then
-			if UniversalAutoload.showDebug then print("NEW OBJECT is longer than previous") end
+		
+		if spec.isLogTrailer then
 			spec.resetLoadingPattern = true
 		end
 
@@ -3375,16 +3369,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				local containerSizeY = containerType.sizeY
 				local containerSizeZ = containerType.sizeZ
 				local containerFlipYZ = containerType.flipYZ
-				
-				if UniversalAutoload.showDebug then
-					print("-------------------------------")
-					print("containerSizeX: " .. tostring(containerSizeX) )
-					print("containerSizeY: " .. tostring(containerSizeY) )
-					print("containerSizeZ: " .. tostring(containerSizeZ) )
-					print("containerFlipYZ: " .. tostring(containerFlipYZ) )
-					print("-------------------------------")
-				end
-				
+
 				--TEST FOR ROUNDBALE PACKING
 				if containerType.isBale and containerType.sizeX==containerType.sizeZ then
 					if spec.useHorizontalLoading then
@@ -3532,7 +3517,6 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								spec.currentLoadHeight = spec.currentLoadHeight + containerSizeY
 
 								spec.nextLayerHeight = math.max(spec.currentLoadHeight, spec.nextLayerHeight)
-								if UniversalAutoload.showDebug then print("nextLayerHeight: " .. spec.nextLayerHeight) end
 								
 								if UniversalAutoload.showDebug then print("USING LOAD PLACE - height: " .. tostring(spec.currentLoadHeight)) end
 								return thisLoadPlace
@@ -4156,16 +4140,19 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 		-- SPLITSHAPE ROTATION
 		if object.isSplitShape then
 		
-			local s = rotateLogs and 1 or -1
-			local xx,xy,xz = localDirectionToWorld(position.node, s, 0, 0) --length
-			local yx,yy,yz = localDirectionToWorld(position.node, 0, 1, 0) --height
-			local zx,zy,zz = localDirectionToWorld(position.node, 0, 0, 0) --width
-			-- print(string.format("X %f, %f, %f",xx,xy,xz))
-			-- print(string.format("Y %f, %f, %f",yx,yy,yz))
-			-- print(string.format("Z %f, %f, %f",zx,zy,zz))
-			
 			-- IF OBJECT IS NOT ALREADY LOADED
 			if isLoading then
+			
+				-- if rotateLogs then print("ROTATE") else print("NORMAL") end
+			
+				local s = rotateLogs and 1 or -1
+				local xx,xy,xz = localDirectionToWorld(position.node, s, 0, 0) --length
+				local yx,yy,yz = localDirectionToWorld(position.node, 0, 1, 0) --height
+				local zx,zy,zz = localDirectionToWorld(position.node, 0, 0, 0) --width
+				-- print(string.format("X %f, %f, %f",xx,xy,xz))
+				-- print(string.format("Y %f, %f, %f",yx,yy,yz))
+				-- print(string.format("Z %f, %f, %f",zx,zy,zz))
+			
 				local rx,ry,rz = localRotationToWorld(position.node, 0, 0, s*math.pi/2)
 				-- print(string.format("R %f, %f, %f",rx,ry,rz))
 				
@@ -4206,6 +4193,8 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 			offset['x'] = x0 - (x1-x0)
 			offset['y'] = y0 - (y1-y0)
 			offset['z'] = z0 - (z1-z0)
+
+			-- print(string.format("offset (%f, %f, %f)", offset.x,offset.y,offset.z))
 			UniversalAutoload.moveObjectNode(node, offset)
 
 		end
@@ -4771,15 +4760,24 @@ function UniversalAutoload.getContainerType(object)
 		--print("getContainerType: i3dFilename == NIL")
 		if object.isSplitShape then
 		
-			-- SPLITSHAPE ROTATION
-			local splitShape = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS["splitShape"]
-			splitShape.sizeX = object.sizeY
-			splitShape.sizeY = object.sizeX
-			splitShape.sizeZ = object.sizeZ
-			splitShape.flipXY = true
-			splitShape.alwaysRotate = true
-			return splitShape
+			if object.configuration == nil then
 			
+				local splitShape = {}
+				local configuration = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS["splitShape"]
+				for k, v in pairs(configuration) do
+					splitShape[k] = v
+				end
+				splitShape.sizeX = object.sizeY
+				splitShape.sizeY = object.sizeX
+				splitShape.sizeZ = object.sizeZ
+				splitShape.flipXY = true
+				splitShape.alwaysRotate = true
+				
+				object.configuration = splitShape
+				
+			end
+			return object.configuration
+
 		else
 			return nil
 		end

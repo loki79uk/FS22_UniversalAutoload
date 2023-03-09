@@ -153,7 +153,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 			
 			local objectTypesKey = "universalAutoload.objectTypes"
 			if xmlFile:hasProperty(objectTypesKey) then
-				print("  >> Adding EXTRA object types:")
+				print("ADDING EXTRA object types")
 				local i = 0
 				while true do
 					local objectTypeKey = string.format(objectTypesKey .. ".objectType(%d)", i)
@@ -166,7 +166,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 					local customEnvironment, _ = objectType:match( "^(.-)%.(.+)$" )
 					if customEnvironment==nil or g_modIsLoaded[customEnvironment] then
 						table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
-						print("   - " .. tostring(objectType))
+						print("  >> " .. tostring(objectType))
 					end
 					
 					i = i + 1

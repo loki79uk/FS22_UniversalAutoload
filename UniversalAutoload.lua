@@ -172,6 +172,8 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
+	--SpecializationUtil.registerFunction(vehicleType, "ualSetTipside", UniversalAutoload.ualSetTipside)
+	--SpecializationUtil.registerFunction(vehicleType, "ualGetTipside", UniversalAutoload.ualGetTipside)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitCapacity", UniversalAutoload.ualGetFillUnitCapacity)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFillLevel", UniversalAutoload.ualGetFillUnitFillLevel)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFreeCapacity", UniversalAutoload.ualGetFillUnitFreeCapacity)
@@ -1134,7 +1136,7 @@ function UniversalAutoload:stopLoading(noEventSend)
 	end
 end
 --
-function UniversalAutoload:startUnloading(noEventSend)
+function UniversalAutoload:startUnloading(force, noEventSend)
 	local spec = self.spec_universalAutoload
 
 	if not spec.isUnloading then
@@ -1145,8 +1147,13 @@ function UniversalAutoload:startUnloading(noEventSend)
 			if spec.loadedObjects ~= nil then
 				UniversalAutoload.buildObjectsToUnloadTable(self)
 			end
+			
+			if force and spec.frontUnloadingOnly or spec.rearUnloadingOnly then
+				if UniversalAutoload.showDebug then print("CANNOT FORCE FRONT/REAR UNLOADING") end
+				force = false
+			end
 
-			if spec.objectsToUnload ~= nil and spec.unloadingAreaClear then
+			if spec.objectsToUnload ~= nil and (spec.unloadingAreaClear or force) then
 				self:setAllTensionBeltsActive(false)
 				for object, unloadPlace in pairs(spec.objectsToUnload) do
 					if not UniversalAutoload.unloadObject(self, object, unloadPlace) then
@@ -1175,7 +1182,7 @@ function UniversalAutoload:startUnloading(noEventSend)
 		spec.isUnloading = false
 		spec.doPostLoadDelay = true
 
-		UniversalAutoloadStartUnloadingEvent.sendEvent(self, noEventSend)
+		UniversalAutoloadStartUnloadingEvent.sendEvent(self, force, noEventSend)
 		
 		spec.updateToggleLoading = true
 	end
@@ -2693,6 +2700,15 @@ function UniversalAutoload:determineTipside()
 				UniversalAutoload.setCurrentLoadside(self, "none")
 			end
 		end
+	end
+	
+	if spec.rearUnloadingOnly and spec.currentTipside ~= "rear" then
+		UniversalAutoload.setCurrentTipside(self, "rear")
+		UniversalAutoload.setCurrentLoadside(self, "rear")	
+	end
+	if spec.frontUnloadingOnly and spec.currentTipside ~= "front" then
+		UniversalAutoload.setCurrentTipside(self, "front")
+		UniversalAutoload.setCurrentLoadside(self, "front")	
 	end
 end
 --
@@ -4904,6 +4920,14 @@ function UniversalAutoload:getPalletIsSelectedLoadside(object)
 		return true
 	end
 	
+	if spec.rearUnloadingOnly and spec.currentLoadside == "rear" then
+		return true
+	end
+	
+	if spec.frontUnloadingOnly and spec.currentLoadside == "front" then
+		return true
+	end
+	
 	if spec.availableObjects[object] == nil then
 		return true
 	end
@@ -5257,7 +5281,7 @@ function UniversalAutoload:onAIFieldWorkerEnd()
 	end
 end  
 
--- Courseplay interface functions.
+-- CoursePlay interface functions.
 function UniversalAutoload:ualIsFull()
 	local spec = self.spec_universalAutoload
 	return (spec~=nil and spec.isAutoloadEnabled) and spec.trailerIsFull
@@ -5287,45 +5311,67 @@ function UniversalAutoload:ualIsObjectLoadable(object)
 	return false
 end
 
--- Autodrive interface functions.
---[[
-	TODO:
-    ualStartLoad, i.e. onAIFieldWorkerStart, is only activating the autoload for bales, not pallets etc.
-]]
+-- AutoDrive interface functions.
 function UniversalAutoload:ualStartLoad()
-	UniversalAutoload.onAIFieldWorkerStart(self)
+	local spec = self.spec_universalAutoload
+	if spec~=nil and spec.isAutoloadEnabled then
+		-- print("UAL/AD - START AUTOLOAD")
+		UniversalAutoload.startLoading(self)
+	end
 end
-
 function UniversalAutoload:ualStopLoad()
-	UniversalAutoload.onAIFieldWorkerEnd(self)
+	local spec = self.spec_universalAutoload
+	if spec~=nil and spec.isAutoloadEnabled then
+		-- print("UAL/AD - STOP AUTOLOAD")
+		UniversalAutoload.stopLoading(self)
+	end
 end
 
 --[[
 	TODO:
     What is the tipSideString to unload on the platform, i.e. pallet to disappear if reached the destination position?
     What is the tipSideString to unload behind the vehicle / trailer?
+	
+	NOTE:
+	I have separated the unload AND get/set tip side functions (both commented out for now)
+	I think it is best to keep the tip side as selected in UAL for now
+		- Most trailers have ONLY left/right unloading
+		- Pickups etc. have ONLY rear unloading
+	
+	BUT I will work on adding all zones to all vehicles so that they can be selected via an external interface function
 ]]
-function UniversalAutoload:ualUnload(tipSideString)
-	self:ualStopLoad()
-	UniversalAutoload.setCurrentTipside(self, tipSideString or "none")
-	UniversalAutoload.startUnloading(self)
+function UniversalAutoload:ualUnload()
+	local spec = self.spec_universalAutoload
+	if spec~=nil and spec.isAutoloadEnabled then
+		-- print("UAL/AD - UNLOAD")
+		UniversalAutoload.startUnloading(self, true)
+	end
 end
+-- function UniversalAutoload:ualGetTipside()
+	-- local spec = self.spec_universalAutoload
+	-- if spec~=nil and spec.isAutoloadEnabled then
+		-- print("UAL/AD - GET TIPSIDE: " .. tostring(spec.currentTipside))
+		-- return spec.currentTipside or "none"
+	-- end
+	-- return "none"
+-- end
+-- function UniversalAutoload:ualSetTipside(tipSideString)
+	-- local spec = self.spec_universalAutoload
+	-- if spec~=nil and spec.isAutoloadEnabled then
+		-- print("UAL/AD - SET TIPSIDE: " .. (tipSideString or "none"))
+		-- UniversalAutoload.setCurrentTipside(self, tipSideString or "none")
+	-- end
+-- end
 
---[[
-	TODO: 
-		- AD needs functions like: 
-			- :ualGetFillUnitFillLevel()
-		 	- :ualGetFillUnitCapacity()
-			- :ualGetFillUnitFreeCapacity()
-			
-			in function: AutoDrive:getALObjectFillLevels(object) for better performance.
-		
-]]
 
 --[[
 	TODO:
     Is spec.validUnloadCount the correct value to get the fill level?
     Add a better calculation for getFillUnitCapacity, for the moment it returns always 1 more than spec.validUnloadCount
+	
+	NOTE:
+	I don't think it is possible to do better than this..
+	We will never know if there is enough space for a pallet until we try to load it.
 ]]
 function UniversalAutoload:ualGetFillUnitCapacity(fillUnitIndex)
     local spec = self.spec_universalAutoload

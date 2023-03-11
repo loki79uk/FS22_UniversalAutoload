@@ -105,7 +105,7 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 		copyFile(defaultSettingsFile, userSettingsFile, false)
 
 		UniversalAutoload.showDebug = false
-		UniversalAutoload.highPriority = false
+		UniversalAutoload.highPriority = true
 		UniversalAutoload.disableAutoStrap = false
 		UniversalAutoload.manualLoadingOnly = false
 		UniversalAutoload.pricePerLog = 0
@@ -133,7 +133,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				print("IMPORT Universal Autoload global settings")
 				UniversalAutoload.globalSettingsLoaded = true
 				UniversalAutoload.showDebug = xmlFile:getValue("universalAutoload#showDebug", false)
-				UniversalAutoload.highPriority = xmlFile:getValue("universalAutoload#highPriority", false)
+				UniversalAutoload.highPriority = xmlFile:getValue("universalAutoload#highPriority", true)
 				UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
 				UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
 				UniversalAutoload.pricePerLog = xmlFile:getValue("universalAutoload#pricePerLog", 0)

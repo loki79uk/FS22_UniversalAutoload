@@ -51,7 +51,7 @@ function UniversalAutoload.initSpecialization()
 
 	local globalKey = "universalAutoload"
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
-	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#highPriority", "Apply high priority to all UAL key bindings in the F1 menu", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#highPriority", "Apply high priority to all UAL key bindings in the F1 menu", true)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerLog", "The price charged for each auto-loaded log (default is zero)", 0)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 
 <!-- GLOBAL SETTINGS - OVERRIDE ALL OTHERS -->
-<universalAutoload showDebug="false" manualLoadingOnly="false" disableAutoStrap="false" pricePerLog="0" pricePerBale="0" pricePerPallet="0" minLogLength="0">
+<universalAutoload showDebug="false" highPriority="true" manualLoadingOnly="false" disableAutoStrap="false" pricePerLog="0" pricePerBale="0" pricePerPallet="0" minLogLength="0">
 
 	<!-- APPLIES TO ALL IN THIS SECTION -->
     <vehicleConfigurations showDebug="false">

@@ -68,8 +68,7 @@ UniversalAutoload.VALID_OBJECTS = {
 	[2] = "bigBag",
 	[3] = "treeSaplingPallet",
 	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
-	[5] = "pdlc_forestryPack.woodContainer",
-	[6] = "FS22_SeedPotatoFarmBuildings.dischargeable_pallet"
+	[5] = "pdlc_forestryPack.woodContainer"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES
@@ -165,8 +164,10 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 					
 					local customEnvironment, _ = objectType:match( "^(.-)%.(.+)$" )
 					if customEnvironment==nil or g_modIsLoaded[customEnvironment] then
-						table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
-						print("  >> " .. tostring(objectType))
+						if not tableContainsValue(UniversalAutoload.VALID_OBJECTS, objectType) then
+							table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
+							print("  >> " .. tostring(objectType))
+						end
 					end
 					
 					i = i + 1
@@ -390,6 +391,28 @@ function UniversalAutoloadManager.importContainerTypeFromXml(xmlFilename, custom
 				xmlFile:delete()
 			end
 		end
+		
+	end
+end
+--
+function UniversalAutoloadManager.importObjectTypeTypeFromXml(xmlInput, customEnvironment)
+	
+	local xmlFile = xmlInput
+	if type(xmlInput) == 'string' then
+		xmlFile = XMLFile.load("configXml", xmlInput, Vehicle.xmlSchema)
+	end
+	
+	if xmlFile~=nil then
+		local vehicleType = xmlFile:getValue("vehicle#type")
+		if vehicleType~=nil and customEnvironment~=nil then
+			local objectType = customEnvironment.."."..vehicleType
+			if not tableContainsValue(UniversalAutoload.VALID_OBJECTS, objectType) then
+				table.insert(UniversalAutoload.VALID_OBJECTS, objectType)
+			end
+		end
+		if type(xmlInput) == 'string' then
+			xmlFile:delete()
+		end
 	end
 end
 --
@@ -427,6 +450,7 @@ function UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, cus
 			newType.length = oldType.length
 		end
 		print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name, newType.sizeX, newType.sizeY, newType.sizeZ, newType.type ))
+		UniversalAutoloadManager.importObjectTypeTypeFromXml(xmlFilename, customEnvironment)
 		return true
 	end
 end
@@ -487,7 +511,8 @@ function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnviron
 				
 			print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
 				newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
-				
+			UniversalAutoloadManager.importObjectTypeTypeFromXml(xmlFile, customEnvironment)
+			return true
 		end
 	end
 end
@@ -545,7 +570,7 @@ function UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironme
 				
 			print(string.format("  >> %s [%.3f, %.3f, %.3f] - %s", newType.name,
 				newType.sizeX, newType.sizeY, newType.sizeZ, containerType ))
-				
+			return true
 		end
 	end
 end
@@ -1225,6 +1250,15 @@ function UniversalAutoloadManager:loadMap(name)
 		then
 			UniversalAutoloadManager.importContainerTypeFromXml(storeItem.xmlFilename, storeItem.customEnvironment)
 		end	
+	end
+	
+	-- DISPLAY LIST OF VALID OBJECT TYPES
+	print("USING custom object types")
+	table.sort(UniversalAutoload.VALID_OBJECTS) --function(a, b) return a:lower() < b:lower() end
+	for _, objectType in pairs(UniversalAutoload.VALID_OBJECTS) do
+		if objectType:find("%.") and not objectType:find("pdlc_") then
+			print("  >> " .. objectType)
+		end
 	end
 	
 	UniversalAutoloadManager.detectOldConfigVersion()

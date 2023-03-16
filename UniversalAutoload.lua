@@ -3491,7 +3491,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 										end
 									end
 									
-									if thisLoadPlace.useRoundbalePacking ~= nil then
+									if thisLoadPlace.useRoundbalePacking == false then
 										spec.loadSpeedFactor = 5
 									end
 								else
@@ -3529,7 +3529,12 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 									spec.currentLoadingPlace = nil
 								end
 								
-								spec.currentLoadHeight = spec.currentLoadHeight + containerSizeY
+								local newLoadHeight = containerSizeY
+								if thisLoadPlace.useRoundbalePacking == false then
+									newLoadHeight = 0.85355339*newLoadHeight
+								end
+								
+								spec.currentLoadHeight = spec.currentLoadHeight + newLoadHeight
 
 								spec.nextLayerHeight = math.max(spec.currentLoadHeight, spec.nextLayerHeight)
 								

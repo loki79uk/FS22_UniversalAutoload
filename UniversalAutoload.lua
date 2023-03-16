@@ -966,12 +966,6 @@ function UniversalAutoload:setHorizontalLoading(state, noEventSend)
 
 	spec.useHorizontalLoading = state
 	
-	if spec.useHorizontalLoading == true then
-		spec.loadSpeedFactor = 5
-	else
-		spec.loadSpeedFactor = 1
-	end
-
 	UniversalAutoloadSetHorizontalLoadingEvent.sendEvent(self, state, noEventSend)
 	
 	spec.updateHorizontalLoading = true
@@ -1023,13 +1017,7 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	end
 	
 	spec.baleCollectionMode = baleCollectionMode
-	
-	if spec.baleCollectionMode == true then
-		spec.loadSpeedFactor = 3
-	else
-		spec.loadSpeedFactor = 1
-	end
-	
+
 	UniversalAutoloadSetBaleCollectionModeEvent.sendEvent(self, baleCollectionMode, noEventSend)
 	spec.updateToggleLoading = true
 end
@@ -2496,6 +2484,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 
 			else
+				spec.loadSpeedFactor = spec.loadSpeedFactor or 1
 				spec.spawnLogsDelayTime = spec.spawnLogsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
@@ -2516,6 +2505,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				UniversalAutoload.createPallet(self, pallet)
 				spec.lastSpawnedPallet = pallet
 			else
+				spec.loadSpeedFactor = spec.loadSpeedFactor or 1
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
@@ -3145,6 +3135,7 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	local containerSizeY = containerType.sizeY
 	local containerSizeZ = containerType.sizeZ
 	local containerFlipYZ = containerType.flipYZ
+	local isRoundbale = false
 	
 	--TEST FOR ROUNDBALE PACKING
 	if containerType.isBale and containerSizeX==containerSizeZ then
@@ -3450,7 +3441,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 					if thisLoadPlace ~= nil then
 					
 						local containerFitsInLoadSpace = spec.isLogTrailer or 
-							(loadPlace.useRoundbalePacking ~= nil and containerSizeX==containerSizeZ) or
+							(thisLoadPlace.useRoundbalePacking ~= nil and containerSizeX==containerSizeZ) or
 							(containerSizeX <= thisLoadPlace.sizeX and containerSizeZ <= thisLoadPlace.sizeZ)
 
 						local thisLoadHeight = spec.currentLoadHeight
@@ -3459,19 +3450,21 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 						
 						if containerFitsInLoadSpace then
 							local useThisLoadSpace = false
+							spec.loadSpeedFactor = 1
+							
 							if spec.isLogTrailer then
 							
 								if not self:ualGetIsMoving() then
 									local logLoadHeight = maxLoadAreaHeight + 0.1
 									if not spec.zonesOverlap then
-										logLoadHeight = math.min(spec.currentLayerHeight+containerSizeY, maxLoadAreaHeight) + 0.1
+										logLoadHeight = math.min(spec.currentLayerHeight, maxLoadAreaHeight) + 0.1
 									end
 									setTranslation(thisLoadPlace.node, x0, logLoadHeight, z0)
 									if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object) then
 										spec.currentLoadHeight = spec.currentLayerHeight
 										local massFactor = UniversalAutoload.clamp((1/mass)/2, 0.2, 1)
 										local heightFactor = maxLoadAreaHeight/(maxLoadAreaHeight+spec.currentLoadHeight)
-										spec.loadSpeedFactor = UniversalAutoload.clamp(heightFactor*massFactor, 0.2, 1)
+										spec.loadSpeedFactor = UniversalAutoload.clamp(heightFactor*massFactor, 0.1, 0.5)
 										-- print("loadSpeedFactor: " .. spec.loadSpeedFactor)
 										useThisLoadSpace = true
 									end
@@ -3497,6 +3490,10 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 											thisLoadHeight = thisLoadHeight + increment
 										end
 									end
+									
+									if thisLoadPlace.useRoundbalePacking ~= nil then
+										spec.loadSpeedFactor = 5
+									end
 								else
 								
 									while thisLoadHeight >= -increment do
@@ -3518,6 +3515,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 										setTranslation(thisLoadPlace.node, x0, spec.currentLayerHeight, z0)
 										if UniversalAutoload.showDebug then print("useHorizontalLoading: " .. spec.currentLayerHeight) end
 									end
+									spec.loadSpeedFactor = 2
 									useThisLoadSpace = true
 								else
 									return
@@ -3527,6 +3525,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							if useThisLoadSpace then
 								-- UniversalAutoload.testLocation(self)
 								if containerType.neverStack then
+									-- print("NEVER STACK")
 									spec.currentLoadingPlace = nil
 								end
 								

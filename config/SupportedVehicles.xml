@@ -101,7 +101,7 @@
         
         <!-- SUPPORTED FORESTRY VEHICLES/TRAILERS -->
         <vehicleConfiguration configFileName="data/vehicles/fliegl/timberRunner/timberRunner.xml">
-            <loadingArea offset="0 1.666 -0.05" width="2.40" height="2.2" length="12.3"/>
+            <loadingArea offset="0 1.666 -0.05" width="2.375" height="2.2" length="12.3"/>
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="data/vehicles/andersonGroup/m160/m160.xml">

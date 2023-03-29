@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Attiva/disattiva il caricamento"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Modalità raccolta automatica delle balle"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Scaricare"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Scarico forzato"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Alterna il lato di scarico"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Attiva/disattiva il filtro di caricamento"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Attiva/disattiva il caricamento orizzontale"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Inizia a caricare"/>
 		<text name="universalAutoload_stopLoading" text="IFerma il caricamento"/>
 		<text name="universalAutoload_unloadAll" text="Scarico"/>
+		<text name="universalAutoload_unloadAllForce" text="Scarico forzato"/>
 		<text name="universalAutoload_baleMode" text="Modo Auto-Balle"/>
 		<text name="universalAutoload_enabled" text="Abilitato"/>
 		<text name="universalAutoload_disabled" text="Disabilitato"/>

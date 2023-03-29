@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Cambiar carga/descarga"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Modo de recogida automática de balas"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Descargar"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Descargar forzada"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Cambiar lado de descarga"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Cambiar filtro de carga"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Alternar carga horizontal"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Empezar carga"/>
 		<text name="universalAutoload_stopLoading" text="Detener carga"/>
 		<text name="universalAutoload_unloadAll" text="Descargar"/>
+		<text name="universalAutoload_unloadAllForce" text="Descargar forzada"/>
 		<text name="universalAutoload_baleMode" text="Modo Auto-Paca"/>
 		<text name="universalAutoload_enabled" text="Activado"/>
 		<text name="universalAutoload_disabled" text="Desactivado"/>

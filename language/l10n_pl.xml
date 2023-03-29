@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Przełącz ładowanie"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Tryb automatycznego zbierania beli"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Rozładuj"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Wymusić Rozładuj"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Przełącz stronę rozładunku"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Przełącz filtr ładowania"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Przełączanie ładowania poziomego"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Rozpocznij ładowanie"/>
 		<text name="universalAutoload_stopLoading" text="Zatrzymaj ładowanie"/>
 		<text name="universalAutoload_unloadAll" text="Rozładuj"/>
+		<text name="universalAutoload_unloadAllForce" text="Wymusić Rozładuj"/>
 		<text name="universalAutoload_baleMode" text="Tryb Auto-Bale"/>
 		<text name="universalAutoload_enabled" text="Włączone"/>
 		<text name="universalAutoload_disabled" text="Wyłączone"/>

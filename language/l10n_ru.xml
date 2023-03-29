@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Переключить загрузку"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Автоматический сбор тюков"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Разгрузка"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Принудительная разгрузка"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Сменить сторону разгрузки"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Переключить фильтр загрузки"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Переключение горизонтальной загрузки"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Начать загрузку"/>
 		<text name="universalAutoload_stopLoading" text="Остановить загрузку"/>
 		<text name="universalAutoload_unloadAll" text="Разгрузка"/>
+		<text name="universalAutoload_unloadAllForce" text="Принудительная разгрузка"/>
 		<text name="universalAutoload_baleMode" text="Автосбор тюков"/>
 		<text name="universalAutoload_enabled" text="Включено"/>
 		<text name="universalAutoload_disabled" text="Отключено"/>

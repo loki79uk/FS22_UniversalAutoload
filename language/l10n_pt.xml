@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Toggle loading"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Automatic Bale Collection Mode"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Unload"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Force Unload"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Toggle unloading side"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Toggle loading filter"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Toggle horizontal loading"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Start loading"/>
 		<text name="universalAutoload_stopLoading" text="Stop loading"/>
 		<text name="universalAutoload_unloadAll" text="Unload"/>
+		<text name="universalAutoload_unloadAllForce" text="Force Unload"/>
 		<text name="universalAutoload_baleMode" text="Auto-Bale Mode"/>
 		<text name="universalAutoload_enabled" text="Enabled"/>
 		<text name="universalAutoload_disabled" text="Disabled"/>

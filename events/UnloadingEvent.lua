@@ -11,7 +11,7 @@ end
 function UniversalAutoloadStartUnloadingEvent.new(vehicle, force)
 	local self = UniversalAutoloadStartUnloadingEvent.emptyNew()
 	self.vehicle = vehicle
-	self.force = force
+	self.force = force or false
 	return self
 end
 

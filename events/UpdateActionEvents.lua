@@ -11,8 +11,8 @@ end
 function UniversalAutoloadUpdateActionEvents.new(vehicle, loadCount, unloadCount)
 	local self = UniversalAutoloadUpdateActionEvents.emptyNew()
 	self.vehicle = vehicle
-	self.loadCount = loadCount
-	self.unloadCount = unloadCount
+	self.loadCount = loadCount or 0
+	self.unloadCount = unloadCount or 0
 	return self
 end
 

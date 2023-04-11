@@ -1022,14 +1022,18 @@ function UniversalAutoload:setBaleCollectionMode(baleCollectionMode, noEventSend
 	spec.updateToggleLoading = true
 end
 --
-function UniversalAutoload:startLoading(noEventSend)
+function UniversalAutoload:startLoading(force, noEventSend)
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - startLoading") end
 		return
 	end
 
-	if not spec.isLoading and UniversalAutoload.getIsLoadingVehicleAllowed(self) then
+	if force then
+		spec.activeLoading = true
+	end
+	
+	if (not spec.isLoading or spec.activeLoading) and UniversalAutoload.getIsLoadingVehicleAllowed(self) then
 		-- print("Start Loading: "..self:getFullName() )
 
 		spec.isLoading = true
@@ -1045,7 +1049,7 @@ function UniversalAutoload:startLoading(noEventSend)
 			spec.sortedObjectsToLoad = UniversalAutoload.createSortedObjectsToLoad(self, spec.availableObjects)
 		end
 		
-		UniversalAutoloadStartLoadingEvent.sendEvent(self, noEventSend)
+		UniversalAutoloadStartLoadingEvent.sendEvent(self, force, noEventSend)
 		spec.updateToggleLoading = true
 	end
 end
@@ -1103,10 +1107,14 @@ function UniversalAutoload.sortLogsForLoading(w1,w2)
 	end
 end
 --
-function UniversalAutoload:stopLoading(noEventSend)
+function UniversalAutoload:stopLoading(force, noEventSend)
 	local spec = self.spec_universalAutoload
 	
-	if spec.isLoading then
+	if force then
+		spec.activeLoading = false
+	end
+	
+	if spec.isLoading and not spec.activeLoading then
 		-- print("Stop Loading: "..self:getFullName() )
 		spec.isLoading = false
 		spec.doPostLoadDelay = true
@@ -1119,7 +1127,7 @@ function UniversalAutoload:stopLoading(noEventSend)
 			end
 		end
 		
-		UniversalAutoloadStopLoadingEvent.sendEvent(self, noEventSend)
+		UniversalAutoloadStopLoadingEvent.sendEvent(self, force, noEventSend)
 		spec.updateToggleLoading = true
 	end
 end
@@ -1868,6 +1876,7 @@ function UniversalAutoload:onLoad(savegame)
 		--server only
 		spec.isLoading = false
 		spec.isUnloading = false
+		spec.activeLoading = false
 		spec.doPostLoadDelay = false
 		spec.doSetTensionBelts = false
 		spec.totalAvailableCount = 0
@@ -2226,6 +2235,7 @@ function UniversalAutoload:onReadStream(streamId, connection)
 		spec.baleCollectionMode = streamReadBool(streamId)
 		spec.isLoading = streamReadBool(streamId)
 		spec.isUnloading = streamReadBool(streamId)
+		spec.activeLoading = streamReadBool(streamId)
 		spec.validLoadCount = streamReadInt32(streamId)
 		spec.validUnloadCount = streamReadInt32(streamId)
 		spec.isBoxTrailer = streamReadBool(streamId)
@@ -2258,6 +2268,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		spec.baleCollectionMode = spec.baleCollectionMode or false
 		spec.isLoading = spec.isLoading or false
 		spec.isUnloading = spec.isUnloading or false
+		spec.activeLoading = spec.activeLoading or false
 		spec.validLoadCount = spec.validLoadCount or 0
 		spec.validUnloadCount = spec.validUnloadCount or 0
 		spec.isBoxTrailer = spec.isBoxTrailer or false
@@ -2276,6 +2287,7 @@ function UniversalAutoload:onWriteStream(streamId, connection)
 		streamWriteBool(streamId, spec.baleCollectionMode)
 		streamWriteBool(streamId, spec.isLoading)
 		streamWriteBool(streamId, spec.isUnloading)
+		streamWriteBool(streamId, spec.activeLoading)
 		streamWriteInt32(streamId, spec.validLoadCount)
 		streamWriteInt32(streamId, spec.validUnloadCount)
 		streamWriteBool(streamId, spec.isBoxTrailer)
@@ -2595,14 +2607,23 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 								spec.resetLoadingPattern = true
 							end
 						else
-							if spec.firstAttemptToLoad and not spec.baleCollectionMode and not self:ualGetIsMoving() then
-								--UNABLE_TO_LOAD_OBJECT
-								UniversalAutoload.showWarningMessage(self, 3)
-								spec.partiallyUnloaded = true
-								spec.resetLoadingPattern = true
+							if spec.activeLoading then
+								if not spec.trailerIsFull and not self:ualGetIsMoving() then
+									--print("ATTEMPT RELOAD")
+									UniversalAutoload.startLoading(self)
+								end
+							else
+							
+								if spec.firstAttemptToLoad and not spec.baleCollectionMode and not self:ualGetIsMoving() then
+									--UNABLE_TO_LOAD_OBJECT
+									UniversalAutoload.showWarningMessage(self, 3)
+									spec.partiallyUnloaded = true
+									spec.resetLoadingPattern = true
+								end
+								if UniversalAutoload.showDebug then print("STOP LOADING") end
+								UniversalAutoload.stopLoading(self)
+							
 							end
-							if UniversalAutoload.showDebug then print("STOP LOADING") end
-							UniversalAutoload.stopLoading(self)
 						end
 					end
 				else
@@ -3579,9 +3600,11 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 		end
 		if UniversalAutoload.showDebug then print("===============================") end
 	else
-		if UniversalAutoload.showDebug then print("CAN'T LOAD WHEN MOVING...") end
-		--NO_LOADING_UNLESS_STATIONARY
-		UniversalAutoload.showWarningMessage(self, 4)
+		if not spec.activeLoading then
+			if UniversalAutoload.showDebug then print("CAN'T LOAD WHEN MOVING...") end
+			--NO_LOADING_UNLESS_STATIONARY
+			UniversalAutoload.showWarningMessage(self, 4)
+		end
 	end
 end
 
@@ -5320,14 +5343,14 @@ function UniversalAutoload:ualStartLoad()
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		-- print("UAL/AD - START AUTOLOAD")
-		UniversalAutoload.startLoading(self)
+		UniversalAutoload.startLoading(self, true)
 	end
 end
 function UniversalAutoload:ualStopLoad()
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
 		-- print("UAL/AD - STOP AUTOLOAD")
-		UniversalAutoload.stopLoading(self)
+		UniversalAutoload.stopLoading(self, true)
 	end
 end
 

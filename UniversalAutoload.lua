@@ -13,6 +13,7 @@ UniversalAutoload.showLoading = false
 UniversalAutoload.delayTime = 200
 UniversalAutoload.logSpace = 0.25
 UniversalAutoload.maxLayerCount = 20
+UniversalAutoload.onFootCheckTime = 500
 UniversalAutoload.SPLITSHAPES_LOOKUP = {}
 
 local debugKeys = false
@@ -259,46 +260,54 @@ end
 
 -- HOOK PLAYER ON FOOT UPDATE OBJECTS/TRIGGERS
 UniversalAutoload.lastClosestVehicle = nil
+UniversalAutoload.lastClosestVehicleTime = 0
 function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 
 	superFunc(self, ...)
-		
+
 	if self.mission.player.isControlled and not g_gui:getIsGuiVisible() then
-		-- print("Player Is Controlled")
-		local player = self.mission.player
-		local playerId = player.userId
 	
-		local closestVehicle = nil
-		local closestVehicleDistance = 25 --math.huge
-		for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
-			if vehicle ~= nil then
-				local SPEC = vehicle.spec_universalAutoload
-				if SPEC.playerInTrigger~=nil and SPEC.playerInTrigger[playerId] == true and
-				g_currentMission.nodeToObject[vehicle.rootNode]~=nil then
-					local distance = calcDistanceFrom(player.rootNode, vehicle.rootNode)
-					if distance < closestVehicleDistance then
-						closestVehicle = vehicle
-						closestVehicleDistance = distance
+		UniversalAutoload.lastClosestVehicleTime = UniversalAutoload.lastClosestVehicleTime + g_currentDt
+		
+		if UniversalAutoload.lastClosestVehicleTime > UniversalAutoload.onFootCheckTime then
+			UniversalAutoload.lastClosestVehicleTime = 0
+			-- print("Player Is Controlled")
+			local player = self.mission.player
+			local playerId = player.userId
+		
+			local closestVehicle = nil
+			local closestVehicleDistance = 25 --math.huge
+			for _, vehicle in pairs(UniversalAutoload.VEHICLES) do
+				if vehicle ~= nil then
+					local SPEC = vehicle.spec_universalAutoload
+					if SPEC.playerInTrigger~=nil and SPEC.playerInTrigger[playerId] == true and
+					g_currentMission.nodeToObject[vehicle.rootNode]~=nil then
+						local distance = calcDistanceFrom(player.rootNode, vehicle.rootNode)
+						if distance < closestVehicleDistance then
+							closestVehicle = vehicle
+							closestVehicleDistance = distance
+						end
 					end
+				end
+			end
+			
+			if UniversalAutoload.lastClosestVehicle ~= closestVehicle then
+				local lastVehicle = UniversalAutoload.lastClosestVehicle
+				if lastVehicle ~= nil then
+					UniversalAutoload.clearActionEvents(lastVehicle)
+					UniversalAutoload.forceRaiseActive(lastVehicle)
+				end
+				
+				UniversalAutoload.lastClosestVehicle = closestVehicle
+				if closestVehicle ~= nil then
+					closestVehicle.spec_universalAutoload.updateKeys = true
 				end
 			end
 		end
 		
-		if UniversalAutoload.lastClosestVehicle~=closestVehicle then
-			local lastVehicle = UniversalAutoload.lastClosestVehicle
-			if lastVehicle ~= nil then
-				UniversalAutoload.clearActionEvents(lastVehicle)
-				UniversalAutoload.forceRaiseActive(lastVehicle)
-			end
-			
-			UniversalAutoload.lastClosestVehicle = closestVehicle
-			if closestVehicle ~= nil then
-				closestVehicle.spec_universalAutoload.updateKeys = true
-			end
-		end
-		if closestVehicle ~= nil then
-			UniversalAutoload.printHelpText(closestVehicle)
-			UniversalAutoload.forceRaiseActive(closestVehicle)
+		if UniversalAutoload.lastClosestVehicle ~= nil then
+			UniversalAutoload.printHelpText(UniversalAutoload.lastClosestVehicle)
+			UniversalAutoload.forceRaiseActive(UniversalAutoload.lastClosestVehicle)
 		end
 	end
 end

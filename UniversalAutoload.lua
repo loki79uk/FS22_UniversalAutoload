@@ -173,8 +173,7 @@ function UniversalAutoload.registerFunctions(vehicleType)
 	SpecializationUtil.registerFunction(vehicleType, "ualStartLoad", UniversalAutoload.ualStartLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualStopLoad", UniversalAutoload.ualStopLoad)
 	SpecializationUtil.registerFunction(vehicleType, "ualUnload", UniversalAutoload.ualUnload)
-	--SpecializationUtil.registerFunction(vehicleType, "ualSetTipside", UniversalAutoload.ualSetTipside)
-	--SpecializationUtil.registerFunction(vehicleType, "ualGetTipside", UniversalAutoload.ualGetTipside)
+	SpecializationUtil.registerFunction(vehicleType, "ualSetUnloadPosition", UniversalAutoload.ualSetUnloadPosition)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitCapacity", UniversalAutoload.ualGetFillUnitCapacity)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFillLevel", UniversalAutoload.ualGetFillUnitFillLevel)
 	SpecializationUtil.registerFunction(vehicleType, "ualGetFillUnitFreeCapacity", UniversalAutoload.ualGetFillUnitFreeCapacity)
@@ -1149,13 +1148,14 @@ function UniversalAutoload:startUnloading(force, noEventSend)
 		spec.isUnloading = true
 
 		if self.isServer then
+
 			if spec.loadedObjects ~= nil then
-				UniversalAutoload.buildObjectsToUnloadTable(self)
-			end
-			
-			if force and spec.frontUnloadingOnly or spec.rearUnloadingOnly then
-				if UniversalAutoload.showDebug then print("CANNOT FORCE FRONT/REAR UNLOADING") end
-				force = false
+				if force and spec.forceUnloadPosition then
+					if UniversalAutoload.showDebug then print("USING UNLOADING POSITION: " .. spec.forceUnloadPosition) end
+					UniversalAutoload.buildObjectsToUnloadTable(self, spec.forceUnloadPosition)
+				else
+					UniversalAutoload.buildObjectsToUnloadTable(self)
+				end
 			end
 
 			if spec.objectsToUnload ~= nil and (spec.unloadingAreaClear or force) then
@@ -1751,38 +1751,36 @@ function UniversalAutoload:onLoad(savegame)
 
 		if not UniversalAutoload.manualLoadingOnly then
 
-			if not spec.rearUnloadingOnly and not spec.frontUnloadingOnly then
-				local leftPickupTrigger = {}
-				leftPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "leftPickupTrigger")
-				if leftPickupTrigger.node ~= nil then
-					leftPickupTrigger.name = "leftPickupTrigger"
-					link(spec.loadVolume.rootNode, leftPickupTrigger.node)
-					
-					local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
-
-					setRotation(leftPickupTrigger.node, 0, 0, 0)
-					setTranslation(leftPickupTrigger.node, 1.1*(width+spec.loadVolume.width)/2, 0, 0)
-					setScale(leftPickupTrigger.node, width, height, length)
-
-					table.insert(spec.triggers, leftPickupTrigger)
-					addTrigger(leftPickupTrigger.node, "ualLoadingTrigger_Callback", self)
-				end
+			local leftPickupTrigger = {}
+			leftPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "leftPickupTrigger")
+			if leftPickupTrigger.node ~= nil then
+				leftPickupTrigger.name = "leftPickupTrigger"
+				link(spec.loadVolume.rootNode, leftPickupTrigger.node)
 				
-				local rightPickupTrigger = {}
-				rightPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "rightPickupTrigger")
-				if rightPickupTrigger.node ~= nil then
-					rightPickupTrigger.name = "rightPickupTrigger"
-					link(spec.loadVolume.rootNode, rightPickupTrigger.node)
-					
-					local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
 
-					setRotation(rightPickupTrigger.node, 0, 0, 0)
-					setTranslation(rightPickupTrigger.node, -1.1*(width+spec.loadVolume.width)/2, 0, 0)
-					setScale(rightPickupTrigger.node, width, height, length)
+				setRotation(leftPickupTrigger.node, 0, 0, 0)
+				setTranslation(leftPickupTrigger.node, 1.1*(width+spec.loadVolume.width)/2, 0, 0)
+				setScale(leftPickupTrigger.node, width, height, length)
 
-					table.insert(spec.triggers, rightPickupTrigger)
-					addTrigger(rightPickupTrigger.node, "ualLoadingTrigger_Callback", self)
-				end
+				table.insert(spec.triggers, leftPickupTrigger)
+				addTrigger(leftPickupTrigger.node, "ualLoadingTrigger_Callback", self)
+			end
+			
+			local rightPickupTrigger = {}
+			rightPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "rightPickupTrigger")
+			if rightPickupTrigger.node ~= nil then
+				rightPickupTrigger.name = "rightPickupTrigger"
+				link(spec.loadVolume.rootNode, rightPickupTrigger.node)
+				
+				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+
+				setRotation(rightPickupTrigger.node, 0, 0, 0)
+				setTranslation(rightPickupTrigger.node, -1.1*(width+spec.loadVolume.width)/2, 0, 0)
+				setScale(rightPickupTrigger.node, width, height, length)
+
+				table.insert(spec.triggers, rightPickupTrigger)
+				addTrigger(rightPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 			end
 			
 			if spec.rearUnloadingOnly then
@@ -2992,13 +2990,12 @@ function UniversalAutoload:unloadObject(object, unloadPlace)
 	
 		if UniversalAutoload.moveObjectNodes(self, object, unloadPlace, false, false) then
 			UniversalAutoload.clearPalletFromAllVehicles(self, object)
-			UniversalAutoload.addAvailableObject(self, object)
 			return true
 		end
 	end
 end
 --
-function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
+function UniversalAutoload.buildObjectsToUnloadTable(vehicle, forceUnloadPosition)
 	local spec = vehicle.spec_universalAutoload
 	
 	spec.objectsToUnload = {}
@@ -3028,17 +3025,27 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle)
 				local offsetX = 0
 				local offsetZ = 0
 				
-				if spec.frontUnloadingOnly then
-					offsetZ = spec.loadVolume.length + spec.loadVolume.width/2
-				elseif spec.rearUnloadingOnly then
-					offsetZ = -spec.loadVolume.length - spec.loadVolume.width/2
-				else
-					if spec.isLogTrailer then
-						offsetX = 2*spec.loadVolume.width
-					else
+				if forceUnloadPosition then
+					if forceUnloadPosition == "rear" or forceUnloadPosition == "behind" then
+						offsetZ = -spec.loadVolume.length - spec.loadVolume.width/2
+					elseif forceUnloadPosition == "left" then
 						offsetX = 1.5*spec.loadVolume.width
+					elseif forceUnloadPosition == "right" then
+						offsetX = -1.5*spec.loadVolume.width
 					end
-					if spec.currentTipside == "right" then offsetX = -offsetX end
+				else
+					if spec.frontUnloadingOnly then
+						offsetZ = spec.loadVolume.length + spec.loadVolume.width/2
+					elseif spec.rearUnloadingOnly then
+						offsetZ = -spec.loadVolume.length - spec.loadVolume.width/2
+					else
+						if spec.isLogTrailer then
+							offsetX = 2*spec.loadVolume.width
+						else
+							offsetX = 1.5*spec.loadVolume.width
+						end
+						if spec.currentTipside == "right" then offsetX = -offsetX end
+					end
 				end
 
 				unloadPlace.node = createTransformGroup("unloadPlace")
@@ -5383,21 +5390,14 @@ function UniversalAutoload:ualUnload()
 		UniversalAutoload.startUnloading(self, true)
 	end
 end
--- function UniversalAutoload:ualGetTipside()
-	-- local spec = self.spec_universalAutoload
-	-- if spec~=nil and spec.isAutoloadEnabled then
-		-- print("UAL/AD - GET TIPSIDE: " .. tostring(spec.currentTipside))
-		-- return spec.currentTipside or "none"
-	-- end
-	-- return "none"
--- end
--- function UniversalAutoload:ualSetTipside(tipSideString)
-	-- local spec = self.spec_universalAutoload
-	-- if spec~=nil and spec.isAutoloadEnabled then
-		-- print("UAL/AD - SET TIPSIDE: " .. (tipSideString or "none"))
-		-- UniversalAutoload.setCurrentTipside(self, tipSideString or "none")
-	-- end
--- end
+
+function UniversalAutoload:ualSetUnloadPosition(unloadPosition)
+	local spec = self.spec_universalAutoload
+	if spec~=nil and spec.isAutoloadEnabled then
+		print("UAL/AD - SET UNLOAD POSITION: " .. tostring(unloadPosition))
+		spec.forceUnloadPosition = unloadPosition
+	end
+end
 
 
 --[[

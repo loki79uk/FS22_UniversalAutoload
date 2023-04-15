@@ -2,7 +2,7 @@
 <modDesc descVersion="73">
 
     <author>loki_79</author>
-    <version>1.3.1.16</version>
+    <version>1.4.0.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -78,7 +78,8 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Added support for compatibility with AutoDrive
 - High menu priority mode is now used by default
 - Improvements to the log loading algorithm
 - Improvements to round bale stacking
@@ -174,7 +175,8 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Unterstützung für die Kompatibilität mit AutoDrive hinzugefügt
 - Der Modus für hohe Menüpriorität wird nun standardmäßig verwendet
 - Verbesserungen am Algorithmus zum Laden von Stämmen
 - Verbesserungen bei der Stapelung von Rundballen
@@ -270,7 +272,8 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Ajout d'un support pour la compatibilité avec AutoDrive
 - Le mode de priorité élevée des menus est désormais utilisé par défaut
 - Amélioration de l'algorithme de chargement des grumes
 - Amélioration de l'empilage des balles rondes
@@ -366,7 +369,8 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Přidána podpora kompatibility s aplikací AutoDrive
 - Ve výchozím nastavení je nyní používán režim vysoké priority nabídky
 - Vylepšení algoritmu načítání protokolu
 - Vylepšení stohování kulatých balíků
@@ -462,7 +466,8 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Dodano wsparcie dla kompatybilności z AutoDrive
 - Tryb wysokiego priorytetu menu jest teraz używany domyślnie
 - Ulepszenia algorytmu ładowania kłód
 - Ulepszenia w układaniu bali okrągłych
@@ -559,7 +564,8 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- Se ha añadido compatibilidad con AutoDrive
 - El modo de prioridad alta del menú se utiliza ahora por defecto
 - Mejoras en el algoritmo de carga de troncos
 - Mejoras en el apilado de pacas redondas
@@ -656,7 +662,8 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
-v1.3.2.0
+v1.4.0.0
+- Suporte adicional para compatibilidade com a AutoDrive
 - O modo de alta prioridade do menu é agora usado por padrão
 - Melhorias no algoritmo de carregamento de logs
 - Melhorias no empilhamento de fardos redondos
@@ -752,7 +759,8 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
-v1.3.2.0
+v1.4.0.0
+- AutoDrive ile uyumluluk için destek eklendi
 - Yüksek menü önceliği modu artık varsayılan olarak kullanılıyor
 - Günlük yükleme algoritmasında iyileştirmeler
 - Yuvarlak balya istiflemede iyileştirmeler
@@ -849,7 +857,8 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
-v1.3.2.0
+v1.4.0.0
+- 增加了对与AutoDrive兼容的支持
 - 现在默认使用高菜单优先模式
 - 对原木加载算法的改进
 - 对圆捆堆放的改进

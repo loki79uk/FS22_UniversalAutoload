@@ -5370,19 +5370,6 @@ function UniversalAutoload:ualStopLoad()
 	end
 end
 
---[[
-	TODO:
-    What is the tipSideString to unload on the platform, i.e. pallet to disappear if reached the destination position?
-    What is the tipSideString to unload behind the vehicle / trailer?
-	
-	NOTE:
-	I have separated the unload AND get/set tip side functions (both commented out for now)
-	I think it is best to keep the tip side as selected in UAL for now
-		- Most trailers have ONLY left/right unloading
-		- Pickups etc. have ONLY rear unloading
-	
-	BUT I will work on adding all zones to all vehicles so that they can be selected via an external interface function
-]]
 function UniversalAutoload:ualUnload()
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
@@ -5394,7 +5381,7 @@ end
 function UniversalAutoload:ualSetUnloadPosition(unloadPosition)
 	local spec = self.spec_universalAutoload
 	if spec~=nil and spec.isAutoloadEnabled then
-		print("UAL/AD - SET UNLOAD POSITION: " .. tostring(unloadPosition))
+		-- print("UAL/AD - SET UNLOAD POSITION: " .. tostring(unloadPosition))
 		spec.forceUnloadPosition = unloadPosition
 	end
 end

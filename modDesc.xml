@@ -907,7 +907,7 @@ v1.0.2.0
     </description>
     
     <multiplayer supported="true" />
-    <iconFilename>modIcon.dds</iconFilename>
+    <iconFilename>icon_UniversalAutoload.dds</iconFilename>
     
     <extraSourceFiles>
         <sourceFile filename="UniversalAutoloadInstaller.lua" />

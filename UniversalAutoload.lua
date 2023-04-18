@@ -2211,8 +2211,8 @@ function UniversalAutoload:ualGetIsFilled()
 	local isFilled = false
 	if self.spec_fillVolume ~= nil then
 		for _, fillVolume in ipairs(self.spec_fillVolume.volumes) do
-			local capacity = self:ualGetFillUnitCapacity(fillVolume.fillUnitIndex)
-			local fillLevel = self:ualGetFillUnitFillLevel(fillVolume.fillUnitIndex)
+			local capacity = self:getFillUnitFillLevel(fillVolume.fillUnitIndex)
+			local fillLevel = self:getFillUnitFillLevel(fillVolume.fillUnitIndex)
 			if fillLevel > 0 then
 				isFilled = true
 			end

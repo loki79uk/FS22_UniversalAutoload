@@ -9,13 +9,17 @@ addModEventListener(UniversalAutoloadManager)
 -- specialisation
 g_specializationManager:addSpecialization('universalAutoload', 'UniversalAutoload', Utils.getFilename('UniversalAutoload.lua', g_currentModDirectory), "")
 
-for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
-	-- Anything with tension belts could potentially require autoload
-	if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
-		g_vehicleTypeManager:addSpecialization(vehicleName, UniversalAutoload.name .. '.universalAutoload')
-		-- print("  UAL INSTALLED: "..vehicleName)
+TypeManager.validateTypes = Utils.appendedFunction(TypeManager.validateTypes, function(self)
+	if self.typeName == "vehicle" then
+		for vehicleName, vehicleType in pairs(g_vehicleTypeManager.types) do
+		-- Anything with tension belts could potentially require autoload
+			if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
+				g_vehicleTypeManager:addSpecialization(vehicleName, UniversalAutoload.name .. '.universalAutoload')
+				print("  UAL INSTALLED: "..vehicleName)
+			end
+		end
 	end
-end
+end)
 
 -- Create a new store pack to group all UAL supported vehicles
 -- @Loki Cannot do this in the modDesc using 'storePacks.storePack' as Giants forgot to localise l10n

@@ -3462,7 +3462,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 							end
 						end
 						if not spec.currentLoadingPlace or spec.useHorizontalLoading or spec.isLogTrailer then
-							if not spec.useHorizontalLoading or (spec.useHorizontalLoading and not layerOverMaxHeight) then
+							if not spec.useHorizontalLoading or (spec.useHorizontalLoading and (ignoreHeightForContainer or not layerOverMaxHeight)) then
 								if UniversalAutoload.showDebug then print(string.format("ADDING NEW PLACE FOR: %s [%.3f, %.3f, %.3f]",
 								containerType.name, containerSizeX, containerSizeY, containerSizeZ)) end
 								UniversalAutoload.createLoadingPlace(self, containerType)

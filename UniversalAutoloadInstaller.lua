@@ -15,7 +15,7 @@ TypeManager.validateTypes = Utils.appendedFunction(TypeManager.validateTypes, fu
 		-- Anything with tension belts could potentially require autoload
 			if SpecializationUtil.hasSpecialization(TensionBelts, vehicleType.specializations) then
 				g_vehicleTypeManager:addSpecialization(vehicleName, UniversalAutoload.name .. '.universalAutoload')
-				print("  UAL INSTALLED: "..vehicleName)
+				-- print("  UAL INSTALLED: "..vehicleName)
 			end
 		end
 	end

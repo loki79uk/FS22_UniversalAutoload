@@ -2,7 +2,7 @@
 <modDesc descVersion="73">
 
     <author>loki_79</author>
-    <version>1.3.3.0</version>
+    <version>1.4.0.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -19,7 +19,7 @@
     </title>
     
     <description>
-<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included readme file for instructions on adding to your own mod trailers or pallets.
+<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included read-me file for instructions on adding to your own mod trailers or pallets.
 
 Features:
 - Loads any compatible pallet/container types (see list below)

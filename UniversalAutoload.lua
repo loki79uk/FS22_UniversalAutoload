@@ -2528,6 +2528,81 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				spec.spawnPalletsDelayTime = spec.spawnPalletsDelayTime + (spec.loadSpeedFactor*dt)
 			end
 		end
+		
+		-- CYCLE THROUGH A FULL TESTING PATTERN
+		if UniversalAutoloadManager.runFullTest == true and g_currentMission.controlledVehicle == self.rootVehicle then
+		
+			spec.testStage = spec.testStage or 1
+			spec.testDelayTime = spec.testDelayTime or 0
+			
+			if spec.spawnPallets~=true and spec.spawnLogs~=true and spec.spawnBales~=true then
+
+				if spec.testDelayTime > 1250 or spec.testStage == 1 then
+					spec.testDelayTime = 0
+					
+					print("TEST STAGE: " .. spec.testStage )
+					if spec.testStage == 1 then
+						UniversalAutoloadManager.originalMode = spec.useHorizontalLoading
+						spec.useHorizontalLoading = false
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets("EGG")
+					elseif spec.testStage == 2 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets("WOOL")
+					elseif spec.testStage == 3 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets("LIQUIDFERTILIZER")
+					elseif spec.testStage == 4 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets("LIME")
+					elseif spec.testStage == 5 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets()
+					elseif spec.testStage == 6 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddPallets()
+					elseif spec.testStage == 7 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_125()
+					elseif spec.testStage == 8 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_150()
+					elseif spec.testStage == 9 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_180()
+					elseif spec.testStage == 10 then
+						spec.useHorizontalLoading = true
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_125()
+					elseif spec.testStage == 11 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_150()
+					elseif spec.testStage == 12 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddRoundBales_180()
+					elseif spec.testStage == 13 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddSquareBales_180()
+					elseif spec.testStage == 14 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddSquareBales_220()
+					elseif spec.testStage == 15 then
+						spec.testStage = spec.testStage + 1
+						UniversalAutoloadManager:consoleAddSquareBales_240()
+					elseif spec.testStage == 16 then
+						spec.testStage = nil
+						UniversalAutoloadManager.runFullTest = false
+						UniversalAutoloadManager:consoleClearLoadedObjects()
+						spec.useHorizontalLoading = UniversalAutoloadManager.originalMode
+						print("FULL TEST COMPLETE!" )
+					end
+				else
+					spec.testDelayTime = spec.testDelayTime + dt
+				end
+				
+			end
+			
+		end
 
 		-- CHECK IF ANY PLAYERS ARE ACTIVE ON FOOT
 		local playerTriggerActive = false
@@ -3207,6 +3282,11 @@ function UniversalAutoload:createLoadingPlace(containerType)
 	local N, M, rotation
 	local shouldRotate = ((N2*M2) > (N1*M1)) or (((N2*M2)==(N1*M1)) and (N1>N2) and (N2*M2)>0)
 	local doRotate = (containerType.alwaysRotate or shouldRotate) and not containerType.neverRotate
+	
+	--ALWAYS ROTATE ROUNDBALES WITH HORIZONTAL LOADING
+	if isRoundbale == true and spec.useHorizontalLoading then
+		doRotate = true
+	end
 
 	if UniversalAutoload.showDebug then
 		print("-------------------------------")
@@ -3717,18 +3797,23 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 	end
 	
 	if self:ualGetIsFilled() then
+		-- print("ualGetIsFilled")
 		return false
 	end
 	if spec.noLoadingIfFolded and (self:ualGetIsFolding() or not self:getIsUnfolded()) then
+		-- print("noLoadingIfFolded")
 		return false
 	end
 	if spec.noLoadingIfUnfolded and (self:ualGetIsFolding() or self:getIsUnfolded()) then
+		-- print("noLoadingIfUnfolded")
 		return false
 	end
 	if spec.noLoadingIfCovered and self:ualGetIsCovered() then
+		-- print("noLoadingIfCovered")
 		return false
 	end
 	if spec.noLoadingIfUncovered and not self:ualGetIsCovered() then
+		-- print("noLoadingIfUncovered")
 		return false
 	end
 	
@@ -3757,6 +3842,7 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 
 	local node = UniversalAutoload.getObjectPositionNode( self )
 	if node == nil then
+		-- print("node == nil")
 		return false
 	end
 	

@@ -2,7 +2,7 @@
 <modDesc descVersion="73">
 
     <author>loki_79</author>
-    <version>1.4.0.0</version>
+    <version>1.4.0.1</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -915,7 +915,7 @@ v1.0.2.0
     
     <l10n filenamePrefix="language/l10n" />
     
-     <actions>
+    <actions>
         <action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
         <action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
         <action name="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>

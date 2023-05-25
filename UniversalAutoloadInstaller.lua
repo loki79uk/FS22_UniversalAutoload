@@ -1170,6 +1170,12 @@ function UniversalAutoloadManager.resetVehicle(vehicle)
 end
 --
 
+function UniversalAutoloadManager.consoleFullTest()
+
+	UniversalAutoloadManager.runFullTest = true
+
+end
+
 -- MAIN LOAD MAP FUNCTION
 function UniversalAutoloadManager:loadMap(name)
 
@@ -1285,6 +1291,9 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
 		addConsoleCommand("ualSpawnTestPallets", "Create one of each pallet type (not loaded)", "consoleSpawnTestPallets", UniversalAutoloadManager)
 		
+		addConsoleCommand("ualFullTest", "Test all the different loading types", "consoleFullTest", UniversalAutoloadManager)
+		
+		
 		local oldCleanUp = getmetatable(_G).__index.cleanUp
 		getmetatable(_G).__index.cleanUp = function()
 			-- print("UNIVERSAL AUTOLOAD: CLEAN UP")
@@ -1302,6 +1311,8 @@ function UniversalAutoloadManager:loadMap(name)
 			removeConsoleCommand("ualImportUserConfigurations")
 			removeConsoleCommand("ualCreateBoundingBox")
 			removeConsoleCommand("ualSpawnTestPallets")
+			
+			removeConsoleCommand("ualFullTest")
 			oldCleanUp()
 		end
 	end

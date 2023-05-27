@@ -3028,7 +3028,7 @@ function UniversalAutoload:loadObject(object, chargeForLoading)
 		
 			--ALTERNATE LOG ORIENTATION FOR EACH LAYER
 			local rotateLogs = object.isSplitShape and (math.random(0,1) > 0.5);
-			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, rotateLogs, spec.baleCollectionMode) then
+			if UniversalAutoload.moveObjectNodes(self, object, loadPlace, true, rotateLogs) then
 				UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				UniversalAutoload.addLoadedObject(self, object)
 				
@@ -3607,12 +3607,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 											thisLoadHeight = thisLoadHeight + increment
 										end
 									end
-									
-									if thisLoadPlace.useRoundbalePacking == false then
-										spec.loadSpeedFactor = 5
-									end
 								else
-								
 									while thisLoadHeight >= -increment do
 										setTranslation(thisLoadPlace.node, x0, thisLoadHeight, z0)
 										if UniversalAutoload.testLocationIsEmpty(self, thisLoadPlace, object)
@@ -4271,8 +4266,9 @@ function UniversalAutoload:addBaleModeBale(node)
 	setRotation(node, rx, ry, rz)
 end
 --
-function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateLogs, baleMode )
+function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateLogs )
 
+	local spec = self.spec_universalAutoload
 	local rootNodes = UniversalAutoload.getRootNodes(object)
 	local node = rootNodes[1]
 	if node ~= nil and node ~= 0 and entityExists(node) then
@@ -4316,6 +4312,14 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 
 		end
 		
+		-- ROUND BALE ROTATION
+		if object.isRoundbale and spec.useHorizontalLoading then
+			local rx,ry,rz = localRotationToWorld(position.node, 0, 0, math.pi/4)
+			n[1].rx = rx
+			n[1].ry = ry
+			n[1].rz = rz
+		end
+		
 		-- SHIPPING CONTAINER ROTATION
 		if UniversalAutoload.isShippingContainer(object) and isLoading then
 			local rx,ry,rz = localRotationToWorld(position.node, 0, math.pi, 0)
@@ -4344,7 +4348,7 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 
 		end
 
-		if baleMode==true and object.isRoundbale~=nil then
+		if spec.baleCollectionMode==true and object.isRoundbale~=nil then
 			UniversalAutoload.addBaleModeBale(self, node)
 		else
 			UniversalAutoload.addToPhysics(self, object)

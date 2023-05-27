@@ -1290,9 +1290,7 @@ function UniversalAutoloadManager:loadMap(name)
 		addConsoleCommand("ualImportUserConfigurations", "Force reload configurations from mod settings", "consoleImportUserConfigurations", UniversalAutoloadManager)
 		addConsoleCommand("ualCreateBoundingBox", "Create a bounding box around all loaded pallets", "consoleCreateBoundingBox", UniversalAutoloadManager)
 		addConsoleCommand("ualSpawnTestPallets", "Create one of each pallet type (not loaded)", "consoleSpawnTestPallets", UniversalAutoloadManager)
-		
 		addConsoleCommand("ualFullTest", "Test all the different loading types", "consoleFullTest", UniversalAutoloadManager)
-		
 		
 		local oldCleanUp = getmetatable(_G).__index.cleanUp
 		getmetatable(_G).__index.cleanUp = function()
@@ -1311,7 +1309,6 @@ function UniversalAutoloadManager:loadMap(name)
 			removeConsoleCommand("ualImportUserConfigurations")
 			removeConsoleCommand("ualCreateBoundingBox")
 			removeConsoleCommand("ualSpawnTestPallets")
-			
 			removeConsoleCommand("ualFullTest")
 			oldCleanUp()
 		end

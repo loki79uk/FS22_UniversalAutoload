@@ -3156,7 +3156,7 @@ function UniversalAutoload.buildObjectsToUnloadTable(vehicle, forceUnloadPositio
 				break
 			end
 		end
-		if (not thisAreaClear and not object.isSplitShape) or unloadPlace.heightAboveGround > 0 then
+		if (not thisAreaClear and not object.isSplitShape and not object.isRoundbale) or unloadPlace.heightAboveGround > 0 then
 			spec.unloadingAreaClear = false
 		end
 	end
@@ -4314,7 +4314,8 @@ function UniversalAutoload:moveObjectNodes( object, position, isLoading, rotateL
 		
 		-- ROUND BALE ROTATION
 		if object.isRoundbale and spec.useHorizontalLoading then
-			local rx,ry,rz = localRotationToWorld(position.node, 0, 0, math.pi/4)
+			local rotation = isLoading and math.pi/4 or 0
+			local rx,ry,rz = localRotationToWorld(position.node, 0, 0, rotation)
 			n[1].rx = rx
 			n[1].ry = ry
 			n[1].rz = rz

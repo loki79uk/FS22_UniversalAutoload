@@ -2221,6 +2221,24 @@ function UniversalAutoload:ualGetIsFilled()
 	return isFilled
 end
 --
+function UniversalAutoload:ualGetPalletCanDischargeToTrailer(object)
+	local isSupported = false
+	if object.spec_dischargeable and object.spec_dischargeable.currentDischargeNode then
+		local currentDischargeNode = object.spec_dischargeable.currentDischargeNode
+		local fillType = object:getDischargeFillType(currentDischargeNode)
+		
+		if self.spec_fillVolume ~= nil then
+			for _, fillVolume in ipairs(self.spec_fillVolume.volumes) do
+				if self:getFillUnitAllowsFillType(fillVolume.fillUnitIndex, fillType) then
+					isSupported = true
+				end
+			end		
+		end
+		--print("fillType: "..tostring(fillType)..": "..g_fillTypeManager:getFillTypeNameByIndex(fillType).." - "..tostring(isSupported))
+	end
+	return isSupported
+end
+--
 function UniversalAutoload:ualGetIsMoving()
 	return self.lastSpeedReal > 0.0005
 end
@@ -2845,19 +2863,29 @@ function UniversalAutoload:isValidForLoading(object)
 	if UniversalAutoload.isShippingContainer(object) and object.spec_woodContainer.targetLength > maxLength then
 		return false
 	end
+	if UniversalAutoload.ualGetPalletCanDischargeToTrailer(self, object) then
+		return false
+	end
 	
-	local isSelectedMaterial = UniversalAutoload.getPalletIsSelectedMaterial(self, object)
-	local isSelectedContainer = UniversalAutoload.getPalletIsSelectedContainer(self, object)
+	if not UniversalAutoload.getPalletIsSelectedMaterial(self, object) then
+		return false
+	end
+	if not UniversalAutoload.getPalletIsSelectedContainer(self, object) then
+		return false
+	end
+	
 	local isBeingManuallyLoaded = spec.autoLoadingObjects[object] ~= nil
 	local isValidLoadSide = spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object)
+	if not (isBeingManuallyLoaded or isValidLoadSide) then
+		return false
+	end
+	
 	local isValidLoadFilter = not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) or UniversalAutoload.isShippingContainer(object)
-	-- print("isSelectedMaterial: " .. tostring( isSelectedMaterial ))
-	-- print("isSelectedContainer: " .. tostring(  isSelectedContainer ))
-	-- print("isBeingManuallyLoaded: " .. tostring(  isBeingManuallyLoaded ))
-	-- print("isValidLoadSide: " .. tostring(  isValidLoadSide ))
-	-- print("isValidLoadFilter: " .. tostring(  isValidLoadFilter ))
-
-	return isSelectedMaterial and isSelectedContainer and (isBeingManuallyLoaded or isValidLoadSide) and (UniversalAutoload.manualLoadingOnly or isValidLoadFilter)
+	if not (UniversalAutoload.manualLoadingOnly or isValidLoadFilter) then
+		return false
+	end
+	
+	return true
 end
 --
 function UniversalAutoload:isValidForUnloading(object)

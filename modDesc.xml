@@ -3,7 +3,7 @@
 
     <author>loki_79</author>
     <version>1.4.0.4</version>
-    
+
     <title>
         <en>Universal Autoload</en>
         <!-- <de>Universal Autoload</de> -->
@@ -17,9 +17,9 @@
         <tr>Evrensel Otomatik Yükleme</tr>
         <cs>通用自动装载</cs>
     </title>
-    
+
     <description>
-<en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included read-me file for instructions on adding to your own mod trailers or pallets.
+        <en><![CDATA[Autoloading specialisation for flatbed trailers.  This automatically modifies the actual base game trailers, and will be applied to any new or existing trailers on your farm.  Please see the included read-me file for instructions on adding to your own mod trailers or pallets.
 
 Features:
 - Loads any compatible pallet/container types (see list below)
@@ -124,9 +124,9 @@ v1.1.0.0
 v1.0.2.0
  - Updated to work with 1.4.1.0
 ]]>
-</en>
+        </en>
 
-<de><![CDATA[Fügt die automatische Ladefähigkeit für Transportanhänger und Pritschen hinzu.  Die Änderung gilt automatisch für alle kompatiblen Grundausrüstungen im Spiel. Sie wird sowohl für die bereits auf deiner Farm vorhandenen Geräte als auch für zukünftige Käufe angewendet. Die README-Datei enthält die notwendigen Hinweise, um Ihre eigenen modellierten Anhänger oder Paletten hinzuzufügen.
+        <de><![CDATA[Fügt die automatische Ladefähigkeit für Transportanhänger und Pritschen hinzu.  Die Änderung gilt automatisch für alle kompatiblen Grundausrüstungen im Spiel. Sie wird sowohl für die bereits auf deiner Farm vorhandenen Geräte als auch für zukünftige Käufe angewendet. Die README-Datei enthält die notwendigen Hinweise, um Ihre eigenen modellierten Anhänger oder Paletten hinzuzufügen.
 
 Funktionen:
 - Lädt jede Art von kompatiblen Paletten oder Containern (siehe Liste unten)
@@ -221,9 +221,9 @@ v1.1.0.0
 v1.0.2.0
 - Aktualisiert für die Verwendung mit 1.4.1.0
 ]]>
-</de>
+        </de>
 
-<fr><![CDATA[Ajoute la capacité de chargement automatique pour les remorques de transport et les plateaux.  La modification est automatique pour tous les équipements compatibles de base dans le jeu. Elle est appliquée pour les équipements déjà présents dans votre ferme aussi bien que pour vos futurs achats. Le fichier README donne les indications nécessaires pour ajouter vos propres remorques ou palettes moddées.
+        <fr><![CDATA[Ajoute la capacité de chargement automatique pour les remorques de transport et les plateaux.  La modification est automatique pour tous les équipements compatibles de base dans le jeu. Elle est appliquée pour les équipements déjà présents dans votre ferme aussi bien que pour vos futurs achats. Le fichier README donne les indications nécessaires pour ajouter vos propres remorques ou palettes moddées.
 
 Fonctionnalités :
 - Charge tout type de palettes ou conteneurs compatibles (voir liste ci-dessous)
@@ -318,9 +318,9 @@ v1.1.0.0
 v1.0.2.0
 - Mis à jour pour fonctionner avec la version 1.4.1.0
 ]]>
-</fr>
+        </fr>
 
-<cz><![CDATA[Specializace automatického nakládání pro valníkové přívěsy. Mód automaticky upraví přívěsy ze základní hry a použije se na všechny nové nebo stávající přívěsy na vaší farmě. Pokyny pro přidávání do vašich vlastních modifikačních přívěsů nebo palet naleznete v přiloženém souboru README.
+        <cz><![CDATA[Specializace automatického nakládání pro valníkové přívěsy. Mód automaticky upraví přívěsy ze základní hry a použije se na všechny nové nebo stávající přívěsy na vaší farmě. Pokyny pro přidávání do vašich vlastních modifikačních přívěsů nebo palet naleznete v přiloženém souboru README.
 
 Funkce:
 - Naloží všechny kompatibilní typy palet/kontejnerů (viz seznam níže)
@@ -417,9 +417,9 @@ v1.0.2.0
 
 CZ překlad: SniperKittenCZ
 ]]>
-</cz>
+        </cz>
 
-<pl><![CDATA[Specjalizacja autoloading dla przyczep z platformą. To automatycznie modyfikuje rzeczywiste zwiastuny gry podstawowej i zostanie zastosowane do wszystkich nowych lub istniejących zwiastunów na twojej farmie. Proszę zapoznać się z plikiem README, aby uzyskać instrukcje dotyczące dodawania do własnych przyczep lub palet z modami.
+        <pl><![CDATA[Specjalizacja autoloading dla przyczep z platformą. To automatycznie modyfikuje rzeczywiste zwiastuny gry podstawowej i zostanie zastosowane do wszystkich nowych lub istniejących zwiastunów na twojej farmie. Proszę zapoznać się z plikiem README, aby uzyskać instrukcje dotyczące dodawania do własnych przyczep lub palet z modami.
 Cechy:
 - Ładuje dowolne kompatybilne typy palet/kontenerów (patrz lista poniżej)
 - Załadunek tarcicy na dowolny pojazd leśny
@@ -514,8 +514,8 @@ v1.0.2.0
 
 TRANSLATION - PL by ELRICOFATAL
 ]]>
-</pl>
-<es><![CDATA[Especialización autoload para tráilers. Modifica automáticamente los tráilers del juego base, y se aplica a cualquier existente o nuevo. Por favor consulte el archivo README para instrucciones o para añadir este mod a tus propios tráilers o palés.
+        </pl>
+        <es><![CDATA[Especialización autoload para tráilers. Modifica automáticamente los tráilers del juego base, y se aplica a cualquier existente o nuevo. Por favor consulte el archivo README para instrucciones o para añadir este mod a tus propios tráilers o palés.
 
 Características:
 - Carga cualquier palé/contenedor compatible (ver lista abajo)
@@ -612,8 +612,8 @@ v1.0.2.0
 
 TRANSLATION - ES by Aphroo7
 ]]>
-</es>
-<br><![CDATA[Especialização em carregamento automático para reboques planos. Isso modifica automaticamente os trailers reais do jogo base e será aplicado a quaisquer trailers novos ou existentes em sua fazenda. Consulte o arquivo README para obter instruções sobre como adicionar seus próprios trailers ou paletes de mods.
+        </es>
+        <br><![CDATA[Especialização em carregamento automático para reboques planos. Isso modifica automaticamente os trailers reais do jogo base e será aplicado a quaisquer trailers novos ou existentes em sua fazenda. Consulte o arquivo README para obter instruções sobre como adicionar seus próprios trailers ou paletes de mods.
 
 Características:
 - Carrega qualquer tipo de palete/contêiner compatível (veja a lista abaixo)
@@ -710,8 +710,8 @@ v1.0.2.0
 
 TRADUÇÃO - BR por Myiamoto86
 ]]>
-</br>
-<tr><![CDATA[Düz yataklı römorklar için otomatik yükleme uzmanlığı. Bu gerçek temel oyun römorklarını ve dorselerini otomatik olarak değiştirir ve çiftliğinizdeki tüm yeni veya mevcut römork ve dorselere uygulanır. Kendi mod römorklarınıza veya paletlerinize ekleme talimatları için lütfen birlikte verilen "readme" dosyasına bakın.
+        </br>
+        <tr><![CDATA[Düz yataklı römorklar için otomatik yükleme uzmanlığı. Bu gerçek temel oyun römorklarını ve dorselerini otomatik olarak değiştirir ve çiftliğinizdeki tüm yeni veya mevcut römork ve dorselere uygulanır. Kendi mod römorklarınıza veya paletlerinize ekleme talimatları için lütfen birlikte verilen "readme" dosyasına bakın.
 
 Özellikler:
 - Herhangi bir uyumlu palet tipini yükler (aşağıdaki listeye bakın)
@@ -807,8 +807,8 @@ v1.0.2.0
   
 ÇEVİRİ - RedBeard54
 ]]>
-</tr>
-<cs><![CDATA[平板拖车的自动装载专业化。 这将自动修改游戏拖车，并将应用于你的农场上任何新的或现有的拖车。 关于如何添加到你自己的mod拖车或货盘上，请看附带的readme文件的说明。
+        </tr>
+        <cs><![CDATA[平板拖车的自动装载专业化。 这将自动修改游戏拖车，并将应用于你的农场上任何新的或现有的拖车。 关于如何添加到你自己的mod拖车或货盘上，请看附带的readme文件的说明。
 
 特点
 - 加载任何兼容的托盘/容器类型（见下面的列表）
@@ -903,18 +903,19 @@ v1.1.0.0
 v1.0.2.0
  - 已更新以适用于1.4.1.0版本
  ]]>
- </cs>
+        </cs>
     </description>
-    
+
     <multiplayer supported="true" />
     <iconFilename>icon_UniversalAutoload.dds</iconFilename>
-    
+
     <extraSourceFiles>
+        <sourceFile filename="hud/UniversalAutoloadHud.lua" />
         <sourceFile filename="UniversalAutoloadInstaller.lua" />
     </extraSourceFiles>
-    
+
     <l10n filenamePrefix="language/l10n" />
-    
+
     <actions>
         <action name="UNIVERSALAUTOLOAD_TOGGLE_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
         <action name="UNIVERSALAUTOLOAD_UNLOAD_ALL" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
@@ -934,57 +935,57 @@ v1.0.2.0
         <action name="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
         <action name="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" category="VEHICLE" axisType="HALF" ignoreComboMask="false"/>
     </actions>
-    
+
     <inputBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_LOADING">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_r" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL" >
+        <actionBinding action="UNIVERSALAUTOLOAD_UNLOAD_ALL">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_i" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_u" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_FILTER">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_o" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL">
             <binding device="KB_MOUSE_DEFAULT" input="" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW" >
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_FW">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_y" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW" >
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_MATERIAL_BW">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS" >
+        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_MATERIALS">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_y" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW" >
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_FW">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_t" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW" >
+        <actionBinding action="UNIVERSALAUTOLOAD_CYCLE_CONTAINER_BW">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_t" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS" >
+        <actionBinding action="UNIVERSALAUTOLOAD_SELECT_ALL_CONTAINERS">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BELTS">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_l" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_DOOR">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_CURTAIN">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_DEBUG">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_f12" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_SHOW_LOADING">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f12" />
         </actionBinding>
-        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" >
+        <actionBinding action="UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lshift KEY_r" />
         </actionBinding>
     </inputBinding>

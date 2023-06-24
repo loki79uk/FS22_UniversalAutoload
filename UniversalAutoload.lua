@@ -39,7 +39,6 @@ source(g_currentModDirectory.."events/UnloadingEvent.lua")
 source(g_currentModDirectory.."events/UpdateActionEvents.lua")
 source(g_currentModDirectory.."events/WarningMessageEvent.lua")
 
-
 -- REQUIRED SPECIALISATION FUNCTIONS
 function UniversalAutoload.prerequisitesPresent(specializations)
 	return SpecializationUtil.hasSpecialization(TensionBelts, specializations)
@@ -557,6 +556,7 @@ function UniversalAutoload:updateCycleMaterialActionEvent()
 			local materialTypeText = g_i18n:getText("universalAutoload_materialType")..": "..UniversalAutoload.getSelectedMaterialText(self)
 			g_inputBinding:setActionEventText(spec.cycleMaterialActionEventId, materialTypeText)
 			g_inputBinding:setActionEventTextVisibility(spec.cycleMaterialActionEventId, true)
+			UniversalAutoloadHud:updateMaterial(materialTypeText)
 		end
 
 	end
@@ -572,6 +572,7 @@ function UniversalAutoload:updateCycleContainerActionEvent()
 			local containerTypeText = g_i18n:getText("universalAutoload_containerType")..": "..UniversalAutoload.getSelectedContainerText(self)
 			g_inputBinding:setActionEventText(spec.cycleContainerActionEventId, containerTypeText)
 			g_inputBinding:setActionEventTextVisibility(spec.cycleContainerActionEventId, true)
+			UniversalAutoloadHud:updateContainer(containerTypeText)
 		end
 	end
 end
@@ -590,6 +591,7 @@ function UniversalAutoload:updateToggleFilterActionEvent()
 		end
 		g_inputBinding:setActionEventText(spec.toggleLoadingFilterActionEventId, loadingFilterText)
 		g_inputBinding:setActionEventTextVisibility(spec.toggleLoadingFilterActionEventId, true)
+		UniversalAutoloadHud:updateFilter(loadingFilterText)
 	end
 end
 --
@@ -607,6 +609,7 @@ function UniversalAutoload:updateHorizontalLoadingActionEvent()
 		end
 		g_inputBinding:setActionEventText(spec.toggleHorizontalLoadingActionEventId, horizontalLoadingText)
 		g_inputBinding:setActionEventTextVisibility(spec.toggleHorizontalLoadingActionEventId, true)
+		UniversalAutoloadHud:updateHorizontalLoading(horizontalLoadingText)
 	end
 end
 --
@@ -622,6 +625,7 @@ function UniversalAutoload:updateToggleTipsideActionEvent()
 			local tipsideText = g_i18n:getText("universalAutoload_tipside")..": "..g_i18n:getText("universalAutoload_"..(spec.currentTipside or "none"))
 			g_inputBinding:setActionEventText(spec.toggleTipsideActionEventId, tipsideText)
 			g_inputBinding:setActionEventTextVisibility(spec.toggleTipsideActionEventId, true)
+			UniversalAutoloadHud:updateTipside(tipsideText)
 		end
 	end
 end
@@ -2747,7 +2751,9 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 			UniversalAutoload.determineTipside(self)
 			UniversalAutoload.countActivePallets(self)
 			UniversalAutoload.drawDebugDisplay(self, isActiveForInput)
-
+			if not g_gui:getIsGuiVisible() and not g_noHudModeEnabled then
+				UniversalAutoloadManager.infoTextHud:draw()
+			end
 		end
 	end
 end

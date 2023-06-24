@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Carregar"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Modo de coleta automática de fardos"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Descarregar"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Descarregar à força"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Lado p/ descarregar"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Filtro de carregamento"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Alternar carregamento horizontal"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Iniciar carregamento"/>
 		<text name="universalAutoload_stopLoading" text="Parar carregamento"/>
 		<text name="universalAutoload_unloadAll" text="Descarregar"/>
+		<text name="universalAutoload_unloadAllForce" text="Descarregar à força"/>
 		<text name="universalAutoload_baleMode" text="Modo Auto Fardo"/>
 		<text name="universalAutoload_enabled" text="Habilitado"/>
 		<text name="universalAutoload_disabled" text="Deficiente"/>

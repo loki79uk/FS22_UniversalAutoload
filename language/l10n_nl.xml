@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Laden starten/stoppen"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Automatische balenophaalmodus"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Lossen"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Forceer lossen"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Schakelaar loszijde"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Schakelaar laad filter"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Toggle horizontaal laden"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Start laden"/>
 		<text name="universalAutoload_stopLoading" text="Stop laden"/>
 		<text name="universalAutoload_unloadAll" text="Lossen"/>
+		<text name="universalAutoload_unloadAllForce" text="Forceer lossen"/>
 		<text name="universalAutoload_baleMode" text="Auto-Bale Mode"/>
 		<text name="universalAutoload_enabled" text="Ingeschakeld"/>
 		<text name="universalAutoload_disabled" text="Uitgeschakeld"/>

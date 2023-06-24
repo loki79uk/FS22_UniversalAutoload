@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Přepnout nakládání"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Režim automatického sběru balíků"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Vyložit"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Nucené Vyložit"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Přepnout stranu vykládky"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Přepnout filtr nakládky"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Přepínání horizontálního zatížení"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Začít nakládku"/>
 		<text name="universalAutoload_stopLoading" text="Zastavit nakládku"/>
 		<text name="universalAutoload_unloadAll" text="Vyložit"/>
+		<text name="universalAutoload_unloadAllForce" text="Nucené Vyložit"/>
 		<text name="universalAutoload_baleMode" text="Sbírka Auto-Bale Režim"/>
 		<text name="universalAutoload_enabled" text="Povoleno"/>
 		<text name="universalAutoload_disabled" text="Zakázáno"/>

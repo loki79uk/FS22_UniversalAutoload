@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="切换装载"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="自动捡包模式"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="卸载"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="强制卸货"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="切换卸载端"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="切换装载过滤器"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="切换水平装载"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="开始装载"/>
 		<text name="universalAutoload_stopLoading" text="停止装载"/>
 		<text name="universalAutoload_unloadAll" text="卸载"/>
+		<text name="universalAutoload_unloadAllForce" text="强制卸货"/>
 		<text name="universalAutoload_baleMode" text="自动打包模式"/>
 		<text name="universalAutoload_enabled" text="已启用"/>
 		<text name="universalAutoload_disabled" text="已停用"/>

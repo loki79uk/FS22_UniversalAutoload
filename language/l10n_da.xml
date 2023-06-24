@@ -5,6 +5,7 @@
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_LOADING" text="Skift pålæsning"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_BALE_COLLECTION" text="Automatisk Balle Læsnings Mode"/>
 		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL" text="Aflæs"/>
+		<text name="input_UNIVERSALAUTOLOAD_UNLOAD_ALL_FORCE" text="Tvungen aflæs"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_TIPSIDE" text="Skift aflæsnings side"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_FILTER" text="Skift læsnings type"/>
 		<text name="input_UNIVERSALAUTOLOAD_TOGGLE_HORIZONTAL" text="Skift horisontal læsning"/>
@@ -38,6 +39,7 @@
 		<text name="universalAutoload_startLoading" text="Start læsning"/>
 		<text name="universalAutoload_stopLoading" text="Stop læsning"/>
 		<text name="universalAutoload_unloadAll" text="Aflæs"/>
+		<text name="universalAutoload_unloadAllForce" text="Tvungen aflæs"/>
 		<text name="universalAutoload_baleMode" text="Auto-Balle Mode"/>
 		<text name="universalAutoload_enabled" text="Til"/>
 		<text name="universalAutoload_disabled" text="Fra"/>

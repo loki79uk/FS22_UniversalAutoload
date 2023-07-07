@@ -302,11 +302,14 @@ function UniversalAutoload:OverwrittenUpdateObjects(superFunc, ...)
 					closestVehicle.spec_universalAutoload.updateKeys = true
 				end
 			end
+		
+			if UniversalAutoload.lastClosestVehicle ~= nil then
+				UniversalAutoload.forceRaiseActive(UniversalAutoload.lastClosestVehicle)
+			end
 		end
 		
 		if UniversalAutoload.lastClosestVehicle ~= nil then
 			UniversalAutoload.printHelpText(UniversalAutoload.lastClosestVehicle)
-			UniversalAutoload.forceRaiseActive(UniversalAutoload.lastClosestVehicle)
 		end
 	end
 end

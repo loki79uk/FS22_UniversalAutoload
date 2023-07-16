@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="73">
+<modDesc descVersion="75">
 
     <author>loki_79</author>
-    <version>1.4.0.5</version>
+    <version>1.4.1.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -78,6 +78,10 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
+v1.4.1.0
+- Added vehicle settings for HayAndForagePack DLC
+- Improved loading and unloading of round bales
+- Improved frame rate when operating vehicles on foot
 v1.4.0.0
 - Added support for compatibility with AutoDrive
 - High menu priority mode is now used by default
@@ -175,6 +179,10 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.4.1.0
+- Fahrzeugeinstellungen für HayAndForagePack DLC hinzugefügt
+- Verbessertes Be- und Entladen von Rundballen
+- Verbesserte Framerate beim Betrieb von Fahrzeugen zu Fuß
 v1.4.0.0
 - Unterstützung für die Kompatibilität mit AutoDrive hinzugefügt
 - Der Modus für hohe Menüpriorität wird nun standardmäßig verwendet
@@ -272,6 +280,10 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.4.1.0
+- Ajout des paramètres du véhicule pour le DLC HayAndForagePack
+- Amélioration du chargement et du déchargement des balles rondes
+- Amélioration du taux de rafraîchissement lors de la conduite de véhicules à pied
 v1.4.0.0
 - Ajout d'un support pour la compatibilité avec AutoDrive
 - Le mode de priorité élevée des menus est désormais utilisé par défaut
@@ -369,6 +381,10 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.4.1.0
+- Přidáno nastavení vozidla pro DLC HayAndForagePack
+- Vylepšeno nakládání a vykládání kulatých balíků
+- Vylepšená snímková frekvence při pěším ovládání vozidel
 v1.4.0.0
 - Přidána podpora kompatibility s aplikací AutoDrive
 - Ve výchozím nastavení je nyní používán režim vysoké priority nabídky
@@ -466,6 +482,10 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.4.1.0
+- Dodano ustawienia pojazdu dla DLC HayAndForagePack.
+- Poprawiono ładowanie i rozładowywanie bel okrągłych
+- Poprawiono liczbę klatek na sekundę podczas obsługi pojazdów pieszo
 v1.4.0.0
 - Dodano wsparcie dla kompatybilności z AutoDrive
 - Tryb wysokiego priorytetu menu jest teraz używany domyślnie
@@ -564,6 +584,10 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.4.1.0
+- Añadidos ajustes del vehículo para HayAndForagePack DLC
+- Mejoras en la carga y descarga de pacas redondas.
+- Mejora de la velocidad de fotogramas al manejar vehículos a pie
 v1.4.0.0
 - Se ha añadido compatibilidad con AutoDrive
 - El modo de prioridad alta del menú se utiliza ahora por defecto
@@ -662,6 +686,10 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.4.1.0
+- Adicionadas configurações de veículo para o DLC HayAndForagePack
+- Melhoria no carregamento e descarregamento de fardos redondos
+- Melhoria na taxa de quadros ao operar veículos a pé
 v1.4.0.0
 - Suporte adicional para compatibilidade com a AutoDrive
 - O modo de alta prioridade do menu é agora usado por padrão
@@ -759,6 +787,10 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+v1.4.1.0
+- HayAndForagePack DLC'si için araç ayarları eklendi
+- Yuvarlak balyaların daha iyi yüklenmesi ve boşaltılması
+- Araçları yaya olarak kullanırken kare hızı iyileştirildi
 v1.4.0.0
 - AutoDrive ile uyumluluk için destek eklendi
 - Yüksek menü önceliği modu artık varsayılan olarak kullanılıyor
@@ -857,6 +889,10 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
+v1.4.1.0
+- 为HayAndForagePack DLC添加了车辆设置
+- 改进了圆包的装载和卸载
+- 提高了步行操作车辆时的帧率
 v1.4.0.0
 - 增加了对与AutoDrive兼容的支持
 - 现在默认使用高菜单优先模式

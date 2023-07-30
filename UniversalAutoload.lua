@@ -1047,7 +1047,7 @@ function UniversalAutoload:startLoading(force, noEventSend)
 		
 			spec.loadDelayTime = math.huge
 			if not spec.baleCollectionMode and UniversalAutoload.testLoadAreaIsEmpty(self) then
-				spec.resetLoadingPattern = true
+				UniversalAutoload.resetLoadingArea(self)
 			end
 		
 			spec.sortedObjectsToLoad = UniversalAutoload.createSortedObjectsToLoad(self, spec.availableObjects)
@@ -1165,11 +1165,7 @@ function UniversalAutoload:startUnloading(force, noEventSend)
 				spec.currentLoadingPlace = nil
 				if spec.totalUnloadCount == 0 then
 					if UniversalAutoload.showDebug then print("FULLY UNLOADED...") end
-					UniversalAutoload.resetLoadingLayer(self)
-					UniversalAutoload.resetLoadingPattern(self)
-					spec.trailerIsFull = false
-					spec.partiallyUnloaded = false
-					spec.currentLoadAreaIndex = 1
+					UniversalAutoload.resetLoadingArea(self)
 				else
 					if UniversalAutoload.showDebug then print("PARTIALLY UNLOADED...") end
 					spec.partiallyUnloaded = true
@@ -3196,8 +3192,7 @@ function UniversalAutoload.clearPalletFromAllVehicles(self, object)
 				if self ~= vehicle then
 					local SPEC = vehicle.spec_universalAutoload
 					if SPEC.totalUnloadCount == 0 then
-						SPEC.resetLoadingLayer = true
-						SPEC.resetLoadingPattern = true
+						UniversalAutoload.resetLoadingArea(vehicle)
 						vehicle:setAllTensionBeltsActive(false)
 					elseif loadedObjectRemoved then
 						if vehicle.spec_tensionBelts.areBeltsFasten then
@@ -3482,6 +3477,15 @@ function UniversalAutoload:resetLoadingLayer()
 	spec.resetLoadingLayer = false
 end
 --
+function UniversalAutoload:resetLoadingArea()
+	local spec = self.spec_universalAutoload
+	UniversalAutoload.resetLoadingLayer(self)
+	UniversalAutoload.resetLoadingPattern(self)
+	spec.trailerIsFull = false
+	spec.partiallyUnloaded = false
+	spec.currentLoadAreaIndex = 1
+end
+--
 function UniversalAutoload:getLoadPlace(containerType, object)
 	local spec = self.spec_universalAutoload
 	
@@ -3693,7 +3697,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 		end
 		spec.currentLoadAreaIndex = 1
 		if (spec.isLogTrailer and spec.currentLayerCount < UniversalAutoload.maxLayerCount)
-		or (spec.useHorizontalLoading and spec.currentLayerCount < 5)
+		or (spec.useHorizontalLoading and spec.currentLayerCount < UniversalAutoload.maxLayerCount)
 		and not (spec.baleCollectionMode and spec.nextLayerHeight == 0) then
 			spec.currentLayerCount = spec.currentLayerCount + 1
 			spec.currentLoadingPlace = nil
@@ -4487,11 +4491,7 @@ function UniversalAutoload:removeLoadedObject(object)
 		end
 		if next(spec.loadedObjects) == nil then
 			if UniversalAutoload.showDebug then print("FULLY UNLOADED..") end
-			UniversalAutoload.resetLoadingLayer(self)
-			UniversalAutoload.resetLoadingPattern(self)
-			spec.trailerIsFull = false
-			spec.partiallyUnloaded = false
-			spec.currentLoadAreaIndex = 1
+			UniversalAutoload.resetLoadingArea(self)
 		else
 			spec.partiallyUnloaded = true
 		end
@@ -4841,10 +4841,7 @@ function UniversalAutoload:clearLoadedObjects()
 		end
 		spec.loadedObjects = {}
 		spec.totalUnloadCount = 0
-		UniversalAutoload.resetLoadingLayer(self)
-		UniversalAutoload.resetLoadingPattern(self)
-		spec.trailerIsFull = false
-		spec.partiallyUnloaded = false
+		UniversalAutoload.resetLoadingArea(self)
 	end
 	return palletCount, balesCount, logCount
 end

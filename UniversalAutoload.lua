@@ -3535,7 +3535,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				local volume = containerSizeX * containerSizeY * containerSizeZ
 				local density = math.min(mass/volume, 1.5)
 			
-				while spec.currentLoadLength < spec.loadArea[i].length do
+				while spec.currentLoadLength <= spec.loadArea[i].length do
 
 					local maxLoadAreaHeight = spec.loadArea[i].height
 					if containerType.isBale and spec.loadArea[i].baleHeight ~= nil then

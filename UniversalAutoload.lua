@@ -429,7 +429,7 @@ function UniversalAutoload:updateActionEventKeys()
 			
 			if g_currentMission.player.isControlled then
 			
-				if not g_currentMission.missionDynamicInfo.isMultiplayer then
+				if not g_currentMission.missionDynamicInfo.isMultiplayer and self.spec_tensionBelts then
 					local valid, actionEventId = self:addActionEvent(spec.actionEvents, actions.TOGGLE_BELTS, self, UniversalAutoload.actionEventToggleBelts, false, true, false, true, nil, nil, ignoreCollisions, true)
 					g_inputBinding:setActionEventTextPriority(actionEventId, midPriority)
 					spec.toggleBeltsActionEventId = actionEventId
@@ -1624,7 +1624,7 @@ function UniversalAutoload:onLoad(savegame)
 		
 		if spec.loadArea ~= nil and spec.loadArea[1] ~= nil and spec.loadArea[1].offset ~= nil
 		and spec.loadArea[1].width ~= nil and spec.loadArea[1].length ~= nil and spec.loadArea[1].height ~= nil then
-			if UniversalAutoload.showDebug then print("Universal Autoload Enabled: " .. self:getFullName()) end
+			if UniversalAutoload.showDebug or debugVehicles then print("Universal Autoload Enabled: " .. self:getFullName()) end
 			spec.isAutoloadEnabled = true
 			if self.propertyState ~= Vehicle.PROPERTY_STATE_SHOP_CONFIG then
 				UniversalAutoload.VEHICLES[self] = self
@@ -1633,7 +1633,6 @@ function UniversalAutoload:onLoad(savegame)
 			if UniversalAutoload.showDebug then print("Universal Autoload DISABLED: " .. self:getFullName()) end
 			UniversalAutoload.removeEventListeners(self)
 			spec.isAutoloadEnabled = false
-			--self.spec_universalAutoload = nil
 			return
 		end
 	end
@@ -1650,7 +1649,7 @@ function UniversalAutoload:onLoad(savegame)
 		local x0, y0, z0 = math.huge, math.huge, math.huge
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
 		
-		local actualRootNode = self.spec_tensionBelts.rootNode or self.rootNode
+		local actualRootNode = (self.spec_tensionBelts and self.spec_tensionBelts.rootNode) or self.rootNode
 		if spec.offsetRoot ~= nil then
 			local otherOffset = self.i3dMappings[spec.offsetRoot]
 			if otherOffset ~= nil then
@@ -2328,7 +2327,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		return
 	end
 
-	local playerActive = spec.playerInTrigger[g_currentMission.player.userId] == true
+	local playerActive = (spec.playerInTrigger and (spec.playerInTrigger[g_currentMission.player.userId] == true)) or false
 	if self.isClient and isActiveForInputIgnoreSelection or playerActive then
 		spec.menuDelayTime = spec.menuDelayTime or 0
 		if spec.menuDelayTime > UniversalAutoload.delayTime/2 then

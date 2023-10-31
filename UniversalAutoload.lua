@@ -14,6 +14,7 @@ UniversalAutoload.delayTime = 200
 UniversalAutoload.logSpace = 0.25
 UniversalAutoload.maxLayerCount = 20
 UniversalAutoload.SPLITSHAPES_LOOKUP = {}
+UniversalAutoload.ROTATED_BALE_FACTOR = 0.85355339
 
 local debugKeys = false
 local debugConsole = false
@@ -3525,7 +3526,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 				if containerType.isBale and containerType.sizeX==containerType.sizeZ then
 					if spec.useHorizontalLoading then
 					-- LONGWAYS ROUNDBALE STACKING
-						containerSizeY = containerType.sizeZ
+						containerSizeY = containerType.sizeZ * UniversalAutoload.ROTATED_BALE_FACTOR
 						containerSizeZ = containerType.sizeY
 					end
 				end
@@ -3670,7 +3671,7 @@ function UniversalAutoload:getLoadPlace(containerType, object)
 								
 								local newLoadHeight = containerSizeY
 								if thisLoadPlace.useRoundbalePacking == false then
-									newLoadHeight = 0.85355339*newLoadHeight
+									newLoadHeight = newLoadHeight * UniversalAutoload.ROTATED_BALE_FACTOR
 								end
 								
 								spec.currentLoadHeight = spec.currentLoadHeight + newLoadHeight

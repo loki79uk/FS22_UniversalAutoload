@@ -72,7 +72,8 @@ UniversalAutoload.VALID_OBJECTS = {
 	[2] = "bigBag",
 	[3] = "treeSaplingPallet",
 	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
-	[5] = "pdlc_forestryPack.woodContainer"
+	[5] = "pdlc_forestryPack.woodContainer",
+	[6] = "pdlc_premiumExpansion.vegetablePallet"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES

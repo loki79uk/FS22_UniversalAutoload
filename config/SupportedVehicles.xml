@@ -203,6 +203,12 @@
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>
         
+        <!-- Premium DLC -->
+        <vehicleConfiguration configFileName="premiumExpansion/vehicles/farmtech/ddk2400/ddk2400.xml" selectedConfigs="1">
+            <loadingArea offset="0 1.505 -0.25" width="2.42" height="2.20" length="7.3" baleHeight="2.8"/>
+            <options isBaleTrailer="true"/>
+        </vehicleConfiguration>
+        
         <!-- SUPPORTED MODS -->
         <!-- <vehicleConfiguration configFileName="FS22_lizardCarTrailer/lizardCarTrailer.xml"> -->
             <!-- <options noLoadingIfCovered="true" rearUnloadingOnly="true"/> -->

@@ -14,7 +14,8 @@ UniversalAutoload.delayTime = 200
 UniversalAutoload.logSpace = 0.25
 UniversalAutoload.maxLayerCount = 20
 UniversalAutoload.SPLITSHAPES_LOOKUP = {}
-UniversalAutoload.ROTATED_BALE_FACTOR = 0.85355339
+UniversalAutoload.ROTATED_BALE_FACTOR = 0.75
+--0.85355339
 
 local debugKeys = false
 local debugConsole = false

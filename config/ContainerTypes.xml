@@ -90,7 +90,7 @@
         <containerConfiguration containerType="SHIPPING_CONTAINER" name="pdlc_forestryPack:shippingContainer" sizeX="2.44" sizeY="2.59" sizeZ="?" neverStack="true"/>
         
         <!-- Premium DLC -->
-        <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:soupCansPallet" sizeX="1.225" sizeY="0.75" sizeZ="0.825"/>
+        <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:soupCansPallet" sizeX="1.225" sizeY="0.755" sizeZ="0.825"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:vegetablesPallet" sizeX="1.65" sizeY="1.165" sizeZ="1.15"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:potatoChipsPallet" sizeX="1.225" sizeY="0.820" sizeZ="0.825"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:preservedFoodCarrotsPallet" sizeX="1.225" sizeY="0.68" sizeZ="0.825"/>

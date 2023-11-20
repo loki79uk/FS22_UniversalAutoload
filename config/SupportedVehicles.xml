@@ -208,6 +208,13 @@
             <loadingArea offset="0 1.505 -0.25" width="2.42" height="2.20" length="7.3" baleHeight="2.8"/>
             <options isBaleTrailer="true"/>
         </vehicleConfiguration>
+        <vehicleConfiguration configFileName="premiumExpansion/vehicles/lizard/pickup1984/pickup1984.xml">
+            <options isBaleTrailer="false" zonesOverlap="true" />
+            <loadingArea offset="0 0.920 -0.85" width="1.30" height="1.60" length="2.575" baleHeight="1.85"/>
+            <loadingArea offset="0 0.920 -0.175" width="1.42" height="1.60" length="1.225" baleHeight="1.85"/>
+            <loadingArea offset="0 0.920 -1.465" width="1.50" height="1.60" length="1.350" baleHeight="1.85"/>
+        </vehicleConfiguration>
+
         
         <!-- SUPPORTED MODS -->
         <!-- <vehicleConfiguration configFileName="FS22_lizardCarTrailer/lizardCarTrailer.xml"> -->

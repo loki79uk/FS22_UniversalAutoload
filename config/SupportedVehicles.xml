@@ -214,6 +214,15 @@
             <loadingArea offset="0 0.920 -0.175" width="1.42" height="1.60" length="1.225" baleHeight="1.85"/>
             <loadingArea offset="0 0.920 -1.465" width="1.50" height="1.60" length="1.350" baleHeight="1.85"/>
         </vehicleConfiguration>
+		
+        <vehicleConfiguration configFileName="premiumExpansion/vehicles/train/wagonTimber/wagonTimber.xml">
+            <loadingArea offset="0 1.437 -10.615" width="3.30" height="3.50" length="23.70"/>
+            <options isLogTrailer="true" disableHeightLimit="true"/>
+        </vehicleConfiguration>
+        <vehicleConfiguration configFileName="premiumExpansion/vehicles/train/wagonVehicles/wagonVehicles.xml">
+            <loadingArea offset="0 1.325 -10.841" width="2.675" height="3.50" length="24.90"/>
+            <options isBaleTrailer="false" disableHeightLimit="true"/>
+        </vehicleConfiguration>
 
         
         <!-- SUPPORTED MODS -->

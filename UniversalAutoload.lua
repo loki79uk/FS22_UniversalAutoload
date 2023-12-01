@@ -3094,7 +3094,12 @@ end
 function UniversalAutoload.buildObjectsToUnloadTable(vehicle, forceUnloadPosition)
 	local spec = vehicle.spec_universalAutoload
 	
-	spec.objectsToUnload = {}
+	spec.objectsToUnload = spec.objectsToUnload or {}
+	for k, v in pairs(spec.objectsToUnload) do
+		delete(v.node)
+		spec.objectsToUnload[k] = nil
+	end
+
 	spec.unloadingAreaClear = true
 	
 	
@@ -5254,7 +5259,12 @@ function UniversalAutoload:drawDebugDisplay(isActiveForInput)
 			end
 		end
 		
-		UniversalAutoload.buildObjectsToUnloadTable(self)
+		UniversalAutoload.debugRefreshTime = (UniversalAutoload.debugRefreshTime or 0) + g_currentDt
+		if spec.objectsToUnload == nil or UniversalAutoload.debugRefreshTime > UniversalAutoload.delayTime then
+			UniversalAutoload.debugRefreshTime = 0
+			UniversalAutoload.buildObjectsToUnloadTable(self)
+		end
+		
 		for object, unloadPlace in pairs(spec.objectsToUnload) do
 			local containerType = UniversalAutoload.getContainerType(object)
 			local w, h, l = UniversalAutoload.getContainerDimensions(object)

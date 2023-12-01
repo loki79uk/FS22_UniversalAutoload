@@ -55,6 +55,7 @@ function UniversalAutoload.initSpecialization()
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#showDebug", "Show the full graphical debugging display for all vehicles in game", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#highPriority", "Apply high priority to all UAL key bindings in the F1 menu", true)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#manualLoadingOnly", "Prevent autoloading (automatic unloading is allowed)", false)
+	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableManualLoading", "Prevent use of manual loading triggers", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.BOOL, globalKey.."#disableAutoStrap", "Disable the automatic application of tension belts", false)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerLog", "The price charged for each auto-loaded log (default is zero)", 0)
 	UniversalAutoload.xmlSchema:register(XMLValueType.FLOAT, globalKey.."#pricePerBale", "The price charged for each auto-loaded bale (default is zero)", 0)
@@ -2888,6 +2889,9 @@ function UniversalAutoload:isValidForUnloading(object)
 end
 --
 function UniversalAutoload.isValidForManualLoading(object)
+	if UniversalAutoload.disableManualLoading then
+		return false
+	end
 	if object.isSplitShape then
 		return false
 	end

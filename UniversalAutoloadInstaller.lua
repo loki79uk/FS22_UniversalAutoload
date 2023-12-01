@@ -113,6 +113,7 @@ function UniversalAutoloadManager.ImportUserConfigurations(userSettingsFile, ove
 		UniversalAutoload.highPriority = true
 		UniversalAutoload.disableAutoStrap = false
 		UniversalAutoload.manualLoadingOnly = false
+		UniversalAutoload.disableManualLoading = false
 		UniversalAutoload.pricePerLog = 0
 		UniversalAutoload.pricePerBale = 0
 		UniversalAutoload.pricePerPallet = 0
@@ -141,6 +142,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				UniversalAutoload.highPriority = xmlFile:getValue("universalAutoload#highPriority", true)
 				UniversalAutoload.disableAutoStrap = xmlFile:getValue("universalAutoload#disableAutoStrap", false)
 				UniversalAutoload.manualLoadingOnly = xmlFile:getValue("universalAutoload#manualLoadingOnly", false)
+				UniversalAutoload.disableManualLoading = xmlFile:getValue("universalAutoload#disableManualLoading", false)
 				UniversalAutoload.pricePerLog = xmlFile:getValue("universalAutoload#pricePerLog", 0)
 				UniversalAutoload.pricePerBale = xmlFile:getValue("universalAutoload#pricePerBale", 0)
 				UniversalAutoload.pricePerPallet = xmlFile:getValue("universalAutoload#pricePerPallet", 0)
@@ -148,6 +150,7 @@ function UniversalAutoloadManager.ImportGlobalSettings(xmlFilename, overwriteExi
 				print("  >> Show Debug Display: " .. tostring(UniversalAutoload.showDebug))
 				print("  >> Menu High Priority: " .. tostring(UniversalAutoload.highPriority))
 				print("  >> Manual Loading Only: " .. tostring(UniversalAutoload.manualLoadingOnly))
+				print("  >> Disable Manual Loading: " .. tostring(UniversalAutoload.disableManualLoading))
 				print("  >> Automatic Tension Belts: " .. tostring(not UniversalAutoload.disableAutoStrap))
 				print("  >> Price Per Log: " .. tostring(UniversalAutoload.pricePerLog))
 				print("  >> Price Per Bale: " .. tostring(UniversalAutoload.pricePerBale))
@@ -1323,6 +1326,7 @@ Player.readStream = Utils.overwrittenFunction(Player.readStream,
 		-- print("Player.readStream")
 		UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
 		UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+		UniversalAutoload.disableManualLoading = streamReadBool(streamId)
 	end
 )
 Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
@@ -1331,6 +1335,7 @@ Player.writeStream = Utils.overwrittenFunction(Player.writeStream,
 		-- print("Player.writeStream")
 		streamWriteBool(streamId, UniversalAutoload.disableAutoStrap or false)
 		streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly or false)
+		streamWriteBool(streamId, UniversalAutoload.disableManualLoading or false)
 	end
 )
 
@@ -1344,12 +1349,14 @@ FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.s
 
 		-- UniversalAutoload.disableAutoStrap = UniversalAutoload.disableAutoStrap or false
 		-- UniversalAutoload.manualLoadingOnly = UniversalAutoload.manualLoadingOnly or false
+		-- UniversalAutoload.disableManualLoading = UniversalAutoload.disableManualLoading or false
 		-- UniversalAutoload.pricePerLog = UniversalAutoload.pricePerLog or 0
 		-- UniversalAutoload.pricePerBale = UniversalAutoload.pricePerBale or 0
 		-- UniversalAutoload.pricePerPallet = UniversalAutoload.pricePerPallet or 0
 		
 		-- streamWriteBool(streamId, UniversalAutoload.disableAutoStrap)
 		-- streamWriteBool(streamId, UniversalAutoload.manualLoadingOnly)
+		-- streamWriteBool(streamId, UniversalAutoload.disableManualLoading)
 		-- streamWriteInt32(streamId, spec.pricePerLog)
 		-- streamWriteInt32(streamId, spec.pricePerBale)
 		-- streamWriteInt32(streamId, spec.pricePerPallet)
@@ -1357,6 +1364,7 @@ FSBaseMission.sendInitialClientState = Utils.overwrittenFunction(FSBaseMission.s
 
 		-- UniversalAutoload.disableAutoStrap = streamReadBool(streamId)
 		-- UniversalAutoload.manualLoadingOnly = streamReadBool(streamId)
+		-- UniversalAutoload.disableManualLoading = streamReadBool(streamId)
 		-- spec.pricePerLog = streamReadInt32(streamId)
 		-- spec.pricePerBale = streamReadInt32(streamId)
 		-- spec.pricePerPallet = streamReadInt32(streamId)

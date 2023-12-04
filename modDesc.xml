@@ -2,7 +2,7 @@
 <modDesc descVersion="79">
 
     <author>loki_79</author>
-    <version>1.4.6.0</version>
+    <version>1.5.0.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -78,6 +78,10 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
+v1.5.0.0
+- Added items and vehicles from Premium Expansion
+- Fixed memory leak caused by graphical debug display
+- Added a new global option `disableManualLoading` (default is false)
 v1.4.1.0
 - Added vehicle settings for HayAndForagePack DLC
 - Improved loading and unloading of round bales
@@ -179,6 +183,10 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.5.0.0
+- Gegenstände und Fahrzeuge aus der Premium-Erweiterung hinzugefügt
+- Speicherleck behoben, das durch die grafische Debug-Anzeige verursacht wurde
+- Neue globale Option `disableManualLoading` hinzugefügt (Standard ist false)
 v1.4.1.0
 - Fahrzeugeinstellungen für HayAndForagePack DLC hinzugefügt
 - Verbessertes Be- und Entladen von Rundballen
@@ -280,6 +288,10 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.5.0.0
+- Ajout d'objets et de véhicules de l'extension Premium
+- Correction de la fuite de mémoire causée par l'affichage du débogage graphique
+- Ajout d'une nouvelle option globale `disableManualLoading` (false par défaut)
 v1.4.1.0
 - Ajout des paramètres du véhicule pour le DLC HayAndForagePack
 - Amélioration du chargement et du déchargement des balles rondes
@@ -381,6 +393,10 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.5.0.0
+- Přidány předměty a vozidla z prémiového rozšíření
+- Opraven únik paměti způsobený zobrazením grafického ladění
+- Přidána nová globální volba `disableManualLoading` (výchozí hodnota je false)
 v1.4.1.0
 - Přidáno nastavení vozidla pro DLC HayAndForagePack
 - Vylepšeno nakládání a vykládání kulatých balíků
@@ -482,6 +498,10 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.5.0.0
+- Dodano przedmioty i pojazdy z rozszerzenia premium
+- Naprawiono wyciek pamięci powodowany przez graficzny ekran debugowania.
+- Dodano nową opcję globalną `disableManualLoading` (domyślnie false)
 v1.4.1.0
 - Dodano ustawienia pojazdu dla DLC HayAndForagePack.
 - Poprawiono ładowanie i rozładowywanie bel okrągłych
@@ -584,6 +604,10 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.5.0.0
+- Se han añadido objetos y vehículos de la expansión Premium.
+- Se ha corregido la pérdida de memoria causada por la pantalla de depuración gráfica.
+- Añadida una nueva opción global `disableManualLoading` (por defecto es false)
 v1.4.1.0
 - Añadidos ajustes del vehículo para HayAndForagePack DLC
 - Mejoras en la carga y descarga de pacas redondas.
@@ -686,6 +710,10 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.5.0.0
+- Inclusão de itens e veículos da Expansão Premium
+- Correção do vazamento de memória causado pela exibição de depuração gráfica
+- Adição de uma nova opção global `disableManualLoading` (o padrão é false)
 v1.4.1.0
 - Adicionadas configurações de veículo para o DLC HayAndForagePack
 - Melhoria no carregamento e descarregamento de fardos redondos
@@ -787,6 +815,10 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+v1.5.0.0
+- Premium Genişleme'den eşyalar ve araçlar eklendi
+- Grafik hata ayıklama ekranının neden olduğu bellek sızıntısı düzeltildi
+- Yeni bir global seçenek `disableManualLoading` eklendi (varsayılan değer false)
 v1.4.1.0
 - HayAndForagePack DLC'si için araç ayarları eklendi
 - Yuvarlak balyaların daha iyi yüklenmesi ve boşaltılması
@@ -889,6 +921,10 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
+v1.5.0.0
+- 添加了高级扩展中的物品和车辆
+- 修正了图形调试显示导致的内存泄漏
+- 添加了新的全局选项 "disableManualLoading"（默认为false）
 v1.4.1.0
 - 为HayAndForagePack DLC添加了车辆设置
 - 改进了圆包的装载和卸载

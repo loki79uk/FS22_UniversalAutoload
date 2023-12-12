@@ -1490,3 +1490,10 @@ StoreManager.loadItem = Utils.overwrittenFunction(StoreManager.loadItem, functio
 
 	return storeItem
 end)
+
+local oldsetTrafficSystemCollisionMasks = getmetatable(_G).__index.setTrafficSystemCollisionMasks
+getmetatable(_G).__index.setTrafficSystemCollisionMasks = function(trafficSystemId, groundMask, stopMask, playerStopMask, ignoreMask)
+	print("UAL setTrafficSystemCollisionMasks")
+	stopMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER	
+	return oldsetTrafficSystemCollisionMasks(trafficSystemId, groundMask, stopMask, playerStopMask, ignoreMask)
+end

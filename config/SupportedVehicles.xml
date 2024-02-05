@@ -193,7 +193,7 @@
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
         <vehicleConfiguration configFileName="forestryPack/vehicles/schwarzmueller/semiLowloader3A/semiLowloader3A.xml">  
-            <loadingArea offset="0 0.905 -1.1" width="2.50" height="2.25" length="9.20" lengthAxis="AXIS_DRAWBAR"/>
+            <loadingArea offset="0 0.905 -1.15" width="2.50" height="2.25" length="9.20" lengthAxis="AXIS_DRAWBAR"/>
             <loadingArea offset="0 1.285 5.35" width="2.50" height="2.25" length="3.75"/>
             <options enableRearLoading="true" enableSideLoading="true"/>
         </vehicleConfiguration>

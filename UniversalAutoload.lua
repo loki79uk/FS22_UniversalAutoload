@@ -86,6 +86,11 @@ function UniversalAutoload.initSpecialization()
 		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#widthAxis", "Axis name to extend width of the loading area", nil)
 		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#lengthAxis", "Axis name to extend length of the loading area", nil)
 		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#heightAxis", "Axis name to extend height of the loading area", nil)
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#offsetFrontAxis", "Axis name to adjust the front position of the loading area", nil)
+		s.schema:register(XMLValueType.STRING, s.key..".loadingArea(?)#offsetRearAxis", "Axis name to adjust the rear position of the loading area", nil)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#reverseWidthAxis", "Reverses direction of width extension if true", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#reverseLengthAxis", "Reverses direction of length extension if true", false)
+		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#reverseHeightAxis", "Reverses direction of height extension if true", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfFolded", "Prevent loading when folded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfUnfolded", "Prevent loading when unfolded (for this area only)", false)
 		s.schema:register(XMLValueType.BOOL, s.key..".loadingArea(?)#noLoadingIfCovered", "Prevent loading when covered (for this area only)", false)
@@ -1524,6 +1529,11 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[i].widthAxis   = loadArea.widthAxis
 							spec.loadArea[i].lengthAxis  = loadArea.lengthAxis
 							spec.loadArea[i].heightAxis  = loadArea.heightAxis
+							spec.loadArea[i].offsetFrontAxis  = loadArea.offsetFrontAxis
+							spec.loadArea[i].offsetRearAxis   = loadArea.offsetRearAxis
+							spec.loadArea[i].reverseWidthAxis   = loadArea.reverseWidthAxis
+							spec.loadArea[i].reverseLengthAxis  = loadArea.reverseLengthAxis
+							spec.loadArea[i].reverseHeightAxis  = loadArea.reverseHeightAxis
 							spec.loadArea[i].noLoadingIfFolded   = loadArea.noLoadingIfFolded
 							spec.loadArea[i].noLoadingIfUnfolded = loadArea.noLoadingIfUnfolded
 							spec.loadArea[i].noLoadingIfCovered  = loadArea.noLoadingIfCovered
@@ -1584,6 +1594,11 @@ function UniversalAutoload:onLoad(savegame)
 							spec.loadArea[j+1].widthAxis  = xmlFile:getValue(loadAreaKey.."#widthAxis", nil)
 							spec.loadArea[j+1].lengthAxis = xmlFile:getValue(loadAreaKey.."#lengthAxis", nil)
 							spec.loadArea[j+1].heightAxis = xmlFile:getValue(loadAreaKey.."#heightAxis", nil)
+							spec.loadArea[j+1].offsetFrontAxis = xmlFile:getValue(loadAreaKey.."#offsetFrontAxis", nil)
+							spec.loadArea[j+1].offsetRearAxis  = xmlFile:getValue(loadAreaKey.."#offsetRearAxis", nil)
+							spec.loadArea[j+1].reverseWidthAxis  = xmlFile:getValue(loadAreaKey.."#reverseWidthAxis", false)
+							spec.loadArea[j+1].reverseLengthAxis = xmlFile:getValue(loadAreaKey.."#reverseLengthAxis", false)
+							spec.loadArea[j+1].reverseHeightAxis = xmlFile:getValue(loadAreaKey.."#reverseHeightAxis", false)
 							spec.loadArea[j+1].offset     = xmlFile:getValue(loadAreaKey.."#offset", "0 0 0", true)
 							spec.loadArea[j+1].offsetRoot = xmlFile:getValue(loadAreaKey.."#offsetRoot", nil)
 							spec.loadArea[j+1].noLoadingIfFolded = xmlFile:getValue(loadAreaKey.."#noLoadingIfFolded", false)
@@ -2101,7 +2116,8 @@ function UniversalAutoload:updateWidthAxis()
 						loadArea.originalWidth = loadArea.width
 						spec.loadVolume.originalWidth = spec.loadVolume.width
 					end
-					local extensionWidth = math.abs(x)
+					local direction = loadArea.reverseWidthAxis and -1 or 1
+					local extensionWidth = math.abs(x) * direction
 					loadArea.width = loadArea.originalWidth + extensionWidth
 					spec.loadVolume.width = spec.loadVolume.originalWidth + extensionWidth
 				end
@@ -2125,7 +2141,8 @@ function UniversalAutoload:updateHeightAxis()
 						loadArea.originalHeight = loadArea.height
 						spec.loadVolume.originalHeight = spec.loadVolume.height
 					end
-					local extensionHeight = math.abs(y)
+					local direction = loadArea.reverseHeightAxis and -1 or 1
+					local extensionHeight = math.abs(y) * direction
 					loadArea.height = loadArea.originalHeight + extensionHeight
 					spec.loadVolume.height = spec.loadVolume.originalHeight + extensionHeight
 					
@@ -2139,13 +2156,15 @@ function UniversalAutoload:updateLengthAxis()
 	local spec = self.spec_universalAutoload
 	
 	for i, loadArea in pairs(spec.loadArea) do
-		if loadArea.lengthAxis ~= nil then
+		if (loadArea.lengthAxis ~= nil) or (loadArea.offsetFrontAxis ~= nil) or (loadArea.offsetRearAxis ~= nil) then
 
 			for i, tool in pairs(self.spec_cylindered.movingTools) do
-				if tool.axis ~= nil and loadArea.lengthAxis == tool.axis then
-			
+				if tool.axis ~= nil and ((loadArea.lengthAxis == tool.axis) or
+					(loadArea.offsetFrontAxis == tool.axis) or (loadArea.offsetRearAxis == tool.axis)) then
+					
 					local x, y, z = getTranslation(tool.node)
 					-- print(self:getFullName() .." - UPDATE LENGTH AXIS: x="..x..",  y="..y..",  z="..z)
+					
 					if loadArea.originalLength == nil then
 						loadArea.originalLength = loadArea.length
 						local X, Y, Z = unpack(loadArea.offset)
@@ -2159,19 +2178,71 @@ function UniversalAutoload:updateLengthAxis()
 						spec.loadVolume.Y = Y0
 						spec.loadVolume.Z = Z0
 					end
+					
+					local offsetEnd = 0
+					local offsetRoot = 0
+					local offsetStart = 0
+					local extensionLength = 0
+					
+					loadArea.length = loadArea.originalLength
+					spec.loadVolume.length = spec.loadVolume.originalLength
+					
+					local function mapValue(value, inMin, inMax, outMin, outMax)
+						return (value - inMin) / (inMax - inMin) * (outMax - outMin) + outMin
+					end
 
-					local extensionLength = math.abs(z)
-					loadArea.length = loadArea.originalLength + extensionLength
-					spec.loadVolume.length = spec.loadVolume.originalLength + extensionLength
-					setTranslation(loadArea.rootNode, loadArea.X, loadArea.Y, loadArea.Z-(extensionLength/2))
-					setTranslation(loadArea.endNode, loadArea.X, loadArea.Y, loadArea.Z-(loadArea.length/2)-(extensionLength/2))
-					setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z-(extensionLength/2))
+					if loadArea.lengthAxis == tool.axis then
+						-- print(self:getFullName() .." EXTEND LENGTH AXIS")
+						local direction = loadArea.reverseLengthAxis and -1 or 1
+						extensionLength = math.abs(z) * direction
+						loadArea.length = loadArea.length + extensionLength
+						spec.loadVolume.length = spec.loadVolume.length + extensionLength
+						offsetEnd = offsetEnd - extensionLength
+						offsetRoot = offsetRoot - (extensionLength/2)
+					end
+
+					if loadArea.offsetFrontAxis == tool.axis then
+						-- print(self:getFullName() .." OFFSET FRONT AXIS")
+						if tool.rotMin and tool.rotMax then
+							local rot = tool.curRot[tool.rotationAxis]
+							local range = math.abs(tool.rotMax - tool.rotMin)
+							extensionLength = mapValue(rot, tool.rotMin, tool.rotMax, 0, range)
+						else
+							extensionLength = math.abs(z)
+						end
+						loadArea.length = loadArea.length - extensionLength
+						spec.loadVolume.length = spec.loadVolume.length - extensionLength
+						offsetRoot = offsetRoot - (extensionLength/2)
+						offsetStart = offsetStart - extensionLength
+					end
+					
+					if loadArea.offsetRearAxis == tool.axis then
+						-- print(self:getFullName() .." OFFSET REAR AXIS")
+						if tool.rotMin and tool.rotMax then
+							local rot = tool.curRot[tool.rotationAxis]
+							local range = math.abs(tool.rotMax - tool.rotMin)
+							extensionLength = mapValue(rot, tool.rotMin, tool.rotMax, 0, range)
+						else
+							extensionLength = math.abs(z)
+						end
+						loadArea.length = loadArea.length - extensionLength
+						spec.loadVolume.length = spec.loadVolume.length - extensionLength
+						offsetRoot = offsetRoot + (extensionLength/2)
+						offsetEnd = offsetEnd + extensionLength
+					end
+					
+					setTranslation(loadArea.endNode, loadArea.X, loadArea.Y, loadArea.Z-(loadArea.originalLength/2) + offsetEnd)
+					setTranslation(loadArea.rootNode, loadArea.X, loadArea.Y, loadArea.Z + offsetRoot)
+					setTranslation(loadArea.startNode, loadArea.X, loadArea.Y, loadArea.Z+(loadArea.originalLength/2) + offsetStart)
+					setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z + offsetRoot)
+					
 					if spec.rearTriggerId then
 						local depth = 0.05
 						local recess = spec.loadVolume.width/4
 						setTranslation(spec.rearTriggerId, 0, spec.loadVolume.height/2, recess-(spec.loadVolume.length/2)-depth)
 					end
 				end
+
 			end
 		end
 	end

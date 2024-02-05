@@ -1499,6 +1499,6 @@ end)
 local oldsetTrafficSystemCollisionMasks = getmetatable(_G).__index.setTrafficSystemCollisionMasks
 getmetatable(_G).__index.setTrafficSystemCollisionMasks = function(trafficSystemId, groundMask, stopMask, playerStopMask, ignoreMask)
 	print("UAL setTrafficSystemCollisionMasks")
-	stopMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER	
+	stopMask = CollisionFlag.DYNAMIC_OBJECT + CollisionFlag.VEHICLE + CollisionFlag.PLAYER + CollisionFlag.TRIGGER_TRAFFIC_VEHICLE_BLOCKING
 	return oldsetTrafficSystemCollisionMasks(trafficSystemId, groundMask, stopMask, playerStopMask, ignoreMask)
 end

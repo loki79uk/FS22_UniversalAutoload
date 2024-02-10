@@ -354,6 +354,7 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 						newType.neverStack = xmlFile:getValue(configKey.."#neverStack", default.neverStack or false)
 						newType.neverRotate = xmlFile:getValue(configKey.."#neverRotate", default.neverRotate or false)
 						newType.alwaysRotate = xmlFile:getValue(configKey.."#alwaysRotate", default.alwaysRotate or false)
+						newType.frontOffset = xmlFile:getValue(configKey.."#frontOffset", default.frontOffset or 0)
 						print(string.format("  >> %s %s [%.3f, %.3f, %.3f]", newType.type, newType.name, newType.sizeX, newType.sizeY, newType.sizeZ ))
 					end				
 				end
@@ -457,6 +458,7 @@ function UniversalAutoloadManager.importUnknownSpecFromExisting(xmlFilename, cus
 		newType.neverStack = oldType.neverStack
 		newType.neverRotate = oldType.neverRotate
 		newType.alwaysRotate = oldType.alwaysRotate
+		newType.frontOffset = oldType.frontOffset
 
 		if oldType.isBale then
 			newType.width = oldType.width
@@ -519,6 +521,7 @@ function UniversalAutoloadManager.importPalletTypeFromXml(xmlFile, customEnviron
 			newType.neverStack = (containerType == "BIGBAG") or false
 			newType.neverRotate = false
 			newType.alwaysRotate = false
+			newType.frontOffset = 0
 			newType.width = math.min(newType.sizeX, newType.sizeZ)
 			newType.length = math.max(newType.sizeX, newType.sizeZ)
 				
@@ -578,6 +581,7 @@ function UniversalAutoloadManager.importBaleTypeFromXml(xmlFile, customEnvironme
 			newType.neverStack = false
 			newType.neverRotate = false
 			newType.alwaysRotate = false
+			newType.frontOffset = 0
 			newType.width = math.min(newType.sizeX, newType.sizeZ)
 			newType.length = math.max(newType.sizeX, newType.sizeZ)
 				

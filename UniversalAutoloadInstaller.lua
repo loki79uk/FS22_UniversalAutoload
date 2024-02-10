@@ -1212,6 +1212,28 @@ function UniversalAutoloadManager:loadMap(name)
 		table.insert(UniversalAutoload.CONTAINERS, "POTATOBOX")
 		UniversalAutoload.POTATOBOX = { sizeX = 1.850, sizeY = 1.100, sizeZ = 1.200 }
 	end
+	
+	if g_modIsLoaded['FS22_strawHarvestPack'] then
+		print("** Adding Pallets for FS22_strawHarvestPack **")
+		local baseDirectory = _G['FS22_strawHarvestPack'].PlaceablePalletizer.MOD_DIRECTORY
+		local palletsToAdd = {
+			{name = 'MOLASSES', xmlPath = 'data/objects/pallets/canisterPallet/canisterPallet.xml'},
+			{name = 'BALENET', xmlPath = 'data/objects/pallets/krone/twinePallets/baleTwinePallet.xml'},
+			{name = 'BALETWINE', xmlPath = 'data/objects/pallets/krone/netPallets/netRolePallet.xml'},
+			{name = 'HAY_PELLETS', xmlPath = 'data/objects/pallets/pelletPallets/hayPelletsPallet.xml'},
+			{name = 'STRAW_PELLETS', xmlPath = 'data/objects/pallets/pelletPallets/strawPelletsPallet.xml'}
+		}
+		for _, fillType in pairs(g_fillTypeManager:getFillTypes()) do
+			for _, pallet in ipairs(palletsToAdd) do
+				if fillType.name == pallet.name and not fillType.palletFilename then
+					local palletFilename = Utils.getFilename(pallet.xmlPath, baseDirectory)
+					if fileExists(palletFilename) then
+						fillType.palletFilename = palletFilename
+					end
+				end
+			end
+		end
+	end
 
 	UniversalAutoload.CONTAINERS_INDEX = {}
 	for i, key in ipairs(UniversalAutoload.CONTAINERS) do

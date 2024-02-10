@@ -2,7 +2,7 @@
 <modDesc descVersion="79">
 
     <author>loki_79</author>
-    <version>1.5.0.2</version>
+    <version>1.5.1.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -78,6 +78,8 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
+v1.5.1.0
+- Added support for pallets in the "Straw Harvest Pack"
 v1.5.0.0
 - Added items and vehicles from Premium Expansion
 - Fixed memory leak caused by graphical debug display
@@ -183,6 +185,8 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.5.1.0
+- Unterstützung für Paletten im "Straw Harvest Pack" hinzugefügt
 v1.5.0.0
 - Gegenstände und Fahrzeuge aus der Premium-Erweiterung hinzugefügt
 - Speicherleck behoben, das durch die grafische Debug-Anzeige verursacht wurde
@@ -288,6 +292,8 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.5.1.0
+- Ajout de la prise en charge des palettes dans le "Straw Harvest Pack"
 v1.5.0.0
 - Ajout d'objets et de véhicules de l'extension Premium
 - Correction de la fuite de mémoire causée par l'affichage du débogage graphique
@@ -393,6 +399,8 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+v1.5.1.0
+- Přidána podpora pro palety v balíčku "Straw Harvest Pack"
 v1.5.0.0
 - Přidány předměty a vozidla z prémiového rozšíření
 - Opraven únik paměti způsobený zobrazením grafického ladění
@@ -498,6 +506,8 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+v1.5.1.0
+- Dodano obsługę palet w pakiecie "Straw Harvest Pack"
 v1.5.0.0
 - Dodano przedmioty i pojazdy z rozszerzenia premium
 - Naprawiono wyciek pamięci powodowany przez graficzny ekran debugowania.
@@ -604,6 +614,8 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+v1.5.1.0
+- Añadido soporte para palets en el "Straw Harvest Pack"
 v1.5.0.0
 - Se han añadido objetos y vehículos de la expansión Premium.
 - Se ha corregido la pérdida de memoria causada por la pantalla de depuración gráfica.
@@ -710,6 +722,8 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+v1.5.1.0
+- Adicionado suporte para paletes no "Straw Harvest Pack"
 v1.5.0.0
 - Inclusão de itens e veículos da Expansão Premium
 - Correção do vazamento de memória causado pela exibição de depuração gráfica
@@ -815,6 +829,8 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+v1.5.1.0
+- "Straw Harvest Pack" e paletler için destek eklendi
 v1.5.0.0
 - Premium Genişleme'den eşyalar ve araçlar eklendi
 - Grafik hata ayıklama ekranının neden olduğu bellek sızıntısı düzeltildi
@@ -921,6 +937,8 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
+v1.5.1.0
+- 在 "稻草收获包 "中添加了对托盘的支持
 v1.5.0.0
 - 添加了高级扩展中的物品和车辆
 - 修正了图形调试显示导致的内存泄漏

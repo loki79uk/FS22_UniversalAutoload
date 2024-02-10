@@ -96,7 +96,14 @@
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:preservedFoodCarrotsPallet" sizeX="1.225" sizeY="0.68" sizeZ="0.825"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:preservedFoodParsnipPallet" sizeX="1.225" sizeY="0.68" sizeZ="0.825"/>
         <containerConfiguration containerType="EURO_PALLET" name="pdlc_premiumExpansion:preservedFoodBeetRootPallet" sizeX="1.225" sizeY="0.68" sizeZ="0.825"/>
-		
+        
+        <!-- Straw Harvest -->
+        <containerConfiguration containerType="EURO_PALLET" name="FS22_strawHarvestPack:netRolePallet" sizeX="1.495" sizeY="1.470" sizeZ="1.000"/>
+        <containerConfiguration containerType="EURO_PALLET" name="FS22_strawHarvestPack:canisterPallet" sizeX="1.495" sizeY="1.415" sizeZ="1.000"/>
+        <containerConfiguration containerType="EURO_PALLET" name="FS22_strawHarvestPack:baleTwinePallet" sizeX="1.495" sizeY="1.415" sizeZ="1.000"/>
+        <containerConfiguration containerType="EURO_PALLET" name="FS22_strawHarvestPack:hayPelletsPallet" sizeX="1.495" sizeY="1.300" sizeZ="1.000"/>
+        <containerConfiguration containerType="EURO_PALLET" name="FS22_strawHarvestPack:strawPelletsPallet" sizeX="1.495" sizeY="1.300" sizeZ="1.000"/>
+        
     </containerConfigurations>
 </universalAutoload>
 

@@ -2920,6 +2920,9 @@ function UniversalAutoload:isValidForLoading(object)
 	if object.isSplitShape and UniversalAutoload.isLoadedOnTrain(self, object) then
 		return false
 	end
+	if spec.baleCollectionMode and UniversalAutoload.isValidForManualLoading(object) then
+		return false
+	end
 
 	if object.isSplitShape and object.sizeY > maxLength then
 		return false

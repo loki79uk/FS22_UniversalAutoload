@@ -2986,11 +2986,9 @@ function UniversalAutoload.isValidForManualLoading(object)
 	if object.dynamicMountObject ~= nil then
 		return true
 	end
-	if g_currentMission.player ~= nil then
-		local rootNode = UniversalAutoload.getObjectRootNode(object)
-		if rootNode ~= nil and g_currentMission.player.pickedUpObject == rootNode then
-			return true
-		end
+	local pickedUpObject = UniversalAutoload.getObjectRootNode(object)
+	if pickedUpObject ~= nil and Player.PICKED_UP_OBJECTS[pickedUpObject] == true then
+		return true
 	end
 end
 --
@@ -4712,9 +4710,14 @@ function UniversalAutoload:addAutoLoadingObject(object)
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 			end
-			local rootNode = UniversalAutoload.getObjectRootNode(object)
-			if rootNode ~= nil and g_currentMission.player ~= nil and g_currentMission.player.pickedUpObject == rootNode then	
-				g_currentMission.player:pickUpObject(false)
+			local pickedUpObject = UniversalAutoload.getObjectRootNode(object)
+			if pickedUpObject ~= nil and Player.PICKED_UP_OBJECTS[pickedUpObject] == true then
+				for _, player in pairs(g_currentMission.players) do
+					if player.isCarryingObject and player.pickedUpObject == pickedUpObject then
+						player:pickUpObject(false)
+						if debugSpecial then print("*** DROP OBJECT ***") end
+					end
+				end
 			end
 			return true
 		end

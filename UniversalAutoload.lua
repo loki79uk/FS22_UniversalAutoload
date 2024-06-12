@@ -20,6 +20,7 @@ UniversalAutoload.ROTATED_BALE_FACTOR = 0.75
 local debugKeys = false
 local debugConsole = false
 local debugLoading = false
+local debugPallets = false
 local debugVehicles = false
 local debugSpecial = false
 
@@ -2911,62 +2912,79 @@ function UniversalAutoload:isValidForLoading(object)
 	end
 	
 	if object == nil then
+		if debugPallets then print("object == nil") end
 		return false
 	end
 	
 	if UniversalAutoload.disableAutoStrap and UniversalAutoload.isStrappedOnOtherVehicle(self, object) then
+		if debugPallets then print(object.i3dFilename, "Strapped On Other Vehicle") end
 		return false
 	end
 	if object.isSplitShape and UniversalAutoload.isLoadedOnTrain(self, object) then
+		if debugPallets then print(object.i3dFilename, "Loaded On Train") end
 		return false
 	end
 	if spec.baleCollectionMode and UniversalAutoload.isValidForManualLoading(object) then
+		if debugPallets then print(object.i3dFilename, "Bale Collection Mode - manual loading") end
 		return false
 	end
 
 	if object.isSplitShape and object.sizeY > maxLength then
+		if debugPallets then print("Log - too long") end
 		return false
 	end
 	if object.isSplitShape and object.sizeY < minLength then
+		if debugPallets then print("Log - too short") end
 		return false
 	end
 	if spec.isLogTrailer and not object.isSplitShape then
+		if debugPallets then print(object.i3dFilename, "Log Trailer - not a log") end
 		return false
 	end
 	if spec.baleCollectionMode and object.isRoundbale==nil then
+		if debugPallets then print(object.i3dFilename, "Bale Collection Mode - not a bale") end
 		return false
 	end
 	if object.isRoundbale ~= nil and object.mountObject then
+		if debugPallets then print(object.i3dFilename, "Object Mounted") end
 		return false
 	end
 	if object.spec_umbilicalReelOverload ~= nil and object.spec_umbilicalReelOverload.isOverloading then
+		if debugPallets then print(object.i3dFilename, "Umbilical Reel - overloading") end
 		return false
 	end
 	if UniversalAutoload.isShippingContainer(object) and object.spec_woodContainer.targetLength > maxLength then
+		if debugPallets then print(object.i3dFilename, "Shipping Container - too long") end
 		return false
 	end
 	if UniversalAutoload.ualGetPalletCanDischargeToTrailer(self, object) then
+		if debugPallets then print(object.i3dFilename, "Pallet Can Discharge To Trailer") end
 		return false
 	end
 	
 	if not UniversalAutoload.getPalletIsSelectedMaterial(self, object) then
+		if debugPallets then print(object.i3dFilename, "Pallet NOT Selected Material") end
 		return false
 	end
 	if not UniversalAutoload.getPalletIsSelectedContainer(self, object) then
+		if debugPallets then print(object.i3dFilename, "Pallet NOT Selected Container") end
 		return false
 	end
 	
 	local isBeingManuallyLoaded = spec.autoLoadingObjects[object] ~= nil
 	local isValidLoadSide = spec.loadedObjects[object] == nil and UniversalAutoload.getPalletIsSelectedLoadside(self, object)
 	if not (isBeingManuallyLoaded or isValidLoadSide) then
+		if debugPallets then print(object.i3dFilename, "NOT Valid Load Side") end
 		return false
 	end
 	
 	local isValidLoadFilter = not spec.currentLoadingFilter or (spec.currentLoadingFilter and UniversalAutoload.getPalletIsFull(object)) or UniversalAutoload.isShippingContainer(object)
 	if not (UniversalAutoload.manualLoadingOnly or isValidLoadFilter) then
+		if debugPallets then print(object.i3dFilename, "NOT Valid Load Filter") end
 		return false
 	end
 	
+	--if debugPallets then print(object.i3dFilename, "Valid For Loading") end
 	return true
 end
 --
@@ -3873,6 +3891,7 @@ function UniversalAutoload:getIsValidObject(object)
 		end
 	end
 	
+	if debugPallets then print("Invalid Object - " .. object.i3dFilename, tostring(object.typeName)) end
 	return false
 end
 --
@@ -4281,6 +4300,7 @@ end
 function UniversalAutoload.getObjectPositionNode( object )
 	local node = UniversalAutoload.getObjectRootNode(object)
 	if node == nil then
+		if debugPallets then print("Object Root Node IS NIL - " .. object.i3dFilename) end
 		return nil
 	end
 	if object.isSplitShape and object.positionNodeId then

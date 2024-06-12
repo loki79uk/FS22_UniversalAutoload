@@ -73,7 +73,8 @@ UniversalAutoload.VALID_OBJECTS = {
 	[3] = "treeSaplingPallet",
 	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
 	[5] = "pdlc_forestryPack.woodContainer",
-	[6] = "pdlc_premiumExpansion.vegetablePallet"
+	[6] = "pdlc_premiumExpansion.vegetablePallet",
+	[7] = "FS22_strawHarvestPack.pelletPallet"
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES

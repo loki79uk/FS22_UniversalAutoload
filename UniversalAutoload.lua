@@ -4149,12 +4149,14 @@ function UniversalAutoload:ualTestUnloadLocation_Callback(hitObjectId, x, y, z, 
 	if hitObjectId ~= 0 and hitObjectId ~= g_currentMission.terrainRootNode then
 		local spec = self.spec_universalAutoload
 		local object = UniversalAutoload.getNodeObject(hitObjectId)
-		if object.spec_objectStorage and object.spec_objectStorage.objectTriggerNode 
-		and hitObjectId == object.spec_objectStorage.objectTriggerNode then
-			return true
-		else
-			spec.hasOverlap = true
-			return false
+		if object ~= nil then
+			if object.spec_objectStorage and object.spec_objectStorage.objectTriggerNode 
+			and hitObjectId == object.spec_objectStorage.objectTriggerNode then
+				return true
+			else
+				spec.hasOverlap = true
+				return false
+			end
 		end
 	end
 	return true

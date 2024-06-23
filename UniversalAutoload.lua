@@ -1669,6 +1669,7 @@ function UniversalAutoload:onLoad(savegame)
 		spec.availableObjects = {}
 		spec.autoLoadingObjects = {}
 		spec.objectToLoadingAreaIndex = {}
+		spec.objectToTriggerId = {}
 		
 		local x0, y0, z0 = math.huge, math.huge, math.huge
 		local x1, y1, z1 = -math.huge, -math.huge, -math.huge
@@ -1806,14 +1807,14 @@ function UniversalAutoload:onLoad(savegame)
 				addTrigger(rightPickupTrigger.node, "ualLoadingTrigger_Callback", self)
 			end
 			
-			if spec.rearUnloadingOnly then
+			if spec.rearUnloadingOnly or spec.isCurtainTrailer then
 				local rearPickupTrigger = {}
 				rearPickupTrigger.node = I3DUtil.getChildByName(triggersRootNode, "rearPickupTrigger")
 				if rearPickupTrigger.node ~= nil then
 					rearPickupTrigger.name = "rearPickupTrigger"
 					link(spec.loadVolume.rootNode, rearPickupTrigger.node)
 					
-					local squareSide = spec.loadVolume.length+spec.loadVolume.width
+					local squareSide = 3*spec.loadVolume.width
 					local width, height, length = squareSide, 2*spec.loadVolume.height, 0.8*squareSide
 
 					setRotation(rearPickupTrigger.node, 0, 0, 0)
@@ -1822,6 +1823,7 @@ function UniversalAutoload:onLoad(savegame)
 
 					table.insert(spec.triggers, rearPickupTrigger)
 					addTrigger(rearPickupTrigger.node, "ualLoadingTrigger_Callback", self)
+					spec.rearPickupTriggerId = rearPickupTrigger.node
 				end
 			end
 			
@@ -1832,7 +1834,7 @@ function UniversalAutoload:onLoad(savegame)
 					frontPickupTrigger.name = "frontPickupTrigger"
 					link(spec.loadVolume.rootNode, frontPickupTrigger.node)
 					
-					local squareSide = spec.loadVolume.length+spec.loadVolume.width
+					local squareSide = 3*spec.loadVolume.width
 					local width, height, length = squareSide, 2*spec.loadVolume.height, 0.8*squareSide
 
 					setRotation(frontPickupTrigger.node, 0, 0, 0)
@@ -1863,7 +1865,7 @@ function UniversalAutoload:onLoad(savegame)
 
 				table.insert(spec.triggers, rearAutoTrigger)
 				addTrigger(rearAutoTrigger.node, "ualAutoLoadingTrigger_Callback", self)
-				spec.rearTriggerId = rearAutoTrigger.node
+				spec.rearAutoTriggerId = rearAutoTrigger.node
 			end
 		end
 		
@@ -2250,10 +2252,10 @@ function UniversalAutoload:updateLengthAxis()
 					setTranslation(loadArea.startNode, loadArea.X, loadArea.Y, loadArea.Z+(loadArea.originalLength/2) + offsetStart)
 					setTranslation(spec.loadVolume.rootNode, spec.loadVolume.X, spec.loadVolume.Y, spec.loadVolume.Z + offsetRoot)
 					
-					if spec.rearTriggerId then
+					if spec.rearAutoTriggerId then
 						local depth = 0.05
 						local recess = spec.loadVolume.width/4
-						setTranslation(spec.rearTriggerId, 0, spec.loadVolume.height/2, recess-(spec.loadVolume.length/2)-depth)
+						setTranslation(spec.rearAutoTriggerId, 0, spec.loadVolume.height/2, recess-(spec.loadVolume.length/2)-depth)
 					end
 				end
 
@@ -2984,6 +2986,21 @@ function UniversalAutoload:isValidForLoading(object)
 		return false
 	end
 	
+	if spec.isCurtainTrailer then
+		local triggerId = spec.objectToTriggerId[object]
+		local tipState = self:getTipState()
+		local doorOpen = self:getIsUnfolded()
+		local rearAutoTrigger = triggerId == spec.rearAutoTriggerId
+		local rearPickupTrigger = triggerId == spec.rearPickupTriggerId
+		local curtainsOpen = not (tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING)
+		if rearPickupTrigger then
+			if not doorOpen then
+				if debugPallets then print(object.i3dFilename, "rear door is CLOSED") end
+				return false
+			end
+		end
+	end
+
 	--if debugPallets then print(object.i3dFilename, "Valid For Loading") end
 	return true
 end
@@ -3948,7 +3965,7 @@ function UniversalAutoload:getIsUnloadingKeyAllowed()
 	return true
 end
 --
-function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
+function UniversalAutoload:getIsLoadingVehicleAllowed()
 	local spec = self.spec_universalAutoload
 	if spec==nil or not spec.isAutoloadEnabled then
 		if debugVehicles then print(self:getFullName() .. ": UAL DISABLED - getIsLoadingVehicleAllowed") end
@@ -3974,29 +3991,6 @@ function UniversalAutoload:getIsLoadingVehicleAllowed(triggerId)
 	if spec.noLoadingIfUncovered and not self:ualGetIsCovered() then
 		-- print("noLoadingIfUncovered")
 		return false
-	end
-	
-	-- check that curtain trailers have an open curtain
-	if spec.isCurtainTrailer and triggerId then
-		-- print("CURTAIN TRAILER")
-		local tipState = self:getTipState()
-		local doorOpen = self:getIsUnfolded()
-		local rearTrigger = triggerId == spec.rearTriggerId
-		local curtainsOpen = not (tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING)
-
-		if spec.enableRearLoading and rearTrigger then
-			if not doorOpen then
-				-- print("NO LOADING IF DOOR CLOSED")
-				return false
-			end
-		end
-		
-		if spec.enableSideLoading and not rearTrigger then
-			if not curtainsOpen then
-				-- print("NO LOADING IF CURTAIN CLOSED")
-				return false
-			end
-		end
 	end
 
 	local node = UniversalAutoload.getObjectPositionNode( self )
@@ -4565,7 +4559,7 @@ function UniversalAutoload:ualLoadingTrigger_Callback(triggerId, otherActorId, o
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
-					UniversalAutoload.addAvailableObject(self, object)
+					UniversalAutoload.addAvailableObject(self, object, triggerId)
 				elseif onLeave then
 					UniversalAutoload.removeAvailableObject(self, object)
 				end
@@ -4604,7 +4598,7 @@ function UniversalAutoload:ualAutoLoadingTrigger_Callback(triggerId, otherActorI
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					if debugLoading then print(" AutoLoadingTrigger ENTER: " .. tostring(object.id)) end
-					UniversalAutoload.addAutoLoadingObject(self, object)
+					UniversalAutoload.addAutoLoadingObject(self, object, triggerId)
 				elseif onLeave then
 					if debugLoading then print(" AutoLoadingTrigger LEAVE: " .. tostring(object.id)) end
 					UniversalAutoload.removeAutoLoadingObject(self, object)
@@ -4658,11 +4652,12 @@ function UniversalAutoload:ualOnDeleteLoadedObject_Callback(object)
 	UniversalAutoload.removeLoadedObject(self, object)
 end
 --
-function UniversalAutoload:addAvailableObject(object)
+function UniversalAutoload:addAvailableObject(object, triggerId)
 	local spec = self.spec_universalAutoload
 	
 	if spec.availableObjects[object] == nil and spec.loadedObjects[object] == nil then
 		spec.availableObjects[object] = object
+		spec.objectToTriggerId[object] = triggerId
 		spec.totalAvailableCount = spec.totalAvailableCount + 1
 		if object.isRoundbale~=nil then
 			spec.availableBaleCount = spec.availableBaleCount + 1
@@ -4685,6 +4680,7 @@ function UniversalAutoload:removeAvailableObject(object)
 	
 	if spec.availableObjects[object] ~= nil then
 		spec.availableObjects[object] = nil
+		spec.objectToTriggerId[object] = nil
 		spec.totalAvailableCount = spec.totalAvailableCount - 1
 		if object.isRoundbale~=nil then
 			spec.availableBaleCount = spec.availableBaleCount - 1
@@ -4724,7 +4720,7 @@ function UniversalAutoload:ualOnDeleteAvailableObject_Callback(object)
 	UniversalAutoload.removeFromSortedObjectsToLoad(self, object)
 end
 --
-function UniversalAutoload:addAutoLoadingObject(object)
+function UniversalAutoload:addAutoLoadingObject(object, triggerId)
 	local spec = self.spec_universalAutoload
 	
 	if UniversalAutoload.isShippingContainer(object) then
@@ -4735,6 +4731,7 @@ function UniversalAutoload:addAutoLoadingObject(object)
 	if UniversalAutoload.isValidForManualLoading(object) or (object.isSplitShape and self.isLogTrailer) then
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
+			spec.objectToTriggerId[object] = triggerId
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 			end
@@ -4757,6 +4754,7 @@ function UniversalAutoload:removeAutoLoadingObject(object)
 	
 	if spec.autoLoadingObjects[object] ~= nil then
 		spec.autoLoadingObjects[object] = nil
+		spec.objectToTriggerId[object] = nil
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 		end
@@ -5230,6 +5228,10 @@ end
 --
 function UniversalAutoload:getPalletIsSelectedLoadside(object)
 	local spec = self.spec_universalAutoload
+	
+	if spec.isCurtainTrailer and spec.objectToTriggerId[object] == spec.rearPickupTriggerId then
+		return true
+	end
 	
 	if spec.currentLoadside == "both" then
 		return true

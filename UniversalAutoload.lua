@@ -2993,11 +2993,9 @@ function UniversalAutoload:isValidForLoading(object)
 		local rearAutoTrigger = triggerId == spec.rearAutoTriggerId
 		local rearPickupTrigger = triggerId == spec.rearPickupTriggerId
 		local curtainsOpen = not (tipState == Trailer.TIPSTATE_CLOSED or tipState == Trailer.TIPSTATE_CLOSING)
-		if rearPickupTrigger then
-			if not doorOpen then
-				if debugPallets then print(object.i3dFilename, "rear door is CLOSED") end
-				return false
-			end
+		if rearPickupTrigger and not doorOpen then
+			if debugPallets then print(object.i3dFilename, "rear door is CLOSED") end
+			return false
 		end
 	end
 
@@ -3927,7 +3925,7 @@ function UniversalAutoload:getIsLoadingKeyAllowed()
 		return
 	end
 
-	if spec.doPostLoadDelay or spec.validLoadCount == 0 or spec.currentLoadside == "none" then
+	if spec.doPostLoadDelay or spec.validLoadCount == 0 then
 		return false
 	end
 	if spec.baleCollectionMode then
@@ -4561,7 +4559,7 @@ function UniversalAutoload:ualLoadingTrigger_Callback(triggerId, otherActorId, o
 				if onEnter then
 					UniversalAutoload.addAvailableObject(self, object, triggerId)
 				elseif onLeave then
-					UniversalAutoload.removeAvailableObject(self, object)
+					UniversalAutoload.removeAvailableObject(self, object, triggerId)
 				end
 			end
 		end
@@ -4598,7 +4596,7 @@ function UniversalAutoload:ualAutoLoadingTrigger_Callback(triggerId, otherActorI
 			if UniversalAutoload.getIsValidObject(self, object) then
 				if onEnter then
 					if debugLoading then print(" AutoLoadingTrigger ENTER: " .. tostring(object.id)) end
-					UniversalAutoload.addAutoLoadingObject(self, object, triggerId)
+					UniversalAutoload.addAutoLoadingObject(self, object)
 				elseif onLeave then
 					if debugLoading then print(" AutoLoadingTrigger LEAVE: " .. tostring(object.id)) end
 					UniversalAutoload.removeAutoLoadingObject(self, object)
@@ -4655,6 +4653,10 @@ end
 function UniversalAutoload:addAvailableObject(object, triggerId)
 	local spec = self.spec_universalAutoload
 	
+	if spec.availableObjects[object] ~= nil and spec.objectToTriggerId[object] ~= triggerId then
+		UniversalAutoload.removeAvailableObject(self, object, spec.objectToTriggerId[object])
+	end
+	
 	if spec.availableObjects[object] == nil and spec.loadedObjects[object] == nil then
 		spec.availableObjects[object] = object
 		spec.objectToTriggerId[object] = triggerId
@@ -4674,11 +4676,11 @@ function UniversalAutoload:addAvailableObject(object, triggerId)
 	end
 end
 --
-function UniversalAutoload:removeAvailableObject(object)
+function UniversalAutoload:removeAvailableObject(object, triggerId)
 	local spec = self.spec_universalAutoload
 	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
 	
-	if spec.availableObjects[object] ~= nil then
+	if spec.availableObjects[object] ~= nil and (triggerId == nil or spec.objectToTriggerId[object] == triggerId) then
 		spec.availableObjects[object] = nil
 		spec.objectToTriggerId[object] = nil
 		spec.totalAvailableCount = spec.totalAvailableCount - 1
@@ -4720,7 +4722,7 @@ function UniversalAutoload:ualOnDeleteAvailableObject_Callback(object)
 	UniversalAutoload.removeFromSortedObjectsToLoad(self, object)
 end
 --
-function UniversalAutoload:addAutoLoadingObject(object, triggerId)
+function UniversalAutoload:addAutoLoadingObject(object)
 	local spec = self.spec_universalAutoload
 	
 	if UniversalAutoload.isShippingContainer(object) then
@@ -4731,7 +4733,6 @@ function UniversalAutoload:addAutoLoadingObject(object, triggerId)
 	if UniversalAutoload.isValidForManualLoading(object) or (object.isSplitShape and self.isLogTrailer) then
 		if spec.autoLoadingObjects[object] == nil and spec.loadedObjects[object] == nil then
 			spec.autoLoadingObjects[object] = object
-			spec.objectToTriggerId[object] = triggerId
 			if object.addDeleteListener ~= nil then
 				object:addDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 			end
@@ -4754,7 +4755,6 @@ function UniversalAutoload:removeAutoLoadingObject(object)
 	
 	if spec.autoLoadingObjects[object] ~= nil then
 		spec.autoLoadingObjects[object] = nil
-		spec.objectToTriggerId[object] = nil
 		if object.removeDeleteListener ~= nil then
 			object:removeDeleteListener(self, "ualOnDeleteAutoLoadingObject_Callback")
 		end

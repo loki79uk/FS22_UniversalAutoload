@@ -1782,6 +1782,9 @@ function UniversalAutoload:onLoad(savegame)
 				link(spec.loadVolume.rootNode, leftPickupTrigger.node)
 				
 				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+				if spec.frontUnloadingOnly or spec.rearUnloadingOnly or spec.isCurtainTrailer then
+					length = 0.85 * length
+				end
 
 				setRotation(leftPickupTrigger.node, 0, 0, 0)
 				setTranslation(leftPickupTrigger.node, 1.1*(width+spec.loadVolume.width)/2, 0, 0)
@@ -1798,6 +1801,9 @@ function UniversalAutoload:onLoad(savegame)
 				link(spec.loadVolume.rootNode, rightPickupTrigger.node)
 				
 				local width, height, length = 1.66*spec.loadVolume.width, 2*spec.loadVolume.height, spec.loadVolume.length+spec.loadVolume.width/2
+				if spec.frontUnloadingOnly or spec.rearUnloadingOnly or spec.isCurtainTrailer then
+					length = 0.85 * length
+				end
 
 				setRotation(rightPickupTrigger.node, 0, 0, 0)
 				setTranslation(rightPickupTrigger.node, -1.1*(width+spec.loadVolume.width)/2, 0, 0)
@@ -4535,7 +4541,7 @@ function UniversalAutoload:ualPlayerTrigger_Callback(triggerId, otherActorId, on
 					local spec = self.spec_universalAutoload
 					local playerId = player.userId
 					
-					if onEnter then
+					if onEnter or onStay then
 						UniversalAutoload.updatePlayerTriggerState(self, playerId, true)
 						UniversalAutoload.forceRaiseActive(self, true)
 					else
@@ -4556,7 +4562,7 @@ function UniversalAutoload:ualLoadingTrigger_Callback(triggerId, otherActorId, o
 		local object = UniversalAutoload.getNodeObject(otherActorId)
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
-				if onEnter then
+				if onEnter or onStay then
 					UniversalAutoload.addAvailableObject(self, object, triggerId)
 				elseif onLeave then
 					UniversalAutoload.removeAvailableObject(self, object, triggerId)
@@ -4572,7 +4578,7 @@ function UniversalAutoload:ualUnloadingTrigger_Callback(triggerId, otherActorId,
 		local object = UniversalAutoload.getNodeObject(otherActorId)
 		if object ~= nil then
 			if UniversalAutoload.getIsValidObject(self, object) then
-				if onEnter then
+				if onEnter or onStay then
 					if debugLoading then print(" UnloadingTrigger ENTER: " .. tostring(object.id)) end
 					UniversalAutoload.addLoadedObject(self, object)
 				elseif onLeave then
@@ -4658,6 +4664,7 @@ function UniversalAutoload:addAvailableObject(object, triggerId)
 	end
 	
 	if spec.availableObjects[object] == nil and spec.loadedObjects[object] == nil then
+		if debugLoading then print(tostring(object.id) .. " IN " .. tostring(triggerId)) end
 		spec.availableObjects[object] = object
 		spec.objectToTriggerId[object] = triggerId
 		spec.totalAvailableCount = spec.totalAvailableCount + 1
@@ -4681,6 +4688,7 @@ function UniversalAutoload:removeAvailableObject(object, triggerId)
 	local isActiveForLoading = spec.isLoading or spec.isUnloading or spec.doPostLoadDelay
 	
 	if spec.availableObjects[object] ~= nil and (triggerId == nil or spec.objectToTriggerId[object] == triggerId) then
+		if debugLoading then print(tostring(object.id) .. " OUT " .. tostring(triggerId)) end
 		spec.availableObjects[object] = nil
 		spec.objectToTriggerId[object] = nil
 		spec.totalAvailableCount = spec.totalAvailableCount - 1

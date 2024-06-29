@@ -260,10 +260,12 @@ function UniversalAutoloadManager.ImportVehicleConfigurations(xmlFilename, overw
 					end
 					
 					local isBaleTrailer = xmlFile:getValue(configKey..".options#isBaleTrailer", nil)
+					local isBaleProcessor = xmlFile:getValue(configKey..".options#isBaleProcessor", nil)
 					local horizontalLoading = xmlFile:getValue(configKey..".options#horizontalLoading", nil)
 					
-					config.horizontalLoading = horizontalLoading or isBaleTrailer or false
+					config.horizontalLoading = horizontalLoading or isBaleTrailer or isBaleProcessor or false
 					config.isBaleTrailer = isBaleTrailer or hasBaleHeight
+					config.isBaleProcessor = isBaleProcessor
 						
 					config.isBoxTrailer = xmlFile:getValue(configKey..".options#isBoxTrailer", false)
 					config.isLogTrailer = xmlFile:getValue(configKey..".options#isLogTrailer", false)

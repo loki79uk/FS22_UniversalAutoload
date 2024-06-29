@@ -128,6 +128,29 @@
             <loadingArea offset="0 1.9 -3.75" width="2.6" height="2.0" length="5.6"/>
             <options isLogTrailer="true"/>
         </vehicleConfiguration>
+		
+		
+        <!-- SUPPORTED STRAW BLOWERS AND TMR MIXERS -->
+		<vehicleConfiguration configFileName="data/vehicles/kuhn/ra142/ra142.xml">
+			<loadingArea offset="0 1.5 0" width="2.0" height="2.20" length="3.5"/>
+			<options isBaleProcessor="true"/>
+		</vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/kuhn/primor15070/primor15070.xml">
+			<loadingArea offset="0 1.1 -0.65" width="1.6" height="2.65" length="4.2"/>
+			<options isBaleProcessor="true"/>
+		</vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/siloking/tl4Premium/tl4Premium.xml">
+			<loadingArea offset="0 1.2 -1.2" width="1.75" height="2.65" length="3.75"/>
+			<options isBaleProcessor="true"/>
+		</vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/faresin/pf224/pf224.xml">
+			<loadingArea offset="0 1.2 0.1" width="2.0" height="2.65" length="4.0"/>
+			<options isBaleProcessor="true"/>
+		</vehicleConfiguration>
+		<vehicleConfiguration configFileName="data/vehicles/andersonGroup/proChop150/proChop150.xml">
+			<loadingArea offset="0 1.1 -0.55" width="1.6" height="1.65" length="1.8"/>
+			<options isBaleProcessor="true"/>
+		</vehicleConfiguration>
 
 
         <!-- SUPPORTED DLCs -->

@@ -2546,7 +2546,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 		
 		-- CHECK STATUS OF MIXER WAGONS
 		if spec.isBaleProcessor and self.spec_mixerWagon then
-			if self.spec_mixerWagon.baleTriggers then
+			if spec.loadedObjects ~= nil and self.spec_mixerWagon.baleTriggers then
 
 				local fillTypes = self.spec_mixerWagon.fillTypeToMixerWagonFillType
 				local totalFillLevel = self.spec_fillUnit.fillUnits[1].fillLevel

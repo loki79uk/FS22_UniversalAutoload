@@ -4725,7 +4725,9 @@ function UniversalAutoload:addLoadedObject(object)
 	local spec = self.spec_universalAutoload
 	
 	if spec.loadedObjects[object] == nil and (not UniversalAutoload.isValidForManualLoading(object)
-	or (object.isSplitShape and spec.autoLoadingObjects[object] == nil)) then
+	or (not spec.enableSideLoading and not spec.enableRearLoading)
+	or (object.isSplitShape and spec.autoLoadingObjects[object] == nil)
+	) then
 		spec.loadedObjects[object] = object
 		spec.objectToLoadingAreaIndex[object] = spec.currentLoadAreaIndex or 1
 		spec.totalUnloadCount = spec.totalUnloadCount + 1

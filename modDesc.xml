@@ -2,7 +2,7 @@
 <modDesc descVersion="80">
 
     <author>loki_79</author>
-    <version>1.5.2.2</version>
+    <version>1.6.0.0</version>
     
     <title>
         <en>Universal Autoload</en>
@@ -57,6 +57,11 @@ Configured for the following trailers:
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
 - Salek ANS-1900 (bale trailer)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Configured for the following vehicles:
 - Lizard Pickup 1986
@@ -78,6 +83,13 @@ Configured for the following Platinum DLC vehicles:
 - Schwarzmüller Low Loader 3A
 
 Changelog:
+v1.6.0.0
+- Added support for STRAW BLOWERS and TMR MIXER WAGONS
+- Fix logic for loading with doors and curtains open/closed
+- Fix issue with "Straw Harvest Pack" after update 1.1.0.0
+- Workaround for unloading to buildings with the object storage specialisation
+- Prevent manual loading while bale collection mode is active
+- Fix for issue where unload did not work correctly in conjunction with manual loading
 v1.5.1.0
 - Added support for pallets in the "Straw Harvest Pack"
 v1.5.0.0
@@ -174,6 +186,11 @@ Liste der kompatiblen Anhänger und Pritschen:
 - LODE KING Renown Drop Deck
 - Welger DK 115 (Ballenpritsche)
 - Salek ANS-1900 (Ballenpritsche)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Liste der kompatiblen Fahrzeuge:
 - Lizard Pickup 1986
@@ -185,6 +202,13 @@ Liste der kompatiblen Fahrzeuge:
 - Zug (Fahrzeugwagen)
 
 Changelog:
+v1.6.0.0
+- Unterstützung für Stroheinstreuer und Futtermischwagen hinzugefügt
+- Korrektur der Logik für das Laden mit offenen/geschlossenen Türen und Schiebeplanen
+- Behebung des Problems mit dem "Straw Harvest Pack" nach dem Update 1.1.0.0
+- Workaround für das Entladen in Gebäude mit der Objektlager-Spezialisierung
+- Verhindern des manuellen Ladens bei aktivem Ballensammelmodus
+- Behebung eines Problems, bei dem das Abladen in Verbindung mit dem manuellen Laden nicht korrekt funktionierte
 v1.5.1.0
 - Unterstützung für Paletten im "Straw Harvest Pack" hinzugefügt
 v1.5.0.0
@@ -281,6 +305,11 @@ Liste des remorques et plateaux compatibles :
 - LODE KING Renown Drop Deck
 - Welger DK 115 (bale trailer)
 - Salek ANS-1900 (bale trailer)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Liste des véhicules compatibles :
 - Lizard Pickup 1986
@@ -292,6 +321,13 @@ Liste des véhicules compatibles :
 - Train (transport de véhicules)
 
 Changelog:
+v1.6.0.0
+- Ajout de la prise en charge des pailleuses et des wagons mélangeurs TMR
+- Correction de la logique de chargement avec portes et rideaux ouverts/fermés
+- Correction d'un problème avec le "Straw Harvest Pack" après la mise à jour 1.1.0.0
+- Solution de contournement pour le déchargement dans des bâtiments avec la spécialisation stockage d'objets
+- Empêche le chargement manuel lorsque le mode de collecte des balles est actif
+- Correction d'un problème où le déchargement ne fonctionnait pas correctement en conjonction avec le chargement manuel
 v1.5.1.0
 - Ajout de la prise en charge des palettes dans le "Straw Harvest Pack"
 v1.5.0.0
@@ -388,6 +424,11 @@ Nakonfigurováno pro následující přívěsy:
 - LODE KING Renomovaný Drop Deck
 - Welger DK 115 (přívěs na balíky)
 - Salek ANS-1900 (přívěs na balíky)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Nakonfigurováno pro následující vozidla:
 - Lizard Pickup 1986
@@ -399,6 +440,12 @@ Nakonfigurováno pro následující vozidla:
 - Vlak (vagon vozidla)
 
 Changelog:
+- Přidána podpora pro vozy s fukary na slámu a míchací vozy TMR
+- Oprava logiky nakládání při otevřených/zavřených dveřích a závěsech.
+- Oprava problému s "Straw Harvest Pack" po aktualizaci 1.1.0.0
+- Obejití problému při vykládání do budov se specializací na skladování objektů.
+- Zabránění ručnímu nakládání při aktivním režimu sběru balíků
+- Oprava problému, kdy vykládání nefungovalo správně ve spojení s ručním nakládáním
 v1.5.1.0
 - Přidána podpora pro palety v balíčku "Straw Harvest Pack"
 v1.5.0.0
@@ -495,6 +542,11 @@ Skonfigurowany dla następujących przyczep:
 - Zrzut talii LODE KING Renown
 - Welger DK 115 (przyczepa do bel)
 - Salek ANS-1900 (przyczepa do bel)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Skonfigurowany dla następujących pojazdów:
 - Lizard Pickup 1986
@@ -506,6 +558,12 @@ Skonfigurowany dla następujących pojazdów:
 - Pociąg (przewóz pojazdów)
 
 Changelog:
+- Dodano obsługę dmuchaw do słomy i wagonów mieszalnikowych TMR.
+- Naprawiono logikę ładowania przy otwartych/zamkniętych drzwiach i zasłonach.
+- Naprawiono błąd związany z "Straw Harvest Pack" po aktualizacji 1.1.0.0.
+- Obejście dla rozładunku do budynków ze specjalizacją przechowywania obiektów.
+- Zapobieganie ręcznemu ładowaniu, gdy aktywny jest tryb zbierania bel.
+- Naprawiono błąd, w wyniku którego rozładunek nie działał poprawnie w połączeniu z ręcznym załadunkiem.
 v1.5.1.0
 - Dodano obsługę palet w pakiecie "Straw Harvest Pack"
 v1.5.0.0
@@ -603,6 +661,11 @@ Configurado para los siguientes tráilers:
 - LODE KING Renown Drop Deck
 - Welger DK 115 (carga de pacas)
 - Salek ANS-1900 (carga de pacas)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Configurado para los siguientes vehículos:
 - Lizard Pickup 1986
@@ -614,6 +677,12 @@ Configurado para los siguientes vehículos:
 - Tren (vagón de vehículos)
 
 Changelog:
+- Añadido soporte para empajadoras y vagones mezcladores TMR
+- Corrección de la lógica de carga con puertas y cortinas abiertas/cerradas
+- Corrección del problema con el "Straw Harvest Pack" tras la actualización 1.1.0.0
+- Solución para la descarga en edificios con la especialización de almacenamiento de objetos
+- Impedir la carga manual mientras está activo el modo de recogida de pacas
+- Corrección de un problema por el que la descarga no funcionaba correctamente junto con la carga manual
 v1.5.1.0
 - Añadido soporte para palets en el "Straw Harvest Pack"
 v1.5.0.0
@@ -711,6 +780,11 @@ Configurado para os seguintes trailers:
 - LODE KING Renown Drop Deck
 - Welger DK 115 (reboque de fardos)
 - Salek ANS-1900 (reboque de fardos)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Configurado para os seguintes veículos:
 - Lizard Pickup 1986
@@ -722,6 +796,12 @@ Configurado para os seguintes veículos:
 - Trem (vagão de veículo)
 
 Registro de alterações:
+- Adicionado suporte para sopradores de palha e vagões misturadores TMR
+- Correção da lógica de carregamento com portas e cortinas abertas/fechadas
+- Correção do problema com o “Straw Harvest Pack” após a atualização 1.1.0.0
+- Solução alternativa para descarregamento em edifícios com a especialização de armazenamento de objetos
+- Impedir o carregamento manual enquanto o modo de coleta de fardos estiver ativo
+- Correção do problema em que o descarregamento não funcionava corretamente em conjunto com o carregamento manual
 v1.5.1.0
 - Adicionado suporte para paletes no "Straw Harvest Pack"
 v1.5.0.0
@@ -818,6 +898,11 @@ Aşağıdaki römorklar için yapılandırılmıştır:
 - LODE KING Renown Drop Deck
 - Welger DK 115 (Balya Römorku)
 - Salek ANS-1900 (Balya Römorku)
+- KUHN RA 142
+- KUHN PRIMOR 15070 M
+- SILOKING TrailedLine 4.0 Premium 2218‑22
+- FARESIN PF 2.24 Plus
+- Anderson Group PRO-CHOP 150
 
 Aşağıdaki araçlar için yapılandırılmıştır:
 - Lizard Pickup 1986
@@ -829,6 +914,12 @@ Aşağıdaki araçlar için yapılandırılmıştır:
 - Tren (yalnızca araç vagonu)
 
 Changelog:
+- Saman üfleyiciler ve TMR karıştırıcı vagonları için destek eklendi
+- Kapılar ve perdeler açık/kapalıyken yükleme mantığını düzeltin
+- Güncelleme 1.1.0.0'dan sonra "Straw Harvest Pack" ile ilgili sorunu düzeltin
+- Nesne depolama uzmanlığı ile binalara boşaltma için geçici çözüm
+- Balya toplama modu aktifken manuel yüklemeyi önleyin
+- Manuel yükleme ile birlikte boşaltmanın düzgün çalışmaması sorunu düzeltildi
 v1.5.1.0
 - "Straw Harvest Pack" e paletler için destek eklendi
 v1.5.0.0
@@ -937,6 +1028,13 @@ v1.0.2.0
 - 火车(汽车车厢)
 
 更改日志
+v1.6.0.0
+- 添加了对秸秆吹风机和TMR搅拌车的支持
+- 修复门和窗帘打开/关闭时的装载逻辑
+- 修复更新 1.1.0.0 后 “秸秆收获包 ”的问题
+- 使用对象存储专用功能向建筑物卸载时的变通方法
+- 防止在包裹收集模式激活时手动装载
+- 修复卸载与手动装载时无法正常工作的问题
 v1.5.1.0
 - 在 "稻草收获包 "中添加了对托盘的支持
 v1.5.0.0

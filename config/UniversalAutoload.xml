@@ -16,6 +16,14 @@
 		<loadingArea offset="0.000 1.100 -0.300" width="3.00" height="2.20" length="7.50"/>
 		<options enableRearLoading="true" enableSideLoading="true" showDebug="true"/>
 	</vehicleConfiguration> -->
+	
+	<!-- *** Folding Straw Blower Example *** -->
+	<!-- <vehicleConfiguration configFileName="FS22_StrawBlower_Gyrax_P22700/Gyrax_P22700.xml"> -->
+		<!-- <loadingArea offset="0 1.35 -1.20" width="1.85" height="1.65" length="5.3" noLoadingIfUnfolded="true"/> -->
+		<!-- <loadingArea offset="2.4 1.35 -1.20" width="2.41" height="1.35" length="5.0" noLoadingIfFolded="true"/> -->
+		<!-- <loadingArea offset="-2.4 1.35 -1.20" width="2.41" height="1.35" length="5.0" noLoadingIfFolded="true"/> -->
+		<!-- <options isBaleProcessor="true"/> -->
+	<!-- </vehicleConfiguration> -->
 		
     </vehicleConfigurations>
 	

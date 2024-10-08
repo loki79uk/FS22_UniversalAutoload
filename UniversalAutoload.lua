@@ -152,6 +152,7 @@ function UniversalAutoload.initSpecialization()
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#layerHeight", "Total height of the currently loaded layers", 0)
 	schemaSavegame:register(XMLValueType.FLOAT, specKey.."#nextLayerHeight", "Height for the next layer (highest point in previous layer)", 0)
+	--schemaSavegame:register(XMLValueType.INT, specKey.."#layerCount", "Number of layers that are currently loaded", 0)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#loadAreaIndex", "Last used load area", 1)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#materialIndex", "Last used material type", 1)
 	schemaSavegame:register(XMLValueType.INT, specKey.."#containerIndex", "Last used container type", 1)
@@ -4505,6 +4506,7 @@ function UniversalAutoload.removeFromPhysics(object)
 	if object.isRoundbale~=nil or object.isSplitShape then
 		local node = UniversalAutoload.getObjectRootNode(object)
 		if node ~= nil then
+			--g_currentMission.activatableObjectsSystem:removeActivatable(object)
 			removeFromPhysics(node)
 		end
 	elseif object.isAddedToPhysics then
@@ -4518,6 +4520,7 @@ function UniversalAutoload:addToPhysics(object)
 		local node = UniversalAutoload.getObjectRootNode(object)
 		if node ~= nil then
 			addToPhysics(node)
+			--g_currentMission.activatableObjectsSystem:addActivatable(object)
 		end
 	else
 		object:addToPhysics()

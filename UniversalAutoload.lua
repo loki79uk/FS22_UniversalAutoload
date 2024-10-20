@@ -2581,7 +2581,7 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 				end
 				
 				for _, object in pairs(spec.loadedObjects) do
-					if object ~= nil and object.isRoundbale~=nil then
+					if object ~= nil and object.isRoundbale~=nil and object.dynamicMountObject == nil then
 						local hasBale = false
 						for _, baleTrigger in ipairs(self.spec_mixerWagon.baleTriggers) do
 							for bale, _ in pairs(baleTrigger.balesInTrigger) do

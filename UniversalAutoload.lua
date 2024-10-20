@@ -2564,13 +2564,15 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 					if totalCapacity > 0 then
 						local percentage = fillLevel / totalCapacity
 						if percentage > avgPercentage then
+							--print("BLOCK CAPACITY")
 							return false
 						end
 					end
 					
-					if totalFillLevel > 0 then
+					if totalFillLevel > 0 and fillLevel~=totalFillLevel then
 						local percentage = fillLevel / totalFillLevel
 						if percentage > 0.99*maxPercentage then
+							--print("BLOCK PERCENTAGE")
 							return false
 						end
 					end

@@ -2587,13 +2587,13 @@ function UniversalAutoload:onUpdate(dt, isActiveForInput, isActiveForInputIgnore
 							for bale, _ in pairs(baleTrigger.balesInTrigger) do
 								if object == bale then
 									hasBale = true
-									if not requiresMore(bale.fillType) then
+									if fillTypes[bale.fillType] and not requiresMore(bale.fillType) then
 										baleTrigger.balesInTrigger[bale] = nil
 									end
 								end
 							end
 						end
-						if hasBale == false and requiresMore(object.fillType) then
+						if hasBale == false and fillTypes[object.fillType] and requiresMore(object.fillType) then
 							local baleTrigger = self.spec_mixerWagon.baleTriggers[1]
 							baleTrigger.balesInTrigger[object] = baleTrigger.balesInTrigger[object] or 1
 						end

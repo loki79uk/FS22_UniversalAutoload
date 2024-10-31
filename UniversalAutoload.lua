@@ -5137,13 +5137,10 @@ function UniversalAutoload.getObjectNameFromI3d(i3d_path)
 	if i3d_path == nil then
 		return
 	end
-	
-	if g_modIsLoaded["FS22_TerraLifePlus"] then
-		for _, invalidObject in pairs(UniversalAutoload.INVALID_OBJECTS) do
-			if i3d_path:sub(-#invalidObject) == invalidObject then
-				-- print("BLOCKED " .. i3d_path)
-				return
-			end
+
+	for _, invalidObject in pairs(UniversalAutoload.INVALID_OBJECTS) do
+		if i3d_path:sub(-#invalidObject) == invalidObject then
+			return
 		end
 	end
 	
@@ -5250,6 +5247,14 @@ function UniversalAutoload.getContainerType(object)
 	local name = UniversalAutoload.getObjectNameFromI3d(object.i3dFilename)
 	if name ~= nil then
 		if object.customEnvironment ~= nil then
+			if UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH[name] then
+				for _, path in pairs(UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH[name]) do
+					if object.i3dFilename:find(path) then
+						name = path
+						break
+					end
+				end
+			end
 			name = object.customEnvironment..":"..name
 		end
 		

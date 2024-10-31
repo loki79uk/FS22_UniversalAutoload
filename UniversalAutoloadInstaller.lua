@@ -316,6 +316,7 @@ end
 
 -- IMPORT CONTAINER TYPE DEFINITIONS
 UniversalAutoload.LOADING_TYPE_CONFIGURATIONS = {}
+UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH = {}
 function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename, overwriteExisting)
 
 	local i = 0
@@ -342,7 +343,14 @@ function UniversalAutoloadManager.ImportContainerTypeConfigurations(xmlFilename,
 				local default = UniversalAutoload[containerType] or {}
 
 				local name = xmlFile:getValue(configKey.."#name")
-				local customEnvironment, _ = name:match( "^(.-):(.+)$" )
+				local customEnvironment, i3d_name = name:match( "^(.-):(.+)$" )
+
+				if i3d_name and i3d_name:find("/") and i3d_name:find(".i3d") then
+					local shortName = UniversalAutoload.getObjectNameFromI3d(i3d_name)
+					UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH[shortName] = UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH[shortName] or {}
+					table.insert(UniversalAutoload.LOADING_TYPE_CONFIG_BY_PATH[shortName], i3d_name)
+				end
+
 				if customEnvironment==nil or g_modIsLoaded[customEnvironment] then
 					local config = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
 					if config == nil or overwriteExisting then

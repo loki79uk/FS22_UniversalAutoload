@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<universalAutoload>
+
+    <containerConfigurations>
+
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:fillablePallet" containerType="EURO_PALLET" sizeY="0.800"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:pioneerPallet" containerType="EURO_PALLET" sizeX="1.350" sizeY="0.833" sizeZ="1.050"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:transportBoxes" containerType="ALL" sizeX="2.275" sizeY="1.005" sizeZ="1.125"/>
+		
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:deukaPallet" containerType="EURO_PALLET" sizeY="1.175"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:deukaBag" containerType="EURO_PALLET" sizeX="0.395" sizeY="0.15" sizeZ="0.825"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:seedBag" containerType="EURO_PALLET" sizeX="0.395" sizeY="0.14" sizeZ="0.825"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:dsvSeedBox" containerType="EURO_PALLET" sizeX="0.30" sizeY="0.40" sizeZ="0.175"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:dsvPallet" containerType="EURO_PALLET" sizeX="1.250" sizeY="1.170" sizeZ="0.850"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:dsvBoxPallet" containerType="EURO_PALLET" sizeX="1.250" sizeY="0.950" sizeZ="0.850"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:dsvCagePallet" containerType="EURO_PALLET" sizeX="1.250" sizeY="0.950" sizeZ="0.850"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:grainPallet" containerType="EURO_PALLET" sizeX="1.250" sizeY="1.170" sizeZ="0.850"/>		
+		
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:boxPallet" containerType="EURO_PALLET" sizeY="0.950"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:applePallet" containerType="EURO_PALLET" sizeY="1.115"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:beetRootSaladPallet" containerType="EURO_PALLET" sizeY="0.650"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:milkJugPallet" containerType="EURO_PALLET" sizeY="1.065" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:starchPallet" containerType="EURO_PALLET" sizeY="1.065"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:popcornPallet" containerType="EURO_PALLET" sizeY="1.065"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:onionRingsPallet" containerType="EURO_PALLET" sizeY="1.065"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:maltDrinkPallet" containerType="EURO_PALLET" sizeY="0.755"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:butterBoxGoatPallet" containerType="EURO_PALLET" sizeY="0.755"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:butterBoxHaymilkPallet" containerType="EURO_PALLET" sizeY="0.755"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:butterBoxSheepPallet" containerType="EURO_PALLET" sizeY="0.755"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:flourBoxRyePallet" containerType="EURO_PALLET" sizeY="0.875"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:bakeryBoxRyePallet" containerType="EURO_PALLET" sizeY="0.875"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:bakeryBoxSpeltPallet" containerType="EURO_PALLET" sizeY="0.875"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:cheeseGoatPallet" containerType="EURO_PALLET" sizeY="0.950"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:cheeseSheepPallet" containerType="EURO_PALLET" sizeY="0.950"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:cheeseHaymilkPallet" containerType="EURO_PALLET" sizeY="0.950"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:flourBoxSpeltPallet" containerType="EURO_PALLET" sizeY="1.115"/>		
+		
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80_pallet" containerType="EURO_PALLET" sizeY="1.920" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80CG_pallet" containerType="EURO_PALLET" sizeY="1.920" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80CL_pallet" containerType="EURO_PALLET" sizeY="1.920" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80Ng_pallet" containerType="EURO_PALLET" sizeY="1.920" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80_2Ng_pallet" containerType="EURO_PALLET" sizeY="1.820" neverStack="true"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale120Ng_pallet" containerType="EURO_PALLET" sizeX="1.250" sizeY="2.475" sizeZ="1.250" neverStack="true"/>
+
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:claas_squarebale180" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:claas_squarebale220" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:claas_squarebale240" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:krone_squarebale180" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:krone_squarebale220" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:krone_squarebale240" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:d1000_squarebale180" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:d1000_squarebale220" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:d1000_squarebale240" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:hesston_squarebale180" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:hesston_squarebale220" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/>
+        <containerConfiguration name="FS22_TerraLifePlus_Assets:hesston_squarebale240" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/>
+		
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80" containerType="BALE" sizeX="0.455" sizeY="0.355" sizeZ="0.80"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80_2Ng" containerType="BALE" sizeX="1.210" sizeY="0.500" sizeZ="0.90"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale120Ng" containerType="BALE" sizeX="1.210" sizeY="0.800" sizeZ="1.210"/> -->
+		
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80Ng" containerType="BALE" sizeX="0.455" sizeY="0.355" sizeZ="0.80"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80_2Ng" containerType="BALE" sizeX="1.210" sizeY="0.500" sizeZ="0.90"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale120Ng" containerType="BALE" sizeX="1.210" sizeY="0.800" sizeZ="1.210"/> -->
+
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale80" containerType="BALE" sizeX="0.455" sizeY="0.355" sizeZ="0.80"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale120" containerType="BALE" sizeX="0.455" sizeY="0.355" sizeZ="1.20"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale180" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="1.80"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale220" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.20"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:squarebale240" containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:roundbale80" containerType="BALE" sizeX="1.300" sizeY="0.80" sizeZ="1.300" isRoundbale="true" flipYZ="true"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:roundbale125" containerType="BALE" sizeX="1.300" sizeY="1.20" sizeZ="1.300" isRoundbale="true" flipYZ="true"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:roundbale150" containerType="BALE" sizeX="1.560" sizeY="1.20" sizeZ="1.560" isRoundbale="true" flipYZ="true"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:roundbale180" containerType="BALE" sizeX="1.835" sizeY="1.20" sizeZ="1.835" isRoundbale="true" flipYZ="true"/> -->
+        <!-- <containerConfiguration name="FS22_TerraLifePlus_Assets:packedSquareBale120"  containerType="BALE" sizeX="1.210" sizeY="0.910" sizeZ="2.40"/> -->
+
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\bigBagPallet\bigBagPallet.i3d  -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\deuka\bigBag\bigBag.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\dsv\bigBag\bigBag.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\grainBags\bigBag\grainBigBag.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\grainBags\euroPallets\grainBag.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\liquidTank\liquidTank.i3d -->
+  
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\Hartog\CompactGras\squarebale80.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\Hartog\CompactLuzerne\squarebale80.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\NATUREgreen\small\squarebale80.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\NATUREgreen\mid\squarebale80_2Ng.i3d -->
+  <!-- E:\FS22\mods\FS22_TerraLifePlus_Assets\NATUREgreen\large\squarebale120Ng.i3d -->
+
+    </containerConfigurations>
+    
+</universalAutoload>

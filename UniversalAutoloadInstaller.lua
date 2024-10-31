@@ -73,8 +73,10 @@ UniversalAutoload.VALID_OBJECTS = {
 	[3] = "treeSaplingPallet",
 	[4] = "pdlc_pumpsAndHosesPack.hosePallet",
 	[5] = "pdlc_forestryPack.woodContainer",
-	[6] = "pdlc_premiumExpansion.vegetablePallet",
-	[7] = "FS22_strawHarvestPack.pelletPallet"
+	[6] = "pdlc_premiumExpansion.vegetablePallet"
+}
+
+UniversalAutoload.INVALID_OBJECTS = {
 }
 
 -- DEFINE DEFAULTS FOR CONTAINER TYPES
@@ -1203,6 +1205,19 @@ function UniversalAutoloadManager:loadMap(name)
 			print("  UAL INSTALLED: "..vehicleName)
 		end
 	end
+	
+	if g_modIsLoaded["FS22_TerraLifePlus"] then
+		print("** FS22_TerraLifePlus is loaded **")
+		table.insert(UniversalAutoload.VALID_OBJECTS, "FS22_TerraLifePlus.transportBox")
+		table.insert(UniversalAutoload.VALID_OBJECTS, "FS22_TerraLifePlus.fillablePallet")
+		
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "Eifelheu/squarebale80.i3d")
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "Hartog/CompactGras/squarebale80.i3d")
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "Hartog/CompactLuzerne/squarebale80.i3d")
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "NATUREgreen/small/squarebale80.i3d")
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "NATUREgreen/mid/squarebale80_2Ng.i3d")
+		table.insert(UniversalAutoload.INVALID_OBJECTS, "NATUREgreen/large/squarebale120Ng.i3d")
+	end
 
 	if g_modIsLoaded["pdlc_forestryPack"] then
 		print("** Forestry Pack is loaded **")
@@ -1218,6 +1233,7 @@ function UniversalAutoloadManager:loadMap(name)
 	
 	if g_modIsLoaded['FS22_strawHarvestPack'] then
 		print("** Adding Pallets for FS22_strawHarvestPack **")
+		table.insert(UniversalAutoload.VALID_OBJECTS, "FS22_strawHarvestPack.pelletPallet")
 		local baseDirectory = _G['FS22_strawHarvestPack'].PlaceablePalletizer.MOD_DIRECTORY
 		local palletsToAdd = {
 			{name = 'MOLASSES', xmlPath = 'data/objects/pallets/canisterPallet/canisterPallet.xml'},
@@ -1272,6 +1288,13 @@ function UniversalAutoloadManager:loadMap(name)
 	print("IMPORT supported container configurations")
 	local ContainerTypeSettingsFile = Utils.getFilename("config/ContainerTypes.xml", UniversalAutoload.path)
 	UniversalAutoloadManager.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
+	
+	--TERRALIFE SETTINGS IF NEEDED
+	if g_modIsLoaded["FS22_TerraLifePlus"] then
+		print("IMPORT TerraLife container configurations")
+		local ContainerTypeSettingsFile = Utils.getFilename("config/TerraLifePlus.xml", UniversalAutoload.path)
+		UniversalAutoloadManager.ImportContainerTypeConfigurations(ContainerTypeSettingsFile)
+	end
 	
 	-- ADDITIONAL SETTINGS THIRD
 	print("ADDITIONAL containers")

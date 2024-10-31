@@ -4010,10 +4010,12 @@ function UniversalAutoload:getIsValidObject(object)
 	
 	if object.i3dFilename ~= nil then
 		local validObject = false
-		for _, name in pairs(UniversalAutoload.VALID_OBJECTS) do
-			if object.typeName == name then
-				validObject = true
-				break
+		if object.typeName and object.isRoundbale==nil then
+			for _, name in pairs(UniversalAutoload.VALID_OBJECTS) do
+				if object.typeName:lower() == name:lower() then
+					validObject = true
+					break
+				end
 			end
 		end
 		
@@ -5136,6 +5138,15 @@ function UniversalAutoload.getObjectNameFromI3d(i3d_path)
 		return
 	end
 	
+	if g_modIsLoaded["FS22_TerraLifePlus"] then
+		for _, invalidObject in pairs(UniversalAutoload.INVALID_OBJECTS) do
+			if i3d_path:sub(-#invalidObject) == invalidObject then
+				-- print("BLOCKED " .. i3d_path)
+				return
+			end
+		end
+	end
+	
 	local i3d_name = i3d_path:match("[^/]*.i3d$")
 	return i3d_name:sub(0, #i3d_name - 4)
 end
@@ -5237,32 +5248,34 @@ function UniversalAutoload.getContainerType(object)
 	end
 	
 	local name = UniversalAutoload.getObjectNameFromI3d(object.i3dFilename)
-	if object.customEnvironment ~= nil then
-		name = object.customEnvironment..":"..name
-	end
-	
-	local objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-	if objectType == nil then
-		if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
-			if object.xmlFilename and object.customEnvironment then
-				print("*** UNIVERSAL AUTOLOAD - importUnknownSpecFromExisting: ".. name.." ***")
-				UniversalAutoloadManager.importUnknownSpecFromExisting(object.xmlFilename, object.customEnvironment)
-				objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
-			end
-			if objectType == nil then
-				UniversalAutoload.UNKNOWN_TYPES[name] = true
-				print("*** UNIVERSAL AUTOLOAD - UNKNOWN OBJECT TYPE: ".. name.." ***")
+	if name ~= nil then
+		if object.customEnvironment ~= nil then
+			name = object.customEnvironment..":"..name
+		end
+		
+		local objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+		if objectType == nil then
+			if UniversalAutoload.UNKNOWN_TYPES[name] == nil then
+				if object.xmlFilename and object.customEnvironment then
+					print("*** UNIVERSAL AUTOLOAD - importUnknownSpecFromExisting: ".. name.." ***")
+					UniversalAutoloadManager.importUnknownSpecFromExisting(object.xmlFilename, object.customEnvironment)
+					objectType = UniversalAutoload.LOADING_TYPE_CONFIGURATIONS[name]
+				end
+				if objectType == nil then
+					UniversalAutoload.UNKNOWN_TYPES[name] = true
+					print("*** UNIVERSAL AUTOLOAD - UNKNOWN OBJECT TYPE: ".. name.." ***")
+				end
 			end
 		end
+		
+		if UniversalAutoload.isShippingContainer(object) then
+			objectType.sizeZ = object.spec_woodContainer.targetLength or 999
+			objectType.sizeZ = 1.015 * objectType.sizeZ
+			objectType.isContainer = true
+		end
+		
+		return objectType
 	end
-	
-	if UniversalAutoload.isShippingContainer(object) then
-		objectType.sizeZ = object.spec_woodContainer.targetLength or 999
-		objectType.sizeZ = 1.015 * objectType.sizeZ
-		objectType.isContainer = true
-	end
-	
-	return objectType
 end
 --
 function UniversalAutoload.getContainerDimensions(object)
